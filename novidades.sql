@@ -1,37 +1,50 @@
--- Novidades: mochila (inventário). Rode no Supabase.
--- ===================== ETAPA 9: mochila (inventário) =====================
-alter table public.moradores add column if not exists mochila jsonb not null default '{}'::jsonb;
+-- Novidades: cargo de prefeito. Rode no Supabase.
+-- ETAPA 10: prefeito da cidade =====================
+create table if not exists public.cidade (
+  id integer primary key default 1 check (id = 1),
+  prefeito uuid references public.moradores(id) on delete set null,
+  desde timestamptz
+);
+insert into public.cidade(id) values (1) on conflict (id) do nothing;
+alter table public.cidade enable row level security;
+drop policy if exists "ler cidade" on public.cidade;
+create policy "ler cidade" on public.cidade for select using (true);
+revoke insert, update, delete on public.cidade from anon, authenticated;
+update public.trabalhos set nivel_min = 1 where id = 'prefeito';
 
--- Compra e guarda na mochila (até 20 de cada)
-create or replace function public.guardar_item(p_item text) returns json
+-- Assume o cargo: só quem tem o maior nível entre os jogadores online
+create or replace function public.assumir_prefeitura() returns json
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores; i public.loja; q integer;
+declare m public.moradores; maior integer; atual public.moradores;
 begin
   m := _eu();
-  select * into i from loja where id = p_item and tipo = 'consumo';
-  if not found or p_item = 'rodada' then raise exception 'Isso não dá para guardar.'; end if;
-  if m.nivel < i.nivel_min then raise exception 'Libera no nível %.', i.nivel_min; end if;
-  if m.dinheiro < i.preco then raise exception 'Dinheiro insuficiente. Vai trabalhar! 😅'; end if;
-  q := coalesce((m.mochila->>p_item)::integer, 0);
-  if q >= 20 then raise exception 'Sua mochila já tem 20 desse item.'; end if;
-  update moradores set dinheiro = dinheiro - i.preco, mochila = mochila || jsonb_build_object(p_item, q + 1) where id = m.id;
-  return json_build_object('item', i.id, 'mochila', (select mochila from moradores where id = m.id), 'eu', _estado(m.id));
+  select max(nivel) into maior from moradores where not banido and visto_em > now() - interval '8 minutes';
+  if m.nivel < coalesce(maior, 0) then
+    raise exception 'Só quem tem o MAIOR nível online pode ser prefeito (agora é o nível %).', maior; end if;
+  select mo.* into atual from cidade c join moradores mo on mo.id = c.prefeito where c.id = 1;
+  if atual.id = m.id then raise exception 'Você já é o prefeito!'; end if;
+  if atual.id is not null and atual.visto_em > now() - interval '8 minutes' and atual.nivel >= m.nivel then
+    raise exception 'O prefeito % está online e tem nível igual ou maior.', atual.nome; end if;
+  update cidade set prefeito = m.id, desde = now() where id = 1;
+  return json_build_object('prefeito', m.id, 'nome', m.nome);
 end $$;
-grant execute on function public.guardar_item(text) to authenticated;
+grant execute on function public.assumir_prefeitura() to authenticated;
 
--- Usa um item da mochila (come ou bebe em qualquer lugar)
-create or replace function public.usar_item(p_item text) returns json
+create or replace function public.comecar_trabalho(p_trabalho text) returns json
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores; i public.loja; q integer; morreu boolean;
+declare m public.moradores; t public.trabalhos; morreu boolean;
 begin
   m := _eu();
-  q := coalesce((m.mochila->>p_item)::integer, 0);
-  if q <= 0 then raise exception 'Você não tem isso na mochila.'; end if;
-  select * into i from loja where id = p_item;
+  select * into t from trabalhos where id = p_trabalho;
+  if not found then raise exception 'Esse trabalho não existe.'; end if;
+  if m.nivel < t.nivel_min then raise exception 'Esse trabalho libera no nível %.', t.nivel_min; end if;
+  if t.id = 'prefeito' and coalesce((select prefeito from cidade where id = 1)::text, '') <> m.id::text then
+    raise exception 'Só o prefeito da cidade trabalha aqui. Vá na prefeitura e assuma o cargo!'; end if;
   morreu := _gastar_fome(m.id, 0);
-  update moradores set fome = least(100, fome + coalesce(i.fome, 0)),
-    mochila = case when q > 1 then mochila || jsonb_build_object(p_item, q - 1) else mochila - p_item end
-  where id = m.id;
-  return json_build_object('item', p_item, 'mochila', (select mochila from moradores where id = m.id), 'morreu', morreu, 'eu', _estado(m.id));
+  if morreu then return json_build_object('morreu', true, 'eu', _estado(m.id)); end if;
+  if (select fome from moradores where id = m.id) < 15 then
+    raise exception 'Você está fraco de fome. Coma alguma coisa antes de trabalhar.';
+  end if;
+  update moradores set trabalho = t.id, trabalho_inicio = now() where id = m.id;
+  return json_build_object('trabalho', t.id, 'duracao', t.duracao, 'salario', t.salario, 'morreu', false, 'eu', _estado(m.id));
 end $$;
-grant execute on function public.usar_item(text) to authenticated;
