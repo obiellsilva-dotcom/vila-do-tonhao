@@ -1276,7 +1276,8 @@ function makeResident(d){
   lx:rand(-6,6),ly:rand(-5,5),spd:rand(40,54),seat:null,sit:false,back:false,spent:0,fiado:d.tipo==='juvenal'?847:0,bub:null,beer:false,fish:false,
   phase:'',nextOrder:0,blinkT:rand(1,4),waitSince:0,onArrive:null};
 }
-BASE.forEach(d=>residents.push(makeResident(d)));
+const NPC_FICAM=['Seu Juvenal','Dona Cida','Doutor Rodrigo','Zé da Kombi','Marquinhos do Pagode','Lurdinha','Careca'];
+BASE.filter(d=>NPC_FICAM.includes(d.nome)).forEach(d=>residents.push(makeResident(d)));
 const tonhao={nome:'Tonhão',tipo:'tonhao',v:vis([2,0,0,4,0,0,2]),x:T(TON_HOME[0]),y:T(TON_HOME[1]),bub:null,dir:1,sleep:false,path:[],state:'idle',job:null,ph:0};
 const chopp={x:T(26.1),y:T(27.55),home:[T(26.1),T(27.55)],tx:null,ty:null,sleep:true,ph:0,dir:-1,until:0};
 const ball={x:T(69),y:T(22),tx:T(69),ty:T(22),z:0};
@@ -3705,7 +3706,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116e';
+const VERSAO_JOGO='v20261116f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
