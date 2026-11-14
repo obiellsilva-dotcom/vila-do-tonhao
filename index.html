@@ -185,7 +185,7 @@ body:has(#zoom:not(.min)) #joy{display:none!important}
 .field label{font-size:13px;color:var(--muted)}.field select{width:100%}
 #sinCv{width:100%;height:auto;aspect-ratio:640/340;display:block;border-radius:14px;touch-action:none;background:#5a3418}
 #mSinuca{padding:6px}#mSinuca .box{width:min(980px,100%);padding:10px}#mSinuca h2{font-size:18px;margin:0 0 2px}
-@media (orientation:portrait) and (max-width:600px){#mSinuca .box{width:100vw;height:100vh;max-height:100vh;border-radius:0;display:flex;flex-direction:column;justify-content:center}#sinCv{width:min(100vw - 24px,(100vh - 190px)*.531);margin:0 auto}}
+
 .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.12);margin-left:4px}
 @media (max-width:480px){#q{width:104px!important}#places{max-width:138px}#rankBtn{padding:7px 10px}.lvl i{width:34px}#top .row:first-child{flex-wrap:nowrap}.brand{font-size:14px;padding:6px 9px;white-space:nowrap}#q{width:130px}.pill{font-size:12.5px;padding:6px 8px;white-space:nowrap}.pill.small{font-size:11.5px;white-space:normal}.prov{flex-direction:column;align-items:center}.prov canvas{width:120px;height:152px}.opts{width:100%}.opt .lab{width:96px}}
 body:has(#tarefa:not(.hidden)) #joy{display:none}
@@ -3577,7 +3577,7 @@ function fimSinuca(){
   .catch(e=>{$('sinMsg').textContent=e.message})
 }
 function desenharSinuca(){
- const cv=$('sinCv'),g=cv.getContext('2d'),VT=innerWidth<innerHeight;if(cv.dataset.vt!==String(VT)){cv.dataset.vt=VT;cv.width=VT?680:1280;cv.height=VT?1280:680;cv.style.aspectRatio=VT?'340/640':'640/340'}if(VT){const sc=cv.width/SH;g.setTransform(0,sc,-sc,0,cv.width,0)}else g.setTransform(cv.width/SW,0,0,cv.height/SH,0,0);
+ const cv=$('sinCv'),g=cv.getContext('2d'),VT=false;if(cv.dataset.vt!==String(VT)){cv.dataset.vt=VT;cv.width=VT?680:1280;cv.height=VT?1280:680;cv.style.aspectRatio=VT?'340/640':'640/340'}if(VT){const sc=cv.width/SH;g.setTransform(0,sc,-sc,0,cv.width,0)}else g.setTransform(cv.width/SW,0,0,cv.height/SH,0,0);
  g.fillStyle='#5a3418';rr(g,0,0,SW,SH,26);g.fill();g.fillStyle='#6e4220';rr(g,8,8,SW-16,SH-16,20);g.fill();
  g.fillStyle='#1f8a4c';g.fillRect(SL-8,STP-8,SR-SL+16,SBT-STP+16);g.fillStyle='rgba(0,0,0,.12)';g.fillRect(SL-8,STP-8,SR-SL+16,6);
  g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=1.5;g.beginPath();g.moveTo(SL+(SR-SL)*.25,STP);g.lineTo(SL+(SR-SL)*.25,SBT);g.stroke();
@@ -3716,7 +3716,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116a';
+const VERSAO_JOGO='v20261116b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
