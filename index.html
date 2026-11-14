@@ -3129,7 +3129,8 @@ $('workStop').onclick=()=>{if(emCasa){sairCasa();return}if(!trabalho)return;cons
 /* ----- salas online (Supabase Realtime) ----- */
 async function conectar(){
  if(!ONLINE){refreshHud();return}
- if(espiaCh){sb.removeChannel(espiaCh);espiaCh=null;others.clear()}
+ if(espiaCh){const e=espiaCh;espiaCh=null;others.clear();try{await sb.removeChannel(e)}catch(_){}await new Promise(r=>setTimeout(r,400))}
+ for(const c of sb.getChannels())if(/^realtime:sala-/.test(c.topic)){try{await sb.removeChannel(c)}catch(_){}}
  for(let n=1;n<=60;n++){
   let ativo=false;
   const ch=sb.channel('sala-'+n,{config:{presence:{key:eu.id},broadcast:{self:false}}});
@@ -3144,7 +3145,7 @@ async function conectar(){
    setTimeout(()=>fim(null),12000)});
   if(cheia===null){sb.removeChannel(ch);toast('Não consegui falar com o servidor. Tentando de novo…',3000);setTimeout(conectar,6000);return}
   if(cheia){sb.removeChannel(ch);continue}
-  ativo=true;canal=ch;sala=n;
+  ativo=true;canal=ch;sala=n;ch.on('system',{},()=>{});
   try{await ch.track({t:Date.now()})}catch(e){}
   syncPresence();sendPos(true);refreshHud();log(`🌐 Você entrou na sala ${n} da cidade`);
   api.chat(n).then(rows=>rows.forEach(r=>onChat(r,true))).catch(()=>{});
@@ -3156,6 +3157,10 @@ let espiaCh=null;
 function espiar(){if(eu||!ONLINE||canal||espiaCh)return;const ch=sb.channel('sala-1',{config:{broadcast:{self:false}}});espiaCh=ch;
  ch.on('presence',{event:'sync'},()=>{if(espiaCh===ch&&!canal)syncPresence()}).on('broadcast',{event:'pos'},({payload})=>{if(espiaCh===ch&&!canal)onPos(payload)}).subscribe()}
 setTimeout(espiar,800);
+// vigia: se eu não apareço na sala (canal caiu), entra de novo
+setInterval(async()=>{if(!ONLINE||!eu||!canal)return;try{const st=canal.state,eu_on=!!canal.presenceState()[eu.id];
+ if(st!=='joined'){const c=canal;canal=null;try{await sb.removeChannel(c)}catch(_){}conectar();return}
+ if(!eu_on)await canal.track({t:Date.now()})}catch(_){}},20000);
 function syncPresence(){
  const chP=canal||espiaCh;if(!chP)return;const ids=Object.keys(chP.presenceState()).filter(id=>!eu||id!==eu.id);
  for(const id of ids)if(!others.has(id))others.set(id,{id,nome:'…',nivel:1,v:visFromName(id),x:0,y:0,tx:null,ty:null,dir:1,ph:0,moving:false,hidden:true,seen:false,isPlayer:true,remote:true,bub:null,blinkT:2,driving:null,beer:false,work:0,novo:true});
@@ -3712,7 +3717,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116j';
+const VERSAO_JOGO='v20261116k';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
