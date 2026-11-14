@@ -235,7 +235,7 @@ body:has(#tarefa:not(.hidden)) #joy{display:none}
   <div class="row"><div class="pill money hidden" id="money">💰 R$ 0</div><div class="pill lvl hidden" id="lvl"><span id="lvlTxt">⭐ Nv 1</span><i><b id="lvlBar"></b></i></div><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill small hidden" id="salaPill"></div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
 </div>
 
-<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zdanca" class="hidden" data-l="Danças e emojis" aria-label="danças">💃</button><button id="zfotos" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Meu perfil" aria-label="meu perfil">👤</button><button id="zme" class="hidden" data-l="Ir até mim" aria-label="ir até mim">📍</button><button id="zin" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
+<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" class="hidden" data-l="Danças e emojis" aria-label="danças">💃</button><button id="zfotos" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Meu perfil" aria-label="meu perfil">👤</button><button id="zme" class="hidden" data-l="Ir até mim" aria-label="ir até mim">📍</button><button id="zin" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
 <div id="cfg" class="hidden"><div class="cfgbox"><button class="x" id="cfgX">×</button><h3>⚙️ Configurações</h3>
 <label>🎵 Volume da música <b id="cfgMusV"></b><input type="range" id="cfgMus" min="0" max="100"></label>
 <label>🔊 Volume dos efeitos <b id="cfgSfxV"></b><input type="range" id="cfgSfx" min="0" max="100"></label>
@@ -2677,6 +2677,8 @@ const api=ONLINE?(()=>{
   tarefa:()=>rpc('tarefa_feita'),
   largar:()=>rpc('largar_trabalho'),
   comprar:i=>rpc('comprar',{p_item:i}),
+  guardar:i=>rpc('guardar_item',{p_item:i}),
+  usar:i=>rpc('usar_item',{p_item:i}),
   venderPeixes:()=>rpc('vender_peixes'),
   comerFruta:a=>rpc('comer_fruta',{p_arvore:a}),
   comprarCarro:c=>rpc('comprar_carro',{p_carro:c}),
@@ -2715,6 +2717,8 @@ const api=ONLINE?(()=>{
    let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(2,Math.round(J.xp/6*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
+  async guardar(i){const m=lme(),it=LOJA[i];if(m.dinheiro<it.preco)fail('Dinheiro insuficiente. Vai trabalhar! 😅');m.mochila=m.mochila||{};if((m.mochila[i]||0)>=20)fail('Sua mochila já tem 20 desse item.');m.dinheiro-=it.preco;m.mochila[i]=(m.mochila[i]||0)+1;lsave();return{item:i,mochila:m.mochila,eu:lest()}},
+  async usar(i){const m=lme(),it=LOJA[i];m.mochila=m.mochila||{};if(!(m.mochila[i]>0))fail('Você não tem isso na mochila.');m.mochila[i]--;if(!m.mochila[i])delete m.mochila[i];m.fome=Math.min(100,m.fome+(it.fome||0));lsave();return{item:i,mochila:m.mochila,eu:lest()}},
   async comprar(i){const m=lme(),it=LOJA[i];if(m.dinheiro<it.preco)fail('Dinheiro insuficiente. Vai trabalhar! 😅');const morreu=lfome(m,0);m.dinheiro-=it.preco;m.fome=Math.min(100,m.fome+it.fome);lsave();return{item:i,preco:it.preco,morreu,eu:lest()}},
   async venderPeixes(){const m=lme();if(m.peixes<1)fail('Você não tem peixe para vender.');const ganho=m.peixes*PRECO_PEIXE,vendidos=m.peixes;m.dinheiro+=ganho;m.peixes=0;lsave();return{ganho,vendidos,eu:lest()}},
   async comerFruta(a){const m=lme();L.frutas=L.frutas||{};const ult=Math.max(0,...Object.values(L.frutas));if(Date.now()-ult<20e3)fail('Calma, ainda está mastigando a última fruta.');
@@ -2769,12 +2773,12 @@ function morreu(){
 async function aplicarPerfil(m,anunciar){
  const novo=!eu;
  if(novo)eu=makePlayer(m.id,m.nome,decode(m.visual)||randomVis());
- eu.nome=m.nome;eu.v=decode(m.visual)||eu.v;aplicarEstado(m);eu.carCores=m.carro_cores||eu.carCores||{};
+ eu.nome=m.nome;eu.v=decode(m.visual)||eu.v;aplicarEstado(m);eu.mochila=m.mochila||eu.mochila||{};eu.carCores=m.carro_cores||eu.carCores||{};
  if(m.casa_id)casasInfo.set(m.casa_id,{dono:m.id,nome:m.nome});
  if(!novo){refreshHud();return}
  if(m.casa_id){const h=houses[m.casa_id-1];eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE}else{eu.x=T(rand(19,29));eu.y=T(29.5)}
  follow=eu;cam.x=eu.x;cam.y=eu.y;cam.z=Math.max(cam.z,1.5);
- ['chatbar','money','salaPill','zme','zperfil','lvl','fomeP','zloja','zjobs','zdanca','zfotos'].forEach(id=>$(id).classList.remove('hidden'));if(matchMedia('(pointer: coarse)').matches)$('joy').classList.remove('hidden');$('join').classList.add('hidden');$('barstat').classList.add('hidden');document.body.classList.add('jogando');
+ ['chatbar','money','salaPill','zme','zperfil','lvl','fomeP','zloja','zjobs','zdanca','zfotos','zcarro','zmochila'].forEach(id=>$(id).classList.remove('hidden'));if(matchMedia('(pointer: coarse)').matches)$('joy').classList.remove('hidden');$('join').classList.add('hidden');$('barstat').classList.add('hidden');document.body.classList.add('jogando');
  await carregarVagas();for(const [id,i] of vagasInfo)if(i.morador===eu.id)eu.parked=id;
  if(m.trabalho&&JOBS[m.trabalho]){const J=JOBS[m.trabalho];iniciarTurno(m.trabalho,Date.parse(m.trabalho_inicio),J.duracao)}
  conectar();if(souVip())later(5,()=>emitEv('chegou',{}));
@@ -2931,7 +2935,7 @@ function abrirLugar(b){
  }
  const comida=Object.entries(LOJA).filter(([,it])=>it.local===k);
  if(comida.length){sub=k==='bar'?'O Tonhão te olha do balcão. O que vai ser?':k==='padaria'?'Cheirinho de pão saindo do forno.':'Tem de tudo um pouco.';
-  comida.forEach(([id,it])=>botao(box,`${ICON[id]||'🍽️'} ${cap(it.nome)}: ${money(it.preco)}`+(it.fome?` · +${it.fome} 🍗`:''),()=>comprarItem(id),{off:eu.dinheiro<it.preco}))}
+  comida.forEach(([id,it])=>{const l=document.createElement('div');l.style.cssText='display:flex;gap:6px;align-items:stretch';box.appendChild(l);const b1=botao(l,`${ICON[id]||'🍽️'} ${cap(it.nome)}: ${money(it.preco)}`+(it.fome?` · +${it.fome} 🍗`:''),()=>comprarItem(id),{off:eu.dinheiro<it.preco});b1.style.flex='1';if(id!=='rodada'){const b2=botao(l,'🎒',()=>guardarItem(id),{ghost:true,off:eu.dinheiro<it.preco});b2.title='Guardar na mochila';b2.style.flex='none'}})}
  if(k==='mercadinho'&&eu.peixes>0)botao(box,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
  if(k==='concessionaria'){sub='Comprou, saiu dirigindo. Para descer ou dirigir de novo, toque em você.';
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
@@ -3706,7 +3710,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116g';
+const VERSAO_JOGO='v20261116h';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3753,6 +3757,21 @@ $('paDescer').onclick=sairCarona;
 setInterval(()=>{if(!eu)return;
  if(eu.passa){const o=others.get(eu.passa);if(!o||!o.driving||!o.caronaLib){sairCarona();return}eu.x=o.x;eu.y=o.y}
  $('carBtns').classList.toggle('hidden',!(eu.driving&&!trabalho));$('paBtns').classList.toggle('hidden',!eu.passa)},120);
+
+/* ----- mochila e atalho do carro ----- */
+function guardarItem(id){const it=LOJA[id];acao(async()=>{const r=tratar(await api.guardar(id));eu.mochila=r.mochila||{};Som.play('compra');floatText(eu.x,eu.y-30,'-'+money(it.preco)+'  🎒','#ffd23f');toast('🎒 Guardado na mochila: '+it.nome,2200)})}
+function abrirMochila(){if(!eu)return;const m=eu.mochila||{},ks=Object.keys(m).filter(k=>m[k]>0&&LOJA[k]);
+ if(!ks.length){confirmar('🎒 Mochila','Sua mochila está vazia.<br><small>Nos lugares que vendem comida e bebida, toque no <b>🎒</b> ao lado do item para guardar e usar depois, em qualquer lugar.</small>',null,[['OK',()=>{}]]);return}
+ confirmar('🎒 Mochila','Toque em um item para usar agora:',null,ks.map(k=>[(ICON[k]||'🍽️')+' '+cap(LOJA[k].nome)+' ×'+m[k]+(LOJA[k].fome?' · +'+LOJA[k].fome+'🍗':''),()=>usarItem(k)]))}
+function usarItem(id){const it=LOJA[id];acao(async()=>{const r=tratar(await api.usar(id));eu.mochila=r.mochila||{};
+ const goles={cerveja:1,pinga:1.5}[id]||0;Som.play(goles?'beber':'comer');if(goles){const a=eu.alcool||0;eu.alcool=a+goles;eu.beer=true;if(a<=2&&eu.alcool>2)later(1.2,()=>{toast('🥴 Opa, bateu! Você está bêbado(a). Vai passando com o tempo…',4500);Som.play('soluco')})}
+ if(it.fome)floatText(eu.x,eu.y-30,'+'+it.fome+'🍗','#9dff7a');say(eu,(ICON[id]||'')+' '+cap(it.nome)+'!',3,true);emitEv('item',{item:id})})}
+$('zmochila').onclick=abrirMochila;
+$('zcarro').onclick=()=>{if(!eu)return;if(!eu.carros.length){confirmar('🚗 Meu carro','Você ainda não tem carro. Compre um na <b>Concessionária</b>!',null,[['📍 Ir até lá',()=>irAoLugar('concessionaria')],['OK',()=>{}]]);return}
+ if(eu.driving){estacionarAqui();return}if(trabalho){toast('Termine o trabalho primeiro.');return}
+ if(eu.carros.length===1){pegarCarro();return}
+ confirmar('🚗 Qual carro?','Escolha o carro:',null,eu.carros.filter(c=>CARS[c]).map(c=>[(c===eu.carro?'✅ ':'🚗 ')+CARS[c].nome,()=>{if(eu.parkLoc&&eu.parkLoc.c!==c){parados.delete(eu.id);eu.parkLoc=null;emitEv('unpark',{})}eu.carro=c;api.usarCarro(c).catch(()=>{});pegarCarro()}]))};
+setInterval(()=>{if(eu)$('zcarro').setAttribute('data-l',eu.driving?'Descer do carro':'Pegar meu carro')},500);
 /* ----- provador / entrar ----- */
 function abrirProvador(){$('enter').textContent='Entrar na cidade';renderProv();$('mProv').classList.remove('hidden');setTimeout(()=>$('provName').focus(),50)}
 let contaModo='nova',contaDepois=null;
