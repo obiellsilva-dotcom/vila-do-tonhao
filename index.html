@@ -184,7 +184,8 @@ body:has(#zoom:not(.min)) #joy{display:none!important}
 .foto-g img{width:100%;height:100%;object-fit:cover}
 .field label{font-size:13px;color:var(--muted)}.field select{width:100%}
 #sinCv{width:100%;height:auto;aspect-ratio:640/340;display:block;border-radius:14px;touch-action:none;background:#5a3418}
-#mSinuca .box{width:min(680px,100%)}
+#mSinuca{padding:6px}#mSinuca .box{width:min(980px,100%);padding:10px}#mSinuca h2{font-size:18px;margin:0 0 2px}
+@media (orientation:portrait) and (max-width:600px){#mSinuca .box{width:100vw;height:100vh;max-height:100vh;border-radius:0;display:flex;flex-direction:column;justify-content:center}#sinCv{width:min(100vw - 24px,(100vh - 190px)*.531);margin:0 auto}}
 .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.12);margin-left:4px}
 @media (max-width:480px){#q{width:104px!important}#places{max-width:138px}#rankBtn{padding:7px 10px}.lvl i{width:34px}#top .row:first-child{flex-wrap:nowrap}.brand{font-size:14px;padding:6px 9px;white-space:nowrap}#q{width:130px}.pill{font-size:12.5px;padding:6px 8px;white-space:nowrap}.pill.small{font-size:11.5px;white-space:normal}.prov{flex-direction:column;align-items:center}.prov canvas{width:120px;height:152px}.opts{width:100%}.opt .lab{width:96px}}
 body:has(#tarefa:not(.hidden)) #joy{display:none}
@@ -1572,7 +1573,7 @@ function balcaoIso(c,x0,x1,i){const y0=T(19.25),y1=T(19.95);sombraChao(c,x0,y0,x
  const top=(x,y)=>{const q=isoP(x,y);return[q[0],q[1]-25]};
  if(i===1||i===4||i===8){const q=top(x0+14,(y0+y1)/2);c.fillStyle='rgba(255,255,255,.45)';c.fillRect(q[0]-3,q[1]-11,6,11);c.fillStyle='#e9a92a';c.fillRect(q[0]-2.5,q[1]-9,5,9);c.fillStyle='#fffaf0';c.beginPath();c.ellipse(q[0],q[1]-10,3,1.5,0,0,7);c.fill()}
  if(i===6){const q=top(x0+14,(y0+y1)/2);c.fillStyle='#2f7d3a';c.fillRect(q[0]-2.5,q[1]-12,5,12);c.fillRect(q[0]-1,q[1]-17,2,5);c.fillStyle='#f4f1e8';c.fillRect(q[0]-2.5,q[1]-8,5,3)}
- if(i===9){isoBox(c,x0+6,y0+2,x0+22,y1-2,25,36,'#8a8f96');const q=top(x0+14,y1-2);c.fillStyle='#1d3b2a';c.fillRect(q[0]-6,q[1]-17,10,4);c.fillStyle='#7dff9a';c.fillRect(q[0]-5,q[1]-16,6,2)}
+ if(i===8){isoBox(c,x0+6,y0+2,x0+22,y1-2,25,36,'#8a8f96');const q=top(x0+14,y1-2);c.fillStyle='#1d3b2a';c.fillRect(q[0]-6,q[1]-17,10,4);c.fillStyle='#7dff9a';c.fillRect(q[0]-5,q[1]-16,6,2)}
  if(i===0){const q=top(x0+12,y1);c.fillStyle='#fff';c.fillRect(q[0]-8,q[1]-6,16,7);c.fillStyle='#c0392b';c.font='700 5px Fredoka, sans-serif';c.fillText('FIADO',q[0]-7,q[1]-1)}}
 function bancoIso(c,X,Y){sombraChao(c,X,Y+4,X+40,Y+14);isoBox(c,X+2,Y+6,X+5,Y+14,0,7,'#5a3418');isoBox(c,X+35,Y+6,X+38,Y+14,0,7,'#5a3418');isoBox(c,X,Y+4,X+40,Y+6,7,18,'#6d4426');isoBox(c,X,Y+6,X+40,Y+14,7,9,'#8b5a2b')}
 // arte guardada em imagem (fachadas e bar), para desenhar em fatias
@@ -2332,9 +2333,9 @@ function drawCena(){
    list.push({x:cx,y:cy,k:cx+cy-1,cam:1,f:()=>cadeiraIso(ctx,cx,cy,dx,dy,col,perto?1:0)});if(perto)list.push({x:cx,y:cy,k:cx+cy+9,cam:1,f:()=>cadeiraIso(ctx,cx,cy,dx,dy,col,2)})}
   {const dB=eu?(eu.x>T(17)&&eu.x<T(31)&&eu.y>T(16)&&eu.y<T(27.2)):(cam.x>T(17)&&cam.x<T(31)&&cam.y>T(16)&&cam.y<T(27.2)),HP=60,pc='#c9a27a',jan=()=>darkness()>.3?'#ffd98a':'#9fd3f2';
    barFade+=((dB?.14:1)-barFade)*.15;const al=barFade;
-   for(let i=18;i<26;i++)list.push({x:T(17),y:T(i+.5),k:T(17)+T(i+.5)-20,cam:1,f:()=>{isoBox(ctx,T(17)-4,T(i),T(17)+2,T(i+1),0,HP,pc);if(i%3===0){const a=isoP(T(17)+2,T(i+.2)),b2=isoP(T(17)+2,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}}});
-   for(let i=18;i<26;i++)list.push({x:T(31),y:T(i+.5),k:T(31)+T(i+.5)+2,cam:1,f:()=>{ctx.globalAlpha=al;isoBox(ctx,T(31)-3,T(i),T(31)+3,T(i+1),0,HP,pc);if(i%3===1){const a=isoP(T(31)+3,T(i+.2)),b2=isoP(T(31)+3,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}ctx.globalAlpha=1}});
-   for(let i=17;i<31;i++){const porta=i===23||i===24;list.push({x:T(i+.5),y:T(26),k:T(i+.5)+T(26)+4,cam:1,f:()=>{ctx.globalAlpha=al;const x0=T(i),x1=T(i+1),y0=T(26),y1=T(26)+6;
+   for(let i=18;i<26;i++)list.push({x:T(18),y:T(i+.5),k:T(18)+T(i+.5)-20,cam:1,f:()=>{isoBox(ctx,T(18)-4,T(i),T(18)+2,T(i+1),0,HP,pc);if(i%3===0){const a=isoP(T(18)+2,T(i+.2)),b2=isoP(T(18)+2,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}}});
+   for(let i=18;i<26;i++)list.push({x:T(30),y:T(i+.5),k:T(30)+T(i+.5)+2,cam:1,f:()=>{ctx.globalAlpha=al;isoBox(ctx,T(30)-3,T(i),T(30)+3,T(i+1),0,HP,pc);if(i%3===1){const a=isoP(T(30)+3,T(i+.2)),b2=isoP(T(30)+3,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}ctx.globalAlpha=1}});
+   for(let i=18;i<30;i++){const porta=i===23||i===24;list.push({x:T(i+.5),y:T(26),k:T(i+.5)+T(26)+4,cam:1,f:()=>{ctx.globalAlpha=al;const x0=T(i),x1=T(i+1),y0=T(26),y1=T(26)+6;
      if(porta)isoBox(ctx,x0,y0,x1,y1,46,HP,pc);else{isoBox(ctx,x0,y0,x1,y1,0,HP,pc);
       if(i%2){const a=isoP(x0+6,y1),b2=isoP(x1-6,y1);ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}}
      isoBox(ctx,x0,y1,x1,y1+9,46,50,i%2?'#e4533a':'#fff5e6');ctx.globalAlpha=1}})}}}
@@ -2346,7 +2347,7 @@ function drawCena(){
  if(barVis){
   inTables.forEach(([x,y])=>list.push({x:T(x),y:T(y)+4,f:()=>drawTable(ctx,x,y,false)}));
   outTables.forEach(([x,y])=>list.push({x:T(x),y:T(y)+4,f:()=>drawTable(ctx,x,y,true)}));
-  for(let i=0;i<11;i++){const x0=T(17.6)+i*T(.96),x1=x0+T(.96);list.push({x:(x0+x1)/2,y:T(19.6),k:(x0+x1)/2+T(19.6),cam:1,f:()=>balcaoIso(ctx,x0,x1,i)})}
+  for(let i=0;i<10;i++){const x0=T(18.1)+i*T(.97),x1=x0+T(.97);list.push({x:(x0+x1)/2,y:T(19.6),k:(x0+x1)/2+T(19.6),cam:1,f:()=>balcaoIso(ctx,x0,x1,i)})}
   for(let i=0;i<9;i++){const x=T(18.5+i),y=T(20.3);list.push({x,y:y-1,cam:1,f:()=>figIso(ctx,'banqueta',x,y,g=>{g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(0,1,7,3,0,0,7);g.fill();isoBox(g,-1.2,-1.2,1.2,1.2,0,12,'#555');isoBox(g,-4,-4,4,4,0,1.5,'#444');isoBox(g,-5,-5,5,5,12,15,'#c0392b')})})}
   list.push({x:T(28),y:T(25),k:T(28)+T(25)-6,cam:1,f:()=>{isoBox(ctx,T(28)-2,T(25),T(28)+3,T(26),0,40,'#d9cbb8');isoBox(ctx,T(28),T(24)-3,T(30),T(24)+2,0,40,'#d9cbb8');const q=isoP(T(28)+3,T(24.6));ctx.fillStyle='#fff';rr(ctx,q[0]-12,q[1]-46,24,12,3);ctx.fill();ctx.fillStyle='#2e86c1';ctx.font='700 8px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('WC',q[0],q[1]-37);ctx.textAlign='left'}});
   list.push({x:T(29.4),y:T(24.8),cam:1,f:()=>{const x=T(29.1),y=T(24.3);isoBox(ctx,x,y,x+14,y+5,0,20,'#f4f4f4');isoBox(ctx,x+1,y+5,x+13,y+17,0,9,'#f4f4f4');liftSet(ctx,9.2);ctx.fillStyle='#cfe8f2';ctx.beginPath();ctx.ellipse(x+7,y+11,4.5,4,0,0,7);ctx.fill();setCam(ctx)}});
@@ -3510,10 +3511,11 @@ const SW=640,SH=340,BR=10,PR=17,SL=34,SR=SW-34,STP=34,SBT=SH-34;
 const POCKETS=[[SL,STP],[SW/2,STP-5],[SR,STP],[SL,SBT],[SW/2,SBT+5],[SR,SBT]];
 const SCORES=['#f1c40f','#2e6fd8','#e74c3c','#8e44ad','#e67e22','#27ae60','#7b241c'];
 function abrirSinuca(dupla){
- if(!eu)return;levantar();sinucaAberta=true;eu.path=[];eu.x=T(25.5);eu.y=T(24.45);eu.dir=1;eu.taco=true;sendPos(true);
+ if(!eu)return;levantar();sinucaAberta=true;eu.path=[];{const LUG=[[25.5,24.45],[27.6,24.45],[24.5,21.6],[28.4,21.6]],oc=[...others.values()].filter(o=>o.work==='sinuca'&&!o.hidden);const l=LUG.find(([lx,ly])=>!oc.some(o=>Math.hypot(o.x-T(lx),o.y-T(ly))<T(.8)))||LUG[0];eu.x=T(l[0]);eu.y=T(l[1]);eu.sinLug=l}eu.dir=1;eu.taco=true;sendPos(true);
  $('mSinuca').classList.remove('hidden');novaPartida(dupla);requestAnimationFrame(sinLoop);
 }
-function fecharSinuca(){if(sin&&sin.dupla&&!sin.fim)emitEv('sinSai',{para:sin.dupla.op});sinucaAberta=false;if(eu){eu.x=T(25.5);eu.y=T(24.45);eu.path=[]}if(eu)eu.taco=false;$('mSinuca').classList.add('hidden');sin=null;sendPos(true)}
+new MutationObserver(()=>{if(sinucaAberta&&$('mSinuca').classList.contains('hidden'))fecharSinuca()}).observe($('mSinuca'),{attributes:true,attributeFilter:['class']});
+function fecharSinuca(){if(sin&&sin.dupla&&!sin.fim)emitEv('sinSai',{para:sin.dupla.op});sinucaAberta=false;if(eu){const l=eu.sinLug||[25.5,24.45];eu.x=T(l[0]);eu.y=Math.max(T(l[1]),T(24.45));eu.path=[]}if(eu)eu.taco=false;$('mSinuca').classList.add('hidden');sin=null;sendPos(true)}
 function novaPartida(dupla){
  const b=[{x:SL+(SR-SL)*.25,y:SH/2,vx:0,vy:0,c:'#fdfdf5',cue:true,in:false}],ox=SL+(SR-SL)*.68;let k=0;
  for(let col=0;col<4&&k<7;col++)for(let row=0;row<=col&&k<7;row++)b.push({x:ox+col*BR*1.8,y:SH/2+(row-col/2)*BR*2.08,vx:0,vy:0,c:SCORES[k++],in:false});
@@ -3525,7 +3527,7 @@ function sinStep(dt){
  // física: atrito de rolamento constante + resistência do pano, tabelas com perda de energia, choque elástico entre bolas
  const B=sin.b;let moving=false;
  for(const b of B){if(b.in)continue;const v=Math.hypot(b.vx,b.vy);
-  if(v>0){const nv=Math.max(0,v-(95+v*.35)*dt),k=nv/v;b.vx*=k;b.vy*=k}
+  if(v>0){b.sl=Math.max(0,(b.sl||0)-dt*2.2);const nv=Math.max(0,v-(70+v*(.22+b.sl*.9))*dt),k=nv/v;b.vx*=k;b.vy*=k}
   b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.vx,b.vy)<4){b.vx=0;b.vy=0}else moving=true;
   for(let pi=0;pi<POCKETS.length;pi++){const [px,py]=POCKETS[pi],r=pi===1||pi===4?PR-1:PR,d=Math.hypot(b.x-px,b.y-py);
    if(d<r+BR*.6){b.vx+=(px-b.x)*dt*6;b.vy+=(py-b.y)*dt*6}
@@ -3537,7 +3539,7 @@ function sinStep(dt){
    if(b.y<STP+BR){b.y=STP+BR;bate(b.vy);b.vy=-b.vy*e;b.vx*=tg}if(b.y>SBT-BR){b.y=SBT-BR;bate(b.vy);b.vy=-b.vy*e;b.vx*=tg}}}
  for(let it=0;it<2;it++)for(let i=0;i<B.length;i++)for(let j=i+1;j<B.length;j++){const a=B[i],c=B[j];if(a.in||c.in)continue;const dx=c.x-a.x,dy=c.y-a.y,d=Math.hypot(dx,dy);
   if(d>0&&d<BR*2){const nx=dx/d,ny=dy/d,o=(BR*2-d)/2;a.x-=nx*o;a.y-=ny*o;c.x+=nx*o;c.y+=ny*o;const dv=(a.vx-c.vx)*nx+(a.vy-c.vy)*ny;
-   if(dv>0){if(dv>50&&it===0)Som.play('bola',Math.min(90,dv/8));const jm=dv*(1+.95)/2;a.vx-=jm*nx;a.vy-=jm*ny;c.vx+=jm*nx;c.vy+=jm*ny;moving=true}}}
+   if(dv>0){if(dv>50&&it===0)Som.play('bola',Math.min(90,dv/8));const jm=dv*(1+.94)/2;a.vx-=jm*nx;a.vy-=jm*ny;c.vx+=jm*nx;c.vy+=jm*ny;c.sl=.5;a.sl=Math.max(a.sl||0,.3);moving=true}}}
  return moving;
 }
 // prevê a primeira bola que a branca vai tocar (linha de mira profissional)
@@ -3548,7 +3550,7 @@ function sinPreve(c,nx,ny){let best=1e9,alvo=null;for(const o of sin.b){if(o===c
 function sinLoop(t){
  if(!sin||!sinucaAberta)return;
  const dt=Math.min(.033,(t-(sin.last||t))/1000);sin.last=t;
- let mv=sin.moving;sin.acc+=dt;let nst=0;while(sin.acc>=1/600&&nst<80){mv=sinStep(1/600);sin.acc-=1/600;nst++}if(!sin.moving)mv=false;
+ let mv=sin.moving;sin.acc+=dt;let nst=0;while(sin.acc>=1/300&&nst<24){mv=sinStep(1/300);sin.acc-=1/300;nst++}if(nst>=24)sin.acc=0;if(!sin.moving)mv=false;
  if(sin.moving&&!mv){sin.moving=false;
   if(sin.falta){sin.falta=false;const c=sin.b[0];c.in=false;c.x=SL+(SR-SL)*.25;c.y=SH/2;while(sin.b.some(o=>o!==c&&!o.in&&Math.hypot(o.x-c.x,o.y-c.y)<BR*2))c.y+=BR*2.2;$('sinMsg').textContent='Ih, a branca caiu! Ela volta para o começo.'}
   if(sin.dupla)sinVez();else if(sin.bolas>=7||sin.tacadas<=0)fimSinuca();}
@@ -3575,13 +3577,13 @@ function fimSinuca(){
   .catch(e=>{$('sinMsg').textContent=e.message})
 }
 function desenharSinuca(){
- const cv=$('sinCv'),g=cv.getContext('2d');g.setTransform(cv.width/SW,0,0,cv.height/SH,0,0);
+ const cv=$('sinCv'),g=cv.getContext('2d'),VT=innerWidth<innerHeight;if(cv.dataset.vt!==String(VT)){cv.dataset.vt=VT;cv.width=VT?680:1280;cv.height=VT?1280:680;cv.style.aspectRatio=VT?'340/640':'640/340'}if(VT){const sc=cv.width/SH;g.setTransform(0,sc,-sc,0,cv.width,0)}else g.setTransform(cv.width/SW,0,0,cv.height/SH,0,0);
  g.fillStyle='#5a3418';rr(g,0,0,SW,SH,26);g.fill();g.fillStyle='#6e4220';rr(g,8,8,SW-16,SH-16,20);g.fill();
  g.fillStyle='#1f8a4c';g.fillRect(SL-8,STP-8,SR-SL+16,SBT-STP+16);g.fillStyle='rgba(0,0,0,.12)';g.fillRect(SL-8,STP-8,SR-SL+16,6);
  g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=1.5;g.beginPath();g.moveTo(SL+(SR-SL)*.25,STP);g.lineTo(SL+(SR-SL)*.25,SBT);g.stroke();
  g.fillStyle='#e8d9a8';for(const k of [.125,.25,.375,.625,.75,.875]){circ(g,SL+(SR-SL)*k,STP-20,2.2);circ(g,SL+(SR-SL)*k,SBT+20,2.2)}
  g.fillStyle='#0b0b0b';for(const [px,py] of POCKETS)circ(g,px,py,PR);
- for(const b of sin.b){if(b.in)continue;g.fillStyle='rgba(0,0,0,.25)';circ(g,b.x+2,b.y+3,BR);g.fillStyle=b.c;circ(g,b.x,b.y,BR);g.fillStyle='rgba(255,255,255,.55)';circ(g,b.x-3,b.y-3.5,3)}
+ for(const b of sin.b){if(b.in)continue;g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(b.x+2.5,b.y+3.5,BR,BR*.8,0,0,7);g.fill();const gr=g.createRadialGradient(b.x-3,b.y-4,1,b.x,b.y,BR);gr.addColorStop(0,'#fff');gr.addColorStop(.25,b.c);gr.addColorStop(1,shade(b.c,-45));g.fillStyle=gr;circ(g,b.x,b.y,BR);if(!b.cue){g.fillStyle='rgba(255,255,255,.92)';circ(g,b.x,b.y,BR*.42)}g.fillStyle='rgba(255,255,255,.7)';circ(g,b.x-3.2,b.y-3.8,2.2)}
  const c=sin.b[0];
  if(sin.aim&&!sin.moving&&!sin.fim&&!c.in){const a=sin.aim,dx=a.x0-a.x,dy=a.y0-a.y,d=Math.hypot(dx,dy);if(d>4){const nx=dx/d,ny=dy/d,pw=Math.min(d,180)/180;
   {const pr=sinPreve(c,nx,ny),gx=c.x+nx*pr.t,gy=c.y+ny*pr.t;g.setLineDash([6,6]);g.strokeStyle='rgba(255,255,255,.8)';g.lineWidth=2;g.beginPath();g.moveTo(c.x,c.y);g.lineTo(gx,gy);g.stroke();g.setLineDash([]);
@@ -3592,12 +3594,12 @@ function desenharSinuca(){
   g.fillStyle='rgba(0,0,0,.45)';rr(g,SW/2-80,SH-24,160,12,6);g.fill();g.fillStyle=pw>.75?'#e74c3c':pw>.4?'#f1c40f':'#2ecc71';rr(g,SW/2-80,SH-24,160*pw,12,6);g.fill()}}
 }
 (()=>{
- const cv=$('sinCv'),pos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*SW/r.width,(e.clientY-r.top)*SH/r.height]};
+ const cv=$('sinCv'),pos=e=>{const r=cv.getBoundingClientRect();if(cv.dataset.vt==='true'){const px=(e.clientX-r.left)/r.width*SH,py=(e.clientY-r.top)/r.height*SW;return[py,SH-px]}return[(e.clientX-r.left)*SW/r.width,(e.clientY-r.top)*SH/r.height]};
  cv.addEventListener('pointerdown',e=>{if(!sin||sin.moving||sin.fim)return;cv.setPointerCapture(e.pointerId);const [x,y]=pos(e);sin.aim={x0:x,y0:y,x,y}});
  cv.addEventListener('pointermove',e=>{if(!sin||!sin.aim)return;const [x,y]=pos(e);sin.aim.x=x;sin.aim.y=y});
  const solta=()=>{if(!sin||!sin.aim)return;const a=sin.aim,dx=a.x0-a.x,dy=a.y0-a.y,d=Math.hypot(dx,dy);sin.aim=null;if(d<8)return;
   if(sin.dupla&&sin.dupla.vez!==eu.id){$('sinMsg').textContent='⏳ Espere a sua vez!';return}Som.play('taco');const pw=Math.min(d,180)/180,c=sin.b[0],f=Math.pow(pw,1.25)*1350+60;
-  if(sin.dupla){sin.antes=sin.bolas;sin.falta=false;emitEv('sinTiro',{para:sin.dupla.op,st:sin.b.map(o=>[o.x,o.y,o.in?1:0]),vx:dx/d*f,vy:dy/d*f})}c.vx=dx/d*f;c.vy=dy/d*f;sin.tacadas--;sin.moving=true;sinInfo();$('sinMsg').textContent=sin.tacadas?'Boa! Continue tacando.':'Última tacada…'};
+  if(sin.dupla){sin.antes=sin.bolas;sin.falta=false;emitEv('sinTiro',{para:sin.dupla.op,st:sin.b.map(o=>[o.x,o.y,o.in?1:0]),vx:dx/d*f,vy:dy/d*f})}c.vx=dx/d*f;c.vy=dy/d*f;c.sl=1;sin.tacadas--;sin.moving=true;sinInfo();$('sinMsg').textContent=sin.tacadas?'Boa! Continue tacando.':'Última tacada…'};
  cv.addEventListener('pointerup',solta);cv.addEventListener('pointercancel',()=>{if(sin)sin.aim=null});
  $('sinNovo').onclick=novaPartida;$('sinSair').onclick=fecharSinuca;
 })();
@@ -3714,7 +3716,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261115iso3';
+const VERSAO_JOGO='v20261116a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
