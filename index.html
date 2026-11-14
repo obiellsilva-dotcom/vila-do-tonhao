@@ -2350,7 +2350,14 @@ function drawCena(){
   for(let i=0;i<9;i++){const x=T(18.5+i),y=T(20.3);list.push({x,y:y-1,cam:1,f:()=>figIso(ctx,'banqueta',x,y,g=>{g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(0,1,7,3,0,0,7);g.fill();isoBox(g,-1.2,-1.2,1.2,1.2,0,12,'#555');isoBox(g,-4,-4,4,4,0,1.5,'#444');isoBox(g,-5,-5,5,5,12,15,'#c0392b')})})}
   list.push({x:T(28),y:T(25),k:T(28)+T(25)-6,cam:1,f:()=>{isoBox(ctx,T(28)-2,T(25),T(28)+3,T(26),0,40,'#d9cbb8');isoBox(ctx,T(28),T(24)-3,T(30),T(24)+2,0,40,'#d9cbb8');const q=isoP(T(28)+3,T(24.6));ctx.fillStyle='#fff';rr(ctx,q[0]-12,q[1]-46,24,12,3);ctx.fill();ctx.fillStyle='#2e86c1';ctx.font='700 8px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('WC',q[0],q[1]-37);ctx.textAlign='left'}});
   list.push({x:T(29.4),y:T(24.8),cam:1,f:()=>{const x=T(29.1),y=T(24.3);isoBox(ctx,x,y,x+14,y+5,0,20,'#f4f4f4');isoBox(ctx,x+1,y+5,x+13,y+17,0,9,'#f4f4f4');liftSet(ctx,9.2);ctx.fillStyle='#cfe8f2';ctx.beginPath();ctx.ellipse(x+7,y+11,4.5,4,0,0,7);ctx.fill();setCam(ctx)}});
-  for(let i=0;i<2;i++)list.push({x:T(25.9),y:T(27.6),k:T(25.9)+T(27.6)+i,cam:1,f:()=>{const x=T(25.4),y=T(27.2);isoBox(ctx,x,y,x+20,y+12,i*11,i*11+11,'#f0b429')}});
+  list.push({x:T(25.9),y:T(27.2),cam:1,f:()=>{const x0=T(25.3),x1=x0+24,y0=T(26.75),y1=y0+16,H=15,R=9;sombraChao(ctx,x0,y0,x1,y1);
+   isoBox(ctx,x0,y0,x1,y1,0,H,'#c0763a');
+   const A=isoP(x0,y1),B2=isoP(x1,y1),C=isoP(x1,y0),D=isoP(x0,y0),M1=isoP(x0,(y0+y1)/2),M2=isoP(x1,(y0+y1)/2);
+   ctx.fillStyle='#a33b2a';ctx.beginPath();ctx.moveTo(A[0]-1,A[1]-H+1);ctx.lineTo(B2[0]+1,B2[1]-H+1);ctx.lineTo(M2[0]+1,M2[1]-H-R);ctx.lineTo(M1[0]-1,M1[1]-H-R);ctx.closePath();ctx.fill();
+   ctx.fillStyle='#c0392b';ctx.beginPath();ctx.moveTo(M1[0]-1,M1[1]-H-R);ctx.lineTo(M2[0]+1,M2[1]-H-R);ctx.lineTo(C[0]+1,C[1]-H+1);ctx.lineTo(D[0]-1,D[1]-H+1);ctx.closePath();ctx.fill();
+   ctx.fillStyle='#8e3a26';ctx.beginPath();ctx.moveTo(B2[0],B2[1]-H);ctx.lineTo(M2[0],M2[1]-H-R);ctx.lineTo(C[0],C[1]-H);ctx.closePath();ctx.fill();
+   const P=isoP((x0+x1)/2,y1);ctx.fillStyle='#2a1a12';ctx.beginPath();ctx.moveTo(P[0]-5,P[1]);ctx.lineTo(P[0]-5,P[1]-7);ctx.arc(P[0],P[1]-7,5,Math.PI,0);ctx.lineTo(P[0]+5,P[1]);ctx.closePath();ctx.fill();
+   ctx.fillStyle='#fff';ctx.font='700 5px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('CHOPP',P[0],P[1]-H+4);ctx.textAlign='left'}});
   list.push({x:T(28.6),y:T(18)+2,w:T(18),f:()=>drawTV(ctx)});list.push({x:T(29.6),y:T(18.95),w:T(18.95),f:()=>drawJukebox(ctx)});
   list.push({x:T(26.4),y:T(22.6),cam:1,f:()=>{const cx=T(26.4),cy=T(22.6),w=T(2.4),h=T(1.3);sombraChao(ctx,cx-w/2,cy-h/2,cx+w/2,cy+h/2);for(const [a,b2] of [[-1,-1],[1,-1],[-1,1],[1,1]])isoBox(ctx,cx+a*(w/2-5)-2,cy+b2*(h/2-5)-2,cx+a*(w/2-5)+2,cy+b2*(h/2-5)+2,0,10,'#4a2a12');isoBox(ctx,cx-w/2,cy-h/2,cx+w/2,cy+h/2,10,15,'#6e4220');liftSet(ctx,15);drawSinuca(ctx)}});
   poles.forEach(p=>list.push({x:p.x,y:p.y,f:()=>{ctx.fillStyle='#4a3a30';ctx.fillRect(p.x-1.5,p.y-40,3,40)}}));
@@ -3707,7 +3714,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261115iso2';
+const VERSAO_JOGO='v20261115iso3';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3855,7 +3862,7 @@ residents.forEach(placeNow);
 log('🍺 O Tonhão abriu o bar. A geladeira de 1987 ainda tá funcionando.');
 let last=performance.now();
 let mediaQ=16,contaQ=0;
-function frame(t){if(CFG.graf==='baixo'&&t-last<30){requestAnimationFrame(frame);return}const dt=Math.min(.1,(t-last)/1000);mediaQ+=((t-last)-mediaQ)*.05;if(++contaQ>180&&mediaQ>42&&CFG.graf!=='baixo'&&!document.hidden){contaQ=0;CFG.graf=CFG.graf==='medio'?'baixo':'medio';salvaCfg();resize();toast('⚙️ Gráfico ajustado para o jogo ficar mais leve.',2500)}last=t;update(dt);draw();requestAnimationFrame(frame)}
+function frame(t){if(CFG.graf==='baixo'&&t-last<30){requestAnimationFrame(frame);return}const dt=Math.min(.1,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(frame)}
 function begin(){buildBg();uiTick();requestAnimationFrame(t=>{last=t;frame(t)});setTimeout(()=>{const l=$('loading');l.style.opacity=0;setTimeout(()=>l.remove(),450)},350)}
 (document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]):Promise.resolve()).then(begin).then(iniciarOnline);
 window.__dbg={houses,comprarCasa,residents,tonhao,queue,get gm(){return gm},set gm(v){gmOff+=v-gm;gm=v},cam,get eu(){return eu},others,get trabalho(){return trabalho},get L(){return L},VAGAS,vagasInfo,CRUZ};
