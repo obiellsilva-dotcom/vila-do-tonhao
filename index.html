@@ -81,7 +81,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:26px;background-ima
 .rowbtns{display:flex;gap:8px;margin-top:12px}
 .rowbtns .btn{flex:1}
 #storyImg{width:100%;max-width:300px;display:block;margin:0 auto;border-radius:14px;-webkit-touch-callout:default;user-select:auto}
-#toast{position:fixed;left:50%;top:222px;transform:translateX(-50%);background:var(--gold);color:#3a1d10;font-weight:600;padding:9px 14px;border-radius:14px;z-index:9;font-size:14.5px;max-width:calc(100vw - 24px);text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast{position:fixed;left:50%;top:222px;transform:translateX(-50%);background:var(--gold);color:#3a1d10;font-weight:600;padding:9px 14px;border-radius:14px;z-index:60;font-size:14.5px;max-width:calc(100vw - 24px);text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
 #toast.on{opacity:1}
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:30;font-size:20px;color:var(--gold);transition:opacity .4s}
 #loading span{font-size:46px;animation:bob 1s ease-in-out infinite}
@@ -189,6 +189,7 @@ body:has(#zoom:not(.min)) #joy{display:none!important}
 .tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.12);margin-left:4px}
 @media (max-width:480px){#q{width:104px!important}#places{max-width:138px}#rankBtn{padding:7px 10px}.lvl i{width:34px}#top .row:first-child{flex-wrap:nowrap}.brand{font-size:14px;padding:6px 9px;white-space:nowrap}#q{width:130px}.pill{font-size:12.5px;padding:6px 8px;white-space:nowrap}.pill.small{font-size:11.5px;white-space:normal}.prov{flex-direction:column;align-items:center}.prov canvas{width:120px;height:152px}.opts{width:100%}.opt .lab{width:96px}}
 body:has(#tarefa:not(.hidden)) #joy{display:none}
+input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 </style>
 </head>
 <body>
@@ -2742,7 +2743,8 @@ const api=ONLINE?(()=>{
    return{xp_ganho:n*3,subiu:novo-antes,premio,morreu,eu:lest()}},
   async denunciar(){}
  };
-async function acao(fn){if(ocupado)return;ocupado=true;try{await fn()}catch(e){Som.play('erro');toast(e.message||'Algo deu errado.',3200)}finally{ocupado=false}}
+async function acao(fn){if(ocupado)return;ocupado=true;try{await fn()}catch(e){try{Som.play('erro')}catch(_){}const m=(e&&e.message)||'Algo deu errado.';toast(m,4000);const h=document.getElementById('provHint');if(h&&!document.getElementById('mProv').classList.contains('hidden')){h.style.display='block';h.style.color='#ff8a7a';h.textContent='⚠️ '+m}}finally{ocupado=false}}
+addEventListener('error',e=>{try{toast('⚠️ '+(e.message||'erro'),4000)}catch(_){}});addEventListener('unhandledrejection',e=>{try{toast('⚠️ '+((e.reason&&e.reason.message)||'erro'),4000)}catch(_){}});
 
 /* ----- estado do jogador ----- */
 function makePlayer(id,nome,v){return{id,nome,v,x:T(24),y:T(29.5),tx:null,ty:null,path:[],dir:1,ph:0,moving:false,hidden:false,beer:false,driving:false,carro:null,carros:[],dinheiro:0,xp:0,nivel:1,fome:100,peixes:0,isPlayer:true,bub:null,blinkT:rand(1,4),fomeAviso:0}}
@@ -3710,7 +3712,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116i';
+const VERSAO_JOGO='v20261116j';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
