@@ -3060,7 +3060,15 @@ const TAREFAS={
  gerente:{cena:'banco',deco:'🏦 📊 💼 🖊️ 📈 🏦',tit:'Gerente: aprove empréstimo se a parcela for até 30% da renda',tipo:'escolha',gerar(){const r=pk([1500,2000,2500,3000,4000,5000]),pc=Math.round(r*(.15+Math.random()*.3)/10)*10,ok=pc<=r*.3;return{ped:`<span class="cli">${pk(['👨','👩','🧔','👵'])}</span>Renda ${money(r)} · parcela ${money(pc)}`,ops:[{t:'🟢 Aprovar',ok},{t:'🔴 Negar',ok:!ok}]}}},
  delegado:{cena:'delegacia',deco:'🚓 🕵️ 📋 🔍 🚨 🚓',tit:'Delegado: ache o suspeito pela descrição',tipo:'escolha',gerar(){const S=['🧔🎩','🧔🧢','👱🧢','👨🎩','👱🕶️','🧔🕶️','👨🧢','👱🎩'],D={'🧔':'barbudo','👱':'loiro','👨':'de bigode','🎩':'de cartola','🧢':'de boné','🕶️':'de óculos escuros'};const w=pk(S),op=emb(S.filter(x=>x!==w)).slice(0,3).concat([w]);const [a,b]=[...w.match(/\p{Extended_Pictographic}/gu)];return{ped:`<span class="cli">📋</span>Testemunha: "Era um homem <b>${D[a]}</b>, <b>${D[b]}</b>"`,ops:emb(op).map(x=>({t:`<span class="e">${x}</span>`,ok:x===w}))}}},
  medico:{cena:'hospital',deco:'🩺 🏥 💊 🌡️ 🩹 🩺',tit:'Médico: receite o tratamento certo',tipo:'escolha',gerar(){const d=pk(DOENCAS),op=emb(DOENCAS.filter(x=>x!==d)).slice(0,3).concat([d]);return{ped:`<span class="cli">🤒</span>"Doutor, estou com ${d[0].toLowerCase()}"`,ops:emb(op).map(x=>({t:x[1],ok:x===d}))}}},
- prefeito:{cena:'prefeitura',deco:'🏛️ 🎗️ 🏗️ 🌳 🏫 🏛️',tit:'Prefeito: escolha a obra que o povo mais quer e cabe no caixa',tipo:'escolha',gerar(){const cx=pk([50,80,100,120]),O=emb([['🏫 Escola',90,95],['🌳 Praça',30,70],['🏥 Posto de saúde',110,98],['🛣️ Asfalto',60,85],['💡 Iluminação',40,75],['⚽ Campo novo',50,80]]);const cab=O.filter(o=>o[1]<=cx).sort((p,q)=>q[2]-p[2]),w=cab[0],op=emb(O.slice(0,3).filter(o=>o!==w).concat([w]));return{ped:`<span class="cli">💰</span>Caixa da prefeitura: <b>R$ ${cx} mil</b>`,ops:op.map(o=>({t:`${o[0]}<br><small>R$ ${o[1]} mil · 😊 ${o[2]}%</small>`,ok:o===w}))}}}
+ prefeito:{cena:'prefeitura',deco:'🏛️ 🎗️ 🏗️ 🌳 🏫 🏛️',tit:'Prefeito(a): governe a Cidade do Tonhão',tipo:'escolha',gerar(){const r=Math.random();
+  if(r<.2){const cx=pk([50,80,100,120]),O=[['🏫 Escola',90,95],['🌳 Praça',30,70],['🏥 Posto de saúde',110,98],['🛣️ Asfalto',60,85],['💡 Iluminação',40,75],['⚽ Campo novo',50,80]],cab=O.filter(o=>o[1]<=cx).sort((p,q)=>q[2]-p[2]),w=cab[0],op=emb(emb(O.filter(o=>o!==w)).slice(0,3).concat([w]));
+   return{tit:'🏗️ Obra: a que o povo mais quer E que cabe no caixa',ped:`<span class="cli">💰</span>Caixa da prefeitura: <b>R$ ${cx} mil</b>`,ops:op.map(o=>({t:`${o[0]}<br><small>R$ ${o[1]} mil · 😊 ${o[2]}%</small>`,ok:o===w}))}}
+  if(r<.4){const L=[['Mais bancos na praça 🪑',1],['Festa junina no centro 🎉',1],['Ônibus de graça no domingo 🚌',1],['Feira toda sexta 🍎',1],['Proibir o Tonhão de vender fiado 😱',0],['Fechar o bar às 18h 🍺❌',0],['Aumentar o imposto da cerveja 💸',0],['Cortar todas as árvores 🌳🪓',0]],boa=pk(L.filter(l=>l[1])),ruins=emb(L.filter(l=>!l[1])).slice(0,2),op=emb([boa,...ruins]);
+   return{tit:'📜 Assine a lei que o povo vai AMAR',ped:`<span class="cli">🖋️</span>Três projetos chegaram na sua mesa. Qual você assina?`,ops:op.map(o=>({t:o[0],ok:!!o[1]}))}}
+  if(r<.6){const P=[['🗣️ "Vou asfaltar a rua do bar!"',1],['🗣️ "Cerveja gelada pra todos no sábado!"',1],['🗣️ "Mais empregos pra nossa gente!"',1],['😴 "Hoje não tenho nada a dizer..."',0],['🙄 "Esse povo reclama demais."',0],['🤑 "Vou aumentar meu salário!"',0]],b=pk(P.filter(x=>x[1])),op=emb([b,...emb(P.filter(x=>!x[1])).slice(0,2)]);
+   return{tit:'🎤 Discurso: escolha a frase que faz a praça aplaudir',ped:`<span class="cli">👥👥👥</span>O povo está reunido na praça esperando você!`,ops:op.map(o=>({t:o[0],ok:!!o[1]}))}}
+  if(r<.8){const v=pk([15,25,35,45,60,75,90,120]);return{tipo:'soma',tit:'💵 Repasse: mande o valor exato para o bairro',ped:`<span class="cli">🏘️</span>"Precisamos de R$ ${v} pra reformar a pracinha!"`}}
+  const a=.25+Math.random()*.5;return{tipo:'timing',tit:'✂️ Inauguração: corte a fita na marca!',ped:`<span class="cli">🎀✂️</span>Corte a fita bem no meio da faixa verde!`,zona:[a,a+.1],vel:.6,bot:'✂️ Cortar a fita'}}},
 };
 TAREFAS.oficina.gerar=function(){const d=pk(DEFEITOS),op=emb(DEFEITOS.filter(x=>x!==d)).slice(0,3).concat([d]);return{ped:`<span class="cli">🚗💨</span>"${d[0]}"`,ops:emb(op).map(x=>({t:x[1],ok:x===d}))}};
 let tarAnim=null;
@@ -3085,15 +3093,15 @@ function tarAcertou(reabrir){if(!trabalho)return;const tr=trabalho;tr.feitas++;i
   if(r.cansado&&trabalho===tr){fimTurno();if(!r.morreu)toast('😩 Você está cansado(a) e com fome. Coma alguma coisa antes de voltar!',4500)}})
   .catch(e=>{if(/calma/i.test(e.message))setTimeout(vai,800);else toast(e.message,3000)});
  vai();setTimeout(()=>{if(trabalho===tr){if(reabrir)abrirTarefa();else proxTarefa()}},reabrir?900:Math.max(600,2600-(Date.now()-t0)))}
-function proxTarefa(){cancelAnimationFrame(tarAnim);const T0=TAREFAS[trabalho.job],g=T0.gerar(),box=$('tBox');let trava=false;
- if(T0.tipo==='escolha'){box.innerHTML=`<div class="ped">${g.ped}</div><div class="ops"></div>`;const ops=box.querySelector('.ops');
+function proxTarefa(){cancelAnimationFrame(tarAnim);const T0=TAREFAS[trabalho.job],g=T0.gerar(),box=$('tBox'),TP=g.tipo||T0.tipo;let trava=false;$('tTit').textContent=g.tit||T0.tit;
+ if(TP==='escolha'){box.innerHTML=`<div class="ped">${g.ped}</div><div class="ops"></div>`;const ops=box.querySelector('.ops');
   g.ops.forEach(o=>{const b=document.createElement('button');b.className='op';b.innerHTML=o.t;b.onclick=()=>{if(trava)return;if(o.ok){trava=true;b.classList.add('ok');if(g.entrega){tarFeedback(true);setTimeout(()=>comecarEntrega(g.entrega),450)}else tarAcertou()}else{b.classList.remove('err');void b.offsetWidth;b.classList.add('err');tarFeedback(false);trava=true;setTimeout(()=>trava=false,900)}};ops.appendChild(b)})}
- else if(T0.tipo==='timing'){const z=g.zona;box.innerHTML=`<div class="ped">${g.ped}</div><div class="trilho"><div class="zona" style="left:${z[0]*100}%;width:${(z[1]-z[0])*100}%"></div><div class="agulha"></div></div><button class="grande">${g.bot}</button>`;
+ else if(TP==='timing'){const z=g.zona;box.innerHTML=`<div class="ped">${g.ped}</div><div class="trilho"><div class="zona" style="left:${z[0]*100}%;width:${(z[1]-z[0])*100}%"></div><div class="agulha"></div></div><button class="grande">${g.bot}</button>`;
   if(g.marcas){const tr=box.querySelector('.trilho');for(let i=1;i<10;i++){const m=document.createElement('div');m.style.cssText=`position:absolute;left:${i*10}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.35)`;tr.appendChild(m);const l=document.createElement('div');l.style.cssText=`position:absolute;left:${i*10}%;bottom:1px;transform:translateX(-50%);font-size:9px;color:#fff`;l.textContent=g.marcas===1?i*10:i;tr.appendChild(l)}}
   const ag=box.querySelector('.agulha'),t0=performance.now();let pos=0;
   const loop=()=>{const t=(performance.now()-t0)/1000*g.vel;pos=g.forno?Math.min(1,t*.8):(1-Math.cos(t*Math.PI))/2;ag.style.left=(pos*100)+'%';if(g.forno)ag.style.background=pos<z[0]?'#f3d29a':pos<=z[1]?'#d9932e':'#4a2a12';if(g.forno&&pos>=1){tarFeedback(false);setTimeout(proxTarefa,700);return}tarAnim=requestAnimationFrame(loop)};loop();
   box.querySelector('.grande').onclick=()=>{if(trava)return;if(pos>=z[0]&&pos<=z[1]){trava=true;cancelAnimationFrame(tarAnim);tarAcertou()}else{tarFeedback(false);trava=true;setTimeout(()=>{trava=false;if(g.forno)proxTarefa()},700)}}}
- else if(T0.tipo==='soma'){const alvo=+g.ped.match(/R\$ (\d+)/)[1];let tot=0;box.innerHTML=`<div class="ped">${g.ped}</div><div class="soma">Na mão: <span>R$ 0</span></div><div class="notas"></div><div class="ops" style="margin-top:8px"></div>`;
+ else if(TP==='soma'){const alvo=+g.ped.match(/R\$ (\d+)/)[1];let tot=0;box.innerHTML=`<div class="ped">${g.ped}</div><div class="soma">Na mão: <span>R$ 0</span></div><div class="notas"></div><div class="ops" style="margin-top:8px"></div>`;
   const sp=box.querySelector('.soma span'),nt=box.querySelector('.notas'),ops=box.querySelector('.ops');
   [1,2,5,10,20,50,100].forEach(n=>{const b=document.createElement('button');b.className='op nota';b.innerHTML=(n<2?'🪙':'💵')+' '+n;b.onclick=()=>{tot+=n;sp.textContent='R$ '+tot;if(tot>alvo){tarFeedback(false);tot=0;setTimeout(()=>sp.textContent='R$ 0',300)}};nt.appendChild(b)});
   const ent=document.createElement('button');ent.className='op';ent.textContent='🤝 Entregar';ent.onclick=()=>{if(trava)return;if(tot===alvo){trava=true;tarAcertou()}else tarFeedback(false)};
@@ -3717,7 +3725,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116k';
+const VERSAO_JOGO='v20261116l';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
