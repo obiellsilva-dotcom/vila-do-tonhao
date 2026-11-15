@@ -1544,3 +1544,30 @@ language sql stable security definer set search_path = public as $$
   from moradores where id = p_id
 $$;
 revoke execute on function public._estado(uuid) from authenticated;
+
+-- ===================== ETAPA 12: coluna da primeira missão (0, 1, 2) =====================
+do $$ begin
+  if not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'moradores' and column_name = 'missao') then
+    alter table public.moradores add column missao smallint not null default 0;
+    update public.moradores set missao = 2 where xp > 0 or nivel > 1;
+  end if;
+end $$;
+
+-- ===================== ETAPA 16: bônus da primeira missão = R$ 100 =====================
+create or replace function public.missao_passo(p_passo integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; bonus integer := 0;
+begin
+  m := _eu();
+  if p_passo = 1 then
+    if m.missao <> 0 then raise exception 'Essa missão já foi feita.'; end if;
+    if m.xp <= 0 then raise exception 'Faça uma tarefa de trabalho primeiro.'; end if;
+    bonus := 100;
+    update moradores set dinheiro = dinheiro + bonus, missao = 1 where id = m.id;
+  else
+    if m.missao >= 2 then raise exception 'Essa missão já foi feita.'; end if;
+    update moradores set missao = 2 where id = m.id;
+  end if;
+  return json_build_object('missao', (select missao from moradores where id = m.id), 'bonus', bonus, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.missao_passo(integer) to authenticated;

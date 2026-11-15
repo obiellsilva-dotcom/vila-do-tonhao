@@ -175,7 +175,24 @@ body:has(#zoom:not(.min)) #joy{display:none!important}
 .cfgg{display:flex;gap:6px}.cfgg button{flex:1;padding:8px;border-radius:10px;border:1px solid rgba(255,201,74,.35);background:transparent;color:inherit;font:inherit}.cfgg button.on{background:var(--gold);color:#2b1a20;font-weight:600}
 #barstat{display:none!important}
 #tuto{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:rgba(15,8,10,.55);padding:14px}#tuto.hidden{display:none}
-#tuto .tbox{max-width:400px;text-align:center;animation:pop .25s ease}
+#tuto .tbox{max-width:420px;max-height:92vh;overflow:auto;}
+.tv{position:relative;height:150px;margin:0 auto 8px;width:min(300px,100%);border-radius:14px;background:linear-gradient(#5e8f4a,#4c7a3b);overflow:hidden;box-shadow:inset 0 0 0 2px rgba(255,255,255,.15);font-family:Fredoka,sans-serif}
+.tvChao{position:absolute;left:0;right:0;top:52%;height:34px;background:#45444a;border-top:3px solid #ebe7dd;border-bottom:3px solid #ebe7dd}
+.tvBoneco{position:absolute;font-size:34px;left:30px;top:44px;animation:tvAnda 4s ease-in-out infinite}.tvAlvo{position:absolute;left:226px;top:78px;width:34px;height:14px;border:3px solid #ffd23f;border-radius:50%;animation:tvPisca 4s infinite}
+.tvDedo{position:absolute;font-size:30px;left:228px;top:84px;animation:tvToque 4s infinite}
+@keyframes tvToque{0%,8%{opacity:0;transform:translateY(14px)}15%,28%{opacity:1;transform:none}22%{transform:scale(.85)}40%,100%{opacity:0}}
+@keyframes tvPisca{0%,18%{opacity:0}22%,70%{opacity:1}80%,100%{opacity:0}}@keyframes tvAnda{0%,25%{left:30px}70%,100%{left:222px}}
+.tvMenu{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:10px;background:#2b1a20;color:#ffd23f;font-size:24px;line-height:38px;animation:tvMenuP 5s infinite}
+@keyframes tvMenuP{0%,14%{transform:none}18%{transform:scale(.85)}24%,100%{transform:none}}
+.tvDedo2{left:auto;right:6px;top:30px;animation:tvToque2 5s infinite}@keyframes tvToque2{0%,6%{opacity:0;transform:translateY(14px)}12%,20%{opacity:1;transform:none}17%{transform:scale(.85)}28%,100%{opacity:0}}
+.tvLista{position:absolute;left:10px;top:8px;display:flex;flex-direction:column;gap:2px;text-align:left;animation:tvLista 5s infinite}.tvLista span{background:#fff6e4;color:#3a2414;border-radius:7px;padding:1px 7px;font-size:11px;font-weight:600}.tvLista .lk{opacity:.55}
+@keyframes tvLista{0%,22%{opacity:0;transform:translateX(-20px)}30%,92%{opacity:1;transform:none}100%{opacity:0}}
+.tvBarras{display:flex;gap:6px;justify-content:center;padding-top:18px}.tvBarras span{background:#2b1a20;color:#fff;border-radius:10px;padding:4px 8px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:4px}
+.tvBarras i{display:inline-block;width:40px;height:7px;border-radius:4px;background:#9dff7a;animation:tvCai 4s infinite}.tvS i{background:#5ec8ff!important}@keyframes tvCai{0%{width:40px}70%{width:8px;background:#e74c3c}85%{width:8px}100%{width:40px}}
+.tvMissao{position:absolute;left:10px;right:10px;top:8px;background:#2b1a20;border:2px solid #ffd23f;border-radius:10px;color:#ffd23f;font-size:12px;font-weight:700;padding:5px;animation:tvPisca2 3s infinite}@keyframes tvPisca2{50%{box-shadow:0 0 12px #ffd23f}}
+.tvB2{left:120px;top:62px;animation:none}.tvSeta{position:absolute;left:160px;top:86px;color:#ffd23f;font-size:24px;text-shadow:0 0 0 #3a1d10,1px 1px 0 #3a1d10;animation:tvSeta 1s ease-in-out infinite}@keyframes tvSeta{50%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.tv *{animation:none!important}}
+#tuto .tbox{text-align:center;animation:pop .25s ease}
 #tutoImg{height:170px;border-radius:14px;margin:-4px -4px 10px;background:radial-gradient(circle at 50% 40%,#5b3340,#2b1a20);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;position:relative;overflow:hidden}
 #tutoTxt{font-size:15px;line-height:1.35}
 .tdots{display:flex;gap:5px;justify-content:center;margin-top:8px}.tdots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}.tdots i.on{background:var(--gold)}
@@ -844,7 +861,7 @@ const FRUTAS=[[50,88],[54,88],[58,88],[62,88],[50,92],[54,92],[58,92],[62,92],[1
 FRUTAS.forEach(f=>noTree.add(Math.floor(f.x/TILE)+','+Math.floor(f.y/TILE)));
 // zones
 for(let y=15;y<=28;y++)for(let x=37;x<=54;x++)grid[y][x]=G.WALK; // centro de empregos
-for(let y=32;y<=35;y++)for(let x=16;x<=31;x++)grid[y][x]=G.PLAZA; // praça na frente do bar
+for(let y=33;y<=35;y++)for(let x=16;x<=31;x++)grid[y][x]=G.PLAZA; // praça na frente do bar (a linha 32 fica de calçada)
 for(let y=15;y<=28;y++)for(let x=59;x<=79;x++)grid[y][x]=G.FIELD;
 for(let y=27;y<=28;y++)for(let x=15;x<=32;x++)grid[y][x]=G.TERR;
 // bar
@@ -917,7 +934,7 @@ const walkP=(x,y)=>{if(!inWorld(x,y))return false;const t=tileAt(x,y);if(t===G.C
 const carOk=(x,y)=>{const t=tileAt(x,y);return inWorld(x,y)&&(t===G.ROAD||t===G.BRIDGE||t===G.TRAIL)};
 const walkTon=(x,y)=>walk(x,y)||(x>=0&&y>=0&&x<W&&y<H&&grid[y][x]===G.BEHIND);
 const plazaTiles=[],fieldTiles=[];
-for(let y=32;y<=35;y++)for(let x=16;x<=31;x++)if(grid[y][x]===G.PLAZA)plazaTiles.push([x,y]);
+for(let y=33;y<=35;y++)for(let x=16;x<=31;x++)if(grid[y][x]===G.PLAZA)plazaTiles.push([x,y]);
 for(let y=16;y<=27;y++)for(let x=60;x<=78;x++)fieldTiles.push([x,y]);
 
 // decor
@@ -968,7 +985,7 @@ for(let i=0;i<9;i++)seats.push({x:18.5+i,y:20.3,sit:false,back:true,dir:1,kind:'
 seats.push({x:24.55,y:22.65,sit:false,dir:1,kind:'sinuca'},{x:28.3,y:22.65,sit:false,dir:-1,kind:'sinuca'});
 [[28.45,20.6],[29.3,21.4],[28.5,19.45],[24.4,24.9],[25.5,25.3],[26.6,25.3],[21.1,25.55],[18.4,25.6]].forEach(([x,y],i)=>seats.push({x,y,sit:false,dir:i%2?1:-1,kind:'pe'}));
 const WC={x:27.45,y:24.75};
-const PRACA_BANCOS=[[20.3,32.3],[25.6,32.3],[21,34.6],[25,34.6]];
+const PRACA_BANCOS=[[19.6,33.25],[26.3,33.25],[20.6,34.75],[25.4,34.75]];
 const PRACA_SEATS=PRACA_BANCOS.flatMap(([x,y])=>[{x:x+.38,y:y+.36,sit:true,dir:1,frente:true,kind:'praca'},{x:x+.92,y:y+.36,sit:true,dir:-1,frente:true,kind:'praca'}]);
 const TON_HOME=[22.6,18.6];
 
@@ -1781,7 +1798,7 @@ function drawPista(c){const x0=T(PISTA.x0),y0=T(PISTA.y0),cw=(T(PISTA.x1)-x0)/8,
  c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<5;i++){const a=now*3+i*1.3;c.fillRect(cx+Math.cos(a)*4.5,cy+Math.sin(a*1.3)*4,1.4,1.4)}
  c.font='bold 8px Fredoka,sans-serif';c.textAlign='center';c.fillStyle=cores[b%cores.length];c.fillText('💃 PISTA 🕺',cx,y0-3);c.textAlign='left';c.restore()}
 /* ----- Natal na praça: árvore enfeitada e pisca-pisca ----- */
-const NATAL={x:23.9,y:33.9};
+const NATAL={x:23.9,y:34.1};
 function pisca(i){return Math.sin(now*3+i*1.7)>-.2}
 function drawNatal(c){const x=T(NATAL.x),y=T(NATAL.y),cores=['#ff3b3b','#ffd23f','#3bc4ff','#ff7ad9','#7dff6b'];
  c.save();c.fillStyle='rgba(0,0,0,.25)';c.beginPath();c.ellipse(x+6,y+2,26,8,0,0,7);c.fill();
@@ -2033,7 +2050,7 @@ const SPR_VIP=new Image();SPR_VIP.src='data:image/webp;base64,UklGRqJPAQBXRUJQVl
 function giroflex(c,x,y){const f=Math.floor(now*6)%2,yy=y-34*CK*.62;c.save();c.globalCompositeOperation='lighter';
  for(const [dx,cr,on] of [[-5,'255,40,40',f],[5,'40,110,255',1-f]]){if(!on)continue;const g=c.createRadialGradient(x+dx,yy,0,x+dx,yy,38);g.addColorStop(0,`rgba(${cr},.85)`);g.addColorStop(1,`rgba(${cr},0)`);c.fillStyle=g;c.beginPath();c.ellipse(x+dx,yy,38,24,0,0,7);c.fill();c.fillStyle=`rgb(${cr})`;c.fillRect(x+dx-3,yy-2,6,4)}
  c.restore()}
-const CAR_ESC={moto:1.3,fusca:1.08,sedan:1.2,opala:1.18,esportivo:1.3,kombi_tonhao:1.42,viatura:1.2,caminhonete:1.15,neon:1.25};
+const CAR_ESC={moto:1.3,fusca:1.08,sedan:1.2,opala:1.18,esportivo:1.3,kombi_tonhao:1.28,viatura:1.2,caminhonete:1.15,neon:1.25};
 function drawCarSprite(c,x,y,img,ang,o,off=0){const N=32,FR=160,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
  if(!o.semSombra){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.fillStyle='rgba(0,0,0,.3)';rr(c,-30,-13,62,28,8);c.fill();c.restore()}
  const bob=(o.pitch||0)*6;c.drawImage(img,(i%8)*FR,Math.floor(i/8)*FR,FR,FR,x-T/2,o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob,T,T);
@@ -2776,7 +2793,7 @@ const api=ONLINE?(()=>{
    const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
   async cidade(){return null},
   async admin(){fail('Painel só funciona online.')},async venderLoja(c){const m=lme();if(!CARS[c]||CARS[c].premium)fail('A concessionária não compra esse carro.');m.carros=m.carros.filter(x=>x!==c);if(m.carro===c)m.carro=null;const v=Math.floor(CARS[c].preco/2);m.dinheiro+=v;lsave();return{recebido:v,eu:lest()}},async propor(){fail('Venda entre jogadores só funciona online.')},async responder(){fail('Só online.')},
-  async missao(p){const m=lme();m.missao=m.missao||0;let bonus=0;if(p===1){if(m.missao!==0)fail('Essa missão já foi feita.');m.dinheiro+=50;bonus=50;m.missao=1}else m.missao=2;lsave();return{missao:m.missao,bonus,eu:lest()}},
+  async missao(p){const m=lme();m.missao=m.missao||0;let bonus=0;if(p===1){if(m.missao!==0)fail('Essa missão já foi feita.');m.dinheiro+=100;bonus=100;m.missao=1}else m.missao=2;lsave();return{missao:m.missao,bonus,eu:lest()}},
   async guardar(i){const m=lme(),it=LOJA[i];if(m.dinheiro<it.preco)fail('Dinheiro insuficiente. Vai trabalhar! 😅');m.mochila=m.mochila||{};if((m.mochila[i]||0)>=20)fail('Sua mochila já tem 20 desse item.');m.dinheiro-=it.preco;m.mochila[i]=(m.mochila[i]||0)+1;lsave();return{item:i,mochila:m.mochila,eu:lest()}},
   async abastecer(g){const m=lme();if(!m.carros.length)fail('Você não tem carro.');const c=Math.max(2,Math.ceil(precoTanque(m.carro||m.carros[0])*(100-g)/100));if(m.dinheiro<c)fail('Dinheiro insuficiente. Precisa de '+money(c)+'.');m.dinheiro-=c;m.gasolina=100;lsave();return{custo:c,eu:lest()}},
   async salvarGas(g){const m=lme();m.gasolina=g;lsave()},
@@ -2845,7 +2862,7 @@ async function aplicarPerfil(m,anunciar){
  await carregarVagas();for(const [id,i] of vagasInfo)if(i.morador===eu.id)eu.parked=id;
  if(m.trabalho&&JOBS[m.trabalho]){const J=JOBS[m.trabalho];iniciarTurno(m.trabalho,Date.parse(m.trabalho_inicio),J.duracao)}
  conectar();if(souVip())later(5,()=>emitEv('chegou',{}));
- if(anunciar){say(eu,'Cheguei! Cadê o bar?',4,true);log(`🏠 ${m.nome} chegou na cidade!`);setTimeout(tutorial,1200)}
+ if(anunciar){say(eu,'Cheguei! Cadê o bar?',4,true);log(`🏠 ${m.nome} chegou na cidade!`);eu.tutoPend=true;setTimeout(tutorial,1200)}
  else{toast(`Bem-vindo(a) de volta, ${m.nome}! 💰 ${money(m.dinheiro)} · ⭐ nível ${m.nivel}`,3500);}
  refreshHud();
 }
@@ -3830,7 +3847,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119b';
+const VERSAO_JOGO='v20261119c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3984,15 +4001,15 @@ $('contaOk').onclick=()=>{const e=$('contaEmail').value.trim(),p=$('contaSenha')
 $('join').onclick=async()=>{if(ONLINE){let c=null;try{c=await api.conta()}catch(e){}if(!c||c.anon){abrirConta(abrirProvador,false);return}}abrirProvador()};
 /* ----- tutorial ----- */
 const TUTO=[
- [null,'<b>Bem-vindo(a) à Cidade do Tonhão!</b><br>São só 3 dicas rápidas e você já sai jogando.','<div style="font-size:54px">🍺🏘️🎉</div><div class="mkr"><span class="mk">👆 Toque no chão para andar</span></div><div class="mkr"><span class="mk">🕹️ No celular: joystick</span></div>'],
- ['mercadinho','<b>💰 Dinheiro vem do trabalho</b><br>Pegue um emprego e faça as tarefas: cada uma paga <b>dinheiro e XP na hora</b>. Com o nível, liberam empregos que pagam mais.','<div class="mkc" style="align-items:stretch;width:80%"><span class="mk">💼 Repositor · Mercadinho</span><span class="mk">💼 Garçom · Bar do Tonhão</span><span class="mk" style="opacity:.6">🔒 Médico (nível 19)</span></div><span class="mkf" style="right:20px;top:30px">+R$ 8 +3 XP</span>'],
- [null,'<b>🍗 Fique de olho na fome e na sede 💧</b><br>As barrinhas caem com o tempo e trabalhando. Beba água, suco ou uma cervejinha. Coma no bar, na padaria ou na feirinha. No <b>☰</b> (canto direito) ficam empregos, carro, mochila e perfil.','<div class="mkr"><span class="mk">💰 R$ 100</span><span class="mk">⭐ Nv 1</span><span class="mk">🍗 47%</span></div><div style="font-size:40px">🥟🍽️🥖🍎</div>'],
- [null,'<b>🎯 Siga a missão!</b><br>O cartão dourado no alto da tela e a <b>seta amarela</b> mostram o que fazer para ganhar seu primeiro dinheiro. Tem <b>bônus de R$ 50</b> no final!','<div style="font-size:54px">🎯💰</div><div class="mkr"><span class="mk" style="border-color:var(--gold)">🎯 Missão: ganhe seu primeiro dinheiro</span></div>']
+ [null,'<b>Bem-vindo(a) à Cidade do Tonhão! 🍺</b><br>Aqui você trabalha, ganha dinheiro, compra casa e carro e faz amigos.<br><br><b>Como andar:</b> toque no chão para onde quer ir. No celular também dá para usar o <b>joystick</b> (a bolinha no canto de baixo). Para entrar num lugar, é só tocar nele.','<div class="tv"><div class="tvChao"></div><div class="tvDedo">👆</div><div class="tvBoneco">🧍</div><div class="tvAlvo"></div></div>'],
+ [null,'<b>💼 Empregos e o menu ☰</b><br>Toque no <b>☰</b> (lado direito da tela) e depois em <b>💼 Empregos</b>. Lá aparece a lista: os liberados você pega na hora, os com <b>🔒</b> liberam quando você sobe de nível.<br>Cada tarefa paga <b>dinheiro e XP na hora</b>. Mais XP = mais nível = empregos que pagam mais!','<div class="tv"><div class="tvMenu">☰</div><div class="tvDedo tvDedo2">👆</div><div class="tvLista"><span>💼 Repositor · Nv 1</span><span>💼 Garçom · Nv 1</span><span>💼 Frentista · Nv 2</span><span>💼 Padeiro · Nv 3</span><span class="lk">🔒 Mecânico · Nv 6</span><span class="lk">🔒 Policial · Nv 15</span><span class="lk">🔒 Médico · Nv 19</span></div></div>'],
+ [null,'<b>🍗 Fome, 💧 sede e 🎒 mochila</b><br>As barrinhas lá em cima caem com o tempo e trabalhando. Se zerar, você desmaia e vai para o hospital!<br>Coma na <b>Feirinha</b>, na <b>Padaria</b> ou no <b>Bar</b>. Para beber: água, suco ou uma cervejinha.<br>Toque no <b>🎒</b> do lado do item para guardar na mochila e usar depois.','<div class="tv"><div class="tvBarras"><span>💰 R$ 100</span><span class="tvF">🍗 <i></i></span><span class="tvS">💧 <i></i></span></div><div style="font-size:34px;margin-top:8px">🍌🥖💧🍺</div></div>'],
+ [null,'<b>🎯 Agora vem a sua primeira missão!</b><br>Assim que fechar este tutorial, vai aparecer um <b>cartão dourado</b> no alto da tela dizendo o que fazer, e uma <b>seta amarela nos seus pés</b> apontando o caminho.<br>Complete e ganhe <b>R$ 100 de bônus</b>! Se quiser jogar sozinho(a), é só tocar no <b>✕</b> do cartão.','<div class="tv"><div class="tvMissao">🎯 MISSÃO 1: ganhe seu primeiro dinheiro</div><div class="tvBoneco tvB2">🧍</div><div class="tvSeta">➤</div></div>']
 ];
 let tutoI=0;
 function tutoMostra(){const st=TUTO[tutoI];$('tutoTxt').innerHTML=st[1];$('tutoImg').innerHTML=st[2]||'';$('tutoDots').innerHTML=TUTO.map((_,i)=>'<i class="'+(i===tutoI?'on':'')+'"></i>').join('');$('tutoProx').textContent=tutoI===0?'Começar tour ›':tutoI===TUTO.length-1?'Bora jogar! ✓':'Próximo ›';$('tutoPular').classList.toggle('hidden',tutoI===TUTO.length-1);
  if(st[0]&&FOCUS[st[0]]){follow=null;const f=FOCUS[st[0]];cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.min(f[2]*Math.max(.8,cw/700),2.2)}else if(eu){follow=eu}}
-function tutoFim(){$('tuto').classList.add('hidden');if(eu)follow=eu;try{localStorage.setItem('cidadeTonhao.tuto','1')}catch(e){}}
+function tutoFim(){$('tuto').classList.add('hidden');if(eu&&eu.tutoPend){eu.tutoPend=false;if(msAtiva())later(.6,()=>{bannerGrande('🎯 SUA PRIMEIRA MISSÃO!','Siga o cartão dourado e a seta. Bônus de R$ 100!');Som.play('clique')})}if(eu)follow=eu;try{localStorage.setItem('cidadeTonhao.tuto','1')}catch(e){}}
 function tutorial(){tutoI=0;$('tuto').classList.remove('hidden');tutoMostra()}
 $('tutoProx').onclick=()=>{if(++tutoI>=TUTO.length)tutoFim();else tutoMostra()};$('tutoPular').onclick=tutoFim;
 /* ----- primeira missão: guia quem acabou de chegar até o primeiro dinheiro ----- */
@@ -4000,12 +4017,12 @@ const MS_META=3;let msTar=0,msBusy=false;try{msTar=+localStorage.getItem('cidade
 function msAtiva(){return !!eu&&(eu.missao===0||eu.missao===1)}
 function msAlvo(){if(!msAtiva())return null;const b=eu.missao===0?SHOPS.mercadinho:SHOPS.padaria,x=(b.front[0]+.5)*TILE,y=(b.front[1]+.5)*TILE-2;
  return{b,x,y,rotulo:eu.missao===0?'💼 Trabalhe aqui':'🥖 Coma aqui',perto:Math.hypot(eu.x-x,eu.y-y)<T(3),seta:!trabalho&&!emCasa&&!(eu.missao===0&&msTar>=MS_META)}}
-function msRender(){const el=$('missao'),on=msAtiva()&&$('tuto').classList.contains('hidden')&&!sinucaAberta;el.classList.toggle('hidden',!on);if(!on){$('perto').style.top='';return}
+function msRender(){const el=$('missao'),on=msAtiva()&&!eu.tutoPend&&$('tuto').classList.contains('hidden')&&!sinucaAberta;el.classList.toggle('hidden',!on);if(!on){$('perto').style.top='';return}
  const a=msAlvo(),w=$('work'),wOn=!w.classList.contains('hidden');el.style.top=(wOn?Math.round(w.getBoundingClientRect().bottom+6):150)+'px';
  let tit,txt,ir=false,pct;
  if(eu.missao===0){tit='🎯 MISSÃO 1: ganhe seu primeiro dinheiro';pct=Math.min(1,msTar/MS_META);
   if(msTar>=MS_META)txt='Recebendo seu bônus…';
-  else if(trabalho)txt=trabalho.job==='policia'?'Termine a ronda para ganhar.':`Acerte <b>${MS_META} tarefas</b>: <b>${msTar}/${MS_META}</b> · 🎁 bônus de R$ 50`;
+  else if(trabalho)txt=trabalho.job==='policia'?'Termine a ronda para ganhar.':`Acerte <b>${MS_META} tarefas</b>: <b>${msTar}/${MS_META}</b> · 🎁 bônus de R$ 100`;
   else if(a.perto)txt='Chegou! Toque no <b>🛒 Mercadinho</b> e depois em <b>💼 Trabalhar de Repositor</b>.';
   else{txt='Vá até o <b>🛒 Mercadinho</b> e pegue o emprego de <b>Repositor</b>. Siga a seta amarela.';ir=true}
   if(msTar>=MS_META&&!msBusy)msPasso(1)}
@@ -4019,12 +4036,12 @@ setInterval(msRender,400);
 function msTarefa(){if(!eu||eu.missao!==0)return;msTar++;try{localStorage.setItem('cidadeTonhao.msTar',msTar)}catch(e){}msRender()}
 function msComprou(it){if(eu&&eu.missao===1&&it&&it.fome>0&&!msBusy)msPasso(2)}
 function msPasso(p,pulou){msBusy=true;api.missao(p).then(r=>{if(r&&r.eu)aplicarEstado(r.eu);eu.missao=r&&r.missao!=null?+r.missao:2;
-  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('moeda');floatText(eu.x,eu.y-44,'+'+money(r.bonus||50)+' 🎁','#ffd23f');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||50)+'. Agora vá comer alguma coisa!')}
+  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('compra');floatText(eu.x,eu.y-44,'+'+money(r.bonus||100),'#9dff7a');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||100)+'. Agora vá comer alguma coisa!')}
   else if(!pulou){closePlace();bannerGrande('🎉 MISSÃO COMPLETA!','Agora é com você! Mais empregos em ☰ → 💼 Empregos')}
   if(eu.missao>=2)try{localStorage.removeItem('cidadeTonhao.msTar')}catch(e){}})
  .catch(()=>{eu.missao=2}).finally(()=>{msBusy=false;msRender()})}
 $('msIr').onclick=()=>{const a=msAlvo();if(!a||!livre())return;Som.play('clique');irPara(a.x,a.y,()=>abrirLugar(a.b))};
-$('msX').onclick=()=>confirmar('Pular a missão?',eu.missao===0?'Você fica <b>sem o bônus de R$ 50</b>.':'A missão some da tela.',()=>msPasso(2,true));
+$('msX').onclick=()=>confirmar('Pular a missão?',eu.missao===0?'Você fica <b>sem o bônus de R$ 100</b>.':'A missão some da tela.',()=>msPasso(2,true));
 $('shuffle').onclick=()=>{prov=randomVis();renderProv()};
 $('copyCode').onclick=()=>copy(encode(prov),'Código do visual copiado!');
 $('enter').onclick=()=>{
