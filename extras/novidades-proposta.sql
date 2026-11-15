@@ -19,10 +19,13 @@ drop policy if exists "ver meu guarda-roupa" on public.guarda_roupa;
 create policy "ver meu guarda-roupa" on public.guarda_roupa for select to authenticated using (morador = auth.uid());
 revoke insert, update, delete on public.guarda_roupa from anon, authenticated;
 
--- preço igual ao do jogo: as 4 primeiras grátis (2 na estampa), depois R$ 30 subindo 15% por peça
+-- preço igual ao do jogo: as 4 primeiras grátis (2 na estampa), depois R$ 30 subindo 15% por peça; itens de luxo (40 a 49) com preço fixo
 create or replace function public.preco_roupa(p_peca text, p_item integer) returns integer
 language sql immutable as $$
-  select case when p_item < (case when p_peca = 'estampa' then 2 else 4 end) then 0
+  select case
+    when p_item >= 40 then coalesce((case split_part(p_peca, '_', 1)
+      when 'roupa' then array[5000,12000,25000] when 'calcado' then array[3000,6000] when 'chapeu' then array[1500,2500,4000] end)[p_item - 39], 999999)
+    when p_item < (case when p_peca = 'estampa' then 2 else 4 end) then 0
     else (round(30 * power(1.15, p_item - (case when p_peca = 'estampa' then 2 else 4 end)) / 10) * 10)::integer end
 $$;
 

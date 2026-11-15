@@ -514,7 +514,8 @@ const CORES_N=['Vermelha','Azul','Amarela','Verde','Branca','Roxa','Laranja','Tu
 const VIPCOR=['#d4af37','#c9ced6','#39ff14'],VIPCOR_N=['Dourada','Prata','Neon'];
 const corRoupa=i=>i>=50?VIPCOR[i-50]||CORES[0]:CORES[i]||CORES[0];  // cor da roupa (sem "padrão")
 const corOpc=i=>!i?null:i>=50?VIPCOR[i-50]||null:CORES[i-1]||null;  // 0 = cor padrão da peça
-const ESTILO_BASE={listrada:'camiseta',colete:'camiseta',camisaJeans:'social',agasalho:'jaqueta',banda:'camiseta',degrade:'curto',lateral:'curto',surfista:'curto',mullet:'curto',espetado:'curto',couro:'jaqueta',tonhao:'time',ternoBranco:'terno',gala:'vestidoLongo',havaiana:'camiseta',cargo:'bege',boneOuro:'bone',diamante:'corrente',tenisOuro:'tenis'};
+const LUX_COR={veludo:'#6b1f3a',pele:'#efe4d2',grife:'#14142a',dourado:'#d4af37'};
+const ESTILO_BASE={veludo:'blazer',pele:'puffer',grife:'terno',dourado:'vestidoLongo',tenisGrife:'chunky',verniz:'social',listrada:'camiseta',colete:'camiseta',camisaJeans:'social',agasalho:'jaqueta',banda:'camiseta',degrade:'curto',lateral:'curto',surfista:'curto',mullet:'curto',espetado:'curto',couro:'jaqueta',tonhao:'time',ternoBranco:'terno',gala:'vestidoLongo',havaiana:'camiseta',cargo:'bege',boneOuro:'bone',diamante:'corrente',tenisOuro:'tenis'};
 // Cada opção do provador tem nome (o que o jogador vê) e estilo (o que o desenho usa), por sexo.
 // sexo 0 = masculino (é o padrão dos códigos antigos, que continuam iguais), 1 = feminino.
 const OPC={
@@ -522,14 +523,14 @@ const OPC={
   f:[['Comprido','comprido'],['Coque','coque'],['Rabo de cavalo','rabo'],['Trança','tranca','x'],['Cacheado','cacheado'],['Black power','black'],['French bob','chanel'],['Comprido com franja','franja'],['Maria-chiquinha','chiquinha','x'],['Pixie','curto'],['Butterfly (camadas)','butterfly'],['Long bob','lob'],['Ondas boho','ondas'],['Box braids','boxbraids'],['Comprido com cortininha','cortina'],['Meio preso','meiopreso'],['Cachos longos','cachoslongos'],['Duas tranças','duas','x'],['Coque bagunçado','coqueB']]},
  calca:{m:[['Jeans','jeans'],['Preta','preta'],['Marrom','marrom'],['Bege','bege'],['Verde','verde'],['Bermuda jeans','bermudaJeans'],['Bermuda cáqui','bermudaCaqui'],['Calça de moletom','moletomCalca'],['Calça cargo','cargo'],['Jeans baggy','baggy'],['Calça wide leg','wide'],['Jeans barrel','barrel'],['Jogger','jogger'],['Cargo larga','cargoLarga'],['Jeans skinny','skinny'],['Alfaiataria','alfaiataria'],['Bermuda cargo','bermudaCargo'],['Short tactel','tactel']],
   f:[['Calça jeans','jeans'],['Legging','legging'],['Saia jeans','saiaJeans'],['Saia rodada','saiaRodada'],['Short jeans','shortJeans'],['Calça branca','branca'],['Saia preta','saiaPreta'],['Saia longa','saiaLonga'],['Calça cargo','cargo'],['Wide leg','wide'],['Jeans baggy','baggy'],['Flare','flare'],['Pantalona','pantalona'],['Jeans barrel','barrel'],['Jogger','jogger'],['Alfaiataria','alfaiataria'],['Saia midi plissada','saiaMidi'],['Saia lápis','saiaLapis'],['Saia jeans longa','saiaMaxi'],['Saia de tênis','saiaTenis'],['Minissaia jeans','saiaMiniJeans'],['Saia envelope','saiaEnvelope'],['Saia de tule','saiaTule'],['Minissaia de couro','saiaMiniCouro']]},
- chapeu:{vip:[['Coroa','coroa'],['Boné de ouro','boneOuro']],m:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Capacete','capacete'],['Cartola','cartola'],['Chapéu de cowboy','cowboy'],['Boné aba reta','boneReto'],['Chapéu de pescador','pescador']],
+ chapeu:{lux:[['Boné de grife','boneGrife'],['Chapéu panamá','panama'],['Fedora de feltro','fedora']],vip:[['Coroa','coroa'],['Boné de ouro','boneOuro']],m:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Capacete','capacete'],['Cartola','cartola'],['Chapéu de cowboy','cowboy'],['Boné aba reta','boneReto'],['Chapéu de pescador','pescador']],
   f:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Tiara','tiara'],['Flor no cabelo','flor'],['Chapéu de cowboy','cowboy'],['Laço','laco'],['Chapéu de pescador','pescador']]},
  extra:{vip:[['Corrente de diamante','diamante']],m:[['Nada','nada'],['Óculos','oculos'],['Bigode','bigode'],['Óculos escuros','escuros'],['Barba','barba'],['Palito na boca','palito'],['Corrente de ouro','corrente'],['Brinco','brinco']],
   f:[['Nada','nada'],['Óculos','oculos'],['Batom','batom'],['Óculos escuros','escuros'],['Argola grande','argola'],['Colar de pérolas','perolas'],['Corrente de ouro','corrente'],['Brinco','brinco']]},
- roupa:{vip:[['Jaqueta de couro','couro'],['Camisa do Tonhão','tonhao']],vipm:[['Terno branco','ternoBranco']],vipf:[['Vestido de gala','gala']],m:[['Camiseta','camiseta'],['Regata','regata'],['Camisa social','social'],['Jaqueta','jaqueta'],['Moletom','moletom'],['Camisa polo','polo'],['Camisa de time','time'],['Macacão','macacao'],['Camisa xadrez','xadrez'],['Terno','terno'],['Camisa havaiana','havaiana'],['Camiseta listrada','listrada'],['Colete','colete'],['Camisa jeans','camisaJeans'],['Agasalho esportivo','agasalho'],['Camiseta de banda','banda'],['Camiseta oversized','oversized'],['Jaqueta jeans','jaquetaJeans'],['Corta-vento','cortaVento'],['Jaqueta puffer','puffer'],['Blazer','blazer'],['Suéter de tricô','sueter'],['Camisa aberta florida','camisaAberta']],
+ roupa:{lux:[['Blazer de veludo','veludo'],['Casaco de pele','pele']],luxm:[['Terno de grife','grife']],luxf:[['Vestido de festa dourado','dourado']],vip:[['Jaqueta de couro','couro'],['Camisa do Tonhão','tonhao']],vipm:[['Terno branco','ternoBranco']],vipf:[['Vestido de gala','gala']],m:[['Camiseta','camiseta'],['Regata','regata'],['Camisa social','social'],['Jaqueta','jaqueta'],['Moletom','moletom'],['Camisa polo','polo'],['Camisa de time','time'],['Macacão','macacao'],['Camisa xadrez','xadrez'],['Terno','terno'],['Camisa havaiana','havaiana'],['Camiseta listrada','listrada'],['Colete','colete'],['Camisa jeans','camisaJeans'],['Agasalho esportivo','agasalho'],['Camiseta de banda','banda'],['Camiseta oversized','oversized'],['Jaqueta jeans','jaquetaJeans'],['Corta-vento','cortaVento'],['Jaqueta puffer','puffer'],['Blazer','blazer'],['Suéter de tricô','sueter'],['Camisa aberta florida','camisaAberta']],
   f:[['Blusinha','blusinha'],['Cropped','cropped'],['Vestido','vestido'],['Vestido longo','vestidoLongo'],['Jaqueta','jaqueta'],['Moletom','moletom'],['Camisa de time','time'],['Macacão','macacao'],['Camisa xadrez','xadrez'],['Regata','regataF'],['Camisa havaiana','havaiana'],['Top de alcinha','topAlca'],['Blusa ombro a ombro','ombro'],['Cardigan','cardigan'],['Jaqueta jeans','jaquetaJeans'],['Jaqueta puffer','puffer'],['Blazer','blazer'],['Vestido tubinho','tubinho'],['Camiseta oversized','oversized']]},
  barba:{m:[['Nenhuma','nenhuma'],['Por fazer','rala'],['Cheia','cheia'],['Cavanhaque','cavanhaque'],['Bigode grosso','bigodeGrosso'],['Bigodinho','bigodinho'],['Lenhador','lenhador'],['Costeleta','costeleta'],['Bode','bode']],f:[['Nenhuma','nenhuma']]},
- calcado:{vip:[['Tênis de ouro','tenisOuro']],m:[['Tênis','tenis'],['Chinelo','chinelo'],['Bota','bota'],['Sapato social','social'],['Tênis chunky','chunky'],['Tênis cano alto','cano'],['Coturno','coturno'],['Mocassim','mocassim'],['Sandália','sandalia']],
+ calcado:{lux:[['Tênis de grife','tenisGrife'],['Sapato de verniz','verniz']],vip:[['Tênis de ouro','tenisOuro']],m:[['Tênis','tenis'],['Chinelo','chinelo'],['Bota','bota'],['Sapato social','social'],['Tênis chunky','chunky'],['Tênis cano alto','cano'],['Coturno','coturno'],['Mocassim','mocassim'],['Sandália','sandalia']],
   f:[['Tênis','tenis'],['Chinelo','chinelo'],['Bota','bota'],['Salto','salto'],['Sapatilha','sapatilha'],['Tênis chunky','chunky'],['Tênis cano alto','cano'],['Coturno','coturno'],['Sandália','sandalia'],['Mocassim','mocassim']]}
 };
 const FIELDS=[ // a ordem dos 10 primeiros não pode mudar (códigos antigos TH)
@@ -553,9 +554,10 @@ const COR_VIP=new Set(['camisa','corCalca','corCalcado','corChapeu']);
 const sx=v=>v&&v.sexo===1?'f':'m';
 const optsOf=(f,v)=>Array.isArray(f[2])?f[2]:f[2][sx(v)];
 const vipOf=(f,v)=>{if(COR_VIP.has(f[0]))return VIPCOR_N.map(n=>[n,n]);if(Array.isArray(f[2]))return[];return(f[2].vip||[]).concat(f[2]['vip'+sx(v)]||[])};
+const luxOf=(f,v)=>Array.isArray(f[2])?[]:(f[2].lux||[]).concat(f[2]['lux'+sx(v)]||[]);
 const nomesOf=(f,v)=>optsOf(f,v).map(o=>Array.isArray(o)?o[0]:o);
-const valido=(f,v,i)=>i>=0&&(i<optsOf(f,v).length||(i>=50&&i-50<vipOf(f,v).length));
-const estilo=(k,v)=>{const f=FIELDS.find(g=>g[0]===k),i=v[k]||0;const o=i>=50?vipOf(f,v)[i-50]:OPC[k][sx(v)][i];if(o&&o[2]==='x')return OPC[k][sx(v)][v.sexo===1?0:1][1];return(o||OPC[k][sx(v)][0])[1]};
+const valido=(f,v,i)=>i>=0&&(i<optsOf(f,v).length||(i>=40&&i<50&&i-40<luxOf(f,v).length)||(i>=50&&i-50<vipOf(f,v).length));
+const estilo=(k,v)=>{const f=FIELDS.find(g=>g[0]===k),i=v[k]||0;const o=i>=50?vipOf(f,v)[i-50]:i>=40?luxOf(f,v)[i-40]:OPC[k][sx(v)][i];if(o&&o[2]==='x')return OPC[k][sx(v)][v.sexo===1?0:1][1];return(o||OPC[k][sx(v)][0])[1]};
 const ehVip=v=>FIELDS.some(f=>(v[f[0]]||0)>=50);
 const semVip=v=>{const w=Object.assign({},v);FIELDS.forEach(f=>{if((w[f[0]]||0)>=50)w[f[0]]=0});return w};
 const vis=a=>{const v={};FIELDS.forEach((f,i)=>v[f[0]]=a[i]||0);FIELDS.forEach(f=>{if(!valido(f,v,v[f[0]]))v[f[0]]=0});return v};
@@ -871,16 +873,36 @@ function drawHead(c,v,o,dir,back){
   if(ex2==='brinco'){c.fillStyle='#f3c13a';circ(c,-dir*6.8,3.4,1.1)}
   if(ex2==='argola'){c.strokeStyle='#f3c13a';c.lineWidth=.9;c.beginPath();c.arc(-dir*6.8,4.6,2,0,7);c.stroke()}
  }
- const HC=corOpc(v.corChapeu),hc=HC||CAMISA[((v.camisa%10)+3)%10];if(hat==='boneOuro'){c.fillStyle='#d4af37';c.beginPath();c.arc(0,-.8,7.8,Math.PI,2*Math.PI);c.closePath();c.fill();if(!back){if(fr){c.beginPath();c.ellipse(0,-2,7.6,2.3,0,0,Math.PI);c.fill()}else{rr(c,dir>0?-1:-10,-2.2,11,2.3,1);c.fill()}}c.fillStyle='#fff6c9';c.fillRect(-1.5,-6,3,1.4)}
+ const HC=corOpc(v.corChapeu),hc=HC||CAMISA[((v.camisa%10)+3)%10];
+ // ---- chapéus com volume: cúpula com luz e sombra, costuras, aba com sombra na testa ----
+ const gradR=(col,cx,cy,r)=>{const g=c.createRadialGradient(cx-r*.35-(fr?0:dir*r*.15),cy-r*.55,r*.08,cx,cy,r*1.15);g.addColorStop(0,shade(col,40));g.addColorStop(.55,col);g.addColorStop(1,shade(col,-40));return g};
+ const domo=(col,r,cy)=>{c.fillStyle=gradR(col,0,cy,r);c.beginPath();c.arc(0,cy,r,Math.PI,2*Math.PI);c.quadraticCurveTo(0,cy+1.1,-r,cy);c.fill()};
+ const costura=(col,r,cy)=>{c.strokeStyle=shade(col,-30);c.lineWidth=.3;c.beginPath();if(back){c.moveTo(0,cy-r);c.lineTo(0,cy)}else{const k=fr?0:dir*2.2;c.moveTo(k,cy-r);c.quadraticCurveTo(k-3.2,cy-r*.5,k-4.6,cy);c.moveTo(k,cy-r);c.quadraticCurveTo(k+3.2,cy-r*.5,k+4.6,cy)}c.stroke();c.fillStyle=shade(col,-15);circ(c,fr?0:dir*.8,cy-r+.25,.7)};
+ const viseira=(col,cy,larg,reta)=>{if(back){c.fillStyle=shade(col,-25);c.beginPath();c.arc(0,cy-.2,2.2,Math.PI,2*Math.PI);c.fill();c.fillStyle='#ddd';c.fillRect(-1.6,cy-.6,3.2,.6);return}
+  c.fillStyle='rgba(0,0,0,.22)';c.beginPath();c.ellipse(fr?0:dir*2,cy+1.4,fr?6.6:5,1.2,0,0,7);c.fill();
+  if(fr){const g=c.createLinearGradient(0,cy-1,0,cy+(reta?1.6:2.6));g.addColorStop(0,shade(col,10));g.addColorStop(1,shade(col,-35));c.fillStyle=g;c.beginPath();if(reta){c.rect(-larg,cy-.6,larg*2,1.9)}else{c.ellipse(0,cy-.4,larg,2.5,0,0,Math.PI)}c.fill()}
+  else{const g=c.createLinearGradient(0,cy-1,0,cy+1.6);g.addColorStop(0,shade(col,10));g.addColorStop(1,shade(col,-35));c.fillStyle=g;c.beginPath();c.moveTo(-dir*1,cy-.9);c.lineTo(dir*(larg+3.8),cy-(reta?.9:.2));c.quadraticCurveTo(dir*(larg+4.6),cy+.6,dir*(larg+3),cy+(reta?1:1.3));c.lineTo(-dir*1,cy+.9);c.fill()}};
+ const abaLarga=(col,rx,ry,cy)=>{c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(0,cy+1.3,rx*.8,ry*.7,0,0,7);c.fill();const g=c.createLinearGradient(0,cy-ry,0,cy+ry);g.addColorStop(0,shade(col,18));g.addColorStop(1,shade(col,-30));c.fillStyle=g;c.beginPath();c.ellipse(0,cy,rx,ry,0,0,7);c.fill();c.strokeStyle=shade(col,-40);c.lineWidth=.35;c.stroke()};
+ const copa=(col,x0,x1,y0,y1,rad)=>{const g=c.createLinearGradient(x0,0,x1,0);g.addColorStop(0,shade(col,22));g.addColorStop(.5,col);g.addColorStop(1,shade(col,-35));c.fillStyle=g;rr(c,x0,y0,x1-x0,y1-y0,rad);c.fill()};
+ const faixa=(col,x0,x1,y,h)=>{c.fillStyle=col;c.fillRect(x0,y,x1-x0,h);c.fillStyle='rgba(255,255,255,.25)';c.fillRect(x0,y,x1-x0,h*.3)};
+ const boneDe=(col,logo)=>{domo(col,7.9,-.9);costura(col,7.9,-.9);viseira(col,-1.3,7.4,false);if(logo&&!back){c.fillStyle=logo;c.font='bold 2.4px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('T',fr?0:dir*2.4,-4.4)}};
+ if(hat==='boneOuro'){boneDe('#d4af37','#fff6c9')}
  switch(hat){
-  case'bone':c.fillStyle=hc;c.beginPath();c.arc(0,-.8,7.8,Math.PI,2*Math.PI);c.closePath();c.fill();if(!back){if(fr){c.beginPath();c.ellipse(0,-2,7.6,2.3,0,0,Math.PI);c.fill()}else{rr(c,dir>0?-1:-10,-2.2,11,2.3,1);c.fill()}}break;
-  case'palha':c.fillStyle=HC||'#e3c16f';c.beginPath();c.ellipse(0,-4.3,11.5,2.7,0,0,7);c.fill();c.beginPath();c.arc(0,-4.5,6.2,Math.PI,2*Math.PI);c.fill();c.fillStyle='#8b5a2b';c.fillRect(-6,-6,12,1.6);break;
-  case'touca':c.fillStyle=hc;c.beginPath();c.arc(0,-.6,7.9,Math.PI*1.02,Math.PI*1.98);c.closePath();c.fill();c.fillStyle='#fff';circ(c,0,-9,2.4);break;
-  case'bandana':c.fillStyle=HC||'#c0392b';c.fillRect(-7.3,-4.8,14.6,2.7);circ(c,-dir*7.6,-3.6,1.8);break;
-  case'capacete':c.fillStyle=HC||'#f4c430';c.beginPath();c.arc(0,-1.2,8,Math.PI,2*Math.PI);c.closePath();c.fill();c.fillRect(-9.5,-2.4,19,2);c.fillStyle='#e0ad18';c.fillRect(-1,-9,2,7);break;
-  case'cartola':c.fillStyle=HC||'#1b1b1b';c.fillRect(-5.2,-17.5,10.4,12);c.fillRect(-8.8,-6.6,17.6,2.2);c.fillStyle='#c0392b';c.fillRect(-5.2,-8.6,10.4,2);break;
-  case'cowboy':c.fillStyle=HC||'#8a5a33';c.beginPath();c.ellipse(0,-4.6,12.5,2.6,0,0,7);c.fill();rr(c,-6,-12.5,12,8.5,3);c.fill();c.fillStyle='#6d4426';c.fillRect(-6,-6.8,12,1.6);c.fillStyle='#a8743f';c.fillRect(-1,-12.5,2,3);break;
-  case'boneReto':c.fillStyle=HC||'#1d1d22';c.beginPath();c.arc(0,-.9,7.8,Math.PI,2*Math.PI);c.closePath();c.fill();c.fillStyle=hc;c.fillRect(-3,-6.5,6,2.2);if(!back){c.fillStyle='#1d1d22';if(fr)c.fillRect(-7.5,-2.4,15,1.8);else c.fillRect(dir>0?-1:-11,-2.4,12,1.8)}break;
+  case'bone':boneDe(hc,!back?shade(hc,60):null);break;
+  case'boneGrife':boneDe('#141418','#d4af37');if(!back){c.strokeStyle='#d4af37';c.lineWidth=.35;c.beginPath();c.arc(fr?0:dir*2.4,-4.4,1.9,0,7);c.stroke()}break;
+  case'boneReto':{const col=HC||'#1d1d22';domo(col,7.9,-1);costura(col,7.9,-1);if(!back){c.fillStyle=hc;rr(c,(fr?0:dir*2.2)-3,-6.4,6,2.2,.6);c.fill()}viseira('#1d1d22',-1.4,7.6,true);break}
+  case'palha':{const col=HC||'#e3c16f';abaLarga(col,11.8,2.8,-4.3);c.fillStyle=gradR(col,0,-4.6,6.3);c.beginPath();c.arc(0,-4.6,6.3,Math.PI,2*Math.PI);c.fill();c.strokeStyle=shade(col,-28);c.lineWidth=.25;for(let y=-9.6;y<-4.8;y+=1.2){c.beginPath();c.moveTo(-6,y);c.lineTo(6,y);c.stroke()}faixa('#8b5a2b',-6.2,6.2,-6.1,1.5);break}
+  case'touca':{domo(hc,8,-.6);c.strokeStyle=shade(hc,-25);c.lineWidth=.35;for(let x=-6;x<=6;x+=1.5){c.beginPath();c.moveTo(x,-.8);c.lineTo(x*.7,-7.4+Math.abs(x)*.25);c.stroke()}faixa(shade(hc,-12),-8,8,-2.6,2.2);c.fillStyle=gradR('#ffffff',0,-9.2,2.6);circ(c,0,-9.2,2.6);break}
+  case'bandana':{const col=HC||'#c0392b';const g=c.createLinearGradient(0,-5.2,0,-1.8);g.addColorStop(0,shade(col,25));g.addColorStop(1,shade(col,-25));c.fillStyle=g;c.beginPath();c.moveTo(-7.5,-2.2);c.quadraticCurveTo(0,-6.4,7.5,-2.2);c.lineTo(7.4,-4.4);c.quadraticCurveTo(0,-8,-7.4,-4.4);c.closePath();c.fill();c.fillStyle='#fff';for(let i=-2;i<=2;i++)circ(c,i*2.6,-4.6+Math.abs(i)*.5,.35);if(!fr){c.fillStyle=col;c.beginPath();c.moveTo(-dir*7,-3.4);c.lineTo(-dir*10,-1);c.lineTo(-dir*8.4,-.2);c.closePath();c.fill()}break}
+  case'capacete':{const col=HC||'#f4c430';domo(col,8.1,-1.2);c.fillStyle=shade(col,-12);rr(c,-1.2,-9.2,2.4,8,1);c.fill();abaLarga(col,9.8,1.3,-1.6);break}
+  case'cartola':{const col=HC||'#1b1b1b';abaLarga(col,9,1.6,-5.6);copa(col,-5.3,5.3,-17.6,-5.4,1.2);faixa('#c0392b',-5.3,5.3,-8.6,2);c.fillStyle=shade(col,15);c.beginPath();c.ellipse(0,-17.5,5.3,1.1,0,0,7);c.fill();break}
+  case'cowboy':{const col=HC||'#8a5a33';c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(0,-3.2,10,1.8,0,0,7);c.fill();const g=c.createLinearGradient(0,-7,0,-2);g.addColorStop(0,shade(col,18));g.addColorStop(1,shade(col,-30));c.fillStyle=g;c.beginPath();c.moveTo(-13,-6.6);c.quadraticCurveTo(-9,-3,0,-3.6);c.quadraticCurveTo(9,-3,13,-6.6);c.quadraticCurveTo(10,-5.4,0,-5.4);c.quadraticCurveTo(-10,-5.4,-13,-6.6);c.fill();
+   copa(col,-6,6,-12.8,-4.8,3);c.fillStyle=shade(col,-25);c.beginPath();c.moveTo(-2,-12.8);c.quadraticCurveTo(0,-10.6,2,-12.8);c.fill();faixa('#5a3418',-6,6,-6.8,1.5);c.fillStyle='#c9a227';circ(c,fr?0:dir*3,-6.05,.55);break}
+  case'pescador':{const col=HC||'#c7b48a';c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(0,-2.4,8.8,1.4,0,0,7);c.fill();const g=c.createLinearGradient(0,-6,0,-2.8);g.addColorStop(0,shade(col,15));g.addColorStop(1,shade(col,-30));c.fillStyle=g;c.beginPath();c.moveTo(-10,-2.8);c.quadraticCurveTo(0,-1.6,10,-2.8);c.lineTo(6.6,-5.8);c.lineTo(-6.6,-5.8);c.closePath();c.fill();
+   c.fillStyle=gradR(col,0,-5.6,6.5);c.beginPath();c.arc(0,-5.6,6.5,Math.PI,2*Math.PI);c.fill();c.strokeStyle=shade(col,-25);c.lineWidth=.25;c.beginPath();c.arc(0,-5.6,4.4,Math.PI,2*Math.PI);c.stroke();c.fillStyle='#555';circ(c,-4,-7.6,.35);circ(c,4,-7.6,.35);break}
+  case'panama':{const col='#f1e6c8';abaLarga(col,11.4,2.5,-4.4);copa(col,-5.8,5.8,-11.4,-4.2,2.6);c.fillStyle=shade(col,-22);c.beginPath();c.moveTo(-2.6,-11.4);c.quadraticCurveTo(0,-9.4,2.6,-11.4);c.fill();faixa('#14142a',-5.8,5.8,-6.4,1.6);break}
+  case'fedora':{const col='#3b2f2a';c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(0,-3.4,9,1.5,0,0,7);c.fill();const g=c.createLinearGradient(0,-6,0,-3);g.addColorStop(0,shade(col,20));g.addColorStop(1,shade(col,-30));c.fillStyle=g;c.beginPath();c.moveTo(-10.4,-5.6);c.quadraticCurveTo(0,-2.4,10.4,-5.6);c.quadraticCurveTo(0,-4.6,-10.4,-5.6);c.fill();c.beginPath();c.ellipse(0,-4.6,10.2,1.6,0,0,7);c.fill();
+   copa(col,-5.8,5.8,-11.6,-4.6,2.4);c.fillStyle=shade(col,-30);c.beginPath();c.moveTo(-3,-11.6);c.quadraticCurveTo(0,-9.2,3,-11.6);c.fill();faixa('#d4af37',-5.8,5.8,-6.6,1.3);break}
   case'tiara':c.strokeStyle=hc;c.lineWidth=1.6;c.beginPath();c.arc(0,-.4,7.6,Math.PI*1.1,Math.PI*1.9);c.stroke();break;
   case'flor':{const fx=-dir*5.5,fy=-5;c.fillStyle=HC||'#ff86b4';for(let i=0;i<5;i++){const a=i/5*Math.PI*2;circ(c,fx+Math.cos(a)*1.8,fy+Math.sin(a)*1.8,1.4)}c.fillStyle='#f3c13a';circ(c,fx,fy,1.1);break}
   case'pescador':c.fillStyle=HC||'#c7b48a';c.beginPath();c.moveTo(-10,-3.2);c.lineTo(10,-3.2);c.lineTo(6.5,-6);c.lineTo(-6.5,-6);c.closePath();c.fill();c.beginPath();c.arc(0,-5.6,6.4,Math.PI,2*Math.PI);c.fill();c.fillStyle='rgba(0,0,0,.18)';c.fillRect(-6.4,-6.4,12.8,1.2);break;
@@ -941,12 +963,12 @@ function estampa(c,P,e,shirt,bw,by,bh,back,lado,dir){if(!e)return;
 function drawPersonReal0(c,x,y,v,o={}){
  const dir=o.dir||1,s=o.s||1,sit=!!o.sit,ph=o.walk,back=!!o.back,fem=v.sexo===1;
  const roupaR=o.suit?'terno':o.tonhao?'polo':o.regata?'regata':estilo('roupa',v),roupa=ESTILO_BASE[roupaR]||roupaR,baixoR=o.suit?'preta':estilo('calca',v),baixo=ESTILO_BASE[baixoR]||baixoR,calcR=o.suit?'social':estilo('calcado',v),calc=ESTILO_BASE[calcR]||calcR,ex2R=estilo('extra',v),ex2=ESTILO_BASE[ex2R]||ex2R;
- const CC=o.suit?null:corOpc(v.corCalca),SC=o.suit?null:(calcR==='tenisOuro'?'#d4af37':corOpc(v.corCalcado));
+ const CC=o.suit?null:corOpc(v.corCalca),SC=o.suit?null:(calcR==='tenisOuro'?'#d4af37':calcR==='tenisGrife'?'#f6f6f6':calcR==='verniz'?'#101014':corOpc(v.corCalcado));
  const BX=o.perfil||o.lado?.8:o.c34?.9:(!o.cara&&!o.back&&!o.sit&&o.walk!=null)?.93:1;c.save();c.translate(x,y);if(o.bebado)c.rotate(Math.sin(now*2.2+x*.01)*.08*o.bebado);c.scale(s*BX,s);
  if(o.ring){c.strokeStyle='#ffc94a';c.lineWidth=2;c.beginPath();c.ellipse(0,0,12,4.5,0,0,Math.PI*2);c.stroke()}
  {const sw0=o.belly?11:8.5;c.save();c.scale(1,.32);const g=c.createRadialGradient(1.5,0,0,1.5,0,sw0);g.addColorStop(0,'rgba(0,0,0,.34)');g.addColorStop(.7,'rgba(0,0,0,.16)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;circ(c,1.5,0,sw0);c.restore()}
  const skin=PELE[v.pele],skinD=shade(skin,-22);
- const shirt=o.policia?'#25406e':o.tonhao?'#3f9a4a':roupaR==='camisaJeans'?'#4a6fa5':roupaR==='jaquetaJeans'?'#5b7fb5':roupaR==='banda'?'#1d1d22':roupaR==='couro'?'#2a2220':roupaR==='ternoBranco'?'#f2f2f2':corRoupa(v.camisa),shirtD=shade(shirt,-28),shirtL=shade(shirt,22);
+ const shirt=LUX_COR[roupaR]&&!o.policia&&!o.tonhao?LUX_COR[roupaR]:o.policia?'#25406e':o.tonhao?'#3f9a4a':roupaR==='camisaJeans'?'#4a6fa5':roupaR==='jaquetaJeans'?'#5b7fb5':roupaR==='banda'?'#1d1d22':roupaR==='couro'?'#2a2220':roupaR==='ternoBranco'?'#f2f2f2':corRoupa(v.camisa),shirtD=shade(shirt,-28),shirtL=shade(shirt,22);
  const PANT={jeans:'#2d4a7a',preta:'#26262b',marrom:'#6b4a2e',bege:'#c7b48a',verde:'#2f5d43',bermudaJeans:'#3f5f8f',bermudaCaqui:'#b59d70',moletomCalca:'#6b6b72',legging:'#1d1d22',saiaJeans:'#3f5f8f',saiaRodada:CAMISA[((v.camisa%10)+4)%10],shortJeans:'#5577aa',branca:'#ece8df',saiaPreta:'#222226',saiaLonga:CAMISA[((v.camisa%10)+2)%10],baggy:'#6f8fbf',wide:'#3b3b40',barrel:'#4d6a96',flare:'#35558a',jogger:'#2f3036',cargoLarga:'#5c6146',skinny:'#1f2f4f',pantalona:'#efe6d6',alfaiataria:'#2a2d36',bermudaCargo:'#7a7550',tactel:CAMISA[((v.camisa%10)+3)%10],saiaMidi:CAMISA[((v.camisa%10)+7)%10],saiaLapis:'#24242a',saiaMaxi:'#4a6c9c',saiaTenis:'#f2f2f2',saiaMiniJeans:'#5a7db0',saiaEnvelope:CAMISA[((v.camisa%10)+1)%10],saiaTule:'#f4b6c8',saiaMiniCouro:'#1e1c1e',shortSaia:CAMISA[((v.camisa%10)+6)%10]};
  // modelagem da calça: largura no quadril, no joelho e no tornozelo (x largura da perna) + detalhes
  const FITS={legging:[.95,.9,.82],skinny:[1,.92,.82],jeans:[1.14,1.1,1.08,'vinco'],preta:[1.14,1.1,1.08,'vinco'],marrom:[1.14,1.1,1.08,'vinco'],bege:[1.14,1.1,1.08,'vinco'],verde:[1.14,1.1,1.08,'vinco'],branca:[1.14,1.1,1.1,'vinco'],moletomCalca:[1.28,1.22,.92,'punho'],jogger:[1.28,1.22,.92,'punho'],cargo:[1.42,1.42,1.36,'cargo'],cargoLarga:[1.48,1.48,1.42,'cargo'],baggy:[1.5,1.52,1.58,'dobras'],wide:[1.36,1.5,1.92,'vinco'],pantalona:[1.4,1.56,2,'vinco'],alfaiataria:[1.2,1.18,1.16,'vinco'],barrel:[1.42,1.7,1.04,'dobras'],flare:[1.04,.98,1.8,'vinco'],bermudaJeans:[1.3,1.3,1.3],bermudaCaqui:[1.3,1.3,1.3],bermudaCargo:[1.45,1.45,1.45,'cargo'],tactel:[1.4,1.4,1.4],shortJeans:[1.15,1.15,1.15]};
@@ -4262,7 +4284,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261115h';
+const VERSAO_JOGO='v20261115i';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -4379,26 +4401,37 @@ function onProposta(o,p){if(!eu)return;
 // preço: as 4 primeiras de cada peça (2 na estampa) são grátis; depois sobe de R$ 30 até mais de R$ 1.000. A MESMA conta está no banco (comprar_roupa).
 const ROUPA_CAMPOS=[['roupa','👕 Roupas'],['calca','👖 Parte de baixo'],['calcado','👟 Calçados'],['chapeu','🧢 Cabeça'],['estampa','🎨 Estampas']];
 const gratisRoupa=c=>c==='estampa'?2:4;
-const precoRoupa=(c,i)=>i<gratisRoupa(c)?0:Math.round(30*Math.pow(1.15,i-gratisRoupa(c))/10)*10;
+const LUX_PRECO={roupa:[5000,12000,25000],calcado:[3000,6000],chapeu:[1500,2500,4000]};
+const precoRoupa=(c,i)=>i>=40?((LUX_PRECO[c]||[])[i-40]||99999):i<gratisRoupa(c)?0:Math.round(30*Math.pow(1.15,i-gratisRoupa(c))/10)*10;
 const pecaRoupa=(c,v)=>c==='estampa'?'estampa':c+'_'+sx(v);
-let lrC=0,lrI=0,lrTem=new Set();
-async function abrirLojaRoupa(sem){closePlace();if(!sem)try{lrTem=new Set(await api.roupas())}catch(e){lrTem=new Set()}
+let lrC=0,lrI=0,lrTem=new Set(),lrCart={};
+async function abrirLojaRoupa(sem){closePlace();if(!sem){lrCart={};lrI=0}if(!sem)try{lrTem=new Set(await api.roupas())}catch(e){lrTem=new Set()}
  abrirForm('👕 Loja de Roupas',`<div class="fx" id="lrTabs" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
  <canvas id="lrCv" width="150" height="190" style="width:150px;height:190px;display:block;margin:0 auto"></canvas>
  <div class="fx" style="align-items:center;margin-top:8px"><button class="btn ghost" id="lrE" style="flex:none;width:52px;font-size:22px">◀</button><div style="text-align:center"><b id="lrN" style="font-size:18px;color:var(--gold)"></b><div id="lrP" style="font-size:15px;margin-top:2px"></div></div><button class="btn ghost" id="lrD" style="flex:none;width:52px;font-size:22px">▶</button></div>
- <div id="lrA" class="grid" style="grid-template-columns:1fr"></div>`,()=>{
-  const lista=()=>{const c=ROUPA_CAMPOS[lrC][0],f=FIELDS.find(g=>g[0]===c);return optsOf(f,eu.v).map((o,i)=>[i,Array.isArray(o)?o:[o]]).filter(([,o])=>o[2]!=='x')};
+ <div id="lrA" class="grid" style="grid-template-columns:1fr"></div><div id="lrK" style="text-align:center;font-size:13px;margin-top:6px;opacity:.9"></div>`,()=>{
+  const lista=()=>{const c=ROUPA_CAMPOS[lrC][0],f=FIELDS.find(g=>g[0]===c);return optsOf(f,eu.v).map((o,i)=>[i,Array.isArray(o)?o:[o]]).filter(([,o])=>o[2]!=='x').concat(luxOf(f,eu.v).map((o,j)=>[40+j,o,1]))};
   const tem=(c,i)=>precoRoupa(c,i)===0||(eu.v[c]||0)===i||lrTem.has(pecaRoupa(c,eu.v)+':'+i);
-  const tabs=$('lrTabs');tabs.innerHTML='';ROUPA_CAMPOS.forEach(([c,n],k)=>{const b=document.createElement('button');b.className='btn'+(k===lrC?'':' ghost');b.style.cssText='flex:1 1 30%;padding:6px 4px;font-size:13px';b.textContent=n;b.onclick=()=>{lrC=k;lrI=0;abrirLojaRoupa(1)};tabs.appendChild(b)});
-  const pinta=()=>{const L=lista();lrI=(lrI+L.length)%L.length;const c=ROUPA_CAMPOS[lrC][0],[i,o]=L[lrI],pr=precoRoupa(c,i),t=tem(c,i),vest=(eu.v[c]||0)===i;
-   {const g=$('lrCv').getContext('2d');g.clearRect(0,0,150,190);try{drawPerson(g,75,184,Object.assign({},eu.v,{[c]:i}),{s:3.85,dir:1})}catch(e){}}
-   $('lrN').textContent=o[0]+'  '+(lrI+1)+'/'+L.length;$('lrP').innerHTML=vest?'👕 Você está usando':t?(pr?'✅ Já é sua':'🆓 Grátis'):'💰 <b>'+money(pr)+'</b>';
-   const a=$('lrA');a.innerHTML='';const bt=(tx,fn,off)=>{const b=document.createElement('button');b.className='btn';b.textContent=tx;b.disabled=!!off;b.onclick=fn;a.appendChild(b)};
-   if(vest)bt('👕 Vestindo',()=>{},1);
-   else if(t)bt('👕 Vestir',()=>vestirRoupa(c,i));
-   else bt(eu.dinheiro>=pr?'🛍️ Comprar por '+money(pr):'💰 Falta '+money(pr-eu.dinheiro),()=>confirmar('🛍️ Comprar '+o[0],`Comprar <b>${esc(o[0])}</b> por <b>${money(pr)}</b>? Fica no seu guarda-roupa para sempre.`,()=>acao(async()=>{tratar(await api.comprarRoupa(pecaRoupa(c,eu.v),i));lrTem.add(pecaRoupa(c,eu.v)+':'+i);Som.play('compra');await vestirRoupa(c,i,true)})),eu.dinheiro<pr)};
-  window.lrPinta=pinta;$('lrE').onclick=()=>{lrI--;pinta()};$('lrD').onclick=()=>{lrI++;pinta()};pinta();
+  const tabs=$('lrTabs');tabs.innerHTML='';ROUPA_CAMPOS.forEach(([c,n],k)=>{const b=document.createElement('button');b.className='btn'+(k===lrC?'':' ghost');b.style.cssText='flex:1 1 30%;padding:6px 4px;font-size:13px';b.textContent=n;b.onclick=()=>{lrC=k;const L0=FIELDS.find(g=>g[0]===c);const cur=lrCart[c]??(eu.v[c]||0);const L=optsOf(L0,eu.v).map((o,i)=>[i,o]).filter(([,o])=>!(Array.isArray(o)&&o[2]==='x')).map(([i])=>i).concat(luxOf(L0,eu.v).map((o,j)=>40+j));lrI=Math.max(0,L.indexOf(cur));abrirLojaRoupa(1)};tabs.appendChild(b)});
+  const pinta=(mexeu)=>{const L=lista();lrI=(lrI+L.length)%L.length;const c=ROUPA_CAMPOS[lrC][0],[i,o,lux]=L[lrI],pr=precoRoupa(c,i),t=tem(c,i),vest=(eu.v[c]||0)===i;
+   if(mexeu){if(vest)delete lrCart[c];else lrCart[c]=i}
+   {const g=$('lrCv').getContext('2d');g.clearRect(0,0,150,190);try{drawPerson(g,75,184,Object.assign({},eu.v,lrCart,{[c]:i}),{s:3.85,dir:1})}catch(e){}}
+   $('lrN').textContent=(lux?'💎 ':'')+o[0]+'  '+(lrI+1)+'/'+L.length;$('lrP').innerHTML=vest?'👕 Você está usando':t?(pr?'✅ Já é sua':'🆓 Grátis'):(lux?'💎 Luxo · ':'')+'💰 <b>'+money(pr)+'</b>';
+   const a=$('lrA');a.innerHTML='';const bt=(tx,fn,off,g)=>{const b=document.createElement('button');b.className='btn'+(g?' ghost':'');b.textContent=tx;b.disabled=!!off;b.onclick=fn;a.appendChild(b)};
+   const n=Object.keys(lrCart).length,tot=carrinhoTotal();
+   if(n)bt('🛒 Finalizar ('+n+(n>1?' peças':' peça')+(tot?' · '+money(tot):'')+')',()=>fecharLoja());
+   $('lrK').textContent=n?'Toque nas setas para experimentar. As peças ficam no carrinho até você sair.':'Toque nas setas para experimentar à vontade.'};
+  window.lrPinta=pinta;$('lrE').onclick=()=>{lrI--;pinta(1)};$('lrD').onclick=()=>{lrI++;pinta(1)};pinta();
 })}
+function carrinhoTotal(){let t=0;for(const [c,i] of Object.entries(lrCart)){const own=precoRoupa(c,i)===0||(eu.v[c]||0)===i||lrTem.has(pecaRoupa(c,eu.v)+':'+i);if(!own)t+=precoRoupa(c,i)}return t}
+// ao sair da loja: compra o que está no carrinho (ou sai sem comprar)
+function fecharLoja(){const n=Object.keys(lrCart).length;if(!n){$('mForm').classList.add('hidden');return}
+ const tot=carrinhoTotal(),lst=Object.entries(lrCart).map(([c,i])=>{const f=FIELDS.find(g=>g[0]===c),o=i>=40?luxOf(f,eu.v)[i-40]:optsOf(f,eu.v)[i];return esc(Array.isArray(o)?o[0]:o)}).join(', ');
+ const comprar=()=>acao(async()=>{if(eu.dinheiro<tot)throw new Error('Falta '+money(tot-eu.dinheiro)+' para levar tudo.');
+  for(const [c,i] of Object.entries(lrCart)){const p=pecaRoupa(c,eu.v);if(precoRoupa(c,i)>0&&!lrTem.has(p+':'+i)&&(eu.v[c]||0)!==i){tratar(await api.comprarRoupa(p,+i));lrTem.add(p+':'+i)}}
+  const v2=Object.assign({},eu.v,lrCart);const m=await api.criar(eu.nome,encode(v2));eu.v=decode(m.visual);lrCart={};emitEv('perfil',{});Som.play('compra');$('mForm').classList.add('hidden');toast('🛍️ Visual novo! ✨')});
+ confirmar('🛒 Seu carrinho',`<b>${lst}</b><br>${tot?'Total: <b>'+money(tot)+'</b>':'Tudo grátis ou já é seu.'}`,null,[[tot?'🛍️ Comprar e vestir ('+money(tot)+')':'👕 Vestir',comprar],['❌ Sair sem levar',()=>{lrCart={};$('mForm').classList.add('hidden')}],['↩️ Continuar olhando',()=>{}]])}
+window.antesFechar=id=>{if(id==='mForm'&&document.getElementById('lrCv')&&Object.keys(lrCart).length){fecharLoja();return true}return false};
 async function vestirRoupa(c,i,ja){const run=async()=>{const v2=Object.assign({},eu.v,{[c]:i});const m=await api.criar(eu.nome,encode(v2));eu.v=decode(m.visual);emitEv('perfil',{});toast('👕 Visual atualizado!');if(window.lrPinta)lrPinta()};if(ja)return run();return acao(run)}
 /* ----- vitrine da concessionária ----- */
 let vitI=0,vitAnim=null;
@@ -4496,7 +4529,7 @@ $('enter').onclick=()=>{
  });
 };
 async function copy(t,ok){try{await navigator.clipboard.writeText(t);toast(ok||'Copiado!')}catch(e){toast('Não deu para copiar. Segure o dedo no texto para copiar.')}}
-document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).classList.add('hidden'));
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{if(window.antesFechar&&antesFechar(b.dataset.close))return;$(b.dataset.close).classList.add('hidden')});
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden')}));
 
 /* ================= STORY ================= */
