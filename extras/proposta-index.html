@@ -706,7 +706,7 @@ function cabeloF(c,cab,cam,fr,d,hair,oo={}){const pf=!!(oo.perfil||oo.lado);
   else if(S.camadas){P.quadraticCurveTo(x-w,L*.7,x-w-fl,L*.62);P.bezierCurveTo(x-w-fl*.4,L*.55,x-w,L*.3,x-7.6,-3)}
   else P.bezierCurveTo(x-w-fl,L*.7,x-w,L*.35,x-7.6,-3);P.closePath();return P};
  const casco=(tipo)=>{const P=new Path2D();
-  if(costas){P.moveTo(-7,5);P.bezierCurveTo(-9.4,-11,9.4,-11,7,5);P.quadraticCurveTo(0,7.2,-7,5);P.closePath();return P}
+  if(costas){if(tipo==='preso'){P.moveTo(-6.6,1.6);P.bezierCurveTo(-9,-11,9,-11,6.6,1.6);P.quadraticCurveTo(4.6,4.4,0,4.8);P.quadraticCurveTo(-4.6,4.4,-6.6,1.6)}else{P.moveTo(-7,5);P.bezierCurveTo(-9.4,-11,9.4,-11,7,5);P.quadraticCurveTo(0,7.2,-7,5)}P.closePath();return P}
   if(fr){P.moveTo(-7.7,-.5);P.bezierCurveTo(-8.4,-10.9,8.4,-10.9,7.7,-.5);P.lineTo(6.5,-.5);
    if(tipo==='reta'){P.lineTo(6.3,-2.6);P.quadraticCurveTo(0,-2.1,-6.3,-2.6)}
    else if(tipo==='cortina'){P.quadraticCurveTo(5.9,-2.4,3.6,-3.4);P.quadraticCurveTo(1,-4,0,-5.2);P.quadraticCurveTo(-1,-4,-3.6,-3.4);P.quadraticCurveTo(-5.9,-2.4,-6.5,-.5)}
@@ -726,9 +726,9 @@ function cabeloF(c,cab,cam,fr,d,hair,oo={}){const pf=!!(oo.perfil||oo.lado);
   if(tras){if(false){const P=new Path2D(),bx=costas?0:-d*6;for(let i=0;i<7;i++){P.ellipse(bx+(i%2?.4:-.4),3+i*2.3,2-i*.12,1.6,i%2?.5:-.5,0,7)}liso(P,{y0:1,y1:19,n:4,w:4,cx:bx})}
    if(S.preso==='rabo'&&!fr&&!costas){const P=new Path2D(),bx=-d*5.4;P.moveTo(bx+d*.4,-10.6);P.bezierCurveTo(bx-d*4.6,-10,bx-d*4.4,1,bx-d*2.6,9);P.quadraticCurveTo(bx-d*1.6,3,bx+d*.6,-8.6);P.closePath();liso(P,{y0:-7,y1:9,n:5,w:4,cx:bx-d*1.5})}
    return}
-  liso(casco('preso'),{y0:-10.6,y1:costas?6:-1,n:12,w:14,hy:-6.6});
+  {const CP=casco('preso');liso(CP,{y0:-10.6,y1:costas?5:-1,n:costas?1:12,w:14,hy:-6.6});if(costas){const ty=S.preso==='rabo'?-6.4:-8;c.save();c.clip(CP);c.lineCap='round';for(let i=0;i<11;i++){const x0=-6.4+i*1.28,y0=1.6+Math.sin(i/10*Math.PI)*3;c.strokeStyle=i%2?esc:cla;c.globalAlpha=i%2?.3:.2;c.lineWidth=.35;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(x0*.55,(y0+ty)/2,x0*.08,ty);c.stroke()}c.restore()}}
   if(S.preso==='coque'){const P=new Path2D(),bx=fr||costas?0:-d*1.5,by=costas?-9.6:-10.6;P.ellipse(bx,by,3.4,2.8,0,0,7);liso(P,{y0:by-3,y1:by+3,n:6,w:6,cx:bx,hy:by-.6})}
-  if(S.preso==='rabo'){const P=new Path2D();if(costas){P.moveTo(-1.4,-6);P.bezierCurveTo(-2.6,0,-1.6,6,0,10);P.bezierCurveTo(1.6,6,2.6,0,1.4,-6);P.closePath()}else if(fr){P.moveTo(1.4,-11.4);P.bezierCurveTo(9.4,-11,9.8,0,8.2,6.4);P.quadraticCurveTo(7.4,-2,4.6,-8.4);P.closePath()}
+  if(S.preso==='rabo'){const P=new Path2D();if(costas){P.moveTo(-1.5,-6.4);P.bezierCurveTo(-3,-2,-2.8,5,-2,8.4);P.quadraticCurveTo(0,11.4,2,8.4);P.bezierCurveTo(2.8,5,3,-2,1.5,-6.4);P.closePath()}else if(fr){P.moveTo(1.4,-11.4);P.bezierCurveTo(9.4,-11,9.8,0,8.2,6.4);P.quadraticCurveTo(7.4,-2,4.6,-8.4);P.closePath()}
    if(costas||fr){liso(P,{y0:-8,y1:10,n:5,w:4,cx:costas?0:7.6})}{const rx=costas?0:fr?0:-d*5,ry=costas?-6.4:fr?-10.8:-9.8;c.fillStyle='#e0507a';c.beginPath();c.ellipse(rx,ry,costas?2:1.9,1.25,0,0,7);c.fill();c.strokeStyle='#a8325a';c.lineWidth=.3;for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(rx+i*.65,ry-1.1);c.quadraticCurveTo(rx+i*.75,ry,rx+i*.65,ry+1.1);c.stroke()}c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.ellipse(rx-.5,ry-.5,.8,.35,0,0,7);c.fill()}}
   const tranca=(x0,y0,x1,y1,n,w)=>{const P=new Path2D();for(let i=0;i<n;i++){const t=i/(n-1),x=x0+(x1-x0)*t,y=y0+(y1-y0)*t,r=w*(1-t*.3);P.moveTo(x+r,y);P.ellipse(x+(i%2?.3:-.3),y,r,r*.78,i%2?.5:-.5,0,7)}liso(P,{y0,y1,n:3,w:w*2,cx:(x0+x1)/2,hy:-99});c.save();c.strokeStyle=shade(hair,-45);c.lineWidth=.3;c.globalAlpha=.7;for(let i=0;i<n;i++){const t=i/(n-1),x=x0+(x1-x0)*t,y=y0+(y1-y0)*t;c.beginPath();c.arc(x+(i%2?.3:-.3),y,w*(1-t*.3)*.7,i%2?.2:2.2,i%2?1.4:3.4);c.stroke()}c.restore();c.fillStyle='#e0507a';c.beginPath();c.ellipse(x1,y1+w*.6,w*.6,w*.4,0,0,7);c.fill()};
   const lacos=[];
@@ -971,6 +971,8 @@ function drawPersonReal0(c,x,y,v,o={}){
   {const t=tipo==='salto'?0:sola;if(t){c.fillStyle=solaCor;c.beginPath();c.moveTo(X(-L0-.05),sy2-t);c.lineTo(X(L1-.4),sy2-t);c.quadraticCurveTo(X(L1+.75),sy2-t,X(L1+.3),sy2);c.lineTo(X(-L0-.1),sy2);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.22)';c.fillRect(Math.min(X(-L0),X(L1)),sy2-.25,L0+L1,.25);
    if(tipo==='coturno'||tipo==='chunky'){c.strokeStyle='rgba(0,0,0,.3)';c.lineWidth=.25;for(let k=-L0+.5;k<L1;k+=.7){c.beginPath();c.moveTo(X(k),sy2-.05);c.lineTo(X(k),sy2-.45);c.stroke()}}}}
   c.restore()};
+ // quadril (liga o tronco às pernas, sem emenda)
+ if(!sit&&!saia&&!o.tonhao){const yb=-16+dy,Hh=F?(fem?10.4:11.6)/2:(fem?4.4:4.6);c.fillStyle=pants;c.beginPath();c.moveTo(-Hh+.5,yb-1.6);c.lineTo(Hh-.5,yb-1.6);c.quadraticCurveTo(Hh-.2,yb+1,Hh-.9,yb+3);c.lineTo(.9,yb+3);c.quadraticCurveTo(0,yb+1.6,-.9,yb+3);c.lineTo(-Hh+.9,yb+3);c.quadraticCurveTo(-Hh+.2,yb+1,-Hh+.5,yb-1.6);c.fill();c.save();c.clip();const pw=lw0=>lw0;const lx=fem?2.3:2.6,lwp=(fem?3.8:4.2)*1.14;if(F){for(const k of [-1,1])VOLG(c,k*lx-lwp/2-(k<0?Hh:0),yb-2,lwp+Hh,6,.9)}else VOLG(c,-Hh,yb-2,2*Hh,6,.9);c.restore()}
  // pernas
  if(sit){
   if(o.frente){const lc=saia||corte?skin:pants;
@@ -1007,8 +1009,6 @@ function drawPersonReal0(c,x,y,v,o={}){
  // corpo balança ao andar e respira parado
  {const anda2=ph!=null&&!sit;const bob=anda2?(Math.abs(Math.cos(ph))*1.3-.65):Math.sin(now*2.2+x*.13)*.28;c.translate(0,-bob);
   if(anda2&&!F){c.translate(0,-16);c.rotate(dir*.045);c.translate(0,16)}}
- // quadril (liga o tronco às pernas, sem emenda)
- if(!sit&&!saia&&!o.tonhao){const yb=-16+dy,Hh=(fem?10.4:11.6)/2;c.fillStyle=pants;c.beginPath();c.moveTo(-Hh+.5,yb-1.6);c.lineTo(Hh-.5,yb-1.6);c.quadraticCurveTo(Hh-.2,yb+1,Hh-.9,yb+3);c.lineTo(.9,yb+3);c.quadraticCurveTo(0,yb+1.6,-.9,yb+3);c.lineTo(-Hh+.9,yb+3);c.quadraticCurveTo(-Hh+.2,yb+1,-Hh+.5,yb-1.6);c.fill();c.save();c.clip();VOLG(c,-Hh,yb-2,2*Hh,6,.8);c.restore()}
  // tronco
  const bw=(o.tonhao?18.5:o.belly?16:fem?10.4:11.6)+(roupa==='oversized'||roupa==='puffer'?1.4:0),bh=15,by=-31+dy-(o.belly?.5:0);
  const longas=['social','jaqueta','moletom','xadrez','terno','jaquetaJeans','cortaVento','puffer','blazer','sueter','cardigan'].includes(roupa),curta=['camiseta','time','macacao','blusinha','cropped','polo','oversized','camisaAberta'].includes(roupa),sem=['regata','regataF','vestido','vestidoLongo','topAlca','ombro','tubinho'].includes(roupa);
@@ -1039,10 +1039,10 @@ function drawPersonReal0(c,x,y,v,o={}){
  const semManga=fem&&['regataF','vestido','vestidoLongo','topAlca','ombro','tubinho'].includes(roupa),CORPO=new Path2D();
  if(fem){const H=bw/2,lado2=(sg,P)=>{};
   if(semManga&&roupa==='ombro'){CORPO.moveTo(-H-.5,by+2.6);CORPO.lineTo(H+.5,by+2.6)}
-  else if(semManga){CORPO.moveTo(-H+.6,by+3.4);CORPO.quadraticCurveTo(-H+1.6,by+2.4,-3.7,by-.2);CORPO.lineTo(-2.5,by-.2);CORPO.quadraticCurveTo(0,by+(roupa==='topAlca'?3:4.2),2.5,by-.2);CORPO.lineTo(3.7,by-.2);CORPO.quadraticCurveTo(H-1.6,by+2.4,H-.6,by+3.4)}
+  else if(semManga){CORPO.moveTo(-H+.3,by+2.2);CORPO.quadraticCurveTo(-H+1,by+.4,-3.7,by-.3);CORPO.lineTo(-2.5,by-.3);CORPO.quadraticCurveTo(0,by+(back?1.2:roupa==='topAlca'?3:4.2),2.5,by-.3);CORPO.lineTo(3.7,by-.3);CORPO.quadraticCurveTo(H-1,by+.4,H-.3,by+2.2)}
   else{CORPO.moveTo(-2.6,by-.4);CORPO.lineTo(2.6,by-.4);CORPO.quadraticCurveTo(H-.1,by-.4,H,by+1.4)}
   CORPO.quadraticCurveTo(H+.1,by+4.2,H-.2,by+5.6);CORPO.quadraticCurveTo(H-1.5,by+8.2,H-1.3,by+9.6);CORPO.quadraticCurveTo(H-.3,by+12.2,H-.6,by+bh-.6);CORPO.quadraticCurveTo(H-1.2,by+bh+.5,0,by+bh+.7);CORPO.quadraticCurveTo(-H+1.2,by+bh+.5,-H+.6,by+bh-.6);CORPO.quadraticCurveTo(-H+.3,by+12.2,-H+1.3,by+9.6);CORPO.quadraticCurveTo(-H+1.5,by+8.2,-H+.2,by+5.6);CORPO.quadraticCurveTo(-H-.15,by+4.4,-H,by+2);
-  if(!semManga)CORPO.quadraticCurveTo(-H+.1,by-.4,-2.6,by-.4);else if(roupa==='ombro')CORPO.lineTo(-H-.5,by+2.6);else CORPO.lineTo(-H+.6,by+3.4);CORPO.closePath();
+  if(!semManga)CORPO.quadraticCurveTo(-H+.1,by-.4,-2.6,by-.4);else if(roupa==='ombro')CORPO.lineTo(-H-.5,by+2.6);else CORPO.lineTo(-H+.3,by+2.2);CORPO.closePath();
   // ombros e colo (pele), arredondados
   c.fillStyle=skin;c.beginPath();c.moveTo(-2.4,by-.7);c.quadraticCurveTo(-H+.6,by-.6,-H+.6,by+1.5);c.lineTo(-H+1,by+5);c.lineTo(H-1,by+5);c.lineTo(H-.6,by+1.5);c.quadraticCurveTo(H-.6,by-.6,2.4,by-.7);c.closePath();c.fill();
   }
