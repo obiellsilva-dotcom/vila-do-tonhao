@@ -1000,7 +1000,7 @@ function drawPersonReal0(c,x,y,v,o={}){
 
     shoe(L.fx,Math.min(0,L.fy));barra(L.fx,Math.min(0,L.fy),cor)}}
  else{const SHL=[];for(const k of (F?[-1,1]:[dir,-dir])){const hx=F?k*(fem?2.3:2.6):k*(fem?1.5:.9),pk=(ph||0)+(k>0?0:Math.PI),th=anda?Math.sin(pk)*.55*(o.amp||1):0,kn=anda?Math.max(0,Math.cos(pk))*.85*(o.amp||1)+(o.flex||0):0,L1=8.2,L2=7.9;
-   if(F){const lift=anda?Math.max(0,Math.sin(pk))*2.4*(o.amp||1):0,cor=pernaCor(k),ky=-16+L1-lift*.4;if(corte){seg(hx,-16,0,L1-lift*.4,lw*.92,skin);seg(hx,-16,0,corte,lw*FIT[0]*1.12,cor,lw*FIT[0]*1.2,'short')}else seg(hx,-16,0,L1-lift*.4,lw*FIT[0]*(fem?1.08:1),cor,lw*FIT[1],'coxa');seg(hx,ky-1.2,0,L2-.2-lift*.6,corte?lw*.94:lw*FIT[1],corte?skin:cor,corte?lw*.94:lw*FIT[2],'canela');if(!corte&&!saia&&lift>.5&&FIT[1]<1.2){c.fillStyle=pantsD;circ(c,hx,ky,lw*.3)}shoe(hx,-lift);barra(hx,-lift,cor);continue}
+   if(F){const lift=anda?Math.max(0,Math.sin(pk))*2.4*(o.amp||1):0,cor=pernaCor(k),ky=-16+L1-lift*.4;if(corte){seg(hx,-16,0,L1-lift*.4,lw*.92,skin)}else seg(hx,-16,0,L1-lift*.4,lw*FIT[0]*(fem?1.08:1),cor,lw*FIT[1],'coxa');seg(hx,ky-1.2,0,L2-.2-lift*.6,corte?lw*.94:lw*FIT[1],corte?skin:cor,corte?lw*.94:lw*FIT[2],'canela');if(corte)seg(hx,-16,0,corte,lw*FIT[0]*1.12,cor,lw*FIT[0]*1.2,'short');shoe(hx,-lift);barra(hx,-lift,cor);continue}
    const kx=hx+dir*L1*Math.sin(th),ky=-16+L1*Math.cos(th),a2=th-kn,fx=kx+dir*L2*Math.sin(a2),fy=ky+L2*Math.cos(a2);
    const cor=k===dir&&!saia?shade(pernaCor(k),-28):pernaCor(k);if(corte){seg(hx,-16,th,L1+.6,lw*.82,k===dir?shade(skin,-15):skin,lw*.8)}else seg(hx,-16,th,L1,lw*FIT[0]*(fem?1.15:1),cor,lw*FIT[1],'coxa');
    if(corte)SHL.push([hx,th,cor]);
