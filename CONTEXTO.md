@@ -64,7 +64,10 @@ Comprar móveis para a casa (precisa de tabela nova), interiores das lojas, giro
 ## Últimas mudanças (já no ar)
 Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡️ ADM e chat vermelho do admin, aviso para a cidade, vitrine de carros com setas, venda de carros (para a loja e entre jogadores), cargo de prefeito (🏛️ com brilho, banner ao entrar, chat dourado, vistorias), mochila, 🚗 Meu carro no menu, 10 NPCs, geladeira 3D, sem banheiro, sinuca com 4 lugares, reconexão automática da sala.
 
-## ATUALIZAÇÃO (15/11/2026, segunda sessão) — LEIA PRIMEIRO
+## ATUALIZAÇÃO COMPLETA (17/11/2026) — LEIA PRIMEIRO
+A proposta virou o `index.html` oficial (VERSAO_JOGO v20261117a). `novidades.sql` = atualização completa (etapas 13 a 20: sede, prefeito nível 20, gasolina, missão, estampas/loja de roupas/joias, nível 50, carros +20%, oficina), testado num PostgreSQL local em cima do banco antigo. `banco.sql` agora é o completo de verdade (veio do ramo claude/new-session-cwzmp3 + etapas novas). `extras/proposta-index.html` continua igual ao index para seguir trabalhando.
+
+## ATUALIZAÇÃO (15/11/2026, segunda sessão)
 Tudo abaixo está SÓ em `extras/proposta-index.html` (ramo `ccr-e150a3c5-3uuba3` no GitHub). O `index.html` oficial NÃO foi mexido. Aplicar no oficial só quando o usuário aprovar.
 
 ### Feito e aprovado na proposta
