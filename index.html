@@ -730,10 +730,10 @@ function drawPersonReal0(c,x,y,v,o={}){
  }else{
   const lw=baixo==='legging'||fem?3.8:4.2,anda=ph!=null;
   const seg=(x0,y0,ang,len,w,cor)=>{c.save();c.translate(x0,y0);c.rotate(-dir*ang);c.fillStyle=cor;rr(c,-w/2,-.7,w,len+1.4,w/2.2);c.fill();VOLG(c,-w/2,-.7,w,len+1.4,.9);c.restore()};
-  for(const k of [-1,1]){const hx=k*(fem?2.3:2.6),pk=(ph||0)+(k>0?0:Math.PI),th=anda?Math.sin(pk)*.55*(o.amp||1):0,kn=anda?Math.max(0,Math.cos(pk))*.85*(o.amp||1)+(o.flex||0):0,L1=8.2,L2=7.9;
+  for(const k of (F?[-1,1]:[dir,-dir])){const hx=F?k*(fem?2.3:2.6):k*(fem?.7:.9),pk=(ph||0)+(k>0?0:Math.PI),th=anda?Math.sin(pk)*.55*(o.amp||1):0,kn=anda?Math.max(0,Math.cos(pk))*.85*(o.amp||1)+(o.flex||0):0,L1=8.2,L2=7.9;
    if(F){const lift=anda?Math.max(0,Math.sin(pk))*2.4*(o.amp||1):0,cor=pernaCor(k),ky=-16+L1-lift*.4;seg(hx,-16,0,L1-lift*.4,lw,cor);if(corte&&corte<L1)seg(hx,-16+corte,0,L1-corte-lift*.4,lw*.92,skin);seg(hx,ky,0,L2-lift*.6,lw*.94,corte?skin:cor);if(!corte&&!saia&&lift>.5){c.fillStyle=pantsD;circ(c,hx,ky,lw*.3)}shoe(hx,-lift);continue}
    const kx=hx+dir*L1*Math.sin(th),ky=-16+L1*Math.cos(th),a2=th-kn,fx=kx+dir*L2*Math.sin(a2),fy=ky+L2*Math.cos(a2);
-   const cor=pernaCor(k);seg(hx,-16,th,L1,lw,cor);
+   const cor=k===dir&&!saia?shade(pernaCor(k),-28):pernaCor(k);seg(hx,-16,th,L1,lw,cor);
    if(corte&&corte<L1)seg(hx+dir*corte*Math.sin(th),-16+corte*Math.cos(th),th,L1-corte,lw*.92,skin);
    seg(kx,ky,a2,L2,lw*.94,corte?skin:cor);
    if(!corte&&!saia){c.fillStyle=pantsD;circ(c,kx,ky,lw*.32)}
@@ -748,8 +748,8 @@ function drawPersonReal0(c,x,y,v,o={}){
  const ay=sit?0:sw*2;
  const cTronco=roupa==='terno'?(o.suit?'#2f3542':roupaR==='ternoBranco'?'#f2f2f2':shade(shirt,-55)):shirt;
  const braco=(k)=>{const pose=o.arms?o.arms[k<0?0:1]:null,w=fem?2.9:3.2,ax=k<0?-bw/2-1.7:bw/2-1.5,yy=by+2.2,lado=k<0?1:-1;
-  const sw2=pose!=null?pose:(ph!=null&&!sit?lado*Math.sin(ph)*.62:Math.sin(now*1.6+k+x*.1)*.06);
-  const cot=pose!=null?.12:(ph!=null&&!sit?.3+Math.max(0,lado*Math.sin(ph))*.55:.18);
+  const sw2=pose!=null?pose:(ph!=null&&!sit?lado*Math.sin(ph)*.34:Math.sin(now*1.6+k+x*.1)*.06);
+  const cot=pose!=null?.12:(ph!=null&&!sit?.18+Math.max(0,lado*Math.sin(ph))*.25:.18);
   const manga=longas?(roupa==='jaqueta'||roupa==='terno'?cTronco:shirtD):sem?skin:shirtD,ante=longas?manga:skin,mc=roupa==='cropped'||roupa==='blusinha'?3.6:4.6;
   c.save();c.translate(ax+1.6,yy+1.2+(F&&ph!=null?-lado*Math.sin(ph)*.9:0));c.rotate(-dir*sw2*rotK+(F?-k*.06:0));
   c.fillStyle=curta?skin:manga;rr(c,-w/2,-1.2,w,7.6,w/2.2);c.fill();
@@ -3890,7 +3890,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261120f';
+const VERSAO_JOGO='v20261120g';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
