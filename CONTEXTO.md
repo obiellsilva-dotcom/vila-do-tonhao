@@ -55,3 +55,11 @@ Projeção `isoP`/`setWorld`/`setCam`/`bbSet`/`wallSet`/`isoBox`, ordenação po
 
 ## Ideias para depois
 Comprar móveis para a casa (precisa de tabela nova), interiores das lojas, giro da câmera em 4 posições (dá muito trabalho), opção 2D/2.5D (dá muito trabalho).
+
+## COMBINADO PARA DEPOIS (o usuário pediu para lembrar)
+1. **Interiores maiores**: casas pequenas ocuparem o terreno vazio ao lado (as casas escondidas em `HOUSE_OFF`).
+2. **Loja de móveis** dentro da própria casa (botão "🛋️ Mobiliar"): escolher o móvel e tocar no chão para colocar. Do barato ao caro: cadeira de plástico, colchão, caixote → sofá, cama de casal, mesa, TV → home theater, **caixa de som**, aquário, jukebox, luzes LED. Precisa de tabela nova no banco (os móveis ficam salvos e os visitantes veem).
+3. **Músicas fora do site**: guardar no Supabase Storage (bucket `musicas`, 1 GB grátis, ~200 músicas). O site.zip fica pequeno e a jukebox lista o que estiver lá. Só músicas sem direitos autorais.
+
+## Últimas mudanças (já no ar)
+Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡️ ADM e chat vermelho do admin, aviso para a cidade, vitrine de carros com setas, venda de carros (para a loja e entre jogadores), cargo de prefeito (🏛️ com brilho, banner ao entrar, chat dourado, vistorias), mochila, 🚗 Meu carro no menu, 10 NPCs, geladeira 3D, sem banheiro, sinuca com 4 lugares, reconexão automática da sala.
