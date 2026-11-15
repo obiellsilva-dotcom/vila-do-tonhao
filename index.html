@@ -100,13 +100,18 @@ select{appearance:none;-webkit-appearance:none;padding-right:26px;background-ima
 #missao #msIr{margin-top:7px;padding:6px 12px;font-size:13.5px}#missao #msX{position:absolute;top:2px;right:4px;background:none;border:0;color:var(--muted);font-size:17px;padding:4px 6px;cursor:pointer;font-family:inherit}
 #tarefa{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(440px,calc(100vw - 16px));z-index:8;animation:pop .25s ease;font-family:Fredoka,sans-serif}
 #tarefa .tcena{position:relative;border-radius:18px;padding:12px;overflow:hidden;border:3px solid #3a2414;box-shadow:0 10px 30px rgba(0,0,0,.45),inset 0 -40px 60px rgba(0,0,0,.18);color:#2b1a10}
-#tarefa .tdeco{font-size:26px;letter-spacing:6px;text-align:center;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2));margin:-4px 0 4px}
+#tarefa .tdeco{font-size:18px;letter-spacing:4px;opacity:.8;text-align:center;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2));margin:-4px 0 4px}
 #tarefa .ttit{font-weight:700;font-size:15px;text-align:center;background:rgba(255,255,255,.85);border-radius:10px;padding:4px 8px;margin-bottom:8px}
 #tarefa .ped{background:#fff;border-radius:14px;padding:10px;text-align:center;font-size:16px;font-weight:600;box-shadow:0 4px 0 rgba(0,0,0,.15);margin-bottom:10px;position:relative}
 #tarefa .ped .cli{font-size:34px;display:block;line-height:1}
 #tarefa .ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px}
 #tarefa .op{background:linear-gradient(#fffaf0,#f1e3c4);border:2px solid #8a5a2e;border-radius:12px;padding:8px 6px;font:600 14px Fredoka,sans-serif;color:#3a2414;cursor:pointer;box-shadow:0 4px 0 #8a5a2e;transition:transform .08s}
 #tarefa .op:active{transform:translateY(3px);box-shadow:0 1px 0 #8a5a2e}#tarefa .op .e{font-size:24px;display:block}
+#ptabs{display:flex;gap:6px;margin-bottom:8px}#ptabs button{flex:1;padding:10px 6px;border-radius:12px;border:2px solid #8a5a2e;background:#fff6e4;font:700 15px Fredoka,sans-serif;color:#3a2414}#ptabs button.on{background:#ffd23f;box-shadow:inset 0 -3px 0 #c99a1a}
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.icard{position:relative;border:2px solid #e3cfa6;background:#fffaf0;border-radius:12px;padding:6px 4px 5px;text-align:center;font:600 12px Fredoka,sans-serif;color:#3a2414;cursor:pointer;line-height:1.15}
+.icard:disabled{opacity:.45}.icard .e{font-size:26px;display:block}.icard .pr{display:block;color:#1e7b34;font-size:13px}.icard .tg{display:block;font-size:10px;opacity:.75}
+.icard .mo{position:absolute;top:2px;right:2px;font-size:13px;background:#fff;border:1px solid #d9c49a;border-radius:8px;padding:1px 3px}
+#tarefa .ped .nm{display:block;font-size:20px;font-weight:700;margin-top:2px}
 #tarefa .op.err{animation:treme .3s}#tarefa .op.ok{background:#b8f0a0}
 @keyframes treme{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 #tarefa .trilho{position:relative;height:30px;border-radius:15px;background:linear-gradient(90deg,#5b6b7a,#7a8a99);border:2px solid #2b1a10;overflow:hidden;margin:10px 0}
@@ -2959,10 +2964,17 @@ function abrirLugar(b){
    sub='À venda por '+money(b.preco)+'.'+(volta?` Você recebe ${money(volta)} pela sua casa atual (${eu.casa_id}).`:'');
    botao(box,'🔑 Comprar por '+money(b.preco),()=>{const falta=b.preco-(eu.dinheiro+volta);if(falta>0){confirmar('💰 Falta dinheiro','Essa casa custa <b>'+money(b.preco)+'</b>. Você tem <b>'+money(eu.dinheiro)+'</b>'+(volta?' + '+money(volta)+' da sua casa atual':'')+'.<br>Faltam <b>'+money(falta)+'</b>. Trabalhe mais um pouco! 💼',null,[['💼 Ver empregos',()=>$('zjobs').click()],['OK',()=>{}]]);return}confirmar('🏠 Comprar casa','Comprar a '+(b.kind==='mansao'?'mansão':'casa')+' '+b.n+' por <b>'+money(b.preco)+'</b>?',()=>comprarCasa(b))})}
  }
- const comida=Object.entries(LOJA).filter(([,it])=>it.local===k);
+ const comida=Object.entries(LOJA).filter(([,it])=>it.local===k),temJob=Object.keys(JOBS).some(j=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id));
+ const boxPrin=box;let boxJob=box;
+ if(comida.length&&temJob){const tb=document.createElement('div');tb.id='ptabs';const bc=document.createElement('button'),bj=document.createElement('button');bc.textContent=k==='bar'?'🍺 Pedir':'🛒 Comprar';bj.textContent='💼 Emprego';tb.append(bc,bj);box.appendChild(tb);const pc=document.createElement('div'),pj=document.createElement('div');pj.style.display='none';box.append(pc,pj);
+  const sel=j=>{bc.classList.toggle('on',!j);bj.classList.toggle('on',j);pc.style.display=j?'none':'';pj.style.display=j?'':'none';Som.play('clique')};bc.onclick=()=>sel(0);bj.onclick=()=>sel(1);sel(0);box=pc;boxJob=pj}
  if(comida.length){sub=k==='bar'?'O Tonhão te olha do balcão. O que vai ser?':k==='padaria'?'Cheirinho de pão saindo do forno.':'Tem de tudo um pouco.';
-  comida.forEach(([id,it])=>{const l=document.createElement('div');l.style.cssText='display:flex;gap:6px;align-items:stretch';box.appendChild(l);const b1=botao(l,`${ICON[id]||'🍽️'} ${cap(it.nome)}: ${money(it.preco)}`+(it.fome?` · +${it.fome} 🍗`:'')+(it.sede?` · +${it.sede} 💧`:''),()=>comprarItem(id),{off:eu.dinheiro<it.preco});b1.style.flex='1';if(id!=='rodada'){const b2=botao(l,'🎒',()=>guardarItem(id),{ghost:true,off:eu.dinheiro<it.preco});b2.title='Guardar na mochila';b2.style.flex='none'}})}
- if(k==='mercadinho'&&eu.peixes>0)botao(box,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
+  const g=document.createElement('div');g.className='igrid';box.appendChild(g);
+  comida.forEach(([id,it])=>{const c=document.createElement('button');c.className='icard';c.disabled=eu.dinheiro<it.preco;const nm=cap(it.nome.replace(/^(uma?s?|um)\s+/i,''));
+   c.innerHTML=`<span class="e">${ICON[id]||'🍽️'}</span>${nm}<span class="pr">${money(it.preco)}</span><span class="tg">${it.fome?'🍗'+it.fome+' ':''}${it.sede?'💧'+it.sede:''}</span>`+(id!=='rodada'?'<span class="mo" title="Guardar na mochila">🎒</span>':'');
+   c.onclick=e=>{Som.play('clique');if(e.target.classList.contains('mo'))guardarItem(id);else comprarItem(id)};g.appendChild(c)});
+  const d=document.createElement('div');d.style.cssText='font-size:11px;opacity:.7;text-align:center;margin-top:4px';d.textContent='Toque para consumir agora · 🎒 guarda na mochila';box.appendChild(d)}
+ if(k==='mercadinho'&&eu.peixes>0)botao(boxPrin.querySelector('#ptabs')?box:boxPrin,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
  if(k==='concessionaria'){sub='Comprou, saiu dirigindo. Para descer ou dirigir de novo, toque em você.';
   closePlace();abrirVitrine();return;
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
@@ -2971,8 +2983,8 @@ function abrirLugar(b){
  if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(!sub)sub='O prefeito é sempre o TOP 1 do ranking 🏆. Quem passar o prefeito assume o cargo na hora.'}
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
-  if(eu.nivel<J.nivel_min)botao(box,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
-  else{const sal=Math.round(J.salario*(1+.02*(eu.nivel-1))),ex=Math.max(0,eu.nivel-J.nivel_min),pt=Math.round(J.salario/6*(1+.06*ex)),xt=Math.max(2,Math.round(J.xp/6*(1+.04*ex)));botao(box,j==='pescador'?`🎣 Pescar: 60% de chance de peixe por fisgada · +${xt} XP cada`:j==='policia'?`🚓 Fazer ronda de viatura: ${money(sal)} · +${J.xp} XP`:`💼 Trabalhar de ${J.nome}: ${money(pt)} + ${xt} XP por tarefa`,()=>comecarTrabalho(j),{ghost:comida.length>0||k==='concessionaria'})}
+  if(eu.nivel<J.nivel_min)botao(boxJob,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
+  else{const sal=Math.round(J.salario*(1+.02*(eu.nivel-1))),ex=Math.max(0,eu.nivel-J.nivel_min),pt=Math.round(J.salario/6*(1+.06*ex)),xt=Math.max(2,Math.round(J.xp/6*(1+.04*ex)));botao(boxJob,j==='pescador'?`🎣 Pescar: 60% de chance de peixe por fisgada · +${xt} XP cada`:j==='policia'?`🚓 Fazer ronda de viatura: ${money(sal)} · +${J.xp} XP`:`💼 Trabalhar de ${J.nome}: ${money(pt)} + ${xt} XP por tarefa`,()=>comecarTrabalho(j),{ghost:k==='concessionaria'})}
  });
  if(k==='igreja')sub='Silêncio, por favor. 🙏 Acenda uma vela e siga em paz.';
  if(k==='hospital')sub='Quem desmaia de fome acorda aqui. A conta é R$ 30. Coma direitinho! 🍗';
@@ -3067,12 +3079,12 @@ const CENA={mercado:'linear-gradient(#f6f1e4 0 38%,#c9d6c0 38% 40%,#e8e0cc 40%),
  oficina:'linear-gradient(#9aa3ad 0 40%,#4a4f57 40%)',banco:'linear-gradient(#dfe8e1 0 40%,#2f5d43 40% 42%,#c9d3cc 42%)',
  concessionaria:'linear-gradient(#e7f0fb 0 40%,#b9c6d6 40%)',fabrica:'linear-gradient(#cfe6f2 0 40%,#7f8c96 40%)',lagoa:'linear-gradient(#bfe6ff 0 35%,#6cc06a 35% 42%,#3d8cc4 42%)',
  hospital:'linear-gradient(#f4fbfb 0 40%,#7fc8c0 40% 42%,#e3f1ef 42%)',delegacia:'linear-gradient(#dfe3ea 0 40%,#2b3a55 40% 42%,#c4cad6 42%)'};
-const SETORES=[['🍎🍌 Frutas',['🍎','🍌','🍇','🍐','🍊']],['🥛🧀 Laticínios',['🥛','🧀','🧈','🍦']],['🧽🧴 Limpeza',['🧽','🧴','🧻','🧼']],['🥤🍺 Bebidas',['🥤','🍺','🧃','🍾']],['🍞🥐 Padaria',['🍞','🥐','🥖','🍩']]];
+const SETORES=[['🍎','Frutas',[['🍎','Maçã'],['🍌','Banana'],['🍇','Uva'],['🍐','Pera'],['🍊','Laranja'],['🍉','Melancia']]],['🧀','Frios e leite',[['🥛','Leite'],['🧀','Queijo'],['🧈','Manteiga'],['🥚','Ovos']]],['🧼','Limpeza',[['🧽','Esponja'],['🧴','Detergente'],['🧻','Papel higiênico'],['🧼','Sabonete']]],['🥤','Bebidas',[['🥤','Refrigerante'],['🍺','Cerveja'],['🧃','Suco de caixinha'],['💧','Água']]],['🍞','Padaria',[['🍞','Pão de forma'],['🥐','Croissant'],['🥖','Baguete'],['🍩','Rosquinha']]]];
 const CORTES=[['Raspar na máquina 1','⚡ Máquina'],['Degradê nas laterais','⚡ Máquina'],['Aparar a franja','✂️ Tesoura'],['Corte social com tesoura','✂️ Tesoura'],['Fazer a barba','🪒 Navalha'],['Acertar o pezinho','🪒 Navalha'],['Pentear com gel','🪮 Pente']];
 const DEFEITOS=[['Faz barulho quando freia','🛑 Freio'],['O carro não liga de manhã','🔋 Bateria'],['O motor está esquentando','💧 Radiador'],['O pneu vive murcho','🛞 Pneu'],['Sai fumaça preta','🛢️ Óleo'],['O farol não acende','💡 Lâmpada']];
 const DOENCAS=[['Febre e dor no corpo','🌡️ Antitérmico'],['Tosse sem parar','🍯 Xarope'],['Corte no braço','🩹 Curativo'],['Espirros e coceira','🤧 Antialérgico'],['Dor de barriga e enjoo','🍵 Soro caseiro'],['Pressão alta','🩺 Remédio de pressão']];
 const TAREFAS={
- mercadinho:{cena:'mercado',deco:'🛒 🥫 🍎 🥛 🧴 🥖',tit:'Repositor: coloque o produto na prateleira certa',tipo:'escolha',gerar(){const sx=pk(SETORES),it=pk(sx[1]);return{ped:`<span class="cli">📦${it}</span>Onde vai este produto?`,ops:emb(SETORES).map(z=>({t:z[0],ok:z===sx}))}}},
+ mercadinho:{cena:'mercado',deco:'🛒 🥫 🍎 🥛 🧴 🥖',tit:'📦 Em qual prateleira vai?',tipo:'escolha',gerar(){const sx=pk(SETORES),it=pk(sx[2]);return{ped:`<span class="cli">${it[0]}</span><span class="nm">${it[1]}</span>`,ops:emb(SETORES).map(z=>({t:`<span class="e">${z[0]}</span>${z[1]}`,ok:z===sx}))}}},
  posto:{cena:'posto',deco:'⛽ 🚗 🛢️ 🚙 ⛽',tit:'Frentista: pare a bomba no valor que o cliente pediu',tipo:'timing',gerar(){const v=pk([20,30,40,50,60,80]),z=v/100;return{ped:`<span class="cli">${pk(['🚗','🚙','🛻','🚕'])}</span>"Completa R$ ${v} de gasolina!"`,zona:[z-.06,z+.06],vel:.42,bot:'⛽ Parar a bomba',marcas:1}}},
  padaria:{cena:'padaria',deco:'🥖 🥐 🍞 🔥 🥯 🍩',tit:'Padeiro: tire o pão do forno quando estiver dourado',tipo:'timing',gerar(){const a=.55+Math.random()*.2;return{ped:`<span class="cli">🔥🍞</span>O pão está assando…`,zona:[a,a+.14],vel:.5,bot:'🧤 Tirar do forno',forno:1}}},
  barbearia:{cena:'barbearia',deco:'💈 ✂️ 🪒 💺 🪞 💈',tit:'Barbeiro: escolha a ferramenta certa',tipo:'escolha',gerar(){const c=pk(CORTES);return{ped:`<span class="cli">${pk(['🧔','👨','👴','👦','🧑'])}</span>"${c[0]}, por favor!"`,ops:emb(['⚡ Máquina','✂️ Tesoura','🪒 Navalha','🪮 Pente']).map(t=>({t,ok:t===c[1]}))}}},
@@ -3771,7 +3783,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261117a';
+const VERSAO_JOGO='v20261117b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3785,7 +3797,7 @@ function irAoLugar(k){const f=FOCUS[k];if(!f)return;follow=null;cam.x=T(f[0]);ca
  toast('📍 Indo até lá! Ao chegar, toque em "Trabalhar".',3500)}
 $('zjobs').onclick=()=>{if(!eu)return;const lista=Object.entries(JOBS).sort((a,b)=>a[1].nivel_min-b[1].nivel_min);
  confirmar('💼 Empregos da cidade','Toque em um emprego para ir até lá. Cada tarefa paga dinheiro e XP na hora.<br><small>🔒 = libera em um nível maior</small>',null,
-  lista.filter(([k])=>k!=='policia'||true).map(([k,J])=>{const lug=k==='bar'?'bar':k==='pescador'?'lagoa':k==='policia'?'delegacia':(JOB_LUGAR[k]||k);const ok=eu.nivel>=J.nivel_min;
+  lista.filter(([k])=>k!=='prefeito'||PREF_ID===eu.id).map(([k,J])=>{const lug=k==='bar'?'bar':k==='pescador'?'lagoa':k==='policia'?'delegacia':(JOB_LUGAR[k]||k);const ok=eu.nivel>=J.nivel_min;
    return[(ok?'💼 ':'🔒 ')+J.nome+(ok?'':' (nível '+J.nivel_min+')')+' · '+(PLACE_NAMES[lug]||lug),()=>ok?irAoLugar(lug):toast('Esse emprego libera no nível '+J.nivel_min+'. Continue trabalhando!',3000)]}))};
 async function boasVindas(){if(eu)return;$('join').classList.add('hidden');const el=document.createElement('div');el.id='boasvindas';
  el.innerHTML='<div class="bvL"><div class="bvT">🟢 Online agora</div><div id="bvLista">Carregando…</div></div><div class="bvR"><div style="font-size:40px">🍺</div><b style="font-size:18px">Cidade do Tonhão</b><div class="bvS">Crie seu personagem, trabalhe, faça amigos e curta o bar!</div><button class="btn big" id="bvCriar">✨ Criar minha conta</button><button class="btn ghost" id="bvEntrar">Já tenho conta</button><div class="bvS" id="bvTot"></div></div>';
