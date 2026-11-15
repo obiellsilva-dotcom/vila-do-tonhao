@@ -2816,7 +2816,7 @@ function renderProv(){const box=$('opts');box.innerHTML='';
  box.appendChild(cats);
  const g=GRUPOS.find(x=>x[0]===campoProv)||GRUPOS[2],sel=$('provSel');sel.innerHTML='';
  g[2].forEach(k=>{const f=FIELDS.find(q=>q[0]===k);if(!f)return;
-  const itens=nomesOf(f,prov).map((n,i)=>[n,i,false]).concat(vipOf(f,prov).map((o,i)=>[o[0],50+i,true])).filter(([n,i,vip])=>vip?souVip():!(optsOf(f,prov)[i]||[])[2]),pos=Math.max(0,itens.findIndex(x=>x[1]===prov[k]));
+  const itens=nomesOf(f,prov).map((n,i)=>[n,i,false]).concat(vipOf(f,prov).map((o,i)=>[o[0],50+i,true])).filter(([n,i,vip])=>vip?souVip():!(Array.isArray(optsOf(f,prov)[i])&&optsOf(f,prov)[i][2]==='x')),pos=Math.max(0,itens.findIndex(x=>x[1]===prov[k]));
   const linha=document.createElement('div');linha.className='plinha';
   const mk=(t,d)=>{const b=document.createElement('button');b.className='seta';b.textContent=t;b.onclick=()=>{const n=itens[(pos+d+itens.length)%itens.length];prov[k]=n[1];if(k==='sexo')['cabelo','calca','roupa','calcado','extra','chapeu','barba'].forEach(q=>prov[q]=0);FIELDS.forEach(q=>{if(!valido(q,prov,prov[q[0]]))prov[q[0]]=0});renderProv()};return b};
   const v=document.createElement('div');v.className='val';const it=itens[pos]||['—'],ehCor=['corCab','pele','camisa','corCalca','corCalcado','corChapeu'].includes(k),cor=ehCor?corDoCampo(k,prov[k]):null;
