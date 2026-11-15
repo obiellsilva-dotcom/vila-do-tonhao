@@ -63,3 +63,31 @@ Comprar móveis para a casa (precisa de tabela nova), interiores das lojas, giro
 
 ## Últimas mudanças (já no ar)
 Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡️ ADM e chat vermelho do admin, aviso para a cidade, vitrine de carros com setas, venda de carros (para a loja e entre jogadores), cargo de prefeito (🏛️ com brilho, banner ao entrar, chat dourado, vistorias), mochila, 🚗 Meu carro no menu, 10 NPCs, geladeira 3D, sem banheiro, sinuca com 4 lugares, reconexão automática da sala.
+
+## ATUALIZAÇÃO (15/11/2026, segunda sessão) — LEIA PRIMEIRO
+Tudo abaixo está SÓ em `extras/proposta-index.html` (ramo `ccr-e150a3c5-3uuba3` no GitHub). O `index.html` oficial NÃO foi mexido. Aplicar no oficial só quando o usuário aprovar.
+
+### Feito e aprovado na proposta
+- **Cabelos masculinos** refeitos (funções `cabeloM`, `MASC`, `cabeloM2`, `MASC2`): curto, degradê, topete, social de lado, raspado, espetado, cacheado, coque, trança (nagô), dreads, mullet + novos crop texturizado, undercut, cachos com degradê. Escondidos para homens (marcados com `'x'` em `OPC.cabelo.m`): rabo, surfista, moicano, black, comprido. Escondido = não aparece no provador/sorteio; quem já tinha vira "Curto".
+- **Rosto masculino**: queixo quadrado mais fino, olhos menos abertos, sobrancelha grossa reta, boca menor.
+- **Cabelos femininos** refeitos (`cabeloF`, `FEM`): comprido, coque, rabo (com rabicó rosa, preso na cabeça), cacheado e cachos longos (risquinhas onduladas), black, french bob, comprido com franja, pixie, butterfly, long bob, ondas boho, box braids, comprido com cortininha, meio preso, coque bagunçado. Escondidos para mulheres: trança, maria-chiquinha, duas tranças.
+- **Calças** com modelagem própria (tabela `FITS`: largura quadril/joelho/tornozelo): baggy, wide leg, barrel, flare, pantalona, jogger, cargo larga, skinny, alfaiataria, bermuda cargo, short tactel. Shorts: perna fina e short sempre desenhado por cima.
+- **Saias** novas: midi plissada, lápis, jeans longa, de tênis, minissaia jeans, envelope, tule, minissaia de couro.
+- **Calçados** refeitos (frente/lado/costas) + tênis chunky, cano alto, coturno, mocassim, sandália.
+- **Roupas de cima** novas: oversized, jaqueta jeans, corta-vento, puffer, blazer, suéter, camisa aberta florida, top de alcinha, ombro a ombro, cardigan, vestido tubinho. Camiseta (gola canelada), moletom (capuz, bolso, cordões), jaqueta e vestido melhorados.
+- **Corpo**: mulher em formato violão (`CORPO` Path2D, cintura média), homem em V com peitoral. Quadril na cor da calça ligando ao tronco (sem emenda). Com top/cropped: umbigo, cós com botão, calça de uma cor só. Mãos com dedos (`MAO`), braços desenhados por cima do corpo de frente/costas. Sem sombra retangular atrás do corpo.
+
+### Cuidados (o usuário cobra muito)
+- Testar ampliado em 5 ângulos (frente, diagonal, perfil, outro lado, costas) e andando, antes de mandar.
+- Calça/short: mesma cor e textura do quadril até o pé; nada de emenda, perna passando por cima, cós de outra cor.
+- Ombro não pode passar da linha do braço; barriga não pode ficar quadrada.
+- Scripts de prévia (Playwright) ficavam no scratchpad e se perdem: recriar. Truque: copiar a proposta trocando `window.__dbg={` por `window.__T={OPC,drawHead,cabelo3D,CORCAB,drawPersonReal};window.__dbg={` e chamar `__T.drawPersonReal(c,0,0,v,{cara:true}|{c34:true,dir:1}|{perfil:true,dir:1}|{lado:true,dir:-1}|{back:true})` num canvas.
+- `extras/gerar-teste.py` NÃO está no repositório (pedir ao usuário para gerar o `index-teste.html`).
+
+### Próximos passos (combinados)
+1. **Estampas** de roupa: campo novo "Estampa" (lisa, coração, estrela, florida, xadrez, listras, bolinhas, camuflada, tie-dye, raio, caveirinha, marca inventada "Tonhão Wear"/"Vila 10"). Sem marcas reais.
+2. **Banco**: o visual (`TJ…`) vai passar de 30 dígitos → no `novidades.sql` trocar a regra para até 60: `visual ~ '^(TH[0-9]{7,30}|TJ[0-9]{20,60})$'` (constraint `moradores_visual_check` e função de salvar morador).
+3. **Loja de roupas nova no mapa** (prédio novo). Peças de R$ 30 a R$ 1.000+ com dinheiro do jogo. Guarda-roupa salvo no banco (tabela nova de roupas compradas, conferida pelo servidor).
+4. **Criação de personagem**: só 4 opções grátis de cada peça (camisa, calça, calçado, chapéu) + estampa lisa e mais 1; o resto se compra na loja. Quem já joga mantém o que usa.
+5. Depois: **mapinha** no canto de cima (toca e abre o mapa grande), oficina de carros, acessórios/coroa, poupança.
+6. SQL continua acumulando em `novidades.sql`; só mandar quando ele disser "vamos subir a nova versão".
