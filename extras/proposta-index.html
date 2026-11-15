@@ -1968,8 +1968,9 @@ let cw=0,ch=0,dpr=1;
 const cam={x:T(24),y:T(22.3),z:1};
 let follow=null,selected=null;
 const CFG={mus:60,sfx:50,graf:'medio'};try{Object.assign(CFG,JSON.parse(localStorage.getItem('cidadeTonhao.cfg')||'{}'))}catch(e){}
+if(CFG.graf==='auto')CFG.graf='medio';
 function salvaCfg(){try{localStorage.setItem('cidadeTonhao.cfg',JSON.stringify(CFG))}catch(e){}}
-function resize(){dpr=Math.min(window.devicePixelRatio||1,CFG.graf==='baixo'?.8:CFG.graf==='medio'?1.1:1.4);cw=innerWidth;ch=innerHeight;cv.width=cw*dpr;cv.height=ch*dpr;lc.width=cw*dpr;lc.height=ch*dpr}
+function resize(){dpr=Math.min(window.devicePixelRatio||1,CFG.graf==='baixo'?.8:CFG.graf==='medio'?1.1:1.4);cw=innerWidth;ch=innerHeight;cv.width=cw*dpr;cv.height=ch*dpr;lc.width=Math.ceil(cw*dpr*.5);lc.height=Math.ceil(ch*dpr*.5)}
 addEventListener('resize',resize);resize();
 cam.z=clamp(cw/470,.75,2.2);
 /* ===== VISÃO ISOMÉTRICA =====
@@ -2505,32 +2506,31 @@ const CAR_ESC={moto:1.3,fusca:1.08,sedan:1.2,opala:1.18,esportivo:1.3,kombi_tonh
 // carros mais nítidos: amplia a foto 2x com qualidade, realça as bordas e clareia o preto chapado (vidro e pneu)
 const NITIDO=new WeakMap();
 // md = {roda, vidro, pintura}: rodas (0 original, 1 esportiva vermelha, 2 cromada, 3 dourada, 4 preta fosca), vidro (0 normal, 1 fumê, 2 insulfilm, 3 espelhado), pintura (0 fábrica, 1 fosca, 2 metálica, 3 perolada)
-function nitido(img,md){if(!img)return img;let cc=NITIDO.get(img);if(!cc){cc={};NITIDO.set(img,cc)}const ro=md?md.roda|0:0,vi=md?md.vidro|0:0,pi=md?md.pintura|0:0,key=ro+','+vi+','+pi;if(cc[key])return cc[key];
- const W0=img.naturalWidth||img.width,H0=img.naturalHeight||img.height;if(!W0)return img;let r=img;
- try{const K=2,W=W0*K,H=H0*K,FR=160*K,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(img,0,0,W,H);
-  const id=g.getImageData(0,0,W,H),d=id.data,n=W*H,bl=new Float32Array(n*3),tmp=new Float32Array(n*3);
+// processa só o quadro (ângulo) que vai aparecer, na hora que precisa: leve e sem travadas
+function quadro(img,md,i){let cc=NITIDO.get(img);if(!cc){cc={};NITIDO.set(img,cc)}const ro=md?md.roda|0:0,vi=md?md.vidro|0:0,pi=md?md.pintura|0:0,key=ro+','+vi+','+pi+','+i;if(cc[key])return cc[key];
+ const F=320,cv=document.createElement('canvas');cv.width=F;cv.height=F;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(img,(i%8)*160,Math.floor(i/8)*160,160,160,0,0,F,F);
+ try{const W=F,H=F,id=g.getImageData(0,0,W,H),d=id.data,n=W*H,bl=new Float32Array(n*3),tmp=new Float32Array(n*3);
   for(let y=0;y<H;y++){const o=y*W;for(let x=0;x<W;x++){const x0=x>0?x-1:x,x1=x<W-1?x+1:x;for(let ch=0;ch<3;ch++)tmp[(o+x)*3+ch]=(d[(o+x0)*4+ch]+d[(o+x)*4+ch]+d[(o+x1)*4+ch])/3}}
-  for(let y=0;y<H;y++){const y0=y>0?y-1:y,y1=y<H-1?y+1:y;for(let x=0;x<W;x++){const i=(y*W+x)*3;for(let ch=0;ch<3;ch++)bl[i+ch]=(tmp[(y0*W+x)*3+ch]+tmp[i+ch]+tmp[(y1*W+x)*3+ch])/3}}
-  const nf=Math.ceil(W/FR)*Math.ceil(H/FR),fc=Math.ceil(W/FR),mn=new Int32Array(nf).fill(1e9),mxY=new Int32Array(nf).fill(-1);
-  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>60){const fi=((y/FR)|0)*fc+((x/FR)|0);if(y<mn[fi])mn[fi]=y;if(y>mxY[fi])mxY[fi]=y}
+  for(let y=0;y<H;y++){const y0=y>0?y-1:y,y1=y<H-1?y+1:y;for(let x=0;x<W;x++){const k=(y*W+x)*3;for(let ch=0;ch<3;ch++)bl[k+ch]=(tmp[(y0*W+x)*3+ch]+tmp[k+ch]+tmp[(y1*W+x)*3+ch])/3}}
+  let mn=1e9,mxY=-1;for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>60){if(y<mn)mn=y;if(y>mxY)mxY=y}
   const mix=(q,cr,cg,cb,t)=>{d[q]+=(cr-d[q])*t;d[q+1]+=(cg-d[q+1])*t;d[q+2]+=(cb-d[q+2])*t};
-  for(let p=0;p<n;p++){const q=p*4;if(!d[q+3])continue;const y=(p/W)|0,x=p-y*W,fi=((y/FR)|0)*fc+((x/FR)|0),rel=mxY[fi]>mn[fi]?(y-mn[fi])/(mxY[fi]-mn[fi]):0;
+  for(let p=0;p<n;p++){const q=p*4;if(!d[q+3])continue;const y=(p/W)|0,rel=mxY>mn?(y-mn)/(mxY-mn):0;
    for(let ch=0;ch<3;ch++){const v=d[q+ch];d[q+ch]=v+1.6*(v-bl[p*3+ch])}
    const mx=Math.max(d[q],d[q+1],d[q+2]);
    if(mx<40){const t=(40-mx)/40;
     if(rel>.8&&mx<30){ // rodas e pneus (parte de baixo do carro)
      if(ro===1)mix(q,205,40,45,.42*t);else if(ro===2)mix(q,200,206,214,.45*t);else if(ro===3)mix(q,215,175,55,.5*t);else if(ro!==4){d[q]+=16*t;d[q+1]+=20*t;d[q+2]+=28*t}}
-    else{const sh=Math.max(0,.75-((y%FR)/FR))*46*t; // vidros
+    else{const sh=Math.max(0,.75-y/F)*46*t; // vidros
      if(vi===0){d[q]+=16*t+sh;d[q+1]+=20*t+sh*1.1;d[q+2]+=28*t+sh*1.3}else if(vi===1){d[q]+=9*t+sh*.5;d[q+1]+=10*t+sh*.5;d[q+2]+=12*t+sh*.6}else if(vi===3){mix(q,150,175,205,.65*t);d[q]+=sh*1.4;d[q+1]+=sh*1.5;d[q+2]+=sh*1.6}}}
    else if(pi){const L=(d[q]*.3+d[q+1]*.59+d[q+2]*.11);
     if(pi===1){for(let ch=0;ch<3;ch++)d[q+ch]=L+(d[q+ch]-L)*.75;const lim=170;for(let ch=0;ch<3;ch++)if(d[q+ch]>lim)d[q+ch]=lim+(d[q+ch]-lim)*.3}
-    else if(pi===2){for(let ch=0;ch<3;ch++)d[q+ch]=128+(d[q+ch]-128)*1.22;const h=Math.sin(p*12.9898)*43758.5453;if(h-Math.floor(h)>.985){d[q]+=30;d[q+1]+=30;d[q+2]+=30}}
+    else if(pi===2){for(let ch=0;ch<3;ch++)d[q+ch]=128+(d[q+ch]-128)*1.22;const h=Math.sin((p+i*997)*12.9898)*43758.5453;if(h-Math.floor(h)>.985){d[q]+=30;d[q+1]+=30;d[q+2]+=30}}
     else if(pi===3){const k=Math.max(0,.8-rel)*.45;mix(q,255,232,246,k)}}}
-  g.putImageData(id,0,0);cv.__k=K;r=cv}catch(e){r=img}
- cc[key]=r;return r}
-function drawCarSprite(c,x,y,img,ang,o,off=0){img=nitido(img,CAR_MOD_ATUAL);const KK=img.__k||1,N=32,FR=160*KK,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
+  g.putImageData(id,0,0)}catch(e){}
+ cc[key]=cv;return cv}
+function drawCarSprite(c,x,y,img,ang,o,off=0){const N=32,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
  if(!o.semSombra){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.fillStyle='rgba(0,0,0,.3)';rr(c,-30,-13,62,28,8);c.fill();c.restore()}
- const bob=(o.pitch||0)*6;c.drawImage(img,(i%8)*FR,Math.floor(i/8)*FR,FR,FR,x-T/2,o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob,T,T);
+ const bob=(o.pitch||0)*6;c.drawImage(quadro(img,CAR_MOD_ATUAL,i),0,0,320,320,x-T/2,o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob,T,T);
  if(o.freio){const cs=Math.cos(ang),sn=Math.sin(ang);c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,40,40,.35)';c.beginPath();c.ellipse(x-cs*30*CK,y-sn*30*SY*CK-8*CK,5,3,0,0,7);c.fill();c.restore()}}
 function drawCarStack(c,x,y,kind,ang,v,o={}){
  if(CAR_SOM_ATUAL){const t=now*2.2;c.save();c.globalCompositeOperation='lighter';for(let k=0;k<3;k++){const f=(t+k/3)%1;c.strokeStyle=`rgba(255,80,200,${(1-f)*.55})`;c.lineWidth=2.2;c.beginPath();c.ellipse(x,y-6,20+f*46,9+f*21,0,0,7);c.stroke()}c.restore();c.font='14px sans-serif';c.textAlign='center';c.fillText(['🎵','🎶','🔊'][Math.floor(now*2)%3],x+Math.sin(now*3)*18,y-48-((now*30)%18))}
@@ -2542,7 +2542,7 @@ function drawCarStack(c,x,y,kind,ang,v,o={}){
  if(ANT&&ANT[0].complete&&ANT[0].naturalWidth){const a0=ang-Math.PI/4,th0=Math.atan2((Math.cos(a0)+Math.sin(a0))*IB,(Math.cos(a0)-Math.sin(a0))*IA),th=Math.atan2(Math.sin(th0)/.78,Math.cos(th0)),cs=Math.cos(a0),sn=Math.sin(a0),L=(kind==='caminhonete'?25:22)*CK*(CAR_ESC[kind]||1)/1.1,Wd=9.5*CK*(CAR_ESC[kind]||1)/1.1,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];
   if(kind==='neon'){c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(0,229,255,.3)';c.beginPath();c.ellipse(x,y,44,20,0,0,7);c.fill();c.restore()}
   c.fillStyle='rgba(10,10,20,.22)';c.beginPath();[[L,Wd],[L,-Wd],[-L,-Wd],[-L,Wd]].forEach(([u,w],k2)=>{const q=P(cs*u-sn*w,sn*u+cs*w);k2?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fill();
-  const IMG=nitido(ANT[0],CAR_MOD_ATUAL),N=32,FR=160*(IMG.__k||1),TT=77*CK*(kind==='caminhonete'?1.18:1.06)*(CAR_ESC[kind]||1)/1.1,i=((Math.round((Math.PI+th)/(Math.PI*2/N))+ANT[1])%N+N)%N,HH=TT*.78;c.drawImage(IMG,(i%8)*FR,Math.floor(i/8)*FR,FR,FR,x-TT/2,y-HH*.62,TT,HH);return}}
+  const N=32,TT=77*CK*(kind==='caminhonete'?1.18:1.06)*(CAR_ESC[kind]||1)/1.1,i=((Math.round((Math.PI+th)/(Math.PI*2/N))+ANT[1])%N+N)%N,HH=TT*.78;c.drawImage(quadro(ANT[0],CAR_MOD_ATUAL,i),0,0,320,320,x-TT/2,y-HH*.62,TT,HH);return}}
  if(kind==='caminhonete'&&SPR_PICK.complete&&SPR_PICK.naturalWidth){drawCarSprite(c,x,y,SPR_PICK,ang,o);return}
  if(kind==='neon'&&SPR_VIP.complete&&SPR_VIP.naturalWidth){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.globalCompositeOperation='lighter';c.fillStyle='rgba(0,229,255,.35)';rr(c,-36,-20,72,40,18);c.fill();c.restore();drawCarSprite(c,x,y,SPR_VIP,ang,o,16);return}
  const f=carro3d(kind),col=o.cor||CAR_COR_ATUAL||CAR_COLOR[kind]||'#888',L=f.L,W=f.W,H=f.H,steer=o.steer||0,roll=o.roll||0,pitch=o.pitch||0;
@@ -2927,8 +2927,8 @@ function drawCena(){
   for(const pl of [eu,...others.values()]){if(pl&&!pl.hidden&&carOf(pl)==='viatura'&&(pl===eu?eu.giro:pl.giro))L.push([pl.x,pl.y,110,.95,0,-22])}
   for(const pl of [eu,...others.values()]){if(!pl||pl.hidden||!carOf(pl)||!pl._mov)continue;const a2=pl._mov.ang,cs=Math.cos(a2),sn=Math.sin(a2);
    for(const k of [1,2,3])L.push([pl.x+cs*(30+k*26)*CK,pl.y+sn*(30+k*26)*SY*CK-6,26+k*14,.75-k*.12]);L.push([pl.x-cs*34*CK,pl.y-sn*34*SY*CK-6,18,.35])}
-  for(const [x,y,rad,i,ox,oy,wb] of L){let [sx,sy]=wb!=null?wallScr(x,y,wb):toScreen(x,y);sx+=(ox||0)*cam.z;sy+=(oy||0)*cam.z;const R=rad*cam.z;if(sx<-R||sy<-R||sx>cw+R||sy>ch+R)continue;const g=lctx.createRadialGradient(sx*dpr,sy*dpr,0,sx*dpr,sy*dpr,R*dpr);g.addColorStop(0,`rgba(0,0,0,${i})`);g.addColorStop(1,'rgba(0,0,0,0)');lctx.fillStyle=g;lctx.fillRect((sx-R)*dpr,(sy-R)*dpr,R*2*dpr,R*2*dpr)}
-  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(lc,0,0);
+  for(const [x,y,rad,i,ox,oy,wb] of L){let [sx,sy]=wb!=null?wallScr(x,y,wb):toScreen(x,y);sx+=(ox||0)*cam.z;sy+=(oy||0)*cam.z;const R=rad*cam.z;if(sx<-R||sy<-R||sx>cw+R||sy>ch+R)continue;const ld=dpr*.5,g=lctx.createRadialGradient(sx*ld,sy*ld,0,sx*ld,sy*ld,R*ld);g.addColorStop(0,`rgba(0,0,0,${i})`);g.addColorStop(1,'rgba(0,0,0,0)');lctx.fillStyle=g;lctx.fillRect((sx-R)*ld,(sy-R)*ld,R*2*ld,R*2*ld)}
+  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(lc,0,0,cv.width,cv.height);
   setWorld(ctx);
   ctx.globalCompositeOperation='lighter';
   for(const [x,y,rad] of [...barLights.map(([x,y])=>[T(x),T(y),70]),...lamps.map(l=>[l.x+5,l.y-30,50])]){if(!vis(x,y-150))continue;const g=ctx.createRadialGradient(x,y,0,x,y,rad);g.addColorStop(0,`rgba(255,170,70,${.2*d})`);g.addColorStop(1,'rgba(255,170,70,0)');ctx.fillStyle=g;ctx.fillRect(x-rad,y-rad,rad*2,rad*2)}
