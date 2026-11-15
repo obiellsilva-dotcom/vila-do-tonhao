@@ -3764,7 +3764,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116p';
+const VERSAO_JOGO='v20261116q';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3832,10 +3832,9 @@ let PREF_ID=null,PREF_NOME='';
 function carregaPref(){api.cidade().then(r=>{if(!r)return;const novo=r.prefeito||null;PREF_ID=novo;PREF_NOME=r.moradores?r.moradores.nome:''}).catch(()=>{})}
 setInterval(carregaPref,60000);setTimeout(carregaPref,1500);
 function bannerGrande(t1,t2){const el=document.createElement('div');el.className='bannerPref';el.innerHTML='<div class="bp1">'+t1+'</div>'+(t2?'<div class="bp2">'+t2+'</div>':'');document.body.appendChild(el);try{Som.play('nivel')}catch(_){}setTimeout(()=>el.classList.add('sai'),3600);setTimeout(()=>el.remove(),4300)}
-function trofeu(c,x,y){const k=(Math.sin(now*4)+1)/2;c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y,0,x,y,11);g.addColorStop(0,`rgba(255,215,64,${.55+.35*k})`);g.addColorStop(1,'rgba(255,200,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y,11,0,7);c.fill();c.restore();
- c.save();c.translate(x,y);c.fillStyle='#ffd23f';c.strokeStyle='#8a5a10';c.lineWidth=.8;c.beginPath();c.moveTo(-4,-4);c.lineTo(4,-4);c.lineTo(3,1);c.quadraticCurveTo(0,3.5,-3,1);c.closePath();c.fill();c.stroke();
- c.beginPath();c.arc(-4.2,-2,1.6,Math.PI*.5,Math.PI*1.5);c.stroke();c.beginPath();c.arc(4.2,-2,1.6,-Math.PI*.5,Math.PI*.5);c.stroke();c.fillRect(-.8,2,1.6,2);c.fillRect(-2.6,4,5.2,1.4);c.strokeRect(-2.6,4,5.2,1.4);
- c.fillStyle='rgba(255,255,255,.9)';const s=Math.sin(now*6)*.5+.5;c.beginPath();c.arc(-1.5,-2.5,.7+s*.5,0,7);c.fill();c.restore()}
+function trofeu(c,x,y){const k=(Math.sin(now*4)+1)/2,b=Math.sin(now*3)*1.2;c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y+b,0,x,y+b,13);g.addColorStop(0,`rgba(255,215,64,${.5+.4*k})`);g.addColorStop(1,'rgba(255,200,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y+b,13,0,7);c.fill();c.restore();
+ c.save();c.font='11px sans-serif';c.textAlign='center';c.textBaseline='middle';c.shadowColor='#ffd23f';c.shadowBlur=6+k*6;c.fillText('🏛️',x,y+b);c.restore();
+ for(let i=0;i<3;i++){const a=now*2+i*2.1,r=8;c.fillStyle=`rgba(255,240,170,${.5+.5*Math.sin(now*5+i)})`;c.beginPath();c.arc(x+Math.cos(a)*r,y+b+Math.sin(a)*r*.5,.8,0,7);c.fill()}}
 function assumirPrefeitura(){acao(async()=>{const r=await api.assumirPref();PREF_ID=eu.id;PREF_NOME=eu.nome;emitEv('prefeito',{});bannerGrande('🏛️ NOVO PREFEITO!','👑 '+eu.nome+' assumiu a Cidade do Tonhão');log('🏛️ '+eu.nome+' é o novo prefeito!');closePlace()})}
 
 /* ----- formulário genérico ----- */
