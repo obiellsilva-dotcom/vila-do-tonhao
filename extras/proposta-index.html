@@ -4029,7 +4029,7 @@ function pertoOpcoes(){
  const s=seatPerto();if(s)o.push(['🪑 Sentar',()=>sentar(s)]);
  for(const [k,b] of Object.entries(SHOPS))if(perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.8))||(k==='mercadinho'&&eu.x>T(38)&&eu.x<T(52)&&eu.y>T(24.6)&&eu.y<T(26.4)))o.push([PLACE_TITLE[k],()=>abrirLugar(b)]);
  for(const f of FEATURES)if(perto(f.a.x,f.a.y,T(2.8)))o.push([PLACE_TITLE[f.kind],()=>abrirLugar(f)]);
- if(casaEm(eu.x,eu.y)===lojaRoupa)o.push(['👕 Ver as roupas',()=>abrirLojaRoupa()]);
+ if(casaEm(eu.x,eu.y)===lojaRoupa&&eu.y<T(lojaRoupa.y+lojaRoupa.h-1))o.push(['👕 Ver as roupas',()=>abrirLojaRoupa()]);
  {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  for(const b of houses)if(!b.off&&!casaEm(eu.x,eu.y)&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3))){const i=casasInfo.get(b.n)||{};o.push([i.dono&&i.dono===eu.id?'🏠 Minha casa':i.dono?'🏠 Casa de '+(i.nome||'alguém'):'🔑 Casa '+b.n+' à venda',()=>abrirLugar(b)]);break}
  for(const f of FRUTAS)if(perto(f.x,f.y+8,T(1.4))&&!(frutaCD[f.id]>Date.now())){o.push([f.tipo==='manga'?'🥭 Pegar manga':'🍐 Pegar goiaba',()=>comerFruta(f)]);break}
