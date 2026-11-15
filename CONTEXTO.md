@@ -63,3 +63,20 @@ Comprar móveis para a casa (precisa de tabela nova), interiores das lojas, giro
 
 ## Últimas mudanças (já no ar)
 Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡️ ADM e chat vermelho do admin, aviso para a cidade, vitrine de carros com setas, venda de carros (para a loja e entre jogadores), cargo de prefeito (🏛️ com brilho, banner ao entrar, chat dourado, vistorias), mochila, 🚗 Meu carro no menu, 10 NPCs, geladeira 3D, sem banheiro, sinuca com 4 lugares, reconexão automática da sala.
+
+## ATUALIZAÇÃO (sessão de novembro/2026) — LEIA PRIMEIRO
+Regras novas do usuário:
+- Antes de mexer no jogo, **mostrar fotos/prévia** e só aplicar no `index.html` oficial depois que ele aprovar.
+- **Testar no jogo quadro a quadro** (Playwright: andar nas 8 direções e tirar prints) antes de mandar.
+- Só salvar no GitHub quando ele pedir. SQL: acumular em `novidades.sql` e mandar só quando ele disser "vamos subir a nova versão".
+- Sempre mandar o `index-teste.html` (entra direto na cidade, sem login/tutorial/missão, R$ 50.000 e carros) para ele testar.
+
+Já no `index.html` oficial (GitHub, ainda NÃO subido no site):
+comidas novas + barra de sede; painéis com abas Comprar/Emprego; prefeito só nível 20; missão (bônus R$ 100, depois do tutorial, sai do emprego/padaria sozinha); tutorial com animações; gasolina (preços ~R$ 120–380, botão "Abastecer"); posto entrável (entre Concessionária e Oficina); direção do carro com ré e ajuda nas ruas, aceleração, sons por carro, troca de marcha; carros maiores; asfalto de pixe e meio-fio; praça fora da rua; feirinha com corredor; parede do bar com azulejo/tijolinho; mirante 3D; bar sem barreiras invisíveis; TV inteira e jukebox 3D; boneco em 8 direções com passo seguindo a direção, braço de perto/longe.
+
+`novidades.sql` (acumulado, rodar antes de subir o site): etapas 12 a 16 + gasolina (sede, comidas, prefeito nível 20, gasolina, bônus R$ 100).
+
+EM ANDAMENTO (não aprovado, NÃO está no oficial): `extras/proposta-index.html`
+- boneco 10% maior; cabelos e barbas novos (funções `volPinta`, `mecha`, `cabelo3D`, `barba3D`); rosto oval (fem) e com queixo (masc); cabelo de trás desenhado antes do corpo.
+- Reclamação atual do usuário: **homens ainda com cara de mulher e cabelos masculinos parecendo de mulher/papel**. Próximo passo combinado: pesquisar referências de cabelo masculino e refazer os cabelos masculinos (curtos, rentes, com textura) e o rosto masculino. Depois: oficina com personalização, roupas, loja de roupas, acessórios/coroa, poupança.
+- Para gerar o teste: `python3 extras/gerar-teste.py extras/proposta-index.html` (gera `index-teste.html` na pasta atual).
