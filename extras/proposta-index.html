@@ -2490,7 +2490,18 @@ function giroflex(c,x,y){const f=Math.floor(now*6)%2,yy=y-34*CK*.62;c.save();c.g
  for(const [dx,cr,on] of [[-5,'255,40,40',f],[5,'40,110,255',1-f]]){if(!on)continue;const g=c.createRadialGradient(x+dx,yy,0,x+dx,yy,38);g.addColorStop(0,`rgba(${cr},.85)`);g.addColorStop(1,`rgba(${cr},0)`);c.fillStyle=g;c.beginPath();c.ellipse(x+dx,yy,38,24,0,0,7);c.fill();c.fillStyle=`rgb(${cr})`;c.fillRect(x+dx-3,yy-2,6,4)}
  c.restore()}
 const CAR_ESC={moto:1.3,fusca:1.08,sedan:1.2,opala:1.18,esportivo:1.3,kombi_tonhao:1.28,viatura:1.2,caminhonete:1.15,neon:1.25};
-function drawCarSprite(c,x,y,img,ang,o,off=0){const N=32,FR=160,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
+// carros mais nítidos: amplia a foto 2x com qualidade, realça as bordas e clareia o preto chapado (vidro e pneu)
+const NITIDO=new WeakMap();
+function nitido(img){if(!img)return img;let r=NITIDO.get(img);if(r)return r;const W0=img.naturalWidth||img.width,H0=img.naturalHeight||img.height;if(!W0)return img;
+ try{const K=2,W=W0*K,H=H0*K,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(img,0,0,W,H);
+  const id=g.getImageData(0,0,W,H),d=id.data,n=W*H,bl=new Float32Array(n*3),tmp=new Float32Array(n*3);
+  for(let y=0;y<H;y++){const o=y*W;for(let x=0;x<W;x++){const x0=x>0?x-1:x,x1=x<W-1?x+1:x;for(let ch=0;ch<3;ch++)tmp[(o+x)*3+ch]=(d[(o+x0)*4+ch]+d[(o+x)*4+ch]+d[(o+x1)*4+ch])/3}}
+  for(let y=0;y<H;y++){const y0=y>0?y-1:y,y1=y<H-1?y+1:y;for(let x=0;x<W;x++){const i=(y*W+x)*3;for(let ch=0;ch<3;ch++)bl[i+ch]=(tmp[(y0*W+x)*3+ch]+tmp[i+ch]+tmp[(y1*W+x)*3+ch])/3}}
+  for(let p=0;p<n;p++){const q=p*4;if(!d[q+3])continue;for(let ch=0;ch<3;ch++){const v=d[q+ch];d[q+ch]=v+1.6*(v-bl[p*3+ch])}
+   const mx=Math.max(d[q],d[q+1],d[q+2]);if(mx<40){const t=(40-mx)/40,fy=((p/W|0)%(160*K))/(160*K),sh=Math.max(0,.75-fy)*46*t;d[q]=d[q]+16*t+sh;d[q+1]=d[q+1]+20*t+sh*1.1;d[q+2]=d[q+2]+28*t+sh*1.3}}
+  g.putImageData(id,0,0);cv.__k=K;r=cv}catch(e){r=img}
+ NITIDO.set(img,r);return r}
+function drawCarSprite(c,x,y,img,ang,o,off=0){img=nitido(img);const KK=img.__k||1,N=32,FR=160*KK,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
  if(!o.semSombra){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.fillStyle='rgba(0,0,0,.3)';rr(c,-30,-13,62,28,8);c.fill();c.restore()}
  const bob=(o.pitch||0)*6;c.drawImage(img,(i%8)*FR,Math.floor(i/8)*FR,FR,FR,x-T/2,o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob,T,T);
  if(o.freio){const cs=Math.cos(ang),sn=Math.sin(ang);c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,40,40,.35)';c.beginPath();c.ellipse(x-cs*30*CK,y-sn*30*SY*CK-8*CK,5,3,0,0,7);c.fill();c.restore()}}
@@ -2503,7 +2514,7 @@ function drawCarStack(c,x,y,kind,ang,v,o={}){
  if(ANT&&ANT[0].complete&&ANT[0].naturalWidth){const a0=ang-Math.PI/4,th0=Math.atan2((Math.cos(a0)+Math.sin(a0))*IB,(Math.cos(a0)-Math.sin(a0))*IA),th=Math.atan2(Math.sin(th0)/.78,Math.cos(th0)),cs=Math.cos(a0),sn=Math.sin(a0),L=(kind==='caminhonete'?25:22)*CK*(CAR_ESC[kind]||1)/1.1,Wd=9.5*CK*(CAR_ESC[kind]||1)/1.1,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];
   if(kind==='neon'){c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(0,229,255,.3)';c.beginPath();c.ellipse(x,y,44,20,0,0,7);c.fill();c.restore()}
   c.fillStyle='rgba(10,10,20,.22)';c.beginPath();[[L,Wd],[L,-Wd],[-L,-Wd],[-L,Wd]].forEach(([u,w],k2)=>{const q=P(cs*u-sn*w,sn*u+cs*w);k2?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fill();
-  const N=32,FR=160,TT=77*CK*(kind==='caminhonete'?1.18:1.06)*(CAR_ESC[kind]||1)/1.1,i=((Math.round((Math.PI+th)/(Math.PI*2/N))+ANT[1])%N+N)%N,HH=TT*.78;c.drawImage(ANT[0],(i%8)*FR,Math.floor(i/8)*FR,FR,FR,x-TT/2,y-HH*.62,TT,HH);return}}
+  const IMG=nitido(ANT[0]),N=32,FR=160*(IMG.__k||1),TT=77*CK*(kind==='caminhonete'?1.18:1.06)*(CAR_ESC[kind]||1)/1.1,i=((Math.round((Math.PI+th)/(Math.PI*2/N))+ANT[1])%N+N)%N,HH=TT*.78;c.drawImage(IMG,(i%8)*FR,Math.floor(i/8)*FR,FR,FR,x-TT/2,y-HH*.62,TT,HH);return}}
  if(kind==='caminhonete'&&SPR_PICK.complete&&SPR_PICK.naturalWidth){drawCarSprite(c,x,y,SPR_PICK,ang,o);return}
  if(kind==='neon'&&SPR_VIP.complete&&SPR_VIP.naturalWidth){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.globalCompositeOperation='lighter';c.fillStyle='rgba(0,229,255,.35)';rr(c,-36,-20,72,40,18);c.fill();c.restore();drawCarSprite(c,x,y,SPR_VIP,ang,o,16);return}
  const f=carro3d(kind),col=o.cor||CAR_COR_ATUAL||CAR_COLOR[kind]||'#888',L=f.L,W=f.W,H=f.H,steer=o.steer||0,roll=o.roll||0,pitch=o.pitch||0;
@@ -2798,7 +2809,7 @@ function drawPocas(vx0,vy0,vx1,vy1){if(!(chuva>.05&&cam.z>.5)||sobTeto())return;
 }
 function drawCena(){
  ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#2b1a20';ctx.fillRect(0,0,cv.width,cv.height);
- setWorld(ctx);ctx.imageSmoothingEnabled=true;
+ setWorld(ctx);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
  const q4=[toWorld(-60,-60),toWorld(cw+60,-60),toWorld(-60,ch+120),toWorld(cw+60,ch+120)],vx0=Math.min(...q4.map(q=>q[0])),vx1=Math.max(...q4.map(q=>q[0])),vy0=Math.min(...q4.map(q=>q[1])),vy1=Math.max(...q4.map(q=>q[1]));
  drawGround(vx0,vy0,vx1,vy1);
  const barVis=(()=>{const a=toScreen(T(24),T(22));return a[0]>-700*cam.z&&a[0]<cw+700*cam.z&&a[1]>-500*cam.z&&a[1]<ch+500*cam.z})();
@@ -3103,7 +3114,7 @@ const precoTanque=c=>c==='moto'?120:['fusca','kombi','fusca_ouro'].includes(c)?2
 setInterval(()=>{const nb=!!(eu&&eu.driving&&carOf(eu)!=='viatura'&&BOMBAS.some(bb=>Math.hypot(eu.x-bb.x,eu.y-(bb.y+T(.9)))<T(2.2)));$('cbBomba').classList.toggle('hidden',!nb)},150);
 $('cbBomba').onclick=()=>{if(!eu)return;Som.play('clique');eu.path=[];abrirLugar(Object.assign(Object.create(SHOPS.posto),{bomba:1}))};
 setInterval(()=>{if(eu&&eu.gas!=null&&eu.gas!==eu.gasSalvo){eu.gasSalvo=eu.gas;api.salvarGas&&api.salvarGas(Math.round(eu.gas*10)/10).catch(()=>{})}},30000);
-const CARS={moto:{nome:'Motoca',preco:1800,nivel_min:1},fusca:{nome:'Fusca',preco:3000,nivel_min:1},kombi:{nome:'Kombi',preco:5500,nivel_min:3},opala:{nome:'Opala',preco:12000,nivel_min:6},caminhonete:{nome:'Caminhonete',preco:25000,nivel_min:10},sedan:{nome:'Sedã',preco:45000,nivel_min:13},jipe:{nome:'Jipe',preco:70000,nivel_min:16},esportivo:{nome:'Esportivo',preco:120000,nivel_min:20}};
+const CARS={moto:{nome:'Motoca',preco:2500,nivel_min:1},fusca:{nome:'Fusca',preco:4000,nivel_min:1},kombi:{nome:'Kombi',preco:7000,nivel_min:3},opala:{nome:'Opala',preco:15000,nivel_min:6},caminhonete:{nome:'Caminhonete',preco:32000,nivel_min:10},sedan:{nome:'Sedã',preco:58000,nivel_min:13},jipe:{nome:'Jipe',preco:90000,nivel_min:16},esportivo:{nome:'Esportivo',preco:150000,nivel_min:20}};
 const CAR_SHAPE={sedan:'opala',jipe:'caminhonete',esportivo:'opala',fusca_ouro:'fusca',kombi_tonhao:'caminhonete',neon:'opala'};
 const CARS_PREMIUM={fusca_ouro:{nome:'Fusca Dourado',preco:0,nivel_min:1,premium:true},kombi_tonhao:{nome:'Caminhonete do Tonhão',preco:0,nivel_min:1,premium:true},neon:{nome:'Esportivo Neon',preco:0,nivel_min:1,premium:true}};
 const CAR_COLOR={sedan:'#8e1b3a',jipe:'#3d5a2a',esportivo:'#e01b24',moto:'#c0392b',fusca:'#3c78d8',kombi:'#f3c13a',opala:'#2d2d34',caminhonete:'#46a35b',viatura:'#f4f4f4'};

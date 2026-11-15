@@ -141,11 +141,11 @@ insert into public.loja(id, tipo, nome, preco, local, fome, nivel_min) values
   ('pao',         'consumo', 'um pão na chapa',             5, 'padaria',    15, 1),
   ('coxinha',     'consumo', 'uma coxinha',                 7, 'padaria',    20, 1),
   ('cesta',       'consumo', 'uma cesta básica',           60, 'mercadinho', 100, 1),
-  ('moto',        'carro',   'Motoca',                   1800, 'carros',      0, 1),
-  ('fusca',       'carro',   'Fusca',                    3000, 'carros',      0, 1),
-  ('kombi',       'carro',   'Kombi',                    5500, 'carros',      0, 3),
-  ('opala',       'carro',   'Opala',                   12000, 'carros',      0, 6),
-  ('caminhonete', 'carro',   'Caminhonete',             25000, 'carros',      0, 10)
+  ('moto',        'carro',   'Motoca',                   2500, 'carros',      0, 1),
+  ('fusca',       'carro',   'Fusca',                    4000, 'carros',      0, 1),
+  ('kombi',       'carro',   'Kombi',                    7000, 'carros',      0, 3),
+  ('opala',       'carro',   'Opala',                   15000, 'carros',      0, 6),
+  ('caminhonete', 'carro',   'Caminhonete',             32000, 'carros',      0, 10)
 on conflict (id) do update set tipo = excluded.tipo, nome = excluded.nome, preco = excluded.preco,
   local = excluded.local, fome = excluded.fome, nivel_min = excluded.nivel_min;
 delete from public.loja where id = 'bar';
@@ -920,9 +920,9 @@ on conflict (id) do update set nome = excluded.nome, salario = excluded.salario,
 
 -- carros novos
 insert into public.loja(id, tipo, nome, preco, local, fome, nivel_min) values
-  ('sedan',     'carro', 'Sedã',       45000, 'carros', 0, 13),
-  ('jipe',      'carro', 'Jipe',       70000, 'carros', 0, 16),
-  ('esportivo', 'carro', 'Esportivo', 120000, 'carros', 0, 20)
+  ('sedan',     'carro', 'Sedã',       58000, 'carros', 0, 13),
+  ('jipe',      'carro', 'Jipe',       90000, 'carros', 0, 16),
+  ('esportivo', 'carro', 'Esportivo', 150000, 'carros', 0, 20)
 on conflict (id) do update set nome = excluded.nome, preco = excluded.preco, nivel_min = excluded.nivel_min;
 
 grant execute on function public.criar_morador(text, text) to authenticated;
@@ -1390,3 +1390,13 @@ grant execute on function public.responder_proposta(bigint, boolean) to authenti
 -- ===================== ETAPA 12: nível máximo 50 =====================
 -- quem estava travado no 20 sobe conforme o XP que já tem
 update public.moradores set nivel = public.nivel_de(xp) where nivel <> public.nivel_de(xp) and public.nivel_de(xp) > nivel;
+
+-- ===================== ETAPA 13: carros mais caros =====================
+update public.loja set preco = 2500 where id = 'moto' and tipo = 'carro';
+update public.loja set preco = 4000 where id = 'fusca' and tipo = 'carro';
+update public.loja set preco = 7000 where id = 'kombi' and tipo = 'carro';
+update public.loja set preco = 15000 where id = 'opala' and tipo = 'carro';
+update public.loja set preco = 32000 where id = 'caminhonete' and tipo = 'carro';
+update public.loja set preco = 58000 where id = 'sedan' and tipo = 'carro';
+update public.loja set preco = 90000 where id = 'jipe' and tipo = 'carro';
+update public.loja set preco = 150000 where id = 'esportivo' and tipo = 'carro';
