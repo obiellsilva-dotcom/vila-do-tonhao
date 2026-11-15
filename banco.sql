@@ -464,7 +464,7 @@ declare n integer := greatest(1, floor((1 + sqrt(1 + 4.0 * greatest(p_xp, 0) / 2
 begin
   while public.xp_do_nivel(n + 1) <= p_xp loop n := n + 1; end loop;
   while n > 1 and public.xp_do_nivel(n) > p_xp loop n := n - 1; end loop;
-  return least(n, 20);  -- nível máximo (aumente aqui no futuro)
+  return least(n, 50);  -- nível máximo (aumente aqui no futuro)
 end $$;
 
 -- ---------- Funções internas ----------
@@ -1386,3 +1386,7 @@ begin
   return json_build_object('ok', true, 'carro', p.carro, 'eu', _estado(m.id));
 end $$;
 grant execute on function public.responder_proposta(bigint, boolean) to authenticated;
+
+-- ===================== ETAPA 12: nível máximo 50 =====================
+-- quem estava travado no 20 sobe conforme o XP que já tem
+update public.moradores set nivel = public.nivel_de(xp) where nivel <> public.nivel_de(xp) and public.nivel_de(xp) > nivel;
