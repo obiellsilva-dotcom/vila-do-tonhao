@@ -129,6 +129,7 @@ body:has(#emoBox:not(.hidden)) #joy,body:has(#card:not(.hidden)) #joy,body:has(.
 .bannerPref .bp1{font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(24px,6.5vw,40px);color:#ffd23f;text-shadow:0 3px 0 #3a1d10}.bannerPref .bp2{color:#fff;font-size:clamp(15px,4vw,20px);margin-top:4px}
 .bannerPref.sai{animation:bpOut .6s forwards}@keyframes bpIn{to{transform:translate(-50%,-50%) scale(1);opacity:1}}@keyframes bpOut{to{transform:translate(-50%,-80%) scale(.9);opacity:0}}
 .prefMsg{background:linear-gradient(90deg,rgba(255,210,63,.32),rgba(122,90,16,.25))!important;border:1px solid #ffd23f!important;box-shadow:0 0 10px rgba(255,210,63,.35)}
+#ticker div.ca{background:linear-gradient(90deg,#8e1b1b,#3a0e0e);border:1px solid #ff6b6b}.admMsg{background:linear-gradient(90deg,rgba(214,48,49,.4),rgba(90,15,15,.3))!important;border:1px solid #ff6b6b!important;box-shadow:0 0 10px rgba(255,80,80,.35)}
 #ticker div.cp{background:linear-gradient(90deg,#7a5a10,#3a2a08);border:1px solid #ffd23f}
 #carBtns,#paBtns{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:6}#carBtns.hidden,#paBtns.hidden{display:none}#carBtns .btn,#paBtns .btn{font-size:14px;padding:8px 12px;white-space:nowrap}body:has(#chatPainel.on) #ticker{visibility:hidden}
 @media (pointer:coarse){body:has(#joy:not(.hidden)) #ticker{padding-right:118px}}#chatPainel div{background:rgba(255,255,255,.06);border-radius:9px;padding:4px 8px;word-wrap:break-word}#chatPainel b{color:var(--gold)}#chatPainel time{color:var(--muted);font-size:11px;margin-right:5px}
@@ -2431,7 +2432,7 @@ function drawCena(){
  if(cam.z>=.9)for(const b of houses){if(b.off)continue;const hx=T(b.x+b.w/2);if(!vis(hx,T(b.y+b.h)))continue;const info=casasInfo.get(b.n);
   bbSet(ctx,hx,T(b.y+b.h));if(info&&info.dono){if(info.nome)nameTag(ctx,hx,T(b.y+b.h)-b.h*TILE*WK-4,'🏠 '+info.nome,eu&&info.dono===eu.id,true)}
   else if(eu){const px=T(b.front[0])+22,py=T(b.y+b.h)-18;ctx.fillStyle='#6d4426';ctx.fillRect(px+13,py+8,2,9);ctx.fillStyle='#c0392b';rr(ctx,px,py,28,9,2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 5.5px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('VENDE-SE',px+14,py+6.4);ctx.textAlign='left'}}
- for(const p of plist){if(!vis(p.x,p.y))continue;bbSet(ctx,p.x,p.y);const top=p.y-(carOf(p)?(p.sit?0:26):(p.sit?39:46)*PS)-3;const vp=p.vip_ate&&Date.parse(p.vip_ate)>Date.now(),lb=(vp?'👑VIP ':'')+'⭐'+(p.nivel||1)+' '+p.nome;if(p.foto){ctx.font='600 7px Fredoka, sans-serif';fotoMini(ctx,p.foto,p.x-ctx.measureText(lb).width/2-7,top-2.4,5.2,vp)}nameTag(ctx,p.x,top,lb,p===eu,true,vp);const ehP=PREF_ID&&p.id===PREF_ID;if(ehP)trofeu(ctx,p.x,top-13);if(vp&&(p.moving||p.driving)&&Math.random()<.5)brilhos.push({x:p.x+rand(-5,5),y:p.y-rand(0,8),t:now});if(p.bub&&p.bub.until>now)bubble(ctx,p.x,top-(ehP?24:8),p.bub.t)}
+ for(const p of plist){if(!vis(p.x,p.y))continue;bbSet(ctx,p.x,p.y);const top=p.y-(carOf(p)?(p.sit?0:26):(p.sit?39:46)*PS)-3;const vp=p.vip_ate&&Date.parse(p.vip_ate)>Date.now(),lb=(vp?'👑VIP ':'')+'⭐'+(p.nivel||1)+' '+p.nome;if(p.foto){ctx.font='600 7px Fredoka, sans-serif';fotoMini(ctx,p.foto,p.x-ctx.measureText(lb).width/2-7,top-2.4,5.2,vp)}nameTag(ctx,p.x,top,lb,p===eu,true,vp);const ehP=PREF_ID&&p.id===PREF_ID,ehA=ehAdm(p.id);if(ehA)tagAdm(ctx,p.x,top-12);if(ehP)trofeu(ctx,p.x,top-(ehA?24:13));if(vp&&(p.moving||p.driving)&&Math.random()<.5)brilhos.push({x:p.x+rand(-5,5),y:p.y-rand(0,8),t:now});if(p.bub&&p.bub.until>now)bubble(ctx,p.x,top-(ehP||ehA?(ehP&&ehA?36:24):8),p.bub.t)}
  if(cam.z>=1.3)for(const v of VAGAS){const i=vagasInfo.get(v.id);if(i&&i.ativo&&i.nome&&vis(v.x,v.y)&&!(eu&&i.morador===eu.id&&eu.driving)){bbSet(ctx,v.x,v.y);nameTag(ctx,v.x,v.y-26,'🅿️ '+i.nome,eu&&i.morador===eu.id,true)}}
  setWorld(ctx);
  if(trabalho&&trabalho.ronda&&trabalho.ronda.i<4){const p=trabalho.ronda.pts[trabalho.ronda.i],k=(now*1.5)%1;
@@ -2451,7 +2452,7 @@ function winOn(w){const h=hour();if(h>=18&&h<23.5)return w.on;if(h>=23.5||h<7)re
 /* ================= UI ================= */
 const $=id=>document.getElementById(id);
 function toast(t,ms=2600){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),ms)}
-function renderTicker(){const el=$('ticker'),vis=feed.filter(f=>f.until>now).slice(-5);for(const n of [...el.children])if(!vis.includes(n._f))n.remove();vis.forEach(f=>{if(!f.el){const d=document.createElement('div');d.className=f.kind==='chatp'?'c cp':f.kind==='chat'?'c':'e';if(f.nome){const b=document.createElement('b');b.textContent=f.nome+' ';d.appendChild(b)}d.appendChild(document.createTextNode(f.texto));d._f=f;f.el=d}if(f.el.parentNode!==el)el.appendChild(f.el)})}
+function renderTicker(){const el=$('ticker'),vis=feed.filter(f=>f.until>now).slice(-5);for(const n of [...el.children])if(!vis.includes(n._f))n.remove();vis.forEach(f=>{if(!f.el){const d=document.createElement('div');d.className=f.kind==='chata'?'c ca':f.kind==='chatp'?'c cp':f.kind==='chat'?'c':'e';if(f.nome){const b=document.createElement('b');b.textContent=f.nome+' ';d.appendChild(b)}d.appendChild(document.createTextNode(f.texto));d._f=f;f.el=d}if(f.el.parentNode!==el)el.appendChild(f.el)})}
 setInterval(renderTicker,2000);
 function statusOf(r){
  if(r.isPlayer){const w=r===eu?(trabalho&&trabalho.job):r.work;if(w==='sinuca')return'🎱 Jogando sinuca no bar';if(w==='policia')return'🚓 Fazendo ronda de viatura';if(r.sit)return'🪑 Sentado(a) no bar';if((r===eu?r.bebK:r.bebado)>0)return'🥴 Bêbado(a)';if(w==='pescador')return'🎣 Pescando na lagoa';if(w&&JOBS[w])return'💼 Trabalhando de '+JOBS[w].nome;if(r===eu&&emCasa)return'🛋️ Descansando em casa';if(r.hidden)return'🚪 Lá dentro de algum lugar';const car=carOf(r);if(car)return'🚗 Dirigindo '+(car==='moto'?'a ':'o ')+CARS[car].nome;return r.moving?'🚶 Andando pela cidade':'🧍 Parado(a) na cidade'}
@@ -2956,6 +2957,7 @@ function abrirLugar(b){
   comida.forEach(([id,it])=>{const l=document.createElement('div');l.style.cssText='display:flex;gap:6px;align-items:stretch';box.appendChild(l);const b1=botao(l,`${ICON[id]||'🍽️'} ${cap(it.nome)}: ${money(it.preco)}`+(it.fome?` · +${it.fome} 🍗`:''),()=>comprarItem(id),{off:eu.dinheiro<it.preco});b1.style.flex='1';if(id!=='rodada'){const b2=botao(l,'🎒',()=>guardarItem(id),{ghost:true,off:eu.dinheiro<it.preco});b2.title='Guardar na mochila';b2.style.flex='none'}})}
  if(k==='mercadinho'&&eu.peixes>0)botao(box,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
  if(k==='concessionaria'){sub='Comprou, saiu dirigindo. Para descer ou dirigir de novo, toque em você.';
+  closePlace();abrirVitrine();return;
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
    botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})});
   if(eu.carros.length){eu.carros.filter(c=>CARS[c]&&!CARS[c].premium).forEach(c=>botao(box,`💸 Vender ${CARS[c].nome} para a loja: ${money(Math.floor(CARS[c].preco/2))}`,()=>venderLoja(c),{ghost:true}));botao(box,'🤝 Vender um carro para outro jogador',()=>venderJogador(),{ghost:true})}}
@@ -3243,6 +3245,7 @@ function onEv(p){
  if(p.k==='gesto'&&GESTOS.some(g=>g[0]===p.g))o.gesto={t:p.g,ate:now+3};
  if(p.k==='convite')onConvite(o,p);
  if(p.k==='kick'||p.k==='admAviso')onAdmin(o,p);
+ if(p.k==='anuncio'&&ehAdm(o.id)&&typeof p.t==='string')bannerGrande('📢 AVISO DO ADMIN',esc(p.t.slice(0,90)));
  if(p.k==='proposta'||p.k==='propResp')onProposta(o,p);
  if(p.k==='prefeito'){PREF_ID=o.id;PREF_NOME=o.nome;bannerGrande('🏛️ NOVO PREFEITO!','🏆 '+o.nome+' assumiu a Cidade do Tonhão')}
  if(/^sin(Conv|Resp|Tiro|Sai)$/.test(p.k))onSinuca(o,p);
@@ -3259,14 +3262,14 @@ const hhmm=d=>{const t=d?new Date(d):new Date();return String(t.getHours()).padS
 function onChat(r,hist){
  if(!r||vistos.has(r.id))return;vistos.add(r.id);chatMsgs.push(r);if(chatMsgs.length>50)chatMsgs.shift();
  if(!hist){const o=eu&&r.morador===eu.id?eu:others.get(r.morador);if(o)say(o,short(r.texto),5,true);Som.play('msg',300)}
- pushFeed(PREF_ID&&r.morador===PREF_ID?'chatp':'chat',(PREF_ID&&r.morador===PREF_ID?'🏛️ Prefeito ':'')+r.nome,r.texto,hist?8:40);pintaPainel();
+ pushFeed(ehAdm(r.morador)?'chata':PREF_ID&&r.morador===PREF_ID?'chatp':'chat',(ehAdm(r.morador)?'🛡️ ADM ':PREF_ID&&r.morador===PREF_ID?'🏛️ Prefeito ':'')+r.nome,r.texto,hist?8:40);pintaPainel();
  if(!$('mChat').classList.contains('hidden'))renderChat();
 }
 function renderChat(){
  const box=$('chatList');box.innerHTML='';
  chatMsgs.forEach(m=>{const d=document.createElement('div'),b=document.createElement('b'),t=document.createElement('time');
   t.textContent=hhmm(m.criado_em);b.textContent=m.nome;b.onclick=()=>{const p=eu&&m.morador===eu.id?eu:others.get(m.morador);if(p&&(p===eu||p.seen)){$('mChat').classList.add('hidden');follow=p;cam.z=Math.max(cam.z,1.4);openCard(p)}else toast(m.nome+' não está na cidade agora.',2000)};
-  if(PREF_ID&&m.morador===PREF_ID){d.className='prefMsg';b.textContent='🏛️ Prefeito '+m.nome}d.append(t,b,document.createTextNode(' '+m.texto));box.appendChild(d)});
+  if(ehAdm(m.morador)){d.className='admMsg';b.textContent='🛡️ ADM '+m.nome}else if(PREF_ID&&m.morador===PREF_ID){d.className='prefMsg';b.textContent='🏛️ Prefeito '+m.nome}d.append(t,b,document.createTextNode(' '+m.texto));box.appendChild(d)});
  if(!chatMsgs.length){const d=document.createElement('div');d.textContent='Ninguém falou nada ainda. Puxa assunto!';box.appendChild(d)}
  $('chatSub').textContent=ONLINE?`Sala ${sala||'…'} · últimas ${chatMsgs.length} mensagens. Toque num nome para ir até a pessoa. Quem pegar pesado pode ser denunciado.`:'Modo teste: só você vê suas mensagens.';
  box.scrollTop=box.scrollHeight;
@@ -3761,7 +3764,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116o';
+const VERSAO_JOGO='v20261116p';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3846,14 +3849,14 @@ function painelAdmin(){if(!eu||!eu.admin)return;
  <div class="fx"><div><label class="fl">Pet</label><select id="aPet">${Object.keys(PETS).map(k=>'<option value="'+k+'">'+PETS[k].ic+' '+PETS[k].nome+'</option>').join('')}</select></div><div><label class="fl">Carro</label><select id="aCar">${Object.keys(CARS_PREMIUM).concat(Object.keys(CARS).filter(k=>!CARS_PREMIUM[k])).filter((v,i,a)=>a.indexOf(v)===i).map(k=>'<option value="'+k+'">'+(CARS[k]||CARS_PREMIUM[k]).nome+'</option>').join('')}</select></div></div>
  <div class="grid"><button class="btn" data-a="dinheiro">💰 Dar dinheiro</button><button class="btn" data-a="tirar">💸 Tirar dinheiro</button><button class="btn" data-a="vip">👑 Dar VIP (dias)</button><button class="btn" data-a="pet">🐾 Dar pet</button>
  <button class="btn" data-a="carro">🚗 Dar carro</button><button class="btn" data-a="casa">🏠 Dar casa (nº)</button><button class="btn ghost" data-a="tirar_casa">🏚️ Tirar casa</button><button class="btn ghost" data-a="expulsar">👢 Expulsar</button>
- <button class="btn ghost" data-a="banir" style="color:#ff6b6b">🚫 Banir</button><button class="btn ghost" data-a="desbanir">✅ Desbanir</button></div>`,
- box=>box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const n=$('aNome').value.trim(),v=$('aVal').value.trim(),a=b.dataset.a;if(!n){toast('Escreva o nome do jogador.');return}
+ <button class="btn ghost" data-a="banir" style="color:#ff6b6b">🚫 Banir</button><button class="btn ghost" data-a="desbanir">✅ Desbanir</button></div><div class="grid" style="grid-template-columns:1fr"><button class="btn" id="aAviso" style="background:#d63031;color:#fff">📢 Aviso para toda a cidade</button></div>`,
+ box=>{$('aAviso').onclick=avisoGeral;box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const n=$('aNome').value.trim(),v=$('aVal').value.trim(),a=b.dataset.a;if(!n){toast('Escreva o nome do jogador.');return}
   const alvo=[...others.values()].find(o=>o.nome.toLowerCase()===n.toLowerCase());
   if(a==='expulsar'){if(!alvo){toast(n+' não está na sua sala agora.');return}emitEv('kick',{para:alvo.id});toast('👢 '+n+' foi expulso(a).');return}
   const acaoS=a==='tirar'?'dinheiro':a,val=a==='tirar'?-Math.abs(+v||0):a==='pet'?$('aPet').value:a==='carro'?$('aCar').value:v;
   if(['dinheiro','tirar','vip','casa'].includes(a)&&!(+v)){toast('Coloque o valor.');return}
   confirmar('🛡️ Confirmar',`<b>${esc(b.textContent)}</b> para <b>${esc(n)}</b>${val!==''&&a!=='banir'&&a!=='desbanir'&&a!=='tirar_casa'?' ('+esc(val)+')':''}?`,()=>acao(async()=>{const r=await api.admin(n,acaoS,val);toast('✅ Feito: '+b.textContent+' → '+r.nome,3000);
-   if(alvo)emitEv('admAviso',{para:alvo.id,t:a,v:val});if(a==='banir'&&alvo)emitEv('kick',{para:alvo.id,ban:1});if(r.id===eu.id){const m=await api.perfil(eu.id);if(m)aplicarEstado(m)}}))}))}
+   if(alvo)emitEv('admAviso',{para:alvo.id,t:a,v:val});if(a==='banir'&&alvo)emitEv('kick',{para:alvo.id,ban:1});if(r.id===eu.id){const m=await api.perfil(eu.id);if(m)aplicarEstado(m)}}))})})}
 $('zadm').onclick=painelAdmin;
 setInterval(()=>{if(eu)$('zadm').classList.toggle('hidden',!eu.admin)},1500);
 function onAdmin(o,p){if(!eu||p.para!==eu.id)return;const pf=perfis.get(o.id);if(!(pf&&pf.admin))return;
@@ -3872,6 +3875,28 @@ function venderJogador(c0){if(!eu.carros.length){toast('Você não tem carro par
 function onProposta(o,p){if(!eu)return;
  if(p.k==='proposta'&&p.para===eu.id&&CARS[p.c]){confirmar('🚗 Proposta de carro',`<b>${esc(o.nome)}</b> quer te vender o <b>${esc(CARS[p.c].nome)}</b> por <b>${money(+p.v||0)}</b>.<br>Você tem ${money(eu.dinheiro)}. Aceita?`,null,[['✅ Aceitar',()=>acao(async()=>{const r=tratar(await api.responder(+p.id,true));eu.carros=r.eu&&r.eu.carros||eu.carros.concat([p.c]);eu.carro=p.c;emitEv('propResp',{para:o.id,ok:1,c:p.c,v:p.v});Som.play('buzina');bannerGrande('🚗 CARRO NOVO!','Você comprou o '+CARS[p.c].nome+' de '+o.nome)})],['❌ Recusar',()=>{api.responder(+p.id,false).catch(()=>{});emitEv('propResp',{para:o.id,ok:0,c:p.c})}]])}
  if(p.k==='propResp'&&p.para===eu.id){if(+p.ok){api.perfil(eu.id).then(m=>{if(m){aplicarEstado(m);eu.carros=m.carros||[];eu.carro=m.carro;if(eu.parkLoc&&!eu.carros.includes(eu.parkLoc.c)){parados.delete(eu.id);eu.parkLoc=null;emitEv('unpark',{})}refreshHud()}}).catch(()=>{});Som.play('moeda');toast('🤝 '+o.nome+' comprou seu '+(CARS[p.c]?CARS[p.c].nome:'carro')+' por '+money(+p.v||0)+'!',4000)}else toast(o.nome+' recusou a proposta.',3000)}}
+
+/* ----- vitrine da concessionária ----- */
+let vitI=0,vitAnim=null;
+function abrirVitrine(){const L=Object.entries(CARS).filter(([,c])=>!c.premium).sort((a,b)=>a[1].preco-b[1].preco);if(!L.length)return;vitI=Math.min(vitI,L.length-1);
+ abrirForm('🚗 Carros do Zé',`<canvas id="vitCv" width="600" height="380" style="width:100%;border-radius:16px;background:radial-gradient(circle at 50% 70%,#6b4a5a,#24141a)"></canvas>
+ <div class="fx" style="align-items:center;margin-top:8px"><button class="btn ghost" id="vitE" style="flex:none;width:52px;font-size:22px">◀</button><div style="text-align:center"><b id="vitN" style="font-size:20px;color:var(--gold)"></b><div id="vitP" style="font-size:15px;margin-top:2px"></div></div><button class="btn ghost" id="vitD" style="flex:none;width:52px;font-size:22px">▶</button></div>
+ <div id="vitA" class="grid" style="grid-template-columns:1fr"></div>`,()=>{
+  const pinta=()=>{const [id,c]=L[vitI],tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;$('vitN').textContent=c.nome+'  '+(vitI+1)+'/'+L.length;
+   $('vitP').innerHTML=tem?'✅ Já é seu':trava?'🔒 Libera no nível '+c.nivel_min:'💰 <b>'+money(c.preco)+'</b>';
+   const a=$('vitA');a.innerHTML='';const bt=(t,f,o={})=>{const b=document.createElement('button');b.className='btn'+(o.g?' ghost':'');b.textContent=t;b.disabled=!!o.off;b.onclick=f;a.appendChild(b)};
+   if(tem){bt('💸 Vender para a loja: '+money(Math.floor(c.preco/2)),()=>{$('mForm').classList.add('hidden');venderLoja(id)},{g:1});bt('🤝 Vender para outro jogador',()=>venderJogador(id),{g:1})}
+   else if(trava)bt('🔒 Bloqueado',()=>{},{off:1});else bt(eu.dinheiro>=c.preco?'🚗 Comprar por '+money(c.preco):'💰 Falta '+money(c.preco-eu.dinheiro),()=>{$('mForm').classList.add('hidden');comprarCarro(id)},{off:eu.dinheiro<c.preco})};
+  $('vitE').onclick=()=>{vitI=(vitI-1+L.length)%L.length;pinta()};$('vitD').onclick=()=>{vitI=(vitI+1)%L.length;pinta()};pinta();
+  cancelAnimationFrame(vitAnim);const cv=$('vitCv'),g=cv.getContext('2d');
+  const loop=()=>{if($('mForm').classList.contains('hidden')||!document.getElementById('vitCv'))return;const [id,c]=L[vitI],trava=eu.nivel<c.nivel_min&&!eu.carros.includes(id);
+   g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,600,380);g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(300,270,190,46,0,0,7);g.fill();
+   g.setTransform(4.3,0,0,4.3,300,262);if(trava)g.filter='grayscale(1) brightness(.55)';try{drawCarStack(g,0,0,id,now*.6,null,{cor:CAR_COLOR[id]})}catch(e){}g.filter='none';
+   if(trava){g.setTransform(1,0,0,1,0,0);g.font='54px sans-serif';g.textAlign='center';g.fillText('🔒',540,70)}vitAnim=requestAnimationFrame(loop)};loop()})}
+/* ----- tag de admin e aviso geral ----- */
+const ehAdm=id=>id&&(eu&&id===eu.id?!!eu.admin:!!(perfis.get(id)&&perfis.get(id).admin));
+function tagAdm(c,x,y){c.save();c.font='700 6.5px Fredoka, sans-serif';c.textAlign='center';const w=c.measureText('🛡️ ADM').width+8;c.fillStyle='#d63031';rr(c,x-w/2,y-6,w,9,4);c.fill();c.strokeStyle='#ffd23f';c.lineWidth=.8;c.stroke();c.fillStyle='#fff';c.fillText('🛡️ ADM',x,y+.8);c.restore()}
+function avisoGeral(){abrirForm('📢 Aviso para a cidade','<label class="fl">Mensagem (aparece grande na tela de todos da sala)</label><input id="avT" maxlength="90" placeholder="ex.: Evento no bar às 21h!"><div class="grid" style="grid-template-columns:1fr"><button class="btn" id="avE">📢 Enviar aviso</button></div>',()=>{$('avE').onclick=()=>{const t=$('avT').value.trim();if(!t)return;emitEv('anuncio',{t:t.slice(0,90)});bannerGrande('📢 AVISO DO ADMIN',esc(t));$('mForm').classList.add('hidden')}})}
 /* ----- provador / entrar ----- */
 function abrirProvador(){$('enter').textContent='Entrar na cidade';renderProv();$('mProv').classList.remove('hidden');setTimeout(()=>$('provName').focus(),50)}
 let contaModo='nova',contaDepois=null;
