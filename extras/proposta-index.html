@@ -517,7 +517,7 @@ const ESTILO_BASE={listrada:'camiseta',colete:'camiseta',camisaJeans:'social',ag
 // Cada opção do provador tem nome (o que o jogador vê) e estilo (o que o desenho usa), por sexo.
 // sexo 0 = masculino (é o padrão dos códigos antigos, que continuam iguais), 1 = feminino.
 const OPC={
- cabelo:{m:[['Careca','careca'],['Curto','curto'],['Topete','topete'],['Comprido','comprido'],['Black power','black'],['Coque','coque'],['Rabo de cavalo','rabo'],['Moicano','moicano'],['Trança','tranca'],['Cacheado','cacheado'],['Degradê','degrade'],['Social de lado','lateral'],['Surfista','surfista'],['Dreads','dreads'],['Mullet','mullet'],['Raspado','raspado'],['Espetado','espetado'],['Crop texturizado','crop'],['Undercut','undercut'],['Cachos com degradê','cachosfade']],
+ cabelo:{m:[['Careca','careca'],['Curto','curto'],['Topete','topete'],['Comprido','comprido','x'],['Black power','black','x'],['Coque','coque'],['Rabo de cavalo','rabo','x'],['Moicano','moicano','x'],['Trança','tranca'],['Cacheado','cacheado'],['Degradê','degrade'],['Social de lado','lateral'],['Surfista','surfista','x'],['Dreads','dreads'],['Mullet','mullet'],['Raspado','raspado'],['Espetado','espetado'],['Crop texturizado','crop'],['Undercut','undercut'],['Cachos com degradê','cachosfade']],
   f:[['Comprido','comprido'],['Coque','coque'],['Rabo de cavalo','rabo'],['Trança','tranca'],['Cacheado','cacheado'],['Black power','black'],['Chanel','chanel'],['Franja','franja'],['Maria-chiquinha','chiquinha'],['Curtinho','curto']]},
  calca:{m:[['Jeans','jeans'],['Preta','preta'],['Marrom','marrom'],['Bege','bege'],['Verde','verde'],['Bermuda jeans','bermudaJeans'],['Bermuda cáqui','bermudaCaqui'],['Calça de moletom','moletomCalca'],['Calça cargo','cargo']],
   f:[['Calça jeans','jeans'],['Legging','legging'],['Saia jeans','saiaJeans'],['Saia rodada','saiaRodada'],['Short jeans','shortJeans'],['Calça branca','branca'],['Saia preta','saiaPreta'],['Saia longa','saiaLonga'],['Calça cargo','cargo']]},
@@ -553,7 +553,7 @@ const optsOf=(f,v)=>Array.isArray(f[2])?f[2]:f[2][sx(v)];
 const vipOf=(f,v)=>{if(COR_VIP.has(f[0]))return VIPCOR_N.map(n=>[n,n]);if(Array.isArray(f[2]))return[];return(f[2].vip||[]).concat(f[2]['vip'+sx(v)]||[])};
 const nomesOf=(f,v)=>optsOf(f,v).map(o=>Array.isArray(o)?o[0]:o);
 const valido=(f,v,i)=>i>=0&&(i<optsOf(f,v).length||(i>=50&&i-50<vipOf(f,v).length));
-const estilo=(k,v)=>{const f=FIELDS.find(g=>g[0]===k),i=v[k]||0;const o=i>=50?vipOf(f,v)[i-50]:OPC[k][sx(v)][i];return(o||OPC[k][sx(v)][0])[1]};
+const estilo=(k,v)=>{const f=FIELDS.find(g=>g[0]===k),i=v[k]||0;const o=i>=50?vipOf(f,v)[i-50]:OPC[k][sx(v)][i];if(o&&o[2]==='x')return OPC[k][sx(v)][1][1];return(o||OPC[k][sx(v)][0])[1]};
 const ehVip=v=>FIELDS.some(f=>(v[f[0]]||0)>=50);
 const semVip=v=>{const w=Object.assign({},v);FIELDS.forEach(f=>{if((w[f[0]]||0)>=50)w[f[0]]=0});return w};
 const vis=a=>{const v={};FIELDS.forEach((f,i)=>v[f[0]]=a[i]||0);FIELDS.forEach(f=>{if(!valido(f,v,v[f[0]]))v[f[0]]=0});return v};
@@ -562,7 +562,7 @@ function decode(code){code=(code||'').trim().toUpperCase();let d;
  let m=/^TH(\d{7,12})$/.exec(code);if(m)d=m[1].split('').map(Number);
  else{m=/^TJ(\d{20,30})$/.exec(code);if(!m||m[1].length%2)return null;d=m[1].match(/../g).map(Number)}
  if(d.length>FIELDS.length)d.length=FIELDS.length;return vis(d)}
-function sortVis(r){const v={sexo:r()<.5?0:1};FIELDS.forEach(f=>{if(f[0]!=='sexo')v[f[0]]=Math.floor(r()*optsOf(f,v).length)});if(r()<.6)v.corCalca=0;if(r()<.6)v.corCalcado=0;if(r()<.6)v.corChapeu=0;if(r()<.55)v.chapeu=0;if(r()<.45)v.extra=0;if(r()<.5)v.barba=0;return v}
+function sortVis(r){const v={sexo:r()<.5?0:1};FIELDS.forEach(f=>{if(f[0]!=='sexo')v[f[0]]=Math.floor(r()*optsOf(f,v).length)});if(r()<.6)v.corCalca=0;if(r()<.6)v.corCalcado=0;if(r()<.6)v.corChapeu=0;if(r()<.55)v.chapeu=0;if(r()<.45)v.extra=0;if(r()<.5)v.barba=0;{const L=optsOf(FIELDS.find(g=>g[0]==='cabelo'),v);while(L[v.cabelo]&&L[v.cabelo][2])v.cabelo=(v.cabelo+1)%L.length}return v}
 function visFromName(name){let h=2166136261;for(const ch of name){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return sortVis(mulberry(h>>>0))}
 function randomVis(){return sortVis(Math.random)}
 
@@ -739,7 +739,7 @@ function drawHead(c,v,o,dir,back){
  const longo=['comprido','tranca','franja','chanel'].includes(cab),fr=!!o.cara&&!back;
  const hG=c.createLinearGradient(0,-12,0,10);hG.addColorStop(0,shade(hair,34));hG.addColorStop(.42,hair);hG.addColorStop(1,shade(hair,-30));
 
- const ROSTO=new Path2D();{const qx=back?0:fr?0:dir*1.2,jw=fem?4.4:4.6;ROSTO.arc(0,0,7.1,Math.PI,0);if(fem){ROSTO.bezierCurveTo(7.1,3.4,qx+jw,6.9,qx,7.9);ROSTO.bezierCurveTo(qx-jw,6.9,-7.1,3.4,-7.1,0)}else{ROSTO.bezierCurveTo(7,3.2,qx+jw,7,qx+1.5,8.4);ROSTO.lineTo(qx-1.5,8.4);ROSTO.bezierCurveTo(qx-jw,7,-7,3.2,-7.1,0)}ROSTO.closePath()}
+ const ROSTO=new Path2D();{const qx=back?0:fr?0:dir*1.2,jw=fem?4.4:4.6;ROSTO.arc(0,0,7.1,Math.PI,0);if(fem){ROSTO.bezierCurveTo(7.1,3.4,qx+jw,6.9,qx,7.9);ROSTO.bezierCurveTo(qx-jw,6.9,-7.1,3.4,-7.1,0)}else{ROSTO.bezierCurveTo(7.25,3.6,qx+6.2,6.4,qx+2.6,8.1);ROSTO.quadraticCurveTo(qx,8.7,qx-2.6,8.1);ROSTO.bezierCurveTo(qx-6.2,6.4,-7.25,3.6,-7.1,0)}ROSTO.closePath()}
  c.fillStyle=skin;c.fill(ROSTO);
  {const g=c.createRadialGradient(-2.4,-3,.5,0,.6,8.2);g.addColorStop(0,'rgba(255,255,255,.24)');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(.86,'rgba(0,0,0,.07)');g.addColorStop(1,'rgba(0,0,0,.22)');c.fillStyle=g;c.fill(ROSTO)}
  if(!back){c.save();c.clip(ROSTO);const qx=fr?0:dir*1.2;c.fillStyle='rgba(0,0,0,.035)';c.beginPath();c.ellipse(qx,8.8,4.6,1.6,0,0,7);c.fill();
@@ -763,25 +763,26 @@ function drawHead(c,v,o,dir,back){
   {const orelha=(x,sg)=>{c.fillStyle=shade(skin,-8);c.beginPath();c.ellipse(x,1.3,1.1,1.75,0,0,7);c.fill();c.fillStyle=shade(skin,-36);c.beginPath();c.ellipse(x+sg*.25,1.4,.42,.95,0,0,7);c.fill()};const tapa=['comprido','franja','chanel','surfista','cacheado','black'].includes(cab);if(fr){if(!tapa){orelha(-6.85,1);orelha(6.85,-1)}}else if(o.perfil)orelha(-dir*1.6,dir);else orelha(-dir*6.7,dir)}
   cabelo3D(c,v,o,dir,'frente',fr,cab,hair,fem);
   const pf=!!o.perfil,ex=fr?0:pf?dir*3.3:dir*1.6,pd=fr?0:dir*.42,blink=o.blink||o.sleep,iris=['#5a3a22','#3b2a1e','#2e6b8a','#4f7a3a','#6b4a2a'][(v.pele*3+v.corCab)%5];
-  const olho=(cx,sg,w)=>{c.fillStyle='#fbf8f3';c.beginPath();c.moveTo(cx-w*sg,.3);c.quadraticCurveTo(cx,-1.35,cx+w*sg,.15);c.quadraticCurveTo(cx,1.4,cx-w*sg,.3);c.closePath();c.fill();
+  const olho=(cx,sg,w)=>{const oa=fem?1.35:.95,ob=fem?1.4:1.05;c.fillStyle='#fbf8f3';c.beginPath();c.moveTo(cx-w*sg,.3);c.quadraticCurveTo(cx,-oa,cx+w*sg,.15);c.quadraticCurveTo(cx,ob,cx-w*sg,.3);c.closePath();c.fill();
    c.save();c.clip();c.fillStyle=iris;circ(c,cx+pd,.2,1.08);c.fillStyle='#120c08';circ(c,cx+pd,.2,.52);c.fillStyle='rgba(255,255,255,.9)';circ(c,cx+pd+.38,-.22,.3);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(cx-2,-1.4,4,.7);c.restore();
-   c.strokeStyle='#3a2418';c.lineWidth=.4;c.lineCap='round';c.beginPath();c.moveTo(cx-(w+.05)*sg,.3);c.quadraticCurveTo(cx,-1.45,cx+(w+.05)*sg,.25);c.stroke();
+   c.strokeStyle='#3a2418';c.lineWidth=fem?.4:.55;c.lineCap='round';c.beginPath();c.moveTo(cx-(w+.05)*sg,.3);c.quadraticCurveTo(cx,fem?-1.45:-1.05,cx+(w+.05)*sg,.25);c.stroke();if(!fem){c.strokeStyle='rgba(60,30,20,.22)';c.lineWidth=.3;c.beginPath();c.moveTo(cx-w*sg*.9,-.9);c.quadraticCurveTo(cx,-1.75,cx+w*sg*.9,-.85);c.stroke()}
    if(fem){c.strokeStyle='rgba(60,30,20,.25)';c.lineWidth=.35}else c.strokeStyle='rgba(0,0,0,0)';c.beginPath();c.moveTo(cx-w*sg*.8,1);c.quadraticCurveTo(cx,1.75,cx+w*sg*.8,.9);c.stroke();
    if(fem){c.strokeStyle='rgba(27,18,12,.75)';c.lineWidth=.3;c.beginPath();c.moveTo(cx+w*sg,.2);c.lineTo(cx+(w+.5)*sg,-.2);c.moveTo(cx+w*.6*sg,-.6);c.lineTo(cx+(w+.1)*sg,-.95);c.stroke()}};
   const wE=(fr?1.65:1.7)*(fem?1:.82),wN=(fr?1.65:1.3)*(fem?1:.82);
   if(blink){c.strokeStyle='#2b1a14';c.lineWidth=.8;c.lineCap='round';c.beginPath();c.moveTo(ex-4,.3);c.quadraticCurveTo(ex-2.45,1.2,ex-.9,.3);c.moveTo(ex+.9,.3);c.quadraticCurveTo(ex+2.45,1.2,ex+4,.3);c.stroke()}
   else if(pf){olho(ex-dir*1.2,dir,1.25)}else{olho(ex-2.45,-1,dir>0?wE:wN);olho(ex+2.45,1,dir>0?wN:wE)}
   if(o.bebado){c.fillStyle='rgba(230,60,60,.35)';circ(c,ex-3.8,2.4,1.9);circ(c,ex+3.8,2.4,1.9)}
-  {const bcor=v.corCab===4?'#8f8f8f':shade(hair,-12);c.fillStyle=bcor;const sob=(cx,sg)=>{const th=fem?.3:.8;c.beginPath();c.moveTo(cx-1.3*sg,-2.25);c.quadraticCurveTo(cx+.1*sg,fem?-3.35-th:-2.6-th,cx+2*sg,fem?-2.55:-2.35);c.quadraticCurveTo(cx+.1*sg,-3.3+th*.3,cx-1.3*sg,-2.25+th*.75);c.closePath();c.fill()};if(pf)sob(ex-dir*1.2,dir);else{sob(ex-2.45,-1);sob(ex+2.45,1)}}
+  {const bcor=v.corCab===4?'#8f8f8f':shade(hair,-12);c.fillStyle=bcor;const sob=(cx,sg)=>{if(!fem){c.beginPath();c.moveTo(cx-1.5*sg,-1.75);c.quadraticCurveTo(cx+.2*sg,-2.75,cx+2.2*sg,-2.35);c.lineTo(cx+2.15*sg,-1.85);c.quadraticCurveTo(cx+.2*sg,-2.05,cx-1.5*sg,-1.2);c.closePath();c.fill();return}const th=.3;c.beginPath();c.moveTo(cx-1.3*sg,-2.25);c.quadraticCurveTo(cx+.1*sg,fem?-3.35-th:-2.6-th,cx+2*sg,fem?-2.55:-2.35);c.quadraticCurveTo(cx+.1*sg,-3.3+th*.3,cx-1.3*sg,-2.25+th*.75);c.closePath();c.fill()};if(pf)sob(ex-dir*1.2,dir);else{sob(ex-2.45,-1);sob(ex+2.45,1)}}
   {const nz=shade(skin,-42);if(fr){c.strokeStyle=nz;c.lineWidth=.5;c.lineCap='round';c.beginPath();c.moveTo(ex+.45,-.4);c.quadraticCurveTo(ex+.9,1.3,ex+.65,2);c.stroke();c.fillStyle='rgba(0,0,0,.12)';c.beginPath();c.ellipse(ex,2.15,1.3,.55,0,0,7);c.fill();c.fillStyle=shade(skin,-60);circ(c,ex-.62,2.25,.3);circ(c,ex+.62,2.25,.3);c.fillStyle='rgba(255,255,255,.28)';circ(c,ex-.1,1.5,.35)}
    else{c.fillStyle='rgba(0,0,0,.13)';c.beginPath();c.moveTo(ex+dir*.2,-.3);c.lineTo(ex+dir*1.55,2.3);c.lineTo(ex-dir*.2,2.45);c.closePath();c.fill();c.strokeStyle=nz;c.lineWidth=.6;c.lineCap='round';c.beginPath();c.moveTo(ex+dir*.3,-.2);c.quadraticCurveTo(ex+dir*1.2,1.4,ex+dir*1.45,2.2);c.quadraticCurveTo(ex+dir*.8,2.6,ex-dir*.1,2.4);c.stroke();c.fillStyle=shade(skin,-60);circ(c,ex+dir*.55,2.25,.28)}}
   if(pf){c.fillStyle=skin;c.beginPath();c.moveTo(dir*6.4,-.6);c.quadraticCurveTo(dir*8.3,1.6,dir*6.6,2.5);c.closePath();c.fill();c.strokeStyle=shade(skin,-40);c.lineWidth=.45;c.beginPath();c.moveTo(dir*7.6,1.2);c.quadraticCurveTo(dir*8,2,dir*6.8,2.4);c.stroke();c.fillStyle='rgba(255,110,110,.2)';circ(c,ex-dir*.6,2.7,1.3)}else{if(fem){c.fillStyle='rgba(255,110,110,.2)';circ(c,ex-4.1,2.6,1.35);circ(c,ex+4.1,2.6,1.35)}}
+  if(!fem){c.save();c.clip(ROSTO);const qx=fr?0:dir*1.2;c.fillStyle='rgba(0,0,0,.07)';c.beginPath();c.ellipse(qx,9.6,6.4,2.4,0,0,7);c.fill();c.fillStyle='rgba(60,40,40,.06)';c.beginPath();c.ellipse(qx,6.6,4.6,2.6,0,0,7);c.fill();c.restore()}
   barba3D(c,v,v.sexo===1?'nenhuma':(ex2==='barba'&&estilo('barba',v)==='nenhuma'?'cheia':estilo('barba',v)),dir,fr,ex,hair);
   {const lc=ex2==='batom'?'#c0213a':ex2==='barba'?'#e8b9a0':fem?'#c4646c':shade(skin,-30);
    if(o.sleep){c.strokeStyle=lc;c.lineWidth=.8;c.beginPath();c.arc(ex,4,1,0,Math.PI*2);c.stroke()}
    else if(o.bebado){c.strokeStyle=lc;c.lineWidth=.85;c.beginPath();c.moveTo(ex-1.6,3.6);c.quadraticCurveTo(ex,5.2,ex+1.6,3.2);c.stroke()}
-   else{const w=fr?1.75:1.55;c.fillStyle=lc;c.beginPath();c.moveTo(ex-w,3.5);c.quadraticCurveTo(ex-w*.45,2.85,ex,3.2);c.quadraticCurveTo(ex+w*.45,2.85,ex+w,3.5);c.quadraticCurveTo(ex,3.85,ex-w,3.5);c.fill();
-    c.fillStyle=shade(lc,22);c.beginPath();c.moveTo(ex-w*.88,3.62);c.quadraticCurveTo(ex,fem||ex2==='batom'?5.05:4.65,ex+w*.88,3.62);c.closePath();c.fill();
+   else{const w=(fr?1.75:1.55)*(fem?1:.92);c.fillStyle=lc;c.beginPath();c.moveTo(ex-w,3.5);c.quadraticCurveTo(ex-w*.45,2.85,ex,3.2);c.quadraticCurveTo(ex+w*.45,2.85,ex+w,3.5);c.quadraticCurveTo(ex,3.85,ex-w,3.5);c.fill();
+    c.fillStyle=shade(lc,22);c.beginPath();c.moveTo(ex-w*.88,3.62);c.quadraticCurveTo(ex,fem||ex2==='batom'?5.05:4.25,ex+w*.88,3.62);c.closePath();c.fill();
     c.strokeStyle=shade(lc,-38);c.lineWidth=.38;c.beginPath();c.moveTo(ex-w,3.5);c.quadraticCurveTo(ex,3.95,ex+w,3.5);c.stroke();c.fillStyle='rgba(255,255,255,.3)';circ(c,ex+.3,4.25,.28)}}
   if(ex2==='oculos'){c.fillStyle='rgba(190,225,255,.22)';rr(c,ex-4.45,-1.3,3.9,2.9,1.1);c.fill();rr(c,ex+.55,-1.3,3.9,2.9,1.1);c.fill();c.strokeStyle='#1d1d22';c.lineWidth=.62;rr(c,ex-4.45,-1.3,3.9,2.9,1.1);c.stroke();rr(c,ex+.55,-1.3,3.9,2.9,1.1);c.stroke();c.beginPath();c.moveTo(ex-.55,-.2);c.quadraticCurveTo(ex,-.7,ex+.55,-.2);if(!fr){c.moveTo(ex-dir*4.45,-.4);c.lineTo(-dir*6.6,.2)}c.stroke();c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=.35;c.beginPath();c.moveTo(ex-3.8,-.7);c.lineTo(ex-2.9,-.9);c.moveTo(ex+1.2,-.7);c.lineTo(ex+2.1,-.9);c.stroke()}
   if(ex2==='escuros'){const g=c.createLinearGradient(0,-1.3,0,1.9);g.addColorStop(0,'#3a3f48');g.addColorStop(1,'#07080a');c.fillStyle=g;rr(c,ex-4.7,-1.25,4.2,3,1.2);c.fill();rr(c,ex+.5,-1.25,4.2,3,1.2);c.fill();c.fillStyle='#111';c.fillRect(ex-.6,-.7,1.2,.7);if(!fr)c.fillRect(Math.min(ex-dir*4.6,-dir*6.6),-.5,Math.abs(ex-dir*4.6+dir*6.6),.6);c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=.4;c.beginPath();c.moveTo(ex-4,-.6);c.lineTo(ex-2.6,-.9);c.moveTo(ex+1.2,-.6);c.lineTo(ex+2.6,-.9);c.stroke()}
@@ -2815,7 +2816,7 @@ function renderProv(){const box=$('opts');box.innerHTML='';
  box.appendChild(cats);
  const g=GRUPOS.find(x=>x[0]===campoProv)||GRUPOS[2],sel=$('provSel');sel.innerHTML='';
  g[2].forEach(k=>{const f=FIELDS.find(q=>q[0]===k);if(!f)return;
-  const itens=nomesOf(f,prov).map((n,i)=>[n,i,false]).concat(vipOf(f,prov).map((o,i)=>[o[0],50+i,true])).filter(([n,i,vip])=>!vip||souVip()),pos=Math.max(0,itens.findIndex(x=>x[1]===prov[k]));
+  const itens=nomesOf(f,prov).map((n,i)=>[n,i,false]).concat(vipOf(f,prov).map((o,i)=>[o[0],50+i,true])).filter(([n,i,vip])=>vip?souVip():!(optsOf(f,prov)[i]||[])[2]),pos=Math.max(0,itens.findIndex(x=>x[1]===prov[k]));
   const linha=document.createElement('div');linha.className='plinha';
   const mk=(t,d)=>{const b=document.createElement('button');b.className='seta';b.textContent=t;b.onclick=()=>{const n=itens[(pos+d+itens.length)%itens.length];prov[k]=n[1];if(k==='sexo')['cabelo','calca','roupa','calcado','extra','chapeu','barba'].forEach(q=>prov[q]=0);FIELDS.forEach(q=>{if(!valido(q,prov,prov[q[0]]))prov[q[0]]=0});renderProv()};return b};
   const v=document.createElement('div');v.className='val';const it=itens[pos]||['—'],ehCor=['corCab','pele','camisa','corCalca','corCalcado','corChapeu'].includes(k),cor=ehCor?corDoCampo(k,prov[k]):null;
