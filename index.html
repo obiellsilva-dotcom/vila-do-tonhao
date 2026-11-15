@@ -914,6 +914,8 @@ function drawInterior(c,b){
  c.fillStyle='rgba(0,0,0,.5)';c.font='600 8px Fredoka, sans-serif';c.textAlign='center';const i=casasInfo.get(b.n)||{};c.fillText((ab?'🔓 ':'🔒 ')+(i.nome?'Casa de '+i.nome:'Casa '+b.n),x+w/2,y+ih-3);c.textAlign='left';
 }
 const merc=addB({kind:'mercadinho',x:38,y:24,w:14,h:3});
+for(let x=38;x<=51;x++){grid[25][x]=G.PLAZA;if(x===44||x===45)grid[26][x]=G.PLAZA} // corredor da feirinha
+const BANCAS=[[38,24,41.4],[41.6,24,44.9],[45.1,24,48.4],[48.6,24,52],[38,26,41],[41,26,44],[46,26,49],[49,26,52]].map(([x0,y,x1],i)=>({x0,x1,y,i,fundo:y===24}));
 const pad=addB({kind:'padaria',x:46,y:16,w:5,h:5});
 const barb=addB({kind:'barbearia',x:51,y:17,w:4,h:4});
 const bank=addB({kind:'banco',x:37,y:15,w:8,h:6});
@@ -1630,6 +1632,21 @@ function drawCobertura(c){const x0=T(111.6),x1=T(118.4),y0=T(25.9),y1=T(28.3),H=
  const m=isoP((x0+x1)/2,y1);c.translate(m[0],m[1]-H-4);c.transform(1,(Bq[1]-A[1])/(Bq[0]-A[0]),0,1,0,0);c.fillStyle='#fff';c.font='700 8px Fredoka,sans-serif';c.textAlign='center';c.fillText('POSTO DO TONHÃO',0,3);c.restore();
  const pl=isoP(T(119.6),T(24.6));c.fillStyle='#888';c.fillRect(pl[0]-2,pl[1]-70,4,70);c.fillStyle='#1e8f3e';rr(c,pl[0]-20,pl[1]-108,40,40,5);c.fill();c.fillStyle='#f1c40f';c.font='700 8px Fredoka,sans-serif';c.fillText('⛽ TONHÃO',pl[0],pl[1]-96);
  c.fillStyle='#111';c.fillRect(pl[0]-17,pl[1]-91,34,20);c.fillStyle='#ff5a36';c.font='700 6px monospace';c.fillText('G 5,89',pl[0],pl[1]-83);c.fillText('E 3,99',pl[0],pl[1]-75);c.textAlign='left'}
+function paredeDeco(c,ax,ay,bx,by,H){const P=isoP(ax,ay),Q=isoP(bx,by),L=(u,z)=>[P[0]+(Q[0]-P[0])*u,P[1]+(Q[1]-P[1])*u-z],quad=(u0,u1,z0,z1,col)=>{const a=L(u0,z0),b=L(u1,z0),cc=L(u1,z1),d=L(u0,z1);c.fillStyle=col;c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.lineTo(cc[0],cc[1]);c.lineTo(d[0],d[1]);c.fill()};
+ const AZ=20;quad(0,1,0,AZ,'#2e7d5b');c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=.6;for(let k=1;k<5;k++){const a=L(k/5,0),b=L(k/5,AZ);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}{const a=L(0,AZ/2),b=L(1,AZ/2);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}
+ quad(0,1,AZ,AZ+3,'#f3ead8');quad(0,1,AZ+3,H,'#b5654a');c.strokeStyle='rgba(70,30,20,.45)';c.lineWidth=.7;
+ for(let z=AZ+3+5,row=0;z<H-1;z+=5,row++){const a=L(0,z),b=L(1,z);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke();for(let u=(row%2)*.125;u<1;u+=.25){const m=L(u,z),n=L(u,z+5);c.beginPath();c.moveTo(m[0],m[1]);c.lineTo(n[0],n[1]);c.stroke()}}
+ quad(0,1,H-3,H,'#5a3418')}
+function drawBanca(c,bc,fade){const x0=T(bc.x0)+3,x1=T(bc.x1)-3,y0=T(bc.y)+3,y1=T(bc.y+1)-3,cores=[['#e74c3c','#fff'],['#2e86c1','#fff'],['#27ae60','#fff7d6'],['#f39c12','#fff'],['#8e44ad','#fff']],[ca,cb]=cores[bc.i%5],fr=['#e74c3c','#f1c40f','#27ae60','#e67e22','#8e44ad','#f5b041','#7fb83a'];
+ c.save();if(fade)c.globalAlpha=.35;sombraChao(c,x0,y0,x1,y1);
+ for(const [px,py] of [[x0,y0],[x1-3,y0],[x0,y1-3],[x1-3,y1-3]])isoBox(c,px,py,px+3,py+3,0,36,'#7a4a2a');
+ const fy0=bc.fundo?y1-11:y0,fy1=bc.fundo?y1:y0+11; // balcão do lado do corredor
+ isoBox(c,x0+2,fy0,x1-2,fy1,0,14,'#a0703f');
+ const n=Math.max(2,Math.round((x1-x0)/26));for(let k=0;k<n;k++){const cx=x0+5+k*((x1-x0-10)/n),w=(x1-x0-10)/n-4;isoBox(c,cx,fy0+1,cx+w,fy1-1,14,18,'#c8955a');const q=isoP(cx+w/2,(fy0+fy1)/2);for(let f=0;f<6;f++){c.fillStyle=fr[(bc.i*3+k+f)%7];circ(c,q[0]-5+(f%3)*5,q[1]-21-Math.floor(f/3)*3,2.4)}}
+ if(bc.fundo){isoBox(c,x0+2,y0,x1-2,y0+6,0,26,'#8a5a32');for(let k=0;k<4;k++){const q=isoP(x0+10+k*((x1-x0-20)/3),y0+6);c.fillStyle=fr[(bc.i+k)%7];c.fillRect(q[0]-4,q[1]-24,8,6)}}
+ const lis=6;for(let s2=0;s2<lis;s2++){const u0=x0-3+(x1-x0+6)*s2/lis,u1=x0-3+(x1-x0+6)*(s2+1)/lis;isoBox(c,u0,y0-3,u1,y1+3,36,39,s2%2?cb:ca)}
+ c.restore()}
+function placaFeira(c,b){const pl=isoP(T(b.x+b.w/2),T(b.y+b.h)+6);c.fillStyle='#6d4426';c.fillRect(pl[0]-1.5,pl[1]-26,3,26);c.fillStyle='#f3e3bd';rr(c,pl[0]-34,pl[1]-38,68,14,4);c.fill();c.fillStyle='#5a3a22';c.font='700 9px Fredoka, sans-serif';c.textAlign='center';c.fillText('🍎 FEIRINHA 🥬',pl[0],pl[1]-28);c.textAlign='left'}
 function drawFeira(c,b){const X0=T(b.x),Y0=T(b.y),Y1=T(b.y+b.h),n=4,w=(T(b.w)-12)/n,cores=[['#e74c3c','#fff'],['#2e86c1','#fff'],['#27ae60','#fff7d6'],['#f39c12','#fff']],fr=['#e74c3c','#f1c40f','#27ae60','#e67e22','#8e44ad','#f5b041'];
  for(let i=0;i<n;i++){const x0=X0+6+i*w,x1=x0+w-8,ym=Y0+T(1.2),yf=Y1-6;
   sombraChao(c,x0,ym-4,x1,yf);
@@ -1651,7 +1668,7 @@ function predioFatias(list,b,dentro){
    ctx.fillStyle=shade(wl,-55);ctx.fillRect(X0,Y0-5/WK,X1-X0,5/WK);ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(X0,Y0-44/WK,X1-X0,1.5);
    ctx.fillStyle='rgba(60,30,10,.5)';ctx.fillRect(X0,Y0-3,X1-X0,3)}});
   for(const [mx,my,t] of b.moveis)list.push({x:T(mx)+16,y:T(my)+16,cam:1,f:()=>movelIso(ctx,t,T(mx),T(my))});return}
- if(b.kind==='mercadinho'){list.push({x:(X0+X1)/2,y:Y1,cam:1,f:()=>drawFeira(ctx,b)});return}
+ if(b.kind==='mercadinho'){const dentro=eu&&eu.x>X0&&eu.x<X1&&eu.y>T(24.6)&&eu.y<T(26.4);for(const bc of BANCAS)list.push({x:T((bc.x0+bc.x1)/2),y:T(bc.y+1),k:T((bc.x0+bc.x1)/2)+T(bc.y+(bc.fundo?.9:1))-4,cam:1,f:()=>drawBanca(ctx,bc,dentro&&!bc.fundo)});list.push({x:(X0+X1)/2,y:Y1+T(.6),k:(X0+X1)/2+Y1+T(1),cam:1,f:()=>placaFeira(ctx,b)});return}
  let fade=1;if(eu&&!eu.hidden){const pe=isoP(eu.x,eu.y),c4=[isoP(X0,Y1),isoP(X1,Y1),isoP(X1,Y0),isoP(X0,Y0)],top=Hf+R0(b);
   if(X1+Y1>eu.x+eu.y+8&&pe[0]>Math.min(...c4.map(q=>q[0]))-6&&pe[0]<Math.max(...c4.map(q=>q[0]))+6&&pe[1]-40<Math.max(...c4.map(q=>q[1]))&&pe[1]>Math.min(...c4.map(q=>q[1]))-top)fade=.28}
  const a=artDe('b'+B.indexOf(b),X0-12,Y0-46,X1-X0+24,Y1-Y0+56,c=>drawBuilding0(c,b));
@@ -2381,10 +2398,10 @@ function drawCena(){
    list.push({x:cx,y:cy,k:cx+cy-1,cam:1,f:()=>cadeiraIso(ctx,cx,cy,dx,dy,col,perto?1:0)});if(perto)list.push({x:cx,y:cy,k:cx+cy+9,cam:1,f:()=>cadeiraIso(ctx,cx,cy,dx,dy,col,2)})}
   {const dB=eu?(eu.x>T(17)&&eu.x<T(31)&&eu.y>T(16)&&eu.y<T(27.2)):(cam.x>T(17)&&cam.x<T(31)&&cam.y>T(16)&&cam.y<T(27.2)),HP=60,pc='#c9a27a',jan=()=>darkness()>.3?'#ffd98a':'#9fd3f2';
    barFade+=((dB?.14:1)-barFade)*.15;const al=barFade;
-   for(let i=18;i<26;i++)list.push({x:T(18),y:T(i+.5),k:T(18)+T(i+.5)-20,cam:1,f:()=>{isoBox(ctx,T(18)-4,T(i),T(18)+2,T(i+1),0,HP,pc);if(i%3===0){const a=isoP(T(18)+2,T(i+.2)),b2=isoP(T(18)+2,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}}});
-   for(let i=18;i<26;i++)list.push({x:T(30),y:T(i+.5),k:T(30)+T(i+.5)+2,cam:1,f:()=>{ctx.globalAlpha=al;isoBox(ctx,T(30)-3,T(i),T(30)+3,T(i+1),0,HP,pc);if(i%3===1){const a=isoP(T(30)+3,T(i+.2)),b2=isoP(T(30)+3,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}ctx.globalAlpha=1}});
+   for(let i=18;i<26;i++)list.push({x:T(18),y:T(i+.5),k:T(18)+T(i+.5)-20,cam:1,f:()=>{isoBox(ctx,T(18)-4,T(i),T(18)+2,T(i+1),0,HP,pc);paredeDeco(ctx,T(18)+2,T(i),T(18)+2,T(i+1),HP);if(i%3===0){const a=isoP(T(18)+2,T(i+.2)),b2=isoP(T(18)+2,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}}});
+   for(let i=18;i<26;i++)list.push({x:T(30),y:T(i+.5),k:T(30)+T(i+.5)+2,cam:1,f:()=>{ctx.globalAlpha=al;isoBox(ctx,T(30)-3,T(i),T(30)+3,T(i+1),0,HP,pc);paredeDeco(ctx,T(30)+3,T(i),T(30)+3,T(i+1),HP);if(i%3===1){const a=isoP(T(30)+3,T(i+.2)),b2=isoP(T(30)+3,T(i+.8));ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}ctx.globalAlpha=1}});
    for(let i=18;i<30;i++){const porta=i===23||i===24;list.push({x:T(i+.5),y:T(26),k:T(i+.5)+T(26)+4,cam:1,f:()=>{ctx.globalAlpha=al;const x0=T(i),x1=T(i+1),y0=T(26),y1=T(26)+6;
-     if(porta)isoBox(ctx,x0,y0,x1,y1,46,HP,pc);else{isoBox(ctx,x0,y0,x1,y1,0,HP,pc);
+     if(porta)isoBox(ctx,x0,y0,x1,y1,46,HP,pc);else{isoBox(ctx,x0,y0,x1,y1,0,HP,pc);paredeDeco(ctx,x0,y1,x1,y1,HP);
       if(i%2){const a=isoP(x0+6,y1),b2=isoP(x1-6,y1);ctx.fillStyle=jan();ctx.beginPath();ctx.moveTo(a[0],a[1]-22);ctx.lineTo(b2[0],b2[1]-22);ctx.lineTo(b2[0],b2[1]-44);ctx.lineTo(a[0],a[1]-44);ctx.fill()}}
      isoBox(ctx,x0,y1,x1,y1+9,46,50,i%2?'#e4533a':'#fff5e6');ctx.globalAlpha=1}})}}}
  trees.forEach(t=>{if(vis(t.x,t.y))list.push({x:t.x,y:t.y,f:()=>{drawTree(ctx,t);piscaArvore(ctx,t)}})});
@@ -3613,7 +3630,7 @@ function pertoOpcoes(){
   if(souVip()&&perto(T(29.5),T(18.5),T(3)))o.push(['🎵 Escolher música',escolherMusica]);
  }else if(perto(T(24),T(27.4),T(1.9)))o.push(['🚪 Entrar no bar',()=>irPara(T(24),T(24.6))]);
  const s=seatPerto();if(s)o.push(['🪑 Sentar',()=>sentar(s)]);
- for(const [k,b] of Object.entries(SHOPS))if(perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.8)))o.push([PLACE_TITLE[k],()=>abrirLugar(b)]);
+ for(const [k,b] of Object.entries(SHOPS))if(perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.8))||(k==='mercadinho'&&eu.x>T(38)&&eu.x<T(52)&&eu.y>T(24.6)&&eu.y<T(26.4)))o.push([PLACE_TITLE[k],()=>abrirLugar(b)]);
  for(const f of FEATURES)if(perto(f.a.x,f.a.y,T(2.8)))o.push([PLACE_TITLE[f.kind],()=>abrirLugar(f)]);
  {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  for(const b of houses)if(!b.off&&!casaEm(eu.x,eu.y)&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3))){const i=casasInfo.get(b.n)||{};o.push([i.dono&&i.dono===eu.id?'🏠 Minha casa':i.dono?'🏠 Casa de '+(i.nome||'alguém'):'🔑 Casa '+b.n+' à venda',()=>abrirLugar(b)]);break}
@@ -3847,7 +3864,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119c';
+const VERSAO_JOGO='v20261119d';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
