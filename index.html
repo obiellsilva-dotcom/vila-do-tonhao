@@ -873,8 +873,7 @@ for(let x=19;x<=27;x++)grid[18][x]=G.BEHIND;grid[19][27]=G.BEHIND;
 grid[18][18]=G.BLD; // geladeira
 for(let x=18;x<=26;x++)grid[19][x]=G.BLD; // balcão
 grid[18][29]=G.BLD; // jukebox
-[[28,24],[29,24],[28,25],[29,25]].forEach(([x,y])=>grid[y][x]=G.BLD); // banheiro
-for(let y=21;y<=23;y++)for(let x=25;x<=27;x++)grid[y][x]=G.BLD; // sinuca
+for(let y=22;y<=23;y++)for(let x=25;x<=27;x++)grid[y][x]=G.BLD; // sinuca (só onde a mesa ocupa)
 const inTables=[[19.6,22.4],[22.6,22.4],[19.6,24.7],[22.6,24.7]];
 const outTables=[[17.5,27.85],[20.5,27.85],[27.5,27.85],[30.5,27.85]];
 [...inTables,...outTables].forEach(([x,y])=>grid[Math.floor(y)][Math.floor(x)]=G.BLD);
@@ -3868,7 +3867,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119e';
+const VERSAO_JOGO='v20261119f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
