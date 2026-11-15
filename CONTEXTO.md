@@ -93,6 +93,13 @@ Tudo abaixo está SÓ em `extras/proposta-index.html` (ramo `ccr-e150a3c5-3uuba3
 - **Chapéus com volume** (domo, costura, viseira, aba). Sobraram desenhos prontos de boné de grife, panamá e fedora (sem uso).
 - SQL da proposta: `extras/novidades-proposta.sql` (visual até 60 dígitos, tabela `guarda_roupa`, `preco_roupa`, `comprar_roupa`). Ainda falta a etapa 13: `criar_morador` conferir o guarda-roupa (sem isso dá para vestir tudo pelo provador).
 
+### Na versão do ar (index.html), ainda não publicada
+- Nível máximo 50 (`NIVEL_MAX`, `nivel_de`), quem estava no 20 sobe pelo XP.
+- Carros 20% mais caros (moto 2.200 … esportivo 144.000).
+- Carros mais nítidos (`nitido()`: amplia 2x, realça bordas, clareia vidro/pneu).
+- **Oficina com interior** (`interiorLoja(ofic,…)`; pneus, bancada, caixas de som, elevador). Dentro: "🔧 Personalizar meu carro" (`abrirMecanica`): cor 1.000, rodas (esportiva 2 mil, cromada 4 mil, dourada 8 mil, preta fosca 3 mil), vidros (fumê 800, insulfilm 1.500, espelhado 2.500), pintura (fosca 2.500, metálica 4 mil, perolada 6 mil), som 5 mil. Guardado em `carro_mods` (função `personalizar_carro`). Com som, botão 🔊 ao dirigir mostra anéis e notas para todos (evento `som`). Mods só aparecem nos modelos com foto 3D (kombi e jipe só a cor).
+- SQL de tudo isso: `novidades.sql` (etapas 12, 13 e 14).
+
 ### Próximos passos (combinados)
 1. **Estampas** de roupa: campo novo "Estampa" (lisa, coração, estrela, florida, xadrez, listras, bolinhas, camuflada, tie-dye, raio, caveirinha, marca inventada "Tonhão Wear"/"Vila 10"). Sem marcas reais.
 2. **Banco**: o visual (`TJ…`) vai passar de 30 dígitos → no `novidades.sql` trocar a regra para até 60: `visual ~ '^(TH[0-9]{7,30}|TJ[0-9]{20,60})$'` (constraint `moradores_visual_check` e função de salvar morador).
