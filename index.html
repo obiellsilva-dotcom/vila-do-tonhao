@@ -1985,8 +1985,8 @@ function bubble(c,x,y,text){
 function nameTag(c,x,y,text,mine,online,vip){c.font='600 7px Fredoka, sans-serif';c.textAlign='center';c.lineWidth=2.4;c.strokeStyle='rgba(30,15,20,.85)';c.strokeText(text,x,y);if(vip){c.save();c.shadowColor='#ffd54a';c.shadowBlur=6;c.fillStyle='#ffd700';c.fillText(text,x,y);c.restore()}else{c.fillStyle=mine?'#ffc94a':online?'#9fe3ff':'#fff';c.fillText(text,x,y)}c.textAlign='left'}
 const vipP=p=>!!(p&&p.vip_ate&&Date.parse(p.vip_ate)>Date.now());
 const headTop=r=>r.y-(r.sit?39:46)*PS*(r.belly?1.03:1)-(estilo('chapeu',r.v)==='cartola'?9*PS:0);
-function vistaDe(p){const dx=p.x-(p._lx??p.x),dy=p.y-(p._ly??p.y);p._lx=p.x;p._ly=p.y;const sx=(dx-dy)*IA,sy=(dx+dy)*IB;if(Math.hypot(sx,sy)>.25)p._vs=Math.abs(sy)>Math.abs(sx)*.5?(sy>0?'f':'c'):'l';return p._vs||'f'}
-function personOpts(r){const vs=vistaDe(r),anda=r.state==='walk';const bk=anda?vs==='c':!!r.back||(!r.sit&&vs==='c');return{cara:bk?false:(anda||!r.sit)?vs==='f':!!r.frente,s:PS,dir:r.dir,walk:anda?r.ph:null,sit:r.sit&&!anda,back:bk,frente:r.sit&&r.frente&&r.state!=='walk',beer:r.beer&&r.place==='bar'&&r.phase!=='toOrder',suit:r.suit,belly:r.belly,ring:selected===r,blink:r.blinkT<0}}
+function vistaDe(p){const dx=p.x-(p._lx??p.x),dy=p.y-(p._ly??p.y);p._lx=p.x;p._ly=p.y;const sx=(dx-dy)*IA,sy=(dx+dy)*IB;if(Math.hypot(sx,sy)>.25){p._vs=sy<-Math.abs(sx)*.15?'c':Math.abs(sx)<Math.abs(sy)*.6?'f':'l';if(Math.abs(sx)>.2)p._vd=sx>0?1:-1}return p._vs||'f'}
+function personOpts(r){const vs=vistaDe(r),anda=r.state==='walk';const bk=anda?vs==='c':!!r.back||(!r.sit&&vs==='c');return{cara:bk?false:(anda||!r.sit)?vs==='f':!!r.frente,s:PS,dir:anda&&r._vd?r._vd:r.dir,walk:anda?r.ph:null,sit:r.sit&&!anda,back:bk,frente:r.sit&&r.frente&&r.state!=='walk',beer:r.beer&&r.place==='bar'&&r.phase!=='toOrder',suit:r.suit,belly:r.belly,ring:selected===r,blink:r.blinkT<0}}
 function drawPlayer(p){
  const car=carOf(p);
  if(car){dirigir(ctx,p,car);if(selected===p){ctx.strokeStyle='#ffc94a';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(p.x,p.y,48,22,0,0,7);ctx.stroke()}return}
@@ -2019,7 +2019,7 @@ function drawPlayer(p){
  if(gs==='chorar'){const tr=Math.sin(gt*25)*.05;arms=[1.85+tr,1.95-tr];headRot=.16;olhos=true;maos=true}
  if(it){if(it.t==='abraco'){arms=[1.45,1.6];headRot=.18}if(it.t==='beijo'){arms=[1.05,1.25];headRot=.28;olhos=true}if(it.t==='toca'){const k2=(it.ate-now);arms=[.2,k2>1.4?2.6:1.9]}}
  ctx.save();ctx.translate(p.x+dx,p.y);ctx.rotate(rot);ctx.scale(1,sy);
- const vs=vistaDe(p);drawPerson(ctx,0,-hop,p.v,{cara:p.sit?!!p.frente:(vs==='f'||!!p.danca),s:PS,dir,walk:arms?(p.danca?walk:null):walk,amp:p.danca&&!p.moving?amp:1,flex:p.danca&&!p.moving?flex:0,sit:!!p.sit,back:p.sit?!!p.back:(!p.danca&&vs==='c'),frente:!!(p.sit&&p.frente),bebado:p===eu?eu.bebK:p.bebado,beer:p.beer,policia:p===eu?!!(trabalho&&trabalho.job==='policia'):p.work==='policia',apron:p===eu?eu.apron:p.work==='bar',ring:selected===p,blink:olhos,arms,headRot,maosRosto:maos});
+ const vs=vistaDe(p);drawPerson(ctx,0,-hop,p.v,{cara:p.sit?!!p.frente:(vs==='f'||!!p.danca),s:PS,dir:p.moving&&p._vd?p._vd:dir,walk:arms?(p.danca?walk:null):walk,amp:p.danca&&!p.moving?amp:1,flex:p.danca&&!p.moving?flex:0,sit:!!p.sit,back:p.sit?!!p.back:(!p.danca&&vs==='c'),frente:!!(p.sit&&p.frente),bebado:p===eu?eu.bebK:p.bebado,beer:p.beer,policia:p===eu?!!(trabalho&&trabalho.job==='policia'):p.work==='policia',apron:p===eu?eu.apron:p.work==='bar',ring:selected===p,blink:olhos,arms,headRot,maosRosto:maos});
  ctx.restore();
  const topo=p.y-36;ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.fillStyle='#000';
  if(gs){ctx.font='14px sans-serif';ctx.textAlign='center';const ic={acenar:'👋',comemorar:'🙌',rir:'🤣',chorar:'😭'}[gs];ctx.fillText(ic,p.x+(gs==='acenar'?Math.sin(gt*10)*4:0),topo-hop-4);
@@ -3887,7 +3887,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261120c';
+const VERSAO_JOGO='v20261120d';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
