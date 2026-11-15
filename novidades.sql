@@ -130,5 +130,6 @@ begin
 end $$;
 grant execute on function public.responder_proposta(bigint, boolean) to authenticated;
 
--- TORNE-SE ADMINISTRADOR (troque pelo nome do seu personagem):
-update public.moradores set admin = true where nome = 'SEU NOME AQUI';
+-- TORNE-SE ADMINISTRADOR: troque SEU_EMAIL_AQUI pelo e-mail que você usa para entrar no jogo
+update public.moradores set admin = true where id = (select id from auth.users where email = 'SEU_EMAIL_AQUI');
+select nome as administrador from public.moradores where admin = true;
