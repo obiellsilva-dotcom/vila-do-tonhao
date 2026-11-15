@@ -63,3 +63,8 @@ Comprar móveis para a casa (precisa de tabela nova), interiores das lojas, giro
 
 ## Últimas mudanças (já no ar)
 Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡️ ADM e chat vermelho do admin, aviso para a cidade, vitrine de carros com setas, venda de carros (para a loja e entre jogadores), cargo de prefeito (🏛️ com brilho, banner ao entrar, chat dourado, vistorias), mochila, 🚗 Meu carro no menu, 10 NPCs, geladeira 3D, sem banheiro, sinuca com 4 lugares, reconexão automática da sala.
+
+## Prefeito e primeira missão
+- **Prefeito = TOP 1 do ranking** (mais XP), trocado sozinho pelo banco (gatilho `prefeito_top1`, função `_atualiza_prefeito`). Não existe mais "assumir o cargo".
+- **Primeira missão** para jogador novo (coluna `moradores.missao`: 0, 1, 2; função `missao_passo`): cartão dourado `#missao` + seta amarela. Missão 1: trabalhar de Repositor no Mercadinho e acertar 3 tarefas (bônus R$ 50). Missão 2: comprar comida (pão na Padaria). Dá para pular no ✕. Código: `msRender`, `msAlvo`, `msPasso`.
+- Tutorial encurtado para 4 telas.

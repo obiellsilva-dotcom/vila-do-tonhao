@@ -1,25 +1,31 @@
--- Novidade: o prefeito é sempre o TOP 1 do ranking. Rode no Supabase (SQL Editor).
+-- Novidade: primeira missão para quem acabou de chegar (bônus de R$ 50). Rode no Supabase (SQL Editor).
 
--- O prefeito é SEMPRE o TOP 1 do ranking (mais XP). Se for ultrapassado, o novo TOP 1 assume na hora.
-drop function if exists public.assumir_prefeitura();
-create or replace function public._atualiza_prefeito() returns trigger
-language plpgsql security definer set search_path = public as $$
-declare atual uuid; top uuid;
-begin
-  select prefeito into atual from cidade where id = 1;
-  -- em caso de empate de XP, quem já é prefeito continua
-  select id into top from moradores where not banido
-    order by xp desc, (id is not distinct from atual) desc, criado_em limit 1;
-  if top is distinct from atual then
-    update cidade set prefeito = top, desde = now() where id = 1;
+-- ===================== ETAPA 12: primeira missão (guia de quem acabou de chegar) =====================
+-- missao: 0 = ainda não ganhou o primeiro dinheiro, 1 = recebeu o bônus e falta comer, 2 = terminou (ou pulou)
+do $$ begin
+  if not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'moradores' and column_name = 'missao') then
+    alter table public.moradores add column missao smallint not null default 0;
+    -- quem já jogava não precisa da missão
+    update public.moradores set missao = 2 where xp > 0 or nivel > 1;
   end if;
-  return null;
 end $$;
-drop trigger if exists prefeito_top1 on public.moradores;
-create trigger prefeito_top1 after insert or delete or update of xp, banido on public.moradores
-  for each statement execute function public._atualiza_prefeito();
--- já coloca o TOP 1 atual no cargo
-update public.cidade set prefeito = (select id from public.moradores where not banido order by xp desc, criado_em limit 1), desde = now()
-  where id = 1 and prefeito is distinct from (select id from public.moradores where not banido order by xp desc, criado_em limit 1);
 
-select m.nome as prefeito from public.cidade c left join public.moradores m on m.id = c.prefeito;
+create or replace function public.missao_passo(p_passo integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; bonus integer := 0;
+begin
+  m := _eu();
+  if p_passo = 1 then
+    if m.missao <> 0 then raise exception 'Essa missão já foi feita.'; end if;
+    if m.xp <= 0 then raise exception 'Faça uma tarefa de trabalho primeiro.'; end if;
+    bonus := 50;
+    update moradores set dinheiro = dinheiro + bonus, missao = 1 where id = m.id;
+  else
+    if m.missao >= 2 then raise exception 'Essa missão já foi feita.'; end if;
+    update moradores set missao = 2 where id = m.id;
+  end if;
+  return json_build_object('missao', (select missao from moradores where id = m.id), 'bonus', bonus, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.missao_passo(integer) to authenticated;
+
+select count(*) filter (where missao = 0) as vao_ver_a_missao, count(*) as moradores from public.moradores;
