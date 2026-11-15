@@ -1013,10 +1013,15 @@ function paintTile(c,x,y){
  if(b==='wood'||b==='wood2'){c.strokeStyle='rgba(60,30,10,.22)';c.lineWidth=1;for(let k=0;k<4;k++){const yy=py+k*8+.5;c.beginPath();c.moveTo(px,yy);c.lineTo(px+TILE,yy);c.stroke();const sx=px+((k*13+x*7)%32);c.beginPath();c.moveTo(sx+.5,yy);c.lineTo(sx+.5,yy+8);c.stroke()}}
  if(b==='walk'||b==='plaza'||b==='terr'||b==='grass'||b==='path'){}
  if(inCity(x,y)&&grid[y][x]===G.WALK){c.fillStyle='#d6d2c8';
-  if(y+1<H&&grid[y+1][x]===G.ROAD)c.fillRect(px,py+29,TILE,3);
-  if(y>0&&grid[y-1][x]===G.ROAD)c.fillRect(px,py,TILE,3);
-  if(x+1<W&&grid[y][x+1]===G.ROAD)c.fillRect(px+29,py,3,TILE);
-  if(x>0&&grid[y][x-1]===G.ROAD)c.fillRect(px,py,3,TILE)}
+  const R=(xx,yy)=>xx>=0&&yy>=0&&xx<W&&yy<H&&grid[yy][xx]===G.ROAD,S=10,A='#45444a',TOP='#ebe7dd',FACE='#8f8a80',SH='rgba(0,0,0,.35)';
+  const dn=R(x,y+1),up=R(x,y-1),rt=R(x+1,y),lf=R(x-1,y);
+  c.fillStyle=A;if(dn)c.fillRect(px,py+TILE-S,TILE,S);if(up)c.fillRect(px,py,TILE,S);if(rt)c.fillRect(px+TILE-S,py,S,TILE);if(lf)c.fillRect(px,py,S,TILE);
+  if(!dn&&!rt&&R(x+1,y+1))c.fillRect(px+TILE-S,py+TILE-S,S,S);if(!dn&&!lf&&R(x-1,y+1))c.fillRect(px,py+TILE-S,S,S);if(!up&&!rt&&R(x+1,y-1))c.fillRect(px+TILE-S,py,S,S);if(!up&&!lf&&R(x-1,y-1))c.fillRect(px,py,S,S);
+  // meio-fio: a face de pé aparece do lado de quem olha (baixo e direita); do outro lado, só a sombra
+  if(dn){c.fillStyle=TOP;c.fillRect(px,py+TILE-S-3,TILE,3);c.fillStyle=FACE;c.fillRect(px,py+TILE-S,TILE,4);c.fillStyle=SH;c.fillRect(px,py+TILE-S+4,TILE,2)}
+  if(rt){c.fillStyle=TOP;c.fillRect(px+TILE-S-3,py,3,TILE);c.fillStyle=FACE;c.fillRect(px+TILE-S,py,4,TILE);c.fillStyle=SH;c.fillRect(px+TILE-S+4,py,2,TILE)}
+  if(up){c.fillStyle=SH;c.fillRect(px,py+S-3,TILE,3);c.fillStyle=TOP;c.fillRect(px,py+S,TILE,3)}
+  if(lf){c.fillStyle=SH;c.fillRect(px+S-3,py,3,TILE);c.fillStyle=TOP;c.fillRect(px+S,py,3,TILE)}}
 }
 const walkEdge=(x,y)=>{const t=tileAt(x,y);return t!==G.FOREST&&t!==G.GRASS&&t!==G.ROCK&&t!==G.HILL};
 function placa(c,x,y,txt,cor='#f3e3bd',tinta='#5a3a22'){c.font='600 9px Fredoka, sans-serif';const w=c.measureText(txt).width+12;c.fillStyle='#6d4426';c.fillRect(x-1.5,y+4,3,14);c.fillStyle=cor;rr(c,x-w/2,y-7,w,13,3);c.fill();c.fillStyle=tinta;c.textAlign='center';c.fillText(txt,x,y+3);c.textAlign='left'}
@@ -2875,9 +2880,9 @@ function euUpdate(dt){
  if((kx||ky)&&livre()){
   levantar();eu.path=[];eu.onArrive=null;eu.acel=car?Math.min(1,(eu.acel||0)+dt/1.8):1;let l=Math.hypot(kx,ky);if(car){let tg=Math.atan2(ky,kx);if(eu.hd==null)eu.hd=tg;
    if(tileAt(Math.floor(eu.x/TILE),Math.floor(eu.y/TILE))===G.ROAD){const ax=Math.round(tg/(Math.PI/2))*(Math.PI/2);if(Math.abs(Math.atan2(Math.sin(tg-ax),Math.cos(tg-ax)))<.5)tg=ax}
-   let d=Math.atan2(Math.sin(tg-eu.hd),Math.cos(tg-eu.hd));eu.re=Math.abs(d)>2.3;
+   let d=Math.atan2(Math.sin(tg-eu.hd),Math.cos(tg-eu.hd));eu.re=eu.re?Math.abs(d)>1.2:Math.abs(d)>1.75;
    if(eu.re){d=Math.atan2(Math.sin(tg+Math.PI-eu.hd),Math.cos(tg+Math.PI-eu.hd));eu.acel=Math.min(eu.acel,.55)}
-   const vr=car==='moto'?6:['esportivo','neon'].includes(car)?5:4;eu.hd+=d*Math.min(1,vr*dt);
+   const vr=(car==='moto'?6:['esportivo','neon'].includes(car)?5:4)*(eu.re?.35:1);eu.hd+=d*Math.min(1,vr*dt);
    const sg=eu.re?-1:1;kx=Math.cos(eu.hd)*sg*Math.min(1,l);ky=Math.sin(eu.hd)*sg*Math.min(1,l);l=Math.hypot(kx,ky)}else eu.hd=null;const sp=spd*Math.min(1,l)*(car?.2+.8*eu.acel*eu.acel:1),nx=eu.x+kx/l*sp*dt,ny=eu.y+ky/l*sp*dt;
   const tx0=Math.floor(eu.x/TILE),ty0=Math.floor(eu.y/TILE),tx1=Math.floor(nx/TILE);if(wf(tx1,ty0)&&passa(tx0,ty0,tx1,ty0))eu.x=nx;const tx2=Math.floor(eu.x/TILE),ty1=Math.floor(ny/TILE);if(wf(tx2,ty1)&&passa(tx2,ty0,tx2,ty1))eu.y=ny;
   if(Math.abs(skx)>.15)eu.dir=skx>0?1:-1;eu.ph+=dt*11;eu.moving=true;follow=eu;closePlace();
@@ -3825,7 +3830,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119a';
+const VERSAO_JOGO='v20261119b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
