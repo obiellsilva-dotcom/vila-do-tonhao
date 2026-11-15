@@ -1505,10 +1505,10 @@ alter table public.moradores add column if not exists gasolina numeric not null 
 -- preço do tanque cheio de cada carro
 create or replace function public._preco_tanque(p_carro text) returns integer
 language sql immutable as $$
-  select case when p_carro = 'moto' then 15
-              when p_carro in ('fusca','kombi','fusca_ouro') then 25
-              when p_carro in ('opala','caminhonete','kombi_tonhao') then 35
-              else 45 end
+  select case when p_carro = 'moto' then 120
+              when p_carro in ('fusca','kombi','fusca_ouro') then 220
+              when p_carro in ('opala','caminhonete','kombi_tonhao') then 300
+              else 380 end
 $$;
 
 -- o jogo avisa quanto de gasolina sobrou (só pode diminuir)
