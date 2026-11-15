@@ -895,6 +895,7 @@ function drawHead(c,v,o,dir,back){
    c.fillStyle='#e0302a';circ(c,ex+dir*.5,1.3,1.9);c.fillStyle='rgba(255,255,255,.55)';circ(c,ex+dir*.1-.5,.7,.6)}}
 }
 
+function MAO(c,x,y,sk,d,lado){const r=1.55;c.save();c.translate(x,y);c.fillStyle=sk;c.beginPath();c.ellipse(0,0,r*.95,r,0,0,7);c.fill();c.lineCap='round';c.strokeStyle=sk;c.lineWidth=.62;for(let i=0;i<4;i++){const fx=-.9+i*.6;c.beginPath();c.moveTo(fx,.4);c.lineTo(fx*1.05,1.75+(i===1||i===2?.25:0));c.stroke()}c.lineWidth=.7;c.beginPath();c.moveTo(lado*.9,-.3);c.lineTo(lado*1.5,.7);c.stroke();c.strokeStyle='rgba(0,0,0,.18)';c.lineWidth=.18;for(let i=1;i<4;i++){const fx=-1.2+i*.6;c.beginPath();c.moveTo(fx,.9);c.lineTo(fx*1.05,1.9);c.stroke()}c.fillStyle='rgba(0,0,0,.12)';c.beginPath();c.ellipse(d*.4,.5,.9,.6,0,0,7);c.fill();c.restore()}
 function VOLG(c,x,y,w,h,f=1){const g=c.createLinearGradient(x,0,x+w,0);g.addColorStop(0,`rgba(255,255,255,${.24*f})`);g.addColorStop(.38,'rgba(255,255,255,0)');g.addColorStop(.62,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${.3*f})`);c.fillStyle=g;c.fillRect(x,y,w,h)}
 // personagem pronto em cache (mesmo visual + mesma pose = reaproveita a imagem); poses especiais desenham normal
 const PCACHE=new Map(),VKEY=new WeakMap();
@@ -1021,15 +1022,15 @@ function drawPersonReal0(c,x,y,v,o={}){
   if(o.mv!=null&&ph!=null&&!sit&&pose==null){const ux=Math.cos(o.mv),uy=Math.sin(o.mv),sA=lado*Math.sin(ph),X0=ax+1.6,Y0=yy+.4,ex2=X0+ux*sA*1.8,ey2=Y0+6.6+uy*sA*.8,hx2=ex2+ux*sA*2.8,hy2=ey2+6.2+uy*sA*1.4-Math.abs(sA)*.6;
    c.lineCap='round';c.strokeStyle=curta?skin:manga;c.lineWidth=w;c.beginPath();c.moveTo(X0,Y0);c.lineTo(ex2,ey2);c.stroke();
    if(curta){c.strokeStyle=manga;c.lineWidth=w+.4;c.beginPath();c.moveTo(X0,Y0-.4);c.lineTo(X0+(ex2-X0)*.5,Y0+(ey2-Y0)*.5);c.stroke()}
-   c.strokeStyle=ante;c.lineWidth=w*.9;c.beginPath();c.moveTo(ex2,ey2);c.lineTo(hx2,hy2);c.stroke();c.fillStyle=skin;circ(c,hx2,hy2+.6,1.75);return}
-  c.save();c.translate(ax+1.6,yy+1.2+(F&&ph!=null?-lado*Math.sin(ph)*.9:0));c.rotate(-dir*sw2*rotK+(F?-k*(fem?.07:.06):0));
+   c.strokeStyle=ante;c.lineWidth=w*.9;c.beginPath();c.moveTo(ex2,ey2);c.lineTo(hx2,hy2);c.stroke();MAO(c,hx2,hy2+.3,skin,dir,-lado);return}
+  c.save();c.translate(ax+1.6,yy+1.2+(F&&ph!=null?-lado*Math.sin(ph)*.9:0));c.rotate(-dir*sw2*rotK+(F?k*(fem?.05:.03):0));
   c.fillStyle=curta?skin:manga;rr(c,-w/2,-1.2,w,7.6,w/2.2);c.fill();
   if(curta){c.fillStyle=manga;rr(c,-w/2-.2,-1.3,w+.4,mc,w/2.4);c.fill();c.fillStyle=shade(manga,-24);c.fillRect(-w/2-.25,mc-2.2,w+.5,.75);c.fillStyle='rgba(255,255,255,.18)';c.fillRect(-w/2-.25,mc-2.25,w+.5,.25);c.strokeStyle='rgba(0,0,0,.18)';c.lineWidth=.3;c.beginPath();c.moveTo(-w*.2,.4);c.quadraticCurveTo(0,1.6,w*.25,mc-2.6);c.stroke()}
   c.save();rr(c,-w/2,-1.2,w,7.6,w/2.2);c.clip();VOLG(c,-w/2,-1.2,w,7.6);c.restore();
   c.translate(0,6);c.rotate(-dir*cot*rotK);c.fillStyle=ante;rr(c,-w*.46,-.8,w*.92,6.8,w/2.4);c.fill();c.save();rr(c,-w*.46,-.8,w*.92,6.8,w/2.4);c.clip();VOLG(c,-w*.46,-.8,w*.92,6.8);c.restore();
   if(roupaR==='agasalho'){c.fillStyle='#f4f4f4';c.fillRect(-w/2+.3,-6,.8,12)}
   if(longas){const rib=roupa==='moletom'||roupa==='jaqueta';c.fillStyle=shade(ante,rib?-18:-26);rr(c,-w*.5,4.3,w,1.6,.5);c.fill();if(rib){c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=.22;for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(i*w*.18,4.4);c.lineTo(i*w*.18,5.8);c.stroke()}}c.strokeStyle='rgba(0,0,0,.16)';c.lineWidth=.3;c.beginPath();c.moveTo(-w*.3,-5);c.quadraticCurveTo(0,-4,w*.3,-5.4);c.moveTo(-w*.3,1);c.quadraticCurveTo(w*.1,2,w*.35,.6);c.stroke()}
-  c.fillStyle=skin;circ(c,0,6.4,1.75);c.fillStyle='rgba(0,0,0,.12)';circ(c,dir*.5,6.9,1.1);c.restore()};
+  MAO(c,0,6.1,skin,dir,-lado);c.restore()};
  if(roupa==='moletom'&&!back){c.fillStyle=shade(shirt,-20);c.beginPath();c.ellipse(0,by+.6,5.8,3.3,0,0,7);c.fill();c.fillStyle=shade(shirt,-42);c.beginPath();c.ellipse(0,by-.2,4.2,2,0,Math.PI,0);c.fill()}
  if(roupa==='moletom'&&back){c.fillStyle=shirtD;c.beginPath();c.moveTo(-5.4,by+.6);c.quadraticCurveTo(-5.8,by-6,0,by-6.4);c.quadraticCurveTo(5.8,by-6,5.4,by+.6);c.quadraticCurveTo(0,by+5,-5.4,by+.6);c.fill()}
  if(!back&&!o.tonhao){c.save();c.translate(0,by-7.4);if(o.headRot)c.rotate(dir*o.headRot);c.scale(.8/BX,.82);cabelo3D(c,v,o,dir,'tras',!!o.cara,estilo('cabelo',v),CORCAB[v.corCab],fem);c.restore()}
