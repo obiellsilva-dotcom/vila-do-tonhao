@@ -3783,7 +3783,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261117c';
+const VERSAO_JOGO='v20261117d';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3972,7 +3972,7 @@ setInterval(msRender,400);
 function msTarefa(){if(!eu||eu.missao!==0)return;msTar++;try{localStorage.setItem('cidadeTonhao.msTar',msTar)}catch(e){}msRender()}
 function msComprou(it){if(eu&&eu.missao===1&&it&&it.fome>0&&!msBusy)msPasso(2)}
 function msPasso(p,pulou){msBusy=true;api.missao(p).then(r=>{if(r&&r.eu)aplicarEstado(r.eu);eu.missao=r&&r.missao!=null?+r.missao:2;
-  if(p===1){Som.play('moeda');floatText(eu.x,eu.y-44,'+'+money(r.bonus||50)+' 🎁','#ffd23f');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||50)+'. Agora vá comer alguma coisa!')}
+  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('moeda');floatText(eu.x,eu.y-44,'+'+money(r.bonus||50)+' 🎁','#ffd23f');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||50)+'. Agora vá comer alguma coisa!')}
   else if(!pulou)bannerGrande('🎉 MISSÃO COMPLETA!','Agora é com você! Mais empregos em ☰ → 💼 Empregos');
   if(eu.missao>=2)try{localStorage.removeItem('cidadeTonhao.msTar')}catch(e){}})
  .catch(()=>{eu.missao=2}).finally(()=>{msBusy=false;msRender()})}
