@@ -642,7 +642,45 @@ function cabeloM(c,cab,cam,fr,d,hair){
  // pontas espetadas por cima da silhueta
  if(S.tex==='espeto'){c.fillStyle=hair;for(let i=-3;i<=3;i++){const x=i*1.9+(fr?0:d*.6),y=fT+.9+Math.abs(i)*.45;c.beginPath();c.moveTo(x-1,y+.6);c.lineTo(x+(fr?i*.25:-d*.4),y-1.8);c.lineTo(x+1,y+.6);c.closePath();c.fill()}}
 }
+// ===== versões masculinas de cabelos maiores =====
+const MASC2={cacheado:1,black:1,moicano:1,comprido:1,surfista:1,mullet:1,tranca:1,coque:1,dreads:1};
+function cabeloM2(c,cab,cam,fr,d,hair){
+ const costas=cam==='costas',tras=cam==='tras',esc=shade(hair,-40),cla=shade(hair,30),hs=k=>{const t=Math.sin(k*91.7)*4375.85;return t-Math.floor(t)};
+ const pinta=(P,o={})=>{const g=c.createLinearGradient(0,o.y0??-12,0,o.y1??4);g.addColorStop(0,cla);g.addColorStop(.45,hair);g.addColorStop(1,shade(hair,-28));c.save();c.fillStyle=g;c.fill(P);c.clip(P);c.lineCap='round';
+  if(o.tex==='crespo'){for(let k=0;k<160;k++){c.fillStyle=k%2?esc:cla;c.globalAlpha=.35;c.beginPath();c.arc((hs(k)-.5)*20,-15+hs(k+3)*20,.35+hs(k+5)*.3,0,7);c.fill()}}
+  else if(o.tex==='cachos'){for(let k=0;k<34;k++){const x=(hs(k)-.5)*17,y=(o.ya??-11)+hs(k+3)*(o.yb??7),r=1+hs(k+5)*.5;c.globalAlpha=1;c.fillStyle=k%3?shade(hair,6):cla;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.strokeStyle=esc;c.lineWidth=.4;c.beginPath();c.arc(x,y,r*.6,.4,3.8);c.stroke()}}
+  else{const n=o.n??12;for(let k=0;k<n;k++){const u=(k+.5)/n-.5,x0=(o.cx??0)+u*(o.w??14),y0=(o.ya??-10)+hs(k+2)*1.5,L=(o.L??5)*(.7+hs(k+9)*.5),dx=(o.dx??0)+u*(o.abre??0);c.strokeStyle=esc;c.globalAlpha=.5;c.lineWidth=.45;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(x0+dx*.5,y0+L*.5,x0+dx,y0+L);c.stroke();c.strokeStyle=cla;c.globalAlpha=.3;c.lineWidth=.35;c.beginPath();c.moveTo(x0+.5,y0);c.quadraticCurveTo(x0+.5+dx*.5,y0+L*.45,x0+.5+dx*.9,y0+L*.85);c.stroke()}}
+  c.globalAlpha=.12;c.fillStyle='#fff';c.beginPath();c.ellipse(fr||costas?-1.6:d*.8,(o.y0??-12)+2.6,3.4,1.2,0,0,7);c.fill();c.restore()};
+ // laterais raspadas (degradê)
+ const lados=(alto)=>{const Z=new Path2D();if(costas){Z.arc(0,-.4,7.35,Math.PI*.98,Math.PI*2.02);Z.lineTo(6.6,2.6);Z.quadraticCurveTo(0,4.2,-6.6,2.6);Z.closePath()}else if(fr){Z.moveTo(-7.4,-alto);Z.lineTo(-7.35,1.2);Z.lineTo(-6.5,1.3);Z.lineTo(-6.3,-alto+.4);Z.closePath();Z.moveTo(7.4,-alto);Z.lineTo(7.35,1.2);Z.lineTo(6.5,1.3);Z.lineTo(6.3,-alto+.4);Z.closePath()}else{Z.moveTo(-d*4.3,-alto);Z.quadraticCurveTo(-d*4.2,-1,-d*4.5,1.3);Z.lineTo(-d*5.4,1.3);Z.quadraticCurveTo(-d*6,2.8,-d*6.6,3);Z.quadraticCurveTo(-d*7.5,0,-d*7.5,-alto);Z.closePath()}
+  const lg=c.createLinearGradient(0,-6,0,2.4);lg.addColorStop(0,shade(hair,-8)+'dd');lg.addColorStop(1,shade(hair,-8)+'22');c.save();c.fillStyle=lg;c.fill(Z);c.clip(Z);c.fillStyle=esc;for(let k=0;k<60;k++){c.globalAlpha=.3;c.fillRect(((k*37)%160)/10-8,-6+((k*53)%90)/10,.3,.3)}c.restore()};
+ // casco com volume: rx/ry = tamanho, base = até onde desce nos lados; testa = altura da linha do cabelo
+ const casco=(rx,ry,cy,base,testa=-4.2)=>{const P=new Path2D();
+  if(costas){P.ellipse(0,cy,rx,ry,0,Math.PI,Math.PI*2);P.lineTo(rx*.95,base);P.quadraticCurveTo(0,base+2,-rx*.95,base);P.closePath()}
+  else if(fr){P.moveTo(-rx*.98,base);P.bezierCurveTo(-rx*1.05,cy-ry*.8,-rx*.6,cy-ry,0,cy-ry);P.bezierCurveTo(rx*.6,cy-ry,rx*1.05,cy-ry*.8,rx*.98,base);P.lineTo(6.4,base);P.lineTo(6.2,-3.4);P.quadraticCurveTo(5.8,testa-1,4.4,testa-.9);P.quadraticCurveTo(0,testa-.2,-4.4,testa-.9);P.quadraticCurveTo(-5.8,testa-1,-6.2,-3.4);P.lineTo(-6.4,base);P.closePath()}
+  else{const bx=-d*.7;P.moveTo(d*6.5,-3.2);P.bezierCurveTo(d*(rx*.9),cy-ry*.9,bx+d*rx*.3,cy-ry,bx-d*rx*.2,cy-ry);P.bezierCurveTo(bx-d*rx*.9,cy-ry*.9,bx-d*rx*1.05,cy,bx-d*rx*.98,base);P.lineTo(-d*4.5,base);P.lineTo(-d*4.3,-4);P.quadraticCurveTo(-d*1.5,testa-1,d*1.5,testa-.6);P.quadraticCurveTo(d*4,testa-.6,d*6.5,-3.2);P.closePath()}
+  return P};
+ const m={};
+ if(cab==='comprido'||cab==='surfista'||cab==='mullet'){
+  const L=cab==='comprido'?7.5:cab==='surfista'?4.2:6.5;
+  if(tras||costas){const P=new Path2D(),w=cab==='mullet'?5.4:7.4,x=costas||fr?0:-d*2.2;if(fr&&cab!=='mullet'){rrP(P,-8.4,-2,2.4,L+2,1.2);rrP(P,6,-2,2.4,L+2,1.2)}else if(!fr||costas){rrP(P,x-w,-3,w*2,L+3,2.4)}pinta(P,{ya:-3,L:L+2,w:w*2,cx:x,n:9,y0:-4,y1:L});if(tras)return}
+  if(cab==='mullet'){lados(3.4);pinta(casco(7.3,4.2,-5.4,-3.4,-4.2),{ya:-10,L:3,dx:fr?0:d*1.2,y0:-11,y1:-2})}
+  else{const P=casco(cab==='comprido'?7.9:7.8,cab==='comprido'?3.6:4.4,-5,cab==='comprido'?3:.6,-4.6);
+   if(fr&&!costas){rrP(P,-8.3,-3,2.1,L+1,1);rrP(P,6.2,-3,2.1,L+1,1)}
+   pinta(P,{ya:-10,L:cab==='comprido'?9:6,abre:cab==='comprido'?5:3,dx:fr?0:-d*2.5,y0:-10.5,y1:L});
+   if(cab==='comprido'&&fr&&!costas){c.strokeStyle=shade(hair,-55);c.lineWidth=.5;c.beginPath();c.moveTo(0,-4.8);c.lineTo(0,-8.6);c.stroke()}}
+  return}
+ if(tras)return;
+ if(cab==='cacheado'){lados(1.6);pinta(casco(7.7,4.6,-5.2,-1.6,-4.4),{tex:'cachos',ya:-10.5,yb:7,y0:-11,y1:-2});return}
+ if(cab==='black'){pinta(casco(9,6.4,-4.4,.8,-4.3),{tex:'crespo',y0:-11,y1:1});return}
+ if(cab==='tranca'){const P=casco(7.4,3.3,-5,-1.2,-4.4);pinta(P,{n:1,L:0,y0:-9,y1:-1});c.save();c.clip(P);c.lineCap='round';const n=costas?7:fr?7:6;for(let i=0;i<n;i++){const x=costas||fr?(i-(n-1)/2)*2.1:-d*(i*1.9-3);c.strokeStyle=esc;c.lineWidth=.45;c.beginPath();c.moveTo(x-1,-12);c.lineTo(x-1,4);c.stroke();for(let j=0;j<10;j++){const y=-11+j*1.5;c.fillStyle=cla;c.globalAlpha=.35;c.beginPath();c.ellipse(x,y,.75,.55,.5,0,7);c.fill();c.globalAlpha=1}}c.restore();return}
+ if(cab==='dreads'){lados(2.2);const P=casco(7.6,4.2,-5.2,-2.2,-4.2);pinta(P,{n:1,L:0,y0:-11,y1:-2});c.save();c.lineCap='round';const n=costas?9:8;for(let i=0;i<n;i++){const u=(i+.5)/n-.5,x=u*13+(fr||costas?0:-d*.8),y0=-10.4+Math.abs(u)*3,L=costas?4:fr?3+Math.abs(u)*4:3.5;c.strokeStyle=shade(hair,-15);c.lineWidth=1.6;c.beginPath();c.moveTo(x,y0);c.quadraticCurveTo(x+(fr?u*2:d*.8),y0+L*.5,x+(fr?u*3:d*1.2),y0+L);c.stroke();c.strokeStyle=cla;c.lineWidth=.4;c.globalAlpha=.5;c.beginPath();c.moveTo(x-.3,y0);c.lineTo(x-.3+(fr?u*2.6:d),y0+L*.85);c.stroke();c.globalAlpha=1}c.restore();return}
+ if(cab==='moicano'){lados(3.6);const P=new Path2D();if(costas)rrP(P,-2,-11,4,13,2);else if(fr){P.moveTo(-2.4,-4.6);P.quadraticCurveTo(-3,-10.6,0,-11.4);P.quadraticCurveTo(3,-10.6,2.4,-4.6);P.quadraticCurveTo(0,-4.2,-2.4,-4.6);P.closePath()}else{P.moveTo(d*4.5,-5);P.bezierCurveTo(d*5,-10.6,-d*3,-11.8,-d*6.6,-6);P.lineTo(-d*7.4,-1);P.lineTo(-d*6,-1);P.quadraticCurveTo(-d*2,-7,d*4.5,-5);P.closePath()}
+  pinta(P,{w:4,n:6,ya:-11,L:4,dx:fr?0:-d*1.5,y0:-12,y1:-4});return}
+ if(cab==='coque'){lados(4.4);const P=casco(7.2,3.2,-5,-4.4,-4.4);pinta(P,{ya:-9.8,L:5,dx:fr?0:-d*3,abre:fr?0:0,y0:-10,y1:-3});const B=new Path2D();const bx=costas?0:fr?0:-d*4.4,by=costas?-6.4:fr?-10.4:-9.4;B.ellipse(bx,by,2.4,2,0,0,7);pinta(B,{tex:'crespo',y0:by-3,y1:by+2});c.strokeStyle=esc;c.lineWidth=.4;c.beginPath();c.ellipse(bx,by,1.2,1,0,0,5);c.stroke();return}
+}
 function cabelo3D(c,v,o,dir,cam,fr,cab,hair,fem){
+ if(!fem&&MASC2[cab]){cabeloM2(c,cab,cam,fr,dir,hair);return}
  if(!fem&&MASC[cab]){if(cam!=='tras')cabeloM(c,cab,cam,fr,dir,hair);return}
  if(cab==='careca'){if(cam!=='tras'){c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.ellipse(-dir*1.5,-4.6,3,1.6,-.3,0,7);c.fill()}return}
  const costas=cam==='costas',tras=cam==='tras',L=fem?16:7,P=new Path2D(),d=dir;
