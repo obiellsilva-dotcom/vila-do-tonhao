@@ -1278,19 +1278,19 @@ function passa(ax,ay,bx,by){const A=casaTile.get(ax+','+ay),Bc=casaTile.get(bx+'
 const casaEm=(px,py)=>casaTile.get(Math.floor(px/TILE)+','+Math.floor(py/TILE))||null;
 const podeEntrar=b=>{if(!eu)return false;if(b.loja)return true;const i=casasInfo.get(b.n)||{};return i.dono===eu.id||portas.get(b.n)===true||casaEm(eu.x,eu.y)===b};
 function drawInterior(c,b){
- const x=T(b.x),y=T(b.y),w=T(b.w),h=T(b.h),ih=T(b.h-1);
+ const x=T(b.x),y=T(b.y),w=T(b.w),h=T(b.h),ih=T(b.h-(b.loja?0:1));
  c.fillStyle='#2a1a14';c.fillRect(x,y-6,w,h+6);
  for(let i=0;i<b.w*2;i++){c.fillStyle=i%2?'#b07a4a':'#a56f40';c.fillRect(x+i*16,y,16,ih)}
  c.strokeStyle='rgba(0,0,0,.18)';c.lineWidth=1;for(let j=8;j<ih;j+=8){c.beginPath();c.moveTo(x,y+j);c.lineTo(x+w,y+j);c.stroke()}
  c.fillStyle='#8a3b3b';rr(c,T(b.dx)-14,y+ih-22,T(1)+28,16,6);c.fill();c.fillStyle='rgba(255,255,255,.15)';rr(c,T(b.dx)-10,y+ih-19,T(1)+20,10,4);c.fill();
  c.fillStyle=shade(b.wall,-10);c.fillRect(x,y+ih,T(b.dx)-x,T(1));c.fillRect(T(b.dx+1),y+ih,x+w-T(b.dx+1),T(1));
- const ab=portas.get(b.n)===true;c.fillStyle=ab?'#3a2414':'#6b3f22';c.fillRect(T(b.dx)+2,y+ih,ab?6:T(1)-4,T(1));
+ const ab=portas.get(b.n)===true;c.fillStyle=ab?'#3a2414':'#6b3f22';if(!b.loja)c.fillRect(T(b.dx)+2,y+ih,ab?6:T(1)-4,T(1));
  {const tx=x+w/2,ty=y+ih/2+8;c.fillStyle='#a33b2a';c.beginPath();c.ellipse(tx,ty,Math.min(40,w/3),15,0,0,7);c.fill();c.strokeStyle='#f1c40f';c.lineWidth=1.5;c.beginPath();c.ellipse(tx,ty,Math.min(34,w/3-6),11,0,0,7);c.stroke();c.fillStyle='#d9a441';c.beginPath();c.ellipse(tx,ty,10,4,0,0,7);c.fill()}
- c.fillStyle='rgba(0,0,0,.5)';c.font='600 8px Fredoka, sans-serif';c.textAlign='center';const i=casasInfo.get(b.n)||{};c.fillText(b.loja?'👕 Tonhão Wear':(ab?'🔓 ':'🔒 ')+(i.nome?'Casa de '+i.nome:'Casa '+b.n),x+w/2,y+ih-3);c.textAlign='left';
+ c.fillStyle='rgba(0,0,0,.5)';c.font='600 8px Fredoka, sans-serif';c.textAlign='center';const i=casasInfo.get(b.n)||{};c.fillText(b.loja?'👕 Loja de Roupas':(ab?'🔓 ':'🔒 ')+(i.nome?'Casa de '+i.nome:'Casa '+b.n),x+w/2,y+ih-3);c.textAlign='left';
 }
 const merc=addB({kind:'mercadinho',x:38,y:24,w:14,h:3});
 for(let x=38;x<=51;x++){grid[25][x]=G.PLAZA;if(x===44||x===45)grid[26][x]=G.PLAZA} // corredor da feirinha
-const BANCAS=[[38,24,41.4],[41.6,24,44.9],[45.1,24,48.4],[48.6,24,52],[38,26,41],[41,26,44],[46,26,49],[49,26,52]].map(([x0,y,x1],i)=>({x0,x1,y,i,fundo:y===24}));
+const BANCAS=[[38,24,41.4],[41.6,24,44.9],[45.1,24,48.4],[48.6,24,51.5],[38,26,41],[41,26,44],[46,26,49],[49,26,51.5]].map(([x0,y,x1],i)=>({x0,x1,y,i,fundo:y===24}));
 const pad=addB({kind:'padaria',x:46,y:16,w:5,h:5});
 const barb=addB({kind:'barbearia',x:51,y:17,w:4,h:4});
 const bank=addB({kind:'banco',x:37,y:15,w:8,h:6});
@@ -1552,7 +1552,7 @@ function drawShop(c,b){
  const x=b.x*TILE,y=b.y*TILE,w=b.w*TILE,h=b.h*TILE,roofH=h*.34;
  const CFG={mercadinho:{wall:'#f3e3bd',roof:'#b94a3a',aw:['#e04b3c','#fff'],name:'MERCADINHO'},padaria:{wall:'#f8dcc8',roof:'#8a5a3b',aw:['#f2b134','#7a4a2a'],name:'PADARIA'},barbearia:{wall:'#dfe9f5',roof:'#34495e',aw:['#2e86c1','#fff'],name:'BARBEARIA'},
   concessionaria:{wall:'#eef3f7',roof:'#1f5a8a',aw:['#1f5a8a','#ffc94a'],name:'CARROS DO ZÉ'},oficina:{wall:'#d9d4cc',roof:'#4a4f57',aw:['#e67e22','#2b2b2b'],name:'OFICINA'},
-  posto:{wall:'#fff7e6',roof:'#c0392b',aw:['#c0392b','#f1c40f'],name:'POSTO'},roupas:{wall:'#fbe7f0',roof:'#b0306a',aw:['#e84393','#fff'],name:'TONHÃO WEAR'}};
+  posto:{wall:'#fff7e6',roof:'#c0392b',aw:['#c0392b','#f1c40f'],name:'POSTO'},roupas:{wall:'#fbe7f0',roof:'#b0306a',aw:['#e84393','#fff'],name:'LOJA DE ROUPAS'}};
  const cfg=CFG[b.kind];
  c.fillStyle='rgba(0,0,0,.18)';c.fillRect(x+6,y+h-3,w-2,6);
  c.fillStyle=cfg.wall;c.fillRect(x+3,y+roofH-2,w-6,h-roofH+2);
@@ -2963,7 +2963,7 @@ function uiTick(){
  refreshCard();
 }
 setInterval(uiTick,300);
-const FOCUS={delegacia:[65,69,1.3],hospital:[91,69,1.3],parque:[111,67.5,1.3],lagoa:[46,-9,1.1],mirante:[131,34,1.2],acampamento:[-10,39.5,1.3],pomar:[57,89,1.2],concessionaria:[91,27,1.3],oficina:[108,27,1.3],posto:[98,25,1.4],fabrica:[21,71,1.1],prefeitura:[44,71,1.2],leste:[100,24,.75],sul:[60,68,.65],bar:[24,22,1.4],praca:[23.8,33.8,1.5],campo:[69,22,.85],banco:[41,19,1.3],igreja:[51.5,44,1.3],mercadinho:[45,26,1.3],padaria:[48.5,19.5,1.3],barbearia:[53,20,1.5],rio:[40,52.5,1]};
+const FOCUS={roupas:[54,25,1.3],delegacia:[65,69,1.3],hospital:[91,69,1.3],parque:[111,67.5,1.3],lagoa:[46,-9,1.1],mirante:[131,34,1.2],acampamento:[-10,39.5,1.3],pomar:[57,89,1.2],concessionaria:[91,27,1.3],oficina:[108,27,1.3],posto:[98,25,1.4],fabrica:[21,71,1.1],prefeitura:[44,71,1.2],leste:[100,24,.75],sul:[60,68,.65],bar:[24,22,1.4],praca:[23.8,33.8,1.5],campo:[69,22,.85],banco:[41,19,1.3],igreja:[51.5,44,1.3],mercadinho:[45,26,1.3],padaria:[48.5,19.5,1.3],barbearia:[53,20,1.5],rio:[40,52.5,1]};
 $('places').onchange=e=>{const v=e.target.value;e.target.value='';if(!v)return;follow=null;
  if(v==='cidade'){cam.x=(WX0+WX1)/2;cam.y=(WY0+WY1)/2;cam.z=Math.min(cw/MW,ch/MH)*1.02;return}
  const f=FOCUS[v];cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.min(f[2]*Math.max(.8,cw/700),2.2)};
@@ -3080,7 +3080,7 @@ const CAR_SHAPE={sedan:'opala',jipe:'caminhonete',esportivo:'opala',fusca_ouro:'
 const CARS_PREMIUM={fusca_ouro:{nome:'Fusca Dourado',preco:0,nivel_min:1,premium:true},kombi_tonhao:{nome:'Caminhonete do Tonhão',preco:0,nivel_min:1,premium:true},neon:{nome:'Esportivo Neon',preco:0,nivel_min:1,premium:true}};
 const CAR_COLOR={sedan:'#8e1b3a',jipe:'#3d5a2a',esportivo:'#e01b24',moto:'#c0392b',fusca:'#3c78d8',kombi:'#f3c13a',opala:'#2d2d34',caminhonete:'#46a35b',viatura:'#f4f4f4'};
 Object.assign(CAR_COLOR,{fusca_ouro:'#e6b422',kombi_tonhao:'#e67e22',neon:'#00e5ff'});
-const PLACE_TITLE={roupas:'👕 Tonhão Wear',bar:'🍺 Bar do Tonhão',mercadinho:'🛒 Mercadinho',padaria:'🥖 Padaria',barbearia:'💈 Barbearia',banco:'🏦 Banco',igreja:'⛪ Capela',concessionaria:'🚗 Carros do Zé',oficina:'🔧 Oficina',posto:'⛽ Posto',fabrica:'🏭 Fábrica de Gelo',prefeitura:'🏛️ Prefeitura',delegacia:'🚓 Delegacia',hospital:'🏥 Hospital',lagoa:'🎣 Lagoa da Cachoeira',mirante:'⛰️ Mirante',acampamento:'⛺ Acampamento'};
+const PLACE_TITLE={roupas:'👕 Loja de Roupas',bar:'🍺 Bar do Tonhão',mercadinho:'🛒 Mercadinho',padaria:'🥖 Padaria',barbearia:'💈 Barbearia',banco:'🏦 Banco',igreja:'⛪ Capela',concessionaria:'🚗 Carros do Zé',oficina:'🔧 Oficina',posto:'⛽ Posto',fabrica:'🏭 Fábrica de Gelo',prefeitura:'🏛️ Prefeitura',delegacia:'🚓 Delegacia',hospital:'🏥 Hospital',lagoa:'🎣 Lagoa da Cachoeira',mirante:'⛰️ Mirante',acampamento:'⛺ Acampamento'};
 const PRECO_PEIXE=28,MANSAO_NIVEL=10;
 const NIVEL_MAX=20;
 const LV={de(xp){let n=Math.max(1,Math.floor((1+Math.sqrt(1+4*Math.max(xp,0)/25))/2));while(25*(n+1)*n<=xp)n++;while(n>1&&25*n*(n-1)>xp)n--;return Math.min(n,NIVEL_MAX)},base:n=>25*n*(n-1)};
@@ -3425,7 +3425,6 @@ function botao(box,txt,fn,o={}){
 }
 function abrirLugar(b){
  if(!eu)return;closeCard();lugarAtual=b;const k=b.kind;let box=$('placeActs');box.innerHTML='';let title=PLACE_TITLE[k]||'',sub='';
- if(k==='roupas'){abrirLojaRoupa();return}
  if(k==='casa'||k==='mansao'){
   const info=casasInfo.get(b.n)||{};title=(k==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n;
   if(info.dono&&info.dono===eu.id){sub='Essa casa é sua! 🎉 A garagem na rua em frente é só sua.';botao(box,'🛋️ Entrar e descansar',()=>entrarCasa(b))}
@@ -4263,7 +4262,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261115g';
+const VERSAO_JOGO='v20261115h';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -4273,7 +4272,8 @@ setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now()
 $('zdanca').onclick=()=>{renderEmo();$('emoBox').classList.remove('hidden')};
 $('zfotos').onclick=()=>{if(eu)abrirSocial(eu)};
 function irAoLugar(k){const f=FOCUS[k];if(!f)return;follow=null;cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.max(cam.z,1.2);marker={x:T(f[0]),y:T(f[1]),t:now};
- const b=k==='bar'||k==='lagoa'?null:k==='roupas'?lojaRoupa:SHOPS[k];if(eu&&livre()){const tx=k==='lagoa'?LAGOA.x:b?(b.front[0]+.5)*TILE:T(23.9),ty=k==='lagoa'?LAGOA.y:b?(b.front[1]+.5)*TILE:T(27.2);eu.path=pathTo(eu,tx,ty);eu.onArrive=()=>abrirLugar(k==='lagoa'?FEATURES[0]:b||{kind:'bar'});follow=eu}
+ if(k==='roupas'&&eu&&livre()){eu.path=pathTo(eu,T(lojaRoupa.dx+.5),T(lojaRoupa.y+2.5));follow=eu;return}
+ const b=k==='bar'||k==='lagoa'?null:SHOPS[k];if(eu&&livre()){const tx=k==='lagoa'?LAGOA.x:b?(b.front[0]+.5)*TILE:T(23.9),ty=k==='lagoa'?LAGOA.y:b?(b.front[1]+.5)*TILE:T(27.2);eu.path=pathTo(eu,tx,ty);eu.onArrive=()=>abrirLugar(k==='lagoa'?FEATURES[0]:b||{kind:'bar'});follow=eu}
  toast('📍 Indo até lá! Ao chegar, toque em "Trabalhar".',3500)}
 $('zjobs').onclick=()=>{if(!eu)return;const lista=Object.entries(JOBS).sort((a,b)=>a[1].nivel_min-b[1].nivel_min);
  confirmar('💼 Empregos da cidade','Toque em um emprego para ir até lá. Cada tarefa paga dinheiro e XP na hora.<br><small>🔒 = libera em um nível maior</small>',null,
@@ -4383,7 +4383,7 @@ const precoRoupa=(c,i)=>i<gratisRoupa(c)?0:Math.round(30*Math.pow(1.15,i-gratisR
 const pecaRoupa=(c,v)=>c==='estampa'?'estampa':c+'_'+sx(v);
 let lrC=0,lrI=0,lrTem=new Set();
 async function abrirLojaRoupa(sem){closePlace();if(!sem)try{lrTem=new Set(await api.roupas())}catch(e){lrTem=new Set()}
- abrirForm('👕 Tonhão Wear',`<div class="fx" id="lrTabs" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
+ abrirForm('👕 Loja de Roupas',`<div class="fx" id="lrTabs" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
  <canvas id="lrCv" width="150" height="190" style="width:150px;height:190px;display:block;margin:0 auto"></canvas>
  <div class="fx" style="align-items:center;margin-top:8px"><button class="btn ghost" id="lrE" style="flex:none;width:52px;font-size:22px">◀</button><div style="text-align:center"><b id="lrN" style="font-size:18px;color:var(--gold)"></b><div id="lrP" style="font-size:15px;margin-top:2px"></div></div><button class="btn ghost" id="lrD" style="flex:none;width:52px;font-size:22px">▶</button></div>
  <div id="lrA" class="grid" style="grid-template-columns:1fr"></div>`,()=>{
