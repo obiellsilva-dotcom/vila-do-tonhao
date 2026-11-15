@@ -2608,7 +2608,7 @@ const JOBS={
  gerente:{nome:'Gerente do banco',salario:140,duracao:100,nivel_min:15,xp:56,fome:15},
  delegado:{nome:'Delegado(a)',salario:155,duracao:100,nivel_min:17,xp:62,fome:16},
  medico:{nome:'Médico(a)',salario:175,duracao:110,nivel_min:19,xp:70,fome:16},
- prefeito:{nome:'Prefeito(a)',salario:200,duracao:120,nivel_min:1,xp:78,fome:16}};
+ prefeito:{nome:'Prefeito(a)',salario:200,duracao:120,nivel_min:20,xp:78,fome:16}};
 const JOB_LUGAR={pescador:'lagoa',policia:'delegacia',enfermeiro:'hospital',medico:'hospital',gerente:'banco',delegado:'delegacia',prefeito:'prefeitura'};
 const lugarDoJob=j=>JOB_LUGAR[j]||j;
 const LOJA={
@@ -2954,7 +2954,7 @@ function botao(box,txt,fn,o={}){
  box.appendChild(e);return e;
 }
 function abrirLugar(b){
- if(!eu)return;closeCard();lugarAtual=b;const k=b.kind,box=$('placeActs');box.innerHTML='';let title=PLACE_TITLE[k]||'',sub='';
+ if(!eu)return;closeCard();lugarAtual=b;const k=b.kind;let box=$('placeActs');box.innerHTML='';let title=PLACE_TITLE[k]||'',sub='';
  if(k==='casa'||k==='mansao'){
   const info=casasInfo.get(b.n)||{};title=(k==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n;
   if(info.dono&&info.dono===eu.id){sub='Essa casa é sua! 🎉 A garagem na rua em frente é só sua.';botao(box,'🛋️ Entrar e descansar',()=>entrarCasa(b))}
@@ -2980,7 +2980,7 @@ function abrirLugar(b){
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
    botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})});
   if(eu.carros.length){eu.carros.filter(c=>CARS[c]&&!CARS[c].premium).forEach(c=>botao(box,`💸 Vender ${CARS[c].nome} para a loja: ${money(Math.floor(CARS[c].preco/2))}`,()=>venderLoja(c),{ghost:true}));botao(box,'🤝 Vender um carro para outro jogador',()=>venderJogador(),{ghost:true})}}
- if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(!sub)sub='O prefeito é sempre o TOP 1 do ranking 🏆. Quem passar o prefeito assume o cargo na hora.'}
+ if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(!sub)sub='Prefeito só a partir do nível 20: quem tiver mais XP entre os nível 20 assume o cargo 🏆.'}
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
   if(eu.nivel<J.nivel_min)botao(boxJob,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
@@ -3783,7 +3783,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261117b';
+const VERSAO_JOGO='v20261117c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
