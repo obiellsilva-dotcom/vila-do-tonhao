@@ -990,7 +990,7 @@ function drawPersonReal0(c,x,y,v,o={}){
   if(roupaR==='agasalho'){c.fillStyle='#f4f4f4';c.fillRect(-w/2+.3,-6,.8,12)}
   if(longas){const rib=roupa==='moletom'||roupa==='jaqueta';c.fillStyle=shade(ante,rib?-18:-26);rr(c,-w*.5,4.3,w,1.6,.5);c.fill();if(rib){c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=.22;for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(i*w*.18,4.4);c.lineTo(i*w*.18,5.8);c.stroke()}}c.strokeStyle='rgba(0,0,0,.16)';c.lineWidth=.3;c.beginPath();c.moveTo(-w*.3,-5);c.quadraticCurveTo(0,-4,w*.3,-5.4);c.moveTo(-w*.3,1);c.quadraticCurveTo(w*.1,2,w*.35,.6);c.stroke()}
   c.fillStyle=skin;circ(c,0,6.4,1.75);c.fillStyle='rgba(0,0,0,.12)';circ(c,dir*.5,6.9,1.1);c.restore()};
- if(roupa==='moletom'&&!back){c.fillStyle=shirtD;c.beginPath();c.ellipse(0,by-1.2,6.4,3.6,0,Math.PI,0);c.fill()}
+ if(roupa==='moletom'&&!back){c.fillStyle=shade(shirt,-20);c.beginPath();c.ellipse(0,by+.6,5.8,3.3,0,0,7);c.fill();c.fillStyle=shade(shirt,-42);c.beginPath();c.ellipse(0,by-.2,4.2,2,0,Math.PI,0);c.fill()}
  if(roupa==='moletom'&&back){c.fillStyle=shirtD;c.beginPath();c.moveTo(-5.4,by+.6);c.quadraticCurveTo(-5.8,by-6,0,by-6.4);c.quadraticCurveTo(5.8,by-6,5.4,by+.6);c.quadraticCurveTo(0,by+5,-5.4,by+.6);c.fill()}
  if(!back&&!o.tonhao){c.save();c.translate(0,by-7.4);if(o.headRot)c.rotate(dir*o.headRot);c.scale(.8/BX,.82);cabelo3D(c,v,o,dir,'tras',!!o.cara,estilo('cabelo',v),CORCAB[v.corCab],fem);c.restore()}
  braco(-nearK);
