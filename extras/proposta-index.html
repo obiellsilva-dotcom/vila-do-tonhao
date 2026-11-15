@@ -1259,9 +1259,15 @@ const ROOFS=['#c0392b','#8e5a3c','#2e6f95','#7a4ea0','#3f7d4f','#b5651d','#a33b5
 const HOUSE_DEFS=[[1,3,4,3,12000],[1,8,4,3,12000],[6,3,4,3,12000],[6,8,4,3,12000],[15,3,4,3,12000],[15,8,4,3,12000],[20,3,4,3,12000],[20,8,4,3,12000],[24,3,4,3,12000],[24,8,4,3,12000],[29,3,4,3,12000],[29,8,4,3,12000],[37,3,4,3,12000],[37,8,4,3,12000],[42,3,4,3,12000],[42,8,4,3,12000],[46,3,4,3,12000],[46,8,4,3,12000],[51,3,4,3,12000],[51,8,4,3,12000],[59,3,4,3,12000],[59,8,4,3,12000],[64,3,4,3,12000],[64,8,4,3,12000],[69,3,4,3,12000],[69,8,4,3,12000],[74,3,4,3,12000],[74,8,4,3,12000],[1,17,4,3,12000],[1,26,4,3,12000],[1,36,4,3,12000],[1,45,4,3,12000],[6,17,4,3,12000],[6,26,4,3,12000],[6,36,4,3,12000],[6,45,4,3,12000],[15,36,4,3,12000],[20,36,4,3,12000],[24,36,4,3,12000],[29,36,4,3,12000],[37,36,4,3,12000],[42,36,4,3,12000],[46,36,4,3,12000],[51,36,4,3,12000],[59,36,4,3,12000],[59,45,4,3,12000],[64,36,4,3,12000],[64,45,4,3,12000],[69,36,4,3,12000],[69,45,4,3,12000],[74,36,4,3,12000],[74,45,4,3,12000],[85,3,4,3,20000],[90,3,4,3,20000],[95,3,4,3,20000],[85,8,4,3,20000],[90,8,4,3,20000],[95,8,4,3,20000],[85,17,4,3,20000],[90,17,4,3,20000],[95,17,4,3,20000],[85,36,4,3,20000],[90,36,4,3,20000],[95,36,4,3,20000],[85,45,4,3,20000],[90,45,4,3,20000],[95,45,4,3,20000],[105,2,6,4,90000],[112,2,6,4,90000],[105,7,6,4,90000],[112,7,6,4,90000],[105,16,6,4,90000],[112,16,6,4,90000],[105,35,6,4,90000],[112,35,6,4,90000],[105,44,6,4,90000],[112,44,6,4,90000],[1,58,4,3,8000],[6,58,4,3,8000],[15,58,4,3,8000],[20,58,4,3,8000],[25,58,4,3,8000],[29,58,4,3,8000],[39,58,4,3,8000],[44,58,4,3,8000],[49,58,4,3,8000],[54,58,4,3,8000],[60,58,4,3,8000],[65,58,4,3,8000],[70,58,4,3,8000],[75,58,4,3,8000],[87,58,4,3,8000],[92,58,4,3,8000],[97,58,4,3,8000],[106,58,4,3,8000],[111,58,4,3,8000],[1,72,4,3,8000],[6,72,4,3,8000],[28,72,4,3,8000],[50,72,4,3,8000],[59,72,4,3,8000],[64,72,4,3,8000],[69,72,4,3,8000],[74,72,4,3,8000],[86,72,4,3,8000],[91,72,4,3,8000],[96,72,4,3,8000],[106,72,4,3,8000],[111,72,4,3,8000]];
 const HOUSE_OFF=new Set();{const rows={};HOUSE_DEFS.forEach((p,i)=>{(rows[p[1]]=rows[p[1]]||[]).push(i)});for(const r of Object.values(rows)){r.sort((a,b)=>HOUSE_DEFS[a][0]-HOUSE_DEFS[b][0]);r.forEach((i,k)=>{if(k%2===1&&r.length>2)HOUSE_OFF.add(i)})}}
 const houses=HOUSE_DEFS.map((p,i)=>(HOUSE_OFF.has(i)?(o=>(o.front=[o.x+Math.floor(o.w/2),o.y+o.h],o.off=true,o)):addB)({kind:p[2]>4?'mansao':'casa',x:p[0],y:p[1],w:p[2],h:p[3],preco:p[4],n:i+1,wall:WALLS[Math.floor(hsh(i,3,1)*WALLS.length)],roof:ROOFS[Math.floor(hsh(i,5,2)*ROOFS.length)]}));
+// loja de roupas no Centro de Empregos, com interior (usa o mesmo sistema das casas)
+const lojaRoupa=addB({kind:'roupas',loja:true,n:'roupas',x:52,y:23,w:4,h:5,wall:'#fbe7f0',roof:'#b0306a'});
 // interiores das casas: piso andável, móveis bloqueiam, entrada só pela porta
-const casaTile=new Map(),portas=new Map();
-houses.forEach(b=>{b.dx=b.front[0];b.moveis=[];if(b.off)return;
+const casaTile=new Map(),portas=new Map([['roupas',true]]);
+[...houses,lojaRoupa].forEach(b=>{b.dx=b.front[0];b.moveis=[];if(b.off)return;if(b.loja){
+  for(let y=b.y;y<b.y+b.h-1;y++)for(let x=b.x;x<b.x+b.w;x++){grid[y][x]=G.CASA;casaTile.set(x+','+y,b)}
+  grid[b.y+b.h-1][b.dx]=G.CASA;casaTile.set(b.dx+','+(b.y+b.h-1),b);
+  const m=(x,y,t)=>{grid[y][x]=G.BLD;casaTile.delete(x+','+y);b.moveis.push([x,y,t])};
+  m(b.x,b.y,'arara');m(b.x+1,b.y,'arara2');m(b.x+3,b.y,'espelho');m(b.x,b.y+2,'caixa');m(b.x+3,b.y+2,'manequim');return}
  for(let y=b.y;y<b.y+b.h-1;y++)for(let x=b.x;x<b.x+b.w;x++){grid[y][x]=G.CASA;casaTile.set(x+','+y,b)}
  grid[b.y+b.h-1][b.dx]=G.CASA;casaTile.set(b.dx+','+(b.y+b.h-1),b);
  const m=(x,y,t)=>{grid[y][x]=G.BLD;casaTile.delete(x+','+y);b.moveis.push([x,y,t])};
@@ -1270,7 +1276,7 @@ houses.forEach(b=>{b.dx=b.front[0];b.moveis=[];if(b.off)return;
 function passa(ax,ay,bx,by){const A=casaTile.get(ax+','+ay),Bc=casaTile.get(bx+','+by);if(A===Bc)return true;
  const porta=(b,x,y,ox,oy)=>b&&x===b.dx&&y===b.y+b.h-1&&ox===b.dx&&oy===b.y+b.h;return porta(A,ax,ay,bx,by)||porta(Bc,bx,by,ax,ay)}
 const casaEm=(px,py)=>casaTile.get(Math.floor(px/TILE)+','+Math.floor(py/TILE))||null;
-const podeEntrar=b=>{if(!eu)return false;const i=casasInfo.get(b.n)||{};return i.dono===eu.id||portas.get(b.n)===true||casaEm(eu.x,eu.y)===b};
+const podeEntrar=b=>{if(!eu)return false;if(b.loja)return true;const i=casasInfo.get(b.n)||{};return i.dono===eu.id||portas.get(b.n)===true||casaEm(eu.x,eu.y)===b};
 function drawInterior(c,b){
  const x=T(b.x),y=T(b.y),w=T(b.w),h=T(b.h),ih=T(b.h-1);
  c.fillStyle='#2a1a14';c.fillRect(x,y-6,w,h+6);
@@ -1280,7 +1286,7 @@ function drawInterior(c,b){
  c.fillStyle=shade(b.wall,-10);c.fillRect(x,y+ih,T(b.dx)-x,T(1));c.fillRect(T(b.dx+1),y+ih,x+w-T(b.dx+1),T(1));
  const ab=portas.get(b.n)===true;c.fillStyle=ab?'#3a2414':'#6b3f22';c.fillRect(T(b.dx)+2,y+ih,ab?6:T(1)-4,T(1));
  {const tx=x+w/2,ty=y+ih/2+8;c.fillStyle='#a33b2a';c.beginPath();c.ellipse(tx,ty,Math.min(40,w/3),15,0,0,7);c.fill();c.strokeStyle='#f1c40f';c.lineWidth=1.5;c.beginPath();c.ellipse(tx,ty,Math.min(34,w/3-6),11,0,0,7);c.stroke();c.fillStyle='#d9a441';c.beginPath();c.ellipse(tx,ty,10,4,0,0,7);c.fill()}
- c.fillStyle='rgba(0,0,0,.5)';c.font='600 8px Fredoka, sans-serif';c.textAlign='center';const i=casasInfo.get(b.n)||{};c.fillText((ab?'🔓 ':'🔒 ')+(i.nome?'Casa de '+i.nome:'Casa '+b.n),x+w/2,y+ih-3);c.textAlign='left';
+ c.fillStyle='rgba(0,0,0,.5)';c.font='600 8px Fredoka, sans-serif';c.textAlign='center';const i=casasInfo.get(b.n)||{};c.fillText(b.loja?'👕 Tonhão Wear':(ab?'🔓 ':'🔒 ')+(i.nome?'Casa de '+i.nome:'Casa '+b.n),x+w/2,y+ih-3);c.textAlign='left';
 }
 const merc=addB({kind:'mercadinho',x:38,y:24,w:14,h:3});
 for(let x=38;x<=51;x++){grid[25][x]=G.PLAZA;if(x===44||x===45)grid[26][x]=G.PLAZA} // corredor da feirinha
@@ -1291,7 +1297,6 @@ const bank=addB({kind:'banco',x:37,y:15,w:8,h:6});
 const igreja=addB({kind:'igreja',x:48,y:40,w:7,h:8});
 const conc=addB({kind:'concessionaria',x:86,y:23,w:10,h:6});
 const ofic=addB({kind:'oficina',x:105,y:23,w:6,h:6});
-const lojaRoupa=addB({kind:'roupas',x:89,y:16,w:6,h:4});
 const posto=addB({kind:'posto',x:96,y:21,w:4,h:2});
 for(let y=23;y<=29;y++)for(let x=96;x<=100;x++)grid[y][x]=G.ROAD; // pátio do posto
 const BOMBAS=[{x:T(97.3),y:T(25.4)},{x:T(99.7),y:T(25.4)}];
@@ -1299,7 +1304,7 @@ const fab=addB({kind:'fabrica',x:15,y:66,w:12,h:9});
 const pref=addB({kind:'prefeitura',x:39,y:67,w:10,h:8});
 const deleg=addB({kind:'delegacia',x:60,y:65,w:10,h:6});
 const hosp=addB({kind:'hospital',x:86,y:65,w:10,h:6});
-const SHOPS={banco:bank,mercadinho:merc,padaria:pad,barbearia:barb,igreja,concessionaria:conc,roupas:lojaRoupa,oficina:ofic,posto,fabrica:fab,prefeitura:pref,delegacia:deleg,hospital:hosp};
+const SHOPS={banco:bank,mercadinho:merc,padaria:pad,barbearia:barb,igreja,concessionaria:conc,oficina:ofic,posto,fabrica:fab,prefeitura:pref,delegacia:deleg,hospital:hosp};
 const WALKABLE=new Set([G.ROAD,G.WALK,G.PLAZA,G.TERR,G.SAND,G.FLOOR,G.FIELD,G.PATH,G.BRIDGE,G.TRAIL,G.HILL]);
 const walk=(x,y)=>inWorld(x,y)&&WALKABLE.has(tileAt(x,y));
 const walkP=(x,y)=>{if(!inWorld(x,y))return false;const t=tileAt(x,y);if(t===G.CASA){const b=casaTile.get(x+','+y);return !!b&&podeEntrar(b)}return WALKABLE.has(t)||t===G.GRASS||t===G.HORTA};
@@ -1953,6 +1958,11 @@ function isoBox(c,x0,y0,x1,y1,z0,z1,col){const A=isoP(x0,y1),Bq=isoP(x1,y1),C=is
  c.fillStyle=col;c.beginPath();c.moveTo(A[0],A[1]-z1);c.lineTo(Bq[0],Bq[1]-z1);c.lineTo(C[0],C[1]-z1);c.lineTo(D[0],D[1]-z1);c.closePath();c.fill()}
 function sombraChao(c,x0,y0,x1,y1){setWorld(c);c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x0+3,y0+3,x1-x0+2,y1-y0+2);setCam(c)}
 function movelIso(c,t,X,Y){
+ if(t==='arara'||t==='arara2'){sombraChao(c,X+3,Y+4,X+29,Y+12);isoBox(c,X+4,Y+7,X+6,Y+9,0,34,'#888');isoBox(c,X+26,Y+7,X+28,Y+9,0,34,'#888');isoBox(c,X+4,Y+7,X+28,Y+9,32,34,'#aaa');
+  const cs=t==='arara'?['#e84393','#3fc1ff','#ffd23f','#27ae60','#8e44ad']:['#2d3436','#e17055','#74b9ff','#fdcb6e','#00b894'];cs.forEach((cl,j)=>isoBox(c,X+6+j*4.4,Y+5,X+9.5+j*4.4,Y+11,14,31,cl));return}
+ if(t==='caixa'){sombraChao(c,X+2,Y+2,X+30,Y+30);isoBox(c,X+2,Y+6,X+30,Y+26,0,20,'#b0306a');isoBox(c,X+1,Y+5,X+31,Y+27,20,22,'#f5f0f3');isoBox(c,X+18,Y+10,X+26,Y+18,22,28,'#2d3436');return}
+ if(t==='espelho'){sombraChao(c,X+6,Y+2,X+26,Y+8);isoBox(c,X+6,Y+3,X+26,Y+6,0,44,'#c9a227');isoBox(c,X+8,Y+6,X+24,Y+6.6,3,41,'#cfe8f5');return}
+ if(t==='manequim'){sombraChao(c,X+10,Y+10,X+22,Y+22);isoBox(c,X+12,Y+12,X+20,Y+20,0,2,'#555');isoBox(c,X+15,Y+15,X+17,Y+17,2,16,'#777');isoBox(c,X+11,Y+13,X+21,Y+19,16,30,'#e84393');isoBox(c,X+14,Y+14,X+18,Y+18,30,36,'#f1e0d0');return}
  if(t==='cama'){sombraChao(c,X+3,Y+2,X+29,Y+31);isoBox(c,X+3,Y+1,X+29,Y+4,0,22,'#5a3418');isoBox(c,X+3,Y+4,X+29,Y+31,0,7,'#6b3f22');isoBox(c,X+4,Y+4,X+28,Y+30,7,11,'#f0ece0');isoBox(c,X+7,Y+5,X+25,Y+12,11,14,'#ffffff');isoBox(c,X+4,Y+15,X+28,Y+30,11,12.6,'#4a78b5');isoBox(c,X+4,Y+15,X+28,Y+18,12.6,13.2,'#dfe9f5')}
  else if(t==='estante'){sombraChao(c,X+3,Y+2,X+29,Y+12);isoBox(c,X+3,Y+2,X+29,Y+12,0,46,'#7a4a2a');wallSet(c,Y+12);const z=v=>Y+12-v/WK;
   for(let k=0;k<4;k++){c.fillStyle='#3a2212';c.fillRect(X+5,z(43-k*11),22,9/WK);['#c0392b','#2e86c1','#f1c40f','#27ae60','#8e44ad','#e67e22'].forEach((cl,j)=>{if((j+k)%4===3)return;c.fillStyle=cl;const hb=5+((j*7+k*3)%4);c.fillRect(X+6+j*3.4,z(34-k*11+hb),2.8,hb/WK)})}setCam(c)}
@@ -4020,6 +4030,7 @@ function pertoOpcoes(){
  const s=seatPerto();if(s)o.push(['🪑 Sentar',()=>sentar(s)]);
  for(const [k,b] of Object.entries(SHOPS))if(perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.8))||(k==='mercadinho'&&eu.x>T(38)&&eu.x<T(52)&&eu.y>T(24.6)&&eu.y<T(26.4)))o.push([PLACE_TITLE[k],()=>abrirLugar(b)]);
  for(const f of FEATURES)if(perto(f.a.x,f.a.y,T(2.8)))o.push([PLACE_TITLE[f.kind],()=>abrirLugar(f)]);
+ if(casaEm(eu.x,eu.y)===lojaRoupa)o.push(['👕 Ver as roupas',()=>abrirLojaRoupa()]);
  {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  for(const b of houses)if(!b.off&&!casaEm(eu.x,eu.y)&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3))){const i=casasInfo.get(b.n)||{};o.push([i.dono&&i.dono===eu.id?'🏠 Minha casa':i.dono?'🏠 Casa de '+(i.nome||'alguém'):'🔑 Casa '+b.n+' à venda',()=>abrirLugar(b)]);break}
  for(const f of FRUTAS)if(perto(f.x,f.y+8,T(1.4))&&!(frutaCD[f.id]>Date.now())){o.push([f.tipo==='manga'?'🥭 Pegar manga':'🍐 Pegar goiaba',()=>comerFruta(f)]);break}
@@ -4252,7 +4263,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261115f';
+const VERSAO_JOGO='v20261115g';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -4262,7 +4273,7 @@ setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now()
 $('zdanca').onclick=()=>{renderEmo();$('emoBox').classList.remove('hidden')};
 $('zfotos').onclick=()=>{if(eu)abrirSocial(eu)};
 function irAoLugar(k){const f=FOCUS[k];if(!f)return;follow=null;cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.max(cam.z,1.2);marker={x:T(f[0]),y:T(f[1]),t:now};
- const b=k==='bar'||k==='lagoa'?null:SHOPS[k];if(eu&&livre()){const tx=k==='lagoa'?LAGOA.x:b?(b.front[0]+.5)*TILE:T(23.9),ty=k==='lagoa'?LAGOA.y:b?(b.front[1]+.5)*TILE:T(27.2);eu.path=pathTo(eu,tx,ty);eu.onArrive=()=>abrirLugar(k==='lagoa'?FEATURES[0]:b||{kind:'bar'});follow=eu}
+ const b=k==='bar'||k==='lagoa'?null:k==='roupas'?lojaRoupa:SHOPS[k];if(eu&&livre()){const tx=k==='lagoa'?LAGOA.x:b?(b.front[0]+.5)*TILE:T(23.9),ty=k==='lagoa'?LAGOA.y:b?(b.front[1]+.5)*TILE:T(27.2);eu.path=pathTo(eu,tx,ty);eu.onArrive=()=>abrirLugar(k==='lagoa'?FEATURES[0]:b||{kind:'bar'});follow=eu}
  toast('📍 Indo até lá! Ao chegar, toque em "Trabalhar".',3500)}
 $('zjobs').onclick=()=>{if(!eu)return;const lista=Object.entries(JOBS).sort((a,b)=>a[1].nivel_min-b[1].nivel_min);
  confirmar('💼 Empregos da cidade','Toque em um emprego para ir até lá. Cada tarefa paga dinheiro e XP na hora.<br><small>🔒 = libera em um nível maior</small>',null,
@@ -4370,26 +4381,24 @@ const ROUPA_CAMPOS=[['roupa','👕 Roupas'],['calca','👖 Parte de baixo'],['ca
 const gratisRoupa=c=>c==='estampa'?2:4;
 const precoRoupa=(c,i)=>i<gratisRoupa(c)?0:Math.round(30*Math.pow(1.15,i-gratisRoupa(c))/10)*10;
 const pecaRoupa=(c,v)=>c==='estampa'?'estampa':c+'_'+sx(v);
-let lrC=0,lrI=0,lrTem=new Set(),lrAnim=null;
+let lrC=0,lrI=0,lrTem=new Set();
 async function abrirLojaRoupa(sem){closePlace();if(!sem)try{lrTem=new Set(await api.roupas())}catch(e){lrTem=new Set()}
  abrirForm('👕 Tonhão Wear',`<div class="fx" id="lrTabs" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"></div>
- <canvas id="lrCv" width="400" height="400" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:16px;background:radial-gradient(circle at 50% 60%,#ffe3ef,#b0306a)"></canvas>
+ <canvas id="lrCv" width="150" height="190" style="width:150px;height:190px;display:block;margin:0 auto"></canvas>
  <div class="fx" style="align-items:center;margin-top:8px"><button class="btn ghost" id="lrE" style="flex:none;width:52px;font-size:22px">◀</button><div style="text-align:center"><b id="lrN" style="font-size:18px;color:var(--gold)"></b><div id="lrP" style="font-size:15px;margin-top:2px"></div></div><button class="btn ghost" id="lrD" style="flex:none;width:52px;font-size:22px">▶</button></div>
  <div id="lrA" class="grid" style="grid-template-columns:1fr"></div>`,()=>{
   const lista=()=>{const c=ROUPA_CAMPOS[lrC][0],f=FIELDS.find(g=>g[0]===c);return optsOf(f,eu.v).map((o,i)=>[i,Array.isArray(o)?o:[o]]).filter(([,o])=>o[2]!=='x')};
   const tem=(c,i)=>precoRoupa(c,i)===0||(eu.v[c]||0)===i||lrTem.has(pecaRoupa(c,eu.v)+':'+i);
   const tabs=$('lrTabs');tabs.innerHTML='';ROUPA_CAMPOS.forEach(([c,n],k)=>{const b=document.createElement('button');b.className='btn'+(k===lrC?'':' ghost');b.style.cssText='flex:1 1 30%;padding:6px 4px;font-size:13px';b.textContent=n;b.onclick=()=>{lrC=k;lrI=0;abrirLojaRoupa(1)};tabs.appendChild(b)});
   const pinta=()=>{const L=lista();lrI=(lrI+L.length)%L.length;const c=ROUPA_CAMPOS[lrC][0],[i,o]=L[lrI],pr=precoRoupa(c,i),t=tem(c,i),vest=(eu.v[c]||0)===i;
+   {const g=$('lrCv').getContext('2d');g.clearRect(0,0,150,190);try{drawPerson(g,75,184,Object.assign({},eu.v,{[c]:i}),{s:3.85,dir:1})}catch(e){}}
    $('lrN').textContent=o[0]+'  '+(lrI+1)+'/'+L.length;$('lrP').innerHTML=vest?'👕 Você está usando':t?(pr?'✅ Já é sua':'🆓 Grátis'):'💰 <b>'+money(pr)+'</b>';
    const a=$('lrA');a.innerHTML='';const bt=(tx,fn,off)=>{const b=document.createElement('button');b.className='btn';b.textContent=tx;b.disabled=!!off;b.onclick=fn;a.appendChild(b)};
    if(vest)bt('👕 Vestindo',()=>{},1);
    else if(t)bt('👕 Vestir',()=>vestirRoupa(c,i));
    else bt(eu.dinheiro>=pr?'🛍️ Comprar por '+money(pr):'💰 Falta '+money(pr-eu.dinheiro),()=>confirmar('🛍️ Comprar '+o[0],`Comprar <b>${esc(o[0])}</b> por <b>${money(pr)}</b>? Fica no seu guarda-roupa para sempre.`,()=>acao(async()=>{tratar(await api.comprarRoupa(pecaRoupa(c,eu.v),i));lrTem.add(pecaRoupa(c,eu.v)+':'+i);Som.play('compra');await vestirRoupa(c,i,true)})),eu.dinheiro<pr)};
   window.lrPinta=pinta;$('lrE').onclick=()=>{lrI--;pinta()};$('lrD').onclick=()=>{lrI++;pinta()};pinta();
-  cancelAnimationFrame(lrAnim);const g=$('lrCv').getContext('2d');
-  const loop=()=>{if($('mForm').classList.contains('hidden')||!document.getElementById('lrCv'))return;const L=lista(),c=ROUPA_CAMPOS[lrC][0],v=Object.assign({},eu.v,{[c]:L[(lrI+L.length)%L.length][0]});
-   g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,400,400);g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(200,350,70,16,0,0,7);g.fill();
-   const vista=Math.floor(now/2.2)%4,op=[{cara:true},{c34:true,dir:1},{back:true},{c34:true,dir:-1}][vista];g.setTransform(5.6,0,0,5.6,200,348);try{drawPersonReal(g,0,0,v,op)}catch(e){}lrAnim=requestAnimationFrame(loop)};loop()})}
+})}
 async function vestirRoupa(c,i,ja){const run=async()=>{const v2=Object.assign({},eu.v,{[c]:i});const m=await api.criar(eu.nome,encode(v2));eu.v=decode(m.visual);emitEv('perfil',{});toast('👕 Visual atualizado!');if(window.lrPinta)lrPinta()};if(ja)return run();return acao(run)}
 /* ----- vitrine da concessionária ----- */
 let vitI=0,vitAnim=null;
