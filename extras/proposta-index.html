@@ -518,7 +518,7 @@ const ESTILO_BASE={listrada:'camiseta',colete:'camiseta',camisaJeans:'social',ag
 // sexo 0 = masculino (é o padrão dos códigos antigos, que continuam iguais), 1 = feminino.
 const OPC={
  cabelo:{m:[['Careca','careca'],['Curto','curto'],['Topete','topete'],['Comprido','comprido','x'],['Black power','black','x'],['Coque','coque'],['Rabo de cavalo','rabo','x'],['Moicano','moicano','x'],['Trança','tranca'],['Cacheado','cacheado'],['Degradê','degrade'],['Social de lado','lateral'],['Surfista','surfista','x'],['Dreads','dreads'],['Mullet','mullet'],['Raspado','raspado'],['Espetado','espetado'],['Crop texturizado','crop'],['Undercut','undercut'],['Cachos com degradê','cachosfade']],
-  f:[['Comprido','comprido'],['Coque','coque'],['Rabo de cavalo','rabo'],['Trança','tranca'],['Cacheado','cacheado'],['Black power','black'],['French bob','chanel'],['Comprido com franja','franja'],['Maria-chiquinha','chiquinha'],['Pixie','curto'],['Butterfly (camadas)','butterfly'],['Long bob','lob'],['Ondas boho','ondas'],['Box braids','boxbraids']]},
+  f:[['Comprido','comprido'],['Coque','coque'],['Rabo de cavalo','rabo'],['Trança','tranca'],['Cacheado','cacheado'],['Black power','black'],['French bob','chanel'],['Comprido com franja','franja'],['Maria-chiquinha','chiquinha'],['Pixie','curto'],['Butterfly (camadas)','butterfly'],['Long bob','lob'],['Ondas boho','ondas'],['Box braids','boxbraids'],['Comprido com cortininha','cortina'],['Meio preso','meiopreso'],['Cachos longos','cachoslongos'],['Duas tranças','duas'],['Coque bagunçado','coqueB']]},
  calca:{m:[['Jeans','jeans'],['Preta','preta'],['Marrom','marrom'],['Bege','bege'],['Verde','verde'],['Bermuda jeans','bermudaJeans'],['Bermuda cáqui','bermudaCaqui'],['Calça de moletom','moletomCalca'],['Calça cargo','cargo']],
   f:[['Calça jeans','jeans'],['Legging','legging'],['Saia jeans','saiaJeans'],['Saia rodada','saiaRodada'],['Short jeans','shortJeans'],['Calça branca','branca'],['Saia preta','saiaPreta'],['Saia longa','saiaLonga'],['Calça cargo','cargo']]},
  chapeu:{vip:[['Coroa','coroa'],['Boné de ouro','boneOuro']],m:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Capacete','capacete'],['Cartola','cartola'],['Chapéu de cowboy','cowboy'],['Boné aba reta','boneReto'],['Chapéu de pescador','pescador']],
@@ -681,7 +681,7 @@ function cabeloM2(c,cab,cam,fr,d,hair){
 }
 // ===== cabelos femininos (lisos com brilho, pontas arredondadas, franjas da moda) =====
 const FEM={comprido:{L:12,w:7.9,fl:.6,fr:'meio'},franja:{L:11,w:7.9,fl:.4,fr:'reta'},chanel:{L:3.2,w:8.2,fl:.6,fr:'reta',reto:1},curto:{pixie:1,fr:'lado'},
- butterfly:{L:10,w:8,fl:2.2,fr:'cortina',camadas:1},lob:{L:5.5,w:8.2,fl:.8,fr:'cortina'},ondas:{L:11,w:8.3,fl:1.4,fr:'meio',ondas:1},
+ butterfly:{L:10,w:8,fl:2.2,fr:'cortina',camadas:1},lob:{L:5.8,w:8,fl:1.2,fr:'meio'},cortina:{L:12,w:7.9,fl:.8,fr:'cortina'},meiopreso:{L:11,w:7.8,fl:.6,fr:'meio',coquinho:1},cachoslongos:{cachos:1,L:11,w:9.4},duas:{preso:'duas'},coqueB:{preso:'coqueB'},ondas:{L:11,w:8.3,fl:1.4,fr:'meio',ondas:1},
  coque:{preso:'coque'},rabo:{preso:'rabo'},tranca:{preso:'tranca'},chiquinha:{preso:'chiquinha'},boxbraids:{L:13,w:8,fl:.6,fr:'meio',trancinhas:1},
  cacheado:{cachos:1,L:5,w:9.6},black:{cachos:2,L:2,w:11}};
 function cabeloF(c,cab,cam,fr,d,hair){
@@ -694,7 +694,7 @@ function cabeloF(c,cab,cam,fr,d,hair){
   // faixa de brilho
   if(!o.crespo&&!o.cachos){c.globalAlpha=.22;c.strokeStyle='#fff';c.lineWidth=1.1;c.beginPath();c.ellipse(o.cx??0,o.hy??-6,(o.w??15)*.36,2,0,Math.PI*1.12,Math.PI*1.88);c.stroke()}
   const s=c.createLinearGradient(0,y1-3,0,y1);s.addColorStop(0,'rgba(0,0,0,0)');s.addColorStop(1,'rgba(0,0,0,.18)');c.globalAlpha=1;c.fillStyle=s;c.fillRect(-16,-20,32,40);c.restore()};
- const ox=costas||fr?0:-d*1.8;
+ const ox=costas||fr?0:S.cachos?-d*.6:-d*1.8;
  // massa de trás (atrás da cabeça e do corpo)
  const massa=(L,w,fl)=>{const P=new Path2D(),x=ox;
   P.moveTo(x-7.6,-3);P.bezierCurveTo(x-8.8,-11.4,x+8.8,-11.4,x+7.6,-3);
@@ -720,7 +720,7 @@ function cabeloF(c,cab,cam,fr,d,hair){
   else P.quadraticCurveTo(d*2.4,-5.6,d*6.8,-2.4);P.closePath();return P};
  // mechas da frente que caem ao lado do rosto
  const lados=(L,w,fl)=>{const P=new Path2D();if(fr){for(const s of [-1,1]){P.moveTo(s*6.2,-3);P.quadraticCurveTo(s*6.6,L*.5,s*(6.4+fl*.3),L);P.quadraticCurveTo(s*(7.4+fl*.4),L+1.2,s*(w+fl*.6),L);P.bezierCurveTo(s*(w+fl*.4),L*.5,s*8.4,0,s*7.7,-3);P.closePath()}}
-  else{P.moveTo(-d*4.4,-3);P.quadraticCurveTo(-d*4.6,L*.5,-d*(4.8+fl*.3),L);P.quadraticCurveTo(-d*6.4,L+1.2,-d*(7.8+fl*.5),L);P.bezierCurveTo(-d*8,L*.5,-d*7.8,0,-d*7.6,-3);P.closePath()}return P};
+  else{P.moveTo(-d*4.4,-3);P.quadraticCurveTo(-d*4.6,L*.5,-d*(4.8+fl*.3),L);P.quadraticCurveTo(-d*6.4,L+1.2,-d*(7.8+fl*.5),L);P.bezierCurveTo(-d*8,L*.5,-d*7.8,0,-d*7.6,-3);P.closePath();P.moveTo(d*6.3,-2.6);P.quadraticCurveTo(d*6.5,L*.5,d*(6.2+fl*.2),L);P.quadraticCurveTo(d*7,L+.9,d*(7.6+fl*.4),L);P.bezierCurveTo(d*(7.8+fl*.3),L*.5,d*7.9,0,d*7.4,-3);P.closePath()}return P};
  // ---------- presos ----------
  if(S.preso){
   if(tras){if(S.preso==='tranca'&&!fr){const P=new Path2D(),bx=costas?0:-d*6;for(let i=0;i<7;i++){P.ellipse(bx+(i%2?.4:-.4),3+i*2.3,2-i*.12,1.6,i%2?.5:-.5,0,7)}liso(P,{y0:1,y1:19,n:4,w:4,cx:bx})}
@@ -731,13 +731,14 @@ function cabeloF(c,cab,cam,fr,d,hair){
   if(S.preso==='rabo'){const P=new Path2D();if(costas){P.moveTo(-1.4,-6);P.bezierCurveTo(-2.6,0,-1.6,6,0,10);P.bezierCurveTo(1.6,6,2.6,0,1.4,-6);P.closePath()}else if(fr){P.moveTo(5.6,-8);P.bezierCurveTo(9.6,-6,9.4,2,8,6);P.quadraticCurveTo(7.6,1,6.4,-4);P.closePath()}
    if(costas||fr){liso(P,{y0:-8,y1:10,n:5,w:4,cx:costas?0:7.6})}c.fillStyle=shade(hair,-50);c.beginPath();c.ellipse(costas?0:fr?6:-d*7,costas?-6:-7.4,1.2,.8,0,0,7);c.fill()}
   if(S.preso==='tranca'&&(costas||fr)){const P=new Path2D(),bx=costas?0:6.8;for(let i=0;i<7;i++){P.ellipse(bx+(i%2?.4:-.4),(costas?-2:1)+i*2.3,2-i*.12,1.6,i%2?.5:-.5,0,7)}liso(P,{y0:-2,y1:17,n:4,w:4,cx:bx})}
-  if(S.preso==='chiquinha'){const P=new Path2D();const xs=costas||fr?[-5.6,5.6]:[-d*5.6,d*2.4];for(const x of xs)P.ellipse(x,-9.2,2.9,2.6,0,0,7);liso(P,{y0:-12,y1:-6.6,n:8,w:14,hy:-10})}
+  if(S.preso==='chiquinha'||S.preso==='duas'){const P=new Path2D(),xs=costas||fr?[-1,1]:[-d,d];for(const sg of xs){const x=sg*(fr||costas?(S.preso==='duas'?8.4:7.6):sg===d?(S.preso==='duas'?7.4:6.6):7.8);if(S.preso==='duas'){for(let i=0;i<7;i++){const ex=x+(i%2?.35:-.35),ey=1.4+i*2.1;P.moveTo(ex+1.8,ey);P.ellipse(ex,ey,1.8-i*.1,1.4,i%2?.5:-.5,0,7)}}else{P.moveTo(x-sg*.4,-3.4);P.bezierCurveTo(x+sg*3.4,-3,x+sg*3,5,x+sg*1.6,9.6);P.quadraticCurveTo(x+sg*.6,6,x-sg*.8,-1.6);P.closePath()}}liso(P,{y0:-3,y1:12,n:8,w:18,hy:-1});c.fillStyle='#e0507a';for(const sg of xs){c.beginPath();c.ellipse(sg*(fr||costas?(S.preso==='duas'?8.4:7.6):sg===d?(S.preso==='duas'?7.4:6.6):7.8),S.preso==='duas'?.6:-3,1,.8,0,0,7);c.fill()}}
+  if(S.preso==='coqueB'){const P=new Path2D(),bx=fr||costas?0:-d*1.5,by=costas?-9.4:-10.4;P.ellipse(bx,by,3.9,3.1,.2,0,7);for(let i=0;i<6;i++){const a=i*1.05;P.moveTo(bx+Math.cos(a)*3.4,by+Math.sin(a)*2.6);P.quadraticCurveTo(bx+Math.cos(a+.25)*5.6,by+Math.sin(a+.25)*4.2,bx+Math.cos(a+.5)*3.6,by+Math.sin(a+.5)*2.7)}liso(P,{y0:by-4,y1:by+3,n:8,w:8,cx:bx,hy:by-.8});if(!costas){const M=new Path2D();for(const sg of fr?[-1,1]:[d]){M.moveTo(sg*5.6,-4);M.quadraticCurveTo(sg*6.6,0,sg*5.8,3.4);M.quadraticCurveTo(sg*6.2,0,sg*5.1,-3.6);M.closePath()}liso(M,{y0:-4,y1:3.6,n:3,w:12})}}
   return}
  // ---------- cacheado / black ----------
  if(S.cachos){const w=S.w,L=S.L;const P=new Path2D(),x=ox;
-  if(tras||costas){P.ellipse(x,(L-8)/2,w,(L+15)/2,0,0,7);
+  if(tras||costas){if(S.cachos===2)P.ellipse(x,(L-8)/2,w,(L+15)/2,0,0,7);else P.addPath(massa(L,8.6,1.6));
    liso(P,S.cachos===2?{crespo:1,y0:-13,y1:L+4}:{cachos:1,y0:-12,y1:L+4,lw:w*2.2});if(tras)return}
-  if(!costas){liso(casco(S.cachos===2?'preso':'meio'),S.cachos===2?{crespo:1,y0:-11,y1:0}:{cachos:1,y0:-11,y1:0,lw:16})}
+  if(!costas){const P=casco(S.cachos===2?'preso':'meio');if(S.cachos===1){const xs=fr?[-1,1]:[-d,d];for(const sg of xs){const ins=sg===d&&!fr;P.moveTo(sg*6.3,-3);P.lineTo(sg*(ins?7.4:8.4),-3);P.quadraticCurveTo(sg*(ins?8:9.2),L*.5,sg*(ins?7.2:8.6),Math.min(L,6));P.lineTo(sg*6.3,Math.min(L,6)-1);P.closePath()}}liso(P,S.cachos===2?{crespo:1,y0:-11,y1:0}:{cachos:1,y0:-11,y1:L,lw:18})}
   return}
  // ---------- pixie ----------
  if(S.pixie){if(tras)return;const P=casco(costas?'':'lado');if(!costas){if(fr){P.moveTo(-7.6,-2);P.quadraticCurveTo(-8,1,-7,2.4);P.lineTo(-6.4,-1);P.closePath();P.moveTo(7.6,-2);P.quadraticCurveTo(8,1,7,2.4);P.lineTo(6.4,-1);P.closePath()}else{P.moveTo(-d*4.4,-2);P.quadraticCurveTo(-d*4.8,1.6,-d*5.6,2.6);P.lineTo(-d*7.4,1.4);P.lineTo(-d*7.6,-2.6);P.closePath()}}
@@ -747,7 +748,8 @@ function cabeloF(c,cab,cam,fr,d,hair){
  if(tras||costas){const P=massa(L,w,fl);if(S.trancinhas){liso(P,{y0:-10,y1:L+2,n:1,w:0});c.save();c.clip(P);c.lineCap='round';for(let i=0;i<16;i++){const x=ox+(i/15-.5)*(w*2+fl);c.strokeStyle=esc;c.lineWidth=.35;c.beginPath();c.moveTo(x,-8);c.lineTo(x*1.05,L+2);c.stroke();for(let j=0;j<14;j++){c.fillStyle=cla;c.globalAlpha=.3;c.beginPath();c.ellipse(x*1.02+.4,-6+j*((L+8)/14),.45,.35,.5,0,7);c.fill();c.globalAlpha=1}}c.restore()}
   else liso(P,{y0:-10,y1:L+2,n:16,w:w*2,cx:ox,abre:.1,ondas:S.ondas,hy:-7});if(tras)return}
  if(costas)return;liso(casco(S.fr),{y0:-10.6,y1:-1,n:12,w:14,hy:-6.6});
- {const P=lados(L,w,fl);liso(P,{y0:-3,y1:L+1,n:fr?10:5,w:fr?16:4,cx:fr?0:-d*6,ondas:S.ondas})}
+ {const P=lados(L,w,fl);liso(P,{y0:-3,y1:L+1,n:fr?10:10,w:16,cx:0,ondas:S.ondas})}
+ if(S.coquinho){const P=new Path2D(),bx=fr?0:-d*2.4;P.ellipse(bx,-10.2,2.4,1.9,0,0,7);liso(P,{y0:-12.4,y1:-8,n:5,w:5,cx:bx,hy:-10.6})}
  if(S.fr==='meio'&&fr&&!costas){c.strokeStyle=shade(hair,-50);c.lineWidth=.4;c.beginPath();c.moveTo(0,-4.6);c.quadraticCurveTo(.2,-7.4,0,-9.4);c.stroke()}
 }
 function cabelo3D(c,v,o,dir,cam,fr,cab,hair,fem){
@@ -815,7 +817,7 @@ function drawHead(c,v,o,dir,back){
  c.fillStyle=skin;c.fill(ROSTO);
  {const g=c.createRadialGradient(-2.4,-3,.5,0,.6,8.2);g.addColorStop(0,'rgba(255,255,255,.24)');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(.86,'rgba(0,0,0,.07)');g.addColorStop(1,'rgba(0,0,0,.22)');c.fillStyle=g;c.fill(ROSTO)}
  if(!back){c.save();c.clip(ROSTO);const qx=fr?0:dir*1.2;c.fillStyle='rgba(0,0,0,.035)';c.beginPath();c.ellipse(qx,8.8,4.6,1.6,0,0,7);c.fill();
-  c.fillStyle='rgba(255,255,255,.14)';c.beginPath();c.ellipse(qx,6.4,1.5,.8,0,0,7);c.fill();
+  
   c.fillStyle='rgba(0,0,0,.05)';for(const sg of fr?[-1,1]:[-dir]){c.beginPath();c.ellipse(qx+sg*5.2,3.6,1.6,2.6,sg*.4,0,7);c.fill()}c.restore()}
  const cobre=cab!=='careca'&&cab!=='moicano'&&cab!=='raspado'&&cab!=='dreads';
  const cabNovo=()=>{
