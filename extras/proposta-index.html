@@ -1037,11 +1037,11 @@ function drawPersonReal0(c,x,y,v,o={}){
  c.fillStyle=skinD;c.fillRect(-1.7,by-3,3.4,4);
  // corpo
  const semManga=fem&&['regataF','vestido','vestidoLongo','topAlca','ombro','tubinho'].includes(roupa),CORPO=new Path2D();
- if(fem){const H=bw/2,barr=roupa==='cropped'||roupa==='topAlca',bh=barr?15-1.7:15;
+ if(fem){const H=bw/2,barr=roupa==='cropped'||roupa==='topAlca',bh=barr?15-2.3:15;
   if(semManga&&roupa==='ombro'){CORPO.moveTo(-H-.5,by+2.6);CORPO.lineTo(H+.5,by+2.6)}
   else if(semManga){CORPO.moveTo(-H+.3,by+2.2);CORPO.quadraticCurveTo(-H+1,by+.4,-3.7,by-.3);CORPO.lineTo(-2.5,by-.3);CORPO.quadraticCurveTo(0,by+(back?1.2:roupa==='topAlca'?3:4.2),2.5,by-.3);CORPO.lineTo(3.7,by-.3);CORPO.quadraticCurveTo(H-1,by+.4,H-.3,by+2.2)}
   else{CORPO.moveTo(-2.6,by-.4);CORPO.lineTo(2.6,by-.4);CORPO.quadraticCurveTo(H-.1,by-.4,H,by+1.4)}
-  CORPO.quadraticCurveTo(H+.1,by+4.2,H-.2,by+5.6);CORPO.quadraticCurveTo(H-2.3,by+8,H-2,by+9.4);CORPO.quadraticCurveTo(H-.2,by+12,H-.6,by+bh-.6);CORPO.quadraticCurveTo(H-1.2,by+bh+.5,0,by+bh+.7);CORPO.quadraticCurveTo(-H+1.2,by+bh+.5,-H+.6,by+bh-.6);CORPO.quadraticCurveTo(-H+.2,by+12,-H+2,by+9.4);CORPO.quadraticCurveTo(-H+2.3,by+8,-H+.2,by+5.6);CORPO.quadraticCurveTo(-H-.15,by+4.4,-H,by+2);
+  CORPO.quadraticCurveTo(H+.1,by+4.2,H-.2,by+5.6);CORPO.quadraticCurveTo(H-2.3,by+8,H-2,by+9.4);if(barr){CORPO.quadraticCurveTo(H-.2,by+11.6,H-.45,by+bh+.2);CORPO.quadraticCurveTo(0,by+bh+.55,-H+.45,by+bh+.2)}else{CORPO.quadraticCurveTo(H-.2,by+12,H-.6,by+bh-.6);CORPO.quadraticCurveTo(H-1.2,by+bh+.5,0,by+bh+.7);CORPO.quadraticCurveTo(-H+1.2,by+bh+.5,-H+.6,by+bh-.6)}if(barr)CORPO.quadraticCurveTo(-H+.2,by+11.6,-H+2,by+9.4);else CORPO.quadraticCurveTo(-H+.2,by+12,-H+2,by+9.4);CORPO.quadraticCurveTo(-H+2.3,by+8,-H+.2,by+5.6);CORPO.quadraticCurveTo(-H-.15,by+4.4,-H,by+2);
   if(!semManga)CORPO.quadraticCurveTo(-H+.1,by-.4,-2.6,by-.4);else if(roupa==='ombro')CORPO.lineTo(-H-.5,by+2.6);else CORPO.lineTo(-H+.3,by+2.2);CORPO.closePath();
   // ombros e colo (pele), arredondados
   c.fillStyle=skin;c.beginPath();c.moveTo(-2.4,by-.7);c.quadraticCurveTo(-H+.6,by-.6,-H+.6,by+1.5);c.lineTo(-H+1,by+5);c.lineTo(H-1,by+5);c.lineTo(H-.6,by+1.5);c.quadraticCurveTo(H-.6,by-.6,2.4,by-.7);c.closePath();c.fill();
@@ -1072,7 +1072,9 @@ if(!o.tonhao&&!macacao&&!vest){c.lineCap='round';c.strokeStyle='rgba(0,0,0,.16)'
   if(roupa==='blusinha'){c.fillStyle=shirtL;circ(c,0,by+3.6,1)}
   if(roupa==='polo'){c.fillStyle=shirtL;c.beginPath();c.moveTo(-3.4,by);c.lineTo(0,by+2.6);c.lineTo(3.4,by);c.lineTo(2,by-1);c.lineTo(-2,by-1);c.closePath();c.fill();c.fillStyle=shirtD;circ(c,0,by+3.6,.5);circ(c,0,by+5.4,.5)}
  }else if(roupa==='time'){c.fillStyle='#fff';c.font='700 6px Fredoka, sans-serif';c.textAlign='center';c.fillText('10',0,by+10);c.textAlign='left'}
-  // ===== roupas de cima novas (modeladas) =====
+  // cintura da calça por cima da barriga (top/cropped)
+ if(fem&&!saia&&(roupa==='cropped'||roupa==='topAlca')){const yt=by+bh-2.25,Hw=F?4.75:4.4;c.save();c.fillStyle=shade(pants,-10);c.beginPath();c.moveTo(-Hw,yt);c.quadraticCurveTo(0,yt+.35,Hw,yt);c.lineTo(Hw,yt+1.2);c.quadraticCurveTo(0,yt+1.55,-Hw,yt+1.2);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.18)';c.fillRect(-Hw,yt,2*Hw,.22);c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.moveTo(-Hw,yt+1.2);c.quadraticCurveTo(0,yt+1.55,Hw,yt+1.2);c.lineTo(Hw,yt+1.4);c.quadraticCurveTo(0,yt+1.75,-Hw,yt+1.4);c.fill();for(const k of [-1,1]){c.fillStyle=shade(pants,-24);c.fillRect(k*Hw*.62-.25,yt-.1,.5,1.5)}if(!back){c.fillStyle='#d9a441';c.beginPath();c.arc(F?0:dir*1.1,yt+.6,.35,0,7);c.fill()}c.restore();c.fillStyle='rgba(0,0,0,.12)';c.beginPath();c.moveTo(-Hw+.4,yt-.02);c.quadraticCurveTo(0,yt+.3,Hw-.4,yt-.02);c.quadraticCurveTo(0,yt-.35,-Hw+.4,yt-.02);c.fill()}
+ // ===== roupas de cima novas (modeladas) =====
  {const T=roupa,acc2=CAMISA[((v.camisa%10)+5)%10],ln=(x0,y0,x1,y1,cor,w)=>{c.strokeStyle=cor;c.lineWidth=w;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke()},dash=(on)=>c.setLineDash(on?[.45,.35]:[]);c.lineCap='round';
   const camisetaDentro=(cor)=>{c.fillStyle=cor;c.beginPath();c.moveTo(-2.4,by);c.lineTo(2.4,by);c.lineTo(2,by+bh-1.6);c.lineTo(-2,by+bh-1.6);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.1)';c.fillRect(-2.4,by+bh-5,4.8,3.4);c.fillStyle=shade(cor,-25);c.beginPath();c.arc(0,by,1.7,0,Math.PI);c.fill()};
   if(T==='oversized'){c.fillStyle=cTronco;rr(c,-bw/2,by+bh-3,bw,4.6,1.6);c.fill();c.fillStyle=shade(cTronco,-20);c.fillRect(-bw/2,by+bh,bw,1.6);c.strokeStyle='rgba(0,0,0,.16)';c.lineWidth=.4;c.beginPath();c.moveTo(-bw/2+1.4,by+bh-2);c.quadraticCurveTo(-1,by+bh+.4,-bw/2+2,by+bh+1.2);c.moveTo(bw/2-1.2,by+bh-3);c.quadraticCurveTo(1.6,by+bh,bw/2-2.4,by+bh+1.3);c.stroke();
