@@ -1,6 +1,6 @@
 # Cidade do Tonhão: contexto para continuar em outro chat
 
-> Cole este arquivo no começo de uma conversa nova e anexe: `index.html` (versão no ar), `index-iso.html` (versão isométrica em teste), `banco.sql` e `pix-funcao.ts`.
+> Cole este arquivo no começo de uma conversa nova e anexe: `index.html` (versão no ar, 2.5D), `banco.sql`, `novidades.sql` e `pix-funcao.ts`.
 > Pedido ao assistente: **economize meu limite de uso**. Faça só o que eu pedir, edite pontos específicos (não reescreva o arquivo inteiro), teste o mínimo e responda curto.
 
 ## O que é
