@@ -3189,9 +3189,11 @@ function espiar(){if(eu||!ONLINE||canal||espiaCh)return;const ch=sb.channel('sal
  ch.on('presence',{event:'sync'},()=>{if(espiaCh===ch&&!canal)syncPresence()}).on('broadcast',{event:'pos'},({payload})=>{if(espiaCh===ch&&!canal)onPos(payload)}).subscribe()}
 setTimeout(espiar,800);
 // vigia: se eu não apareço na sala (canal caiu), entra de novo
+async function vigiaSala(){if(!ONLINE||!eu)return;if(!canal){conectar();return}try{const st=canal.state,on=!!canal.presenceState()[eu.id];if(st!=='joined'){const c=canal;canal=null;try{await sb.removeChannel(c)}catch(_){}conectar();return}if(!on)await canal.track({t:Date.now()})}catch(_){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(vigiaSala,800)});addEventListener('online',()=>setTimeout(vigiaSala,800));
 setInterval(async()=>{if(!ONLINE||!eu||!canal)return;try{const st=canal.state,eu_on=!!canal.presenceState()[eu.id];
  if(st!=='joined'){const c=canal;canal=null;try{await sb.removeChannel(c)}catch(_){}conectar();return}
- if(!eu_on)await canal.track({t:Date.now()})}catch(_){}},20000);
+ if(!eu_on)await canal.track({t:Date.now()})}catch(_){}},10000);
 function syncPresence(){
  const chP=canal||espiaCh;if(!chP)return;const ids=Object.keys(chP.presenceState()).filter(id=>!eu||id!==eu.id);
  for(const id of ids)if(!others.has(id))others.set(id,{id,nome:'…',nivel:1,v:visFromName(id),x:0,y:0,tx:null,ty:null,dir:1,ph:0,moving:false,hidden:true,seen:false,isPlayer:true,remote:true,bub:null,blinkT:2,driving:null,beer:false,work:0,novo:true});
@@ -3749,7 +3751,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116m';
+const VERSAO_JOGO='v20261116n';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
