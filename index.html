@@ -735,9 +735,9 @@ function drawPersonReal0(c,x,y,v,o={}){
     const fx=hx+ux*A*s1,fy=uy*A*.4*s1-Math.abs(uy)*A*.4-sw*2,bend=.8+sw*2.2,kx2=(hx+fx)/2+ux*bend,ky2=(hy+fy)/2+uy*bend*.5;pern.push({k,hx,hy,fx,fy,kx2,ky2})}
    pern.sort((a,b)=>a.fy-b.fy);
    for(const L of pern){const back2=L!==pern[1],cor0=pernaCor(L.k),cor=back2&&!saia?shade(cor0,-22):cor0;c.lineCap='round';c.lineJoin='round';
-    c.strokeStyle=cor;c.lineWidth=lw;c.beginPath();c.moveTo(L.hx,L.hy);c.lineTo(L.kx2,L.ky2);c.stroke();
-    c.strokeStyle=corte?skin:cor;c.lineWidth=lw*.9;c.beginPath();c.moveTo(L.kx2,L.ky2);c.lineTo(L.fx,L.fy-1);c.stroke();
-    if(corte){c.strokeStyle=skin;c.lineWidth=lw*.88;c.beginPath();c.moveTo((L.hx+L.kx2)/2,(L.hy+L.ky2)/2);c.lineTo(L.kx2,L.ky2);c.stroke()}
+    c.strokeStyle=cor;c.lineWidth=lw*1.12/BX;c.beginPath();c.moveTo(L.hx,L.hy);c.lineTo(L.kx2,L.ky2);c.stroke();
+    c.strokeStyle=corte?skin:cor;c.lineWidth=lw*1.02/BX;c.beginPath();c.moveTo(L.kx2,L.ky2);c.lineTo(L.fx,L.fy-1);c.stroke();
+    if(corte){c.strokeStyle=skin;c.lineWidth=lw*1/BX;c.beginPath();c.moveTo((L.hx+L.kx2)/2,(L.hy+L.ky2)/2);c.lineTo(L.kx2,L.ky2);c.stroke()}
     shoe(L.fx,Math.min(0,L.fy))}}
  else for(const k of (F?[-1,1]:[dir,-dir])){const hx=F?k*(fem?2.3:2.6):k*(fem?.7:.9),pk=(ph||0)+(k>0?0:Math.PI),th=anda?Math.sin(pk)*.55*(o.amp||1):0,kn=anda?Math.max(0,Math.cos(pk))*.85*(o.amp||1)+(o.flex||0):0,L1=8.2,L2=7.9;
    if(F){const lift=anda?Math.max(0,Math.sin(pk))*2.4*(o.amp||1):0,cor=pernaCor(k),ky=-16+L1-lift*.4;seg(hx,-16,0,L1-lift*.4,lw,cor);if(corte&&corte<L1)seg(hx,-16+corte,0,L1-corte-lift*.4,lw*.92,skin);seg(hx,ky,0,L2-lift*.6,lw*.94,corte?skin:cor);if(!corte&&!saia&&lift>.5){c.fillStyle=pantsD;circ(c,hx,ky,lw*.3)}shoe(hx,-lift);continue}
@@ -756,10 +756,10 @@ function drawPersonReal0(c,x,y,v,o={}){
  const longas=['social','jaqueta','moletom','xadrez','terno'].includes(roupa),curta=['camiseta','time','macacao','blusinha','cropped','polo'].includes(roupa),sem=['regata','regataF','vestido','vestidoLongo'].includes(roupa);
  const ay=sit?0:sw*2;
  const cTronco=roupa==='terno'?(o.suit?'#2f3542':roupaR==='ternoBranco'?'#f2f2f2':shade(shirt,-55)):shirt;
- const braco=(k)=>{const pose=o.arms?o.arms[k<0?0:1]:null,w=fem?2.9:3.2,ax=k<0?-bw/2-1.7:bw/2-1.5,yy=by+2.2,lado=k<0?1:-1;
+ const nearK=F?1:(back?dir:-dir);const braco=(k)=>{const longe=!F&&!sit&&k!==nearK,pose=o.arms?o.arms[k<0?0:1]:null,w=(fem?2.9:3.2)/Math.sqrt(BX),ax=(k<0?-bw/2-1.7:bw/2-1.5)+(longe?-k*1.6:0),yy=by+2.2,lado=k<0?1:-1,skin=longe?shade(PELE[v.pele],-28):PELE[v.pele];
   const sw2=pose!=null?pose:(ph!=null&&!sit?lado*Math.sin(ph)*.34:Math.sin(now*1.6+k+x*.1)*.06);
   const cot=pose!=null?.12:(ph!=null&&!sit?.18+Math.max(0,lado*Math.sin(ph))*.25:.18);
-  const manga=longas?(roupa==='jaqueta'||roupa==='terno'?cTronco:shirtD):sem?skin:shirtD,ante=longas?manga:skin,mc=roupa==='cropped'||roupa==='blusinha'?3.6:4.6;
+  const manga0=longas?(roupa==='jaqueta'||roupa==='terno'?cTronco:shirtD):sem?skin:shirtD,manga=longe?shade(manga0,-26):manga0,ante=longas?manga:skin,mc=roupa==='cropped'||roupa==='blusinha'?3.6:4.6;
   if(o.mv!=null&&ph!=null&&!sit&&pose==null){const ux=Math.cos(o.mv),uy=Math.sin(o.mv),sA=lado*Math.sin(ph),X0=ax+1.6,Y0=yy+.4,ex2=X0+ux*sA*1.8,ey2=Y0+6.6+uy*sA*.8,hx2=ex2+ux*sA*2.8,hy2=ey2+6.2+uy*sA*1.4-Math.abs(sA)*.6;
    c.lineCap='round';c.strokeStyle=curta?skin:manga;c.lineWidth=w;c.beginPath();c.moveTo(X0,Y0);c.lineTo(ex2,ey2);c.stroke();
    if(curta){c.strokeStyle=manga;c.lineWidth=w+.4;c.beginPath();c.moveTo(X0,Y0-.4);c.lineTo(X0+(ex2-X0)*.5,Y0+(ey2-Y0)*.5);c.stroke()}
@@ -772,7 +772,7 @@ function drawPersonReal0(c,x,y,v,o={}){
   if(roupaR==='agasalho'){c.fillStyle='#f4f4f4';c.fillRect(-w/2+.3,-6,.8,12)}
   c.fillStyle=skin;circ(c,0,6.4,1.75);c.fillStyle='rgba(0,0,0,.12)';circ(c,dir*.5,6.9,1.1);c.restore()};
  if(roupa==='moletom'&&!back){c.fillStyle=shirtD;circ(c,0,by-6.5,6.6)}
- braco(back?1:-1);
+ braco(-nearK);
  c.fillStyle=skinD;c.fillRect(-1.7,by-3,3.4,4);
  // corpo
  c.fillStyle=shade(cTronco,-48);rr(c,-bw/2-dir*(back?-1.8:1.8)*rotK,by+.8,bw,bh-.4,4.2);c.fill();
@@ -813,7 +813,7 @@ function drawPersonReal0(c,x,y,v,o={}){
  if(ex2==='corrente'&&!back){const dm=ex2R==='diamante';c.strokeStyle=dm?'#e8f4ff':'#f3c13a';c.lineWidth=.9;c.beginPath();c.arc(0,by+.5,3.2,.15,Math.PI-.15);c.stroke();c.fillStyle=dm?'#7fd3ff':'#f3c13a';circ(c,0,by+3.8,dm?1.3:.9)}
  if(ex2==='perolas'&&!back){c.fillStyle='#fffaf0';for(let i=0;i<7;i++){const a=.2+i*(Math.PI-.4)/6;circ(c,Math.cos(a)*3.4,by+.6+Math.sin(a)*3,.7)}}
  if(o.apron){c.fillStyle='#f4efe4';rr(c,-bw/2+2,by+5,bw-4,bh-3,3);c.fill();c.strokeStyle='#d8cfbd';c.lineWidth=.7;c.beginPath();c.moveTo(-bw/2+2,by+5);c.lineTo(-3,by);c.moveTo(bw/2-2,by+5);c.lineTo(3,by);c.stroke()}
- braco(back?-1:1);
+ braco(nearK);
  if(o.beer){const bx=back?-bw/2-3.6:bw/2-.6;c.fillStyle='#e9a92a';rr(c,bx,by+10+ay,3.4,5.2,.8);c.fill();c.fillStyle='#fff';c.fillRect(bx,by+9.5+ay,3.4,1.4)}
  if(o.tray){c.fillStyle='#c9ccd1';c.beginPath();c.ellipse(bw/2+3,by+3,6,2,0,0,7);c.fill();c.fillStyle='#e9a92a';c.fillRect(bw/2+.5,by-3,2.6,5);c.fillRect(bw/2+4,by-2.5,2.6,4.5);c.fillStyle='#fff';c.fillRect(bw/2+.5,by-3.6,2.6,1.2);c.fillRect(bw/2+4,by-3.1,2.6,1.2)}
  c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(dir*.4,by+.4,4.4,1.7,0,0,7);c.fill();
@@ -3903,7 +3903,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261121a';
+const VERSAO_JOGO='v20261121b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
