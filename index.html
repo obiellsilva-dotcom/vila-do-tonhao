@@ -124,6 +124,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:26px;background-ima
 body:has(#emoBox:not(.hidden)) #joy,body:has(#card:not(.hidden)) #joy,body:has(.modal:not(.hidden)) #joy,body:has(#msg:focus) #joy,body:has(#chatPainel.on) #joy,body:has(#tuto:not(.hidden)) #joy{display:none!important}
 #chatPainel{position:fixed;left:8px;right:8px;bottom:calc(70px + env(safe-area-inset-bottom,0px));max-width:520px;margin:0 auto;max-height:38vh;overflow-y:auto;background:rgba(30,16,22,.94);border:1px solid rgba(255,201,74,.4);border-radius:14px;padding:8px;z-index:9;display:none;flex-direction:column;gap:4px;font-size:14px}
 #chatPainel.on{display:flex}
+#fBody .fl{display:block;font-size:13px;opacity:.8;margin:8px 0 3px}#fBody input,#fBody select{width:100%;box-sizing:border-box;padding:9px 10px;border-radius:10px;border:1px solid rgba(255,201,74,.35);background:rgba(0,0,0,.25);color:#fff;font:inherit}#fBody .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}#fBody .grid .btn{font-size:13.5px;padding:8px 6px}#fBody .fx{display:flex;gap:6px;align-items:flex-end}#fBody .fx>*{flex:1}
 .bannerPref{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:70;text-align:center;padding:18px 26px;border-radius:22px;background:linear-gradient(135deg,#3a2508,#7a5a10 50%,#3a2508);border:3px solid #ffd23f;box-shadow:0 0 40px rgba(255,210,63,.6),0 14px 40px rgba(0,0,0,.6);animation:bpIn .45s cubic-bezier(.2,1.6,.4,1) forwards;width:min(92vw,560px);pointer-events:none}
 .bannerPref .bp1{font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(24px,6.5vw,40px);color:#ffd23f;text-shadow:0 3px 0 #3a1d10}.bannerPref .bp2{color:#fff;font-size:clamp(15px,4vw,20px);margin-top:4px}
 .bannerPref.sai{animation:bpOut .6s forwards}@keyframes bpIn{to{transform:translate(-50%,-50%) scale(1);opacity:1}}@keyframes bpOut{to{transform:translate(-50%,-80%) scale(.9);opacity:0}}
@@ -241,7 +242,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
   <div class="row"><div class="pill money hidden" id="money">💰 R$ 0</div><div class="pill lvl hidden" id="lvl"><span id="lvlTxt">⭐ Nv 1</span><i><b id="lvlBar"></b></i></div><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill small hidden" id="salaPill"></div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
 </div>
 
-<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Meu perfil" aria-label="meu perfil">👤</button><button id="zme" class="hidden" data-l="Ir até mim" aria-label="ir até mim">📍</button><button id="zin" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
+<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Meu perfil" aria-label="meu perfil">👤</button><button id="zme" class="hidden" data-l="Ir até mim" aria-label="ir até mim">📍</button><button id="zin" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b">🛡️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
 <div id="cfg" class="hidden"><div class="cfgbox"><button class="x" id="cfgX">×</button><h3>⚙️ Configurações</h3>
 <label>🎵 Volume da música <b id="cfgMusV"></b><input type="range" id="cfgMus" min="0" max="100"></label>
 <label>🔊 Volume dos efeitos <b id="cfgSfxV"></b><input type="range" id="cfgSfx" min="0" max="100"></label>
@@ -275,6 +276,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
   </div>
   <p class="sub" style="font-size:11.5px;margin-top:10px">Itens de visual não dão XP nem vantagem no ranking. Dúvidas ou problemas com pagamento: fale com o dono da cidade.</p>
 </div></div>
+<div id="mForm" class="modal hidden"><div class="box" style="width:min(380px,100%)"><button class="x" data-close="mForm">×</button><h2 id="fTit"></h2><div id="fBody"></div></div></div>
 <div id="mConf" class="modal hidden"><div class="box" style="text-align:center;width:min(320px,100%)">
   <h2 id="confT">Confirmar</h2><p class="sub" id="confP"></p><div id="confOps" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
   <div style="display:flex;gap:8px;justify-content:center"><button class="btn ghost" id="confNao">Cancelar</button><button class="btn" id="confSim">Confirmar</button></div>
@@ -2651,7 +2653,7 @@ const api=ONLINE?(()=>{
   async esqueci(email){const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});if(error)throw new Error(traduzAuth(error.message))},
   async sair(){await sb.auth.signOut()},
   perfil:id=>q(sb.from('moradores').select('*').eq('id',id).maybeSingle()),
-  perfis:ids=>q(sb.from('moradores').select('id,nome,visual,vip_ate,pet,carro,carro_cores,casa_id,nivel,foto,frase,relacionamento,time_coracao,insta').in('id',ids)),
+  perfis:ids=>q(sb.from('moradores').select('id,admin,nome,visual,vip_ate,pet,carro,carro_cores,casa_id,nivel,foto,frase,relacionamento,time_coracao,insta').in('id',ids)),
   atualizarPerfil:(f,r,t,i)=>rpc('atualizar_perfil',{p_frase:f,p_relacionamento:r,p_time:t,p_insta:i}),
   async enviarFoto(blob){const {data:u}=await sb.auth.getUser();const path=u.user.id+'/perfil.jpg';
    const {error}=await sb.storage.from('fotos').upload(path,blob,{upsert:true,contentType:'image/jpeg',cacheControl:'60'});if(error)throw new Error('Não consegui enviar a foto: '+error.message);
@@ -2683,6 +2685,10 @@ const api=ONLINE?(()=>{
   tarefa:()=>rpc('tarefa_feita'),
   largar:()=>rpc('largar_trabalho'),
   comprar:i=>rpc('comprar',{p_item:i}),
+  admin:(n,a,v)=>rpc('admin_acao',{p_nome:n,p_acao:a,p_valor:String(v??'')}),
+  venderLoja:c=>rpc('vender_carro_loja',{p_carro:c}),
+  propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
+  responder:(id,ok)=>rpc('responder_proposta',{p_id:id,p_aceitar:ok}),
   cidade:()=>ONLINE?q(sb.from('cidade').select('prefeito,desde,moradores(nome)').eq('id',1).maybeSingle()):Promise.resolve(null),
   assumirPref:()=>rpc('assumir_prefeitura'),
   guardar:i=>rpc('guardar_item',{p_item:i}),
@@ -2726,6 +2732,7 @@ const api=ONLINE?(()=>{
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
   async cidade(){return null},
+  async admin(){fail('Painel só funciona online.')},async venderLoja(c){const m=lme();if(!CARS[c]||CARS[c].premium)fail('A concessionária não compra esse carro.');m.carros=m.carros.filter(x=>x!==c);if(m.carro===c)m.carro=null;const v=Math.floor(CARS[c].preco/2);m.dinheiro+=v;lsave();return{recebido:v,eu:lest()}},async propor(){fail('Venda entre jogadores só funciona online.')},async responder(){fail('Só online.')},
   async assumirPref(){return{}},
   async guardar(i){const m=lme(),it=LOJA[i];if(m.dinheiro<it.preco)fail('Dinheiro insuficiente. Vai trabalhar! 😅');m.mochila=m.mochila||{};if((m.mochila[i]||0)>=20)fail('Sua mochila já tem 20 desse item.');m.dinheiro-=it.preco;m.mochila[i]=(m.mochila[i]||0)+1;lsave();return{item:i,mochila:m.mochila,eu:lest()}},
   async usar(i){const m=lme(),it=LOJA[i];m.mochila=m.mochila||{};if(!(m.mochila[i]>0))fail('Você não tem isso na mochila.');m.mochila[i]--;if(!m.mochila[i])delete m.mochila[i];m.fome=Math.min(100,m.fome+(it.fome||0));lsave();return{item:i,mochila:m.mochila,eu:lest()}},
@@ -2784,7 +2791,7 @@ function morreu(){
 async function aplicarPerfil(m,anunciar){
  const novo=!eu;
  if(novo)eu=makePlayer(m.id,m.nome,decode(m.visual)||randomVis());
- eu.nome=m.nome;eu.v=decode(m.visual)||eu.v;aplicarEstado(m);eu.mochila=m.mochila||eu.mochila||{};eu.carCores=m.carro_cores||eu.carCores||{};
+ eu.nome=m.nome;eu.v=decode(m.visual)||eu.v;aplicarEstado(m);eu.admin=!!m.admin;eu.mochila=m.mochila||eu.mochila||{};eu.carCores=m.carro_cores||eu.carCores||{};
  if(m.casa_id)casasInfo.set(m.casa_id,{dono:m.id,nome:m.nome});
  if(!novo){refreshHud();return}
  if(m.casa_id){const h=houses[m.casa_id-1];eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE}else{eu.x=T(rand(19,29));eu.y=T(29.5)}
@@ -2950,7 +2957,8 @@ function abrirLugar(b){
  if(k==='mercadinho'&&eu.peixes>0)botao(box,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
  if(k==='concessionaria'){sub='Comprou, saiu dirigindo. Para descer ou dirigir de novo, toque em você.';
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
-   botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})})}
+   botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})});
+  if(eu.carros.length){eu.carros.filter(c=>CARS[c]&&!CARS[c].premium).forEach(c=>botao(box,`💸 Vender ${CARS[c].nome} para a loja: ${money(Math.floor(CARS[c].preco/2))}`,()=>venderLoja(c),{ghost:true}));botao(box,'🤝 Vender um carro para outro jogador',()=>venderJogador(),{ghost:true})}}
  if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Assumir o cargo de prefeito'+(PREF_NOME?' (hoje: '+PREF_NOME+')':''),()=>{if(!souP)assumirPrefeitura()},{off:souP});if(!sub)sub='Quem tem o maior nível online pode assumir a prefeitura.'}
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
@@ -3234,6 +3242,8 @@ function onEv(p){
  if(p.k==='danca'){o.danca=DANCAS.some(d=>d[0]===p.d)?p.d:null;o.dancaIni=now}
  if(p.k==='gesto'&&GESTOS.some(g=>g[0]===p.g))o.gesto={t:p.g,ate:now+3};
  if(p.k==='convite')onConvite(o,p);
+ if(p.k==='kick'||p.k==='admAviso')onAdmin(o,p);
+ if(p.k==='proposta'||p.k==='propResp')onProposta(o,p);
  if(p.k==='prefeito'){PREF_ID=o.id;PREF_NOME=o.nome;bannerGrande('🏛️ NOVO PREFEITO!','🏆 '+o.nome+' assumiu a Cidade do Tonhão')}
  if(/^sin(Conv|Resp|Tiro|Sai)$/.test(p.k))onSinuca(o,p);
  if(p.k==='resp')onResp(o,p);
@@ -3751,7 +3761,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116n';
+const VERSAO_JOGO='v20261116o';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3824,6 +3834,44 @@ function trofeu(c,x,y){const k=(Math.sin(now*4)+1)/2;c.save();c.globalCompositeO
  c.beginPath();c.arc(-4.2,-2,1.6,Math.PI*.5,Math.PI*1.5);c.stroke();c.beginPath();c.arc(4.2,-2,1.6,-Math.PI*.5,Math.PI*.5);c.stroke();c.fillRect(-.8,2,1.6,2);c.fillRect(-2.6,4,5.2,1.4);c.strokeRect(-2.6,4,5.2,1.4);
  c.fillStyle='rgba(255,255,255,.9)';const s=Math.sin(now*6)*.5+.5;c.beginPath();c.arc(-1.5,-2.5,.7+s*.5,0,7);c.fill();c.restore()}
 function assumirPrefeitura(){acao(async()=>{const r=await api.assumirPref();PREF_ID=eu.id;PREF_NOME=eu.nome;emitEv('prefeito',{});bannerGrande('🏛️ NOVO PREFEITO!','👑 '+eu.nome+' assumiu a Cidade do Tonhão');log('🏛️ '+eu.nome+' é o novo prefeito!');closePlace()})}
+
+/* ----- formulário genérico ----- */
+function abrirForm(tit,html,depois){$('fTit').textContent=tit;$('fBody').innerHTML=html;$('mForm').classList.remove('hidden');if(depois)depois($('fBody'))}
+const esc=t=>String(t).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+/* ----- painel do administrador ----- */
+function painelAdmin(){if(!eu||!eu.admin)return;
+ const nomes=[...others.values()].filter(o=>o.seen).map(o=>o.nome);
+ abrirForm('🛡️ Painel do Admin',`<label class="fl">Jogador (nome exato)</label><input id="aNome" list="aLista" placeholder="Nome do jogador"><datalist id="aLista">${nomes.map(n=>'<option value="'+esc(n)+'">').join('')}</datalist>
+ <label class="fl">Valor (dinheiro, dias de VIP ou nº da casa)</label><input id="aVal" inputmode="numeric" placeholder="ex.: 5000">
+ <div class="fx"><div><label class="fl">Pet</label><select id="aPet">${Object.keys(PETS).map(k=>'<option value="'+k+'">'+PETS[k].ic+' '+PETS[k].nome+'</option>').join('')}</select></div><div><label class="fl">Carro</label><select id="aCar">${Object.keys(CARS_PREMIUM).concat(Object.keys(CARS).filter(k=>!CARS_PREMIUM[k])).filter((v,i,a)=>a.indexOf(v)===i).map(k=>'<option value="'+k+'">'+(CARS[k]||CARS_PREMIUM[k]).nome+'</option>').join('')}</select></div></div>
+ <div class="grid"><button class="btn" data-a="dinheiro">💰 Dar dinheiro</button><button class="btn" data-a="tirar">💸 Tirar dinheiro</button><button class="btn" data-a="vip">👑 Dar VIP (dias)</button><button class="btn" data-a="pet">🐾 Dar pet</button>
+ <button class="btn" data-a="carro">🚗 Dar carro</button><button class="btn" data-a="casa">🏠 Dar casa (nº)</button><button class="btn ghost" data-a="tirar_casa">🏚️ Tirar casa</button><button class="btn ghost" data-a="expulsar">👢 Expulsar</button>
+ <button class="btn ghost" data-a="banir" style="color:#ff6b6b">🚫 Banir</button><button class="btn ghost" data-a="desbanir">✅ Desbanir</button></div>`,
+ box=>box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const n=$('aNome').value.trim(),v=$('aVal').value.trim(),a=b.dataset.a;if(!n){toast('Escreva o nome do jogador.');return}
+  const alvo=[...others.values()].find(o=>o.nome.toLowerCase()===n.toLowerCase());
+  if(a==='expulsar'){if(!alvo){toast(n+' não está na sua sala agora.');return}emitEv('kick',{para:alvo.id});toast('👢 '+n+' foi expulso(a).');return}
+  const acaoS=a==='tirar'?'dinheiro':a,val=a==='tirar'?-Math.abs(+v||0):a==='pet'?$('aPet').value:a==='carro'?$('aCar').value:v;
+  if(['dinheiro','tirar','vip','casa'].includes(a)&&!(+v)){toast('Coloque o valor.');return}
+  confirmar('🛡️ Confirmar',`<b>${esc(b.textContent)}</b> para <b>${esc(n)}</b>${val!==''&&a!=='banir'&&a!=='desbanir'&&a!=='tirar_casa'?' ('+esc(val)+')':''}?`,()=>acao(async()=>{const r=await api.admin(n,acaoS,val);toast('✅ Feito: '+b.textContent+' → '+r.nome,3000);
+   if(alvo)emitEv('admAviso',{para:alvo.id,t:a,v:val});if(a==='banir'&&alvo)emitEv('kick',{para:alvo.id,ban:1});if(r.id===eu.id){const m=await api.perfil(eu.id);if(m)aplicarEstado(m)}}))}))}
+$('zadm').onclick=painelAdmin;
+setInterval(()=>{if(eu)$('zadm').classList.toggle('hidden',!eu.admin)},1500);
+function onAdmin(o,p){if(!eu||p.para!==eu.id)return;const pf=perfis.get(o.id);if(!(pf&&pf.admin))return;
+ if(p.k==='kick'){confirmar(p.ban?'🚫 Banido':'👢 Expulso',p.ban?'Você foi banido da cidade pelo administrador.':'Você foi expulso da sala pelo administrador.',()=>location.reload(),[['OK',()=>location.reload()]]);try{canal&&sb.removeChannel(canal)}catch(_){}canal=null;setTimeout(()=>location.reload(),6000);return}
+ if(p.k==='admAviso'){api.perfil(eu.id).then(m=>{if(m){aplicarEstado(m);eu.pets=m.pets||[];eu.pet=m.pet;eu.carros=m.carros||eu.carros;eu.vip_ate=m.vip_ate;eu.casa_id=m.casa_id;refreshHud()}}).catch(()=>{});
+  const T={dinheiro:'💰 O admin te deu '+money(+p.v||0)+'!',tirar:'💸 O admin tirou '+money(Math.abs(+p.v||0))+'.',vip:'👑 Você ganhou '+p.v+' dias de VIP!',pet:'🐾 Você ganhou um pet!',carro:'🚗 Você ganhou um carro!',casa:'🏠 Você ganhou a casa '+p.v+'!',tirar_casa:'🏚️ Sua casa foi retirada.'}[p.t];if(T)bannerGrande('🎁 PRESENTE DO ADMIN',T)}}
+/* ----- venda de carros ----- */
+function venderLoja(c){const n=CARS[c].nome,v=Math.floor((CARS[c].preco||0)/2);confirmar('💸 Vender '+n,`A concessionária paga <b>${money(v)}</b> pelo seu ${esc(n)} (metade do preço). Vender?`,()=>acao(async()=>{const r=tratar(await api.venderLoja(c));eu.carros=eu.carros.filter(x=>x!==c);if(eu.carro===c){eu.carro=eu.carros[0]||null;if(eu.driving)eu.driving=false}if(eu.parkLoc&&eu.parkLoc.c===c){parados.delete(eu.id);eu.parkLoc=null;emitEv('unpark',{})}Som.play('moeda');toast('💸 Vendido por '+money(r.recebido)+'!',3000);sendPos(true);abrirLugar(lugarAtual)}))}
+function venderJogador(c0){if(!eu.carros.length){toast('Você não tem carro para vender.');return}const nomes=[...others.values()].filter(o=>o.seen).map(o=>o.nome);
+ abrirForm('🤝 Vender para jogador',`<label class="fl">Qual carro?</label><select id="vCar">${eu.carros.filter(k=>CARS[k]).map(k=>'<option value="'+k+'"'+(k===c0?' selected':'')+'>'+CARS[k].nome+'</option>').join('')}</select>
+ <label class="fl">Para quem? (nome do jogador)</label><input id="vNome" list="vLista" placeholder="Nome do comprador"><datalist id="vLista">${nomes.map(n=>'<option value="'+esc(n)+'">').join('')}</datalist>
+ <label class="fl">Valor (R$)</label><input id="vVal" inputmode="numeric" placeholder="ex.: 4000"><div class="grid" style="grid-template-columns:1fr"><button class="btn" id="vEnv">📨 Enviar proposta</button></div>`,
+ box=>{$('vEnv').onclick=()=>{const c=$('vCar').value,n=$('vNome').value.trim(),v=Math.max(0,Math.floor(+$('vVal').value||0));if(!n){toast('Escreva o nome do comprador.');return}
+  acao(async()=>{const r=await api.propor(n,c,v);const alvo=others.get(r.comprador);if(!alvo){toast(r.nome+' precisa estar na cidade (na sua sala) para receber a proposta.',3500);return}
+   emitEv('proposta',{para:r.comprador,id:r.id,c,v});$('mForm').classList.add('hidden');toast('📨 Proposta enviada para '+r.nome+'. Esperando resposta…',3500)})}})}
+function onProposta(o,p){if(!eu)return;
+ if(p.k==='proposta'&&p.para===eu.id&&CARS[p.c]){confirmar('🚗 Proposta de carro',`<b>${esc(o.nome)}</b> quer te vender o <b>${esc(CARS[p.c].nome)}</b> por <b>${money(+p.v||0)}</b>.<br>Você tem ${money(eu.dinheiro)}. Aceita?`,null,[['✅ Aceitar',()=>acao(async()=>{const r=tratar(await api.responder(+p.id,true));eu.carros=r.eu&&r.eu.carros||eu.carros.concat([p.c]);eu.carro=p.c;emitEv('propResp',{para:o.id,ok:1,c:p.c,v:p.v});Som.play('buzina');bannerGrande('🚗 CARRO NOVO!','Você comprou o '+CARS[p.c].nome+' de '+o.nome)})],['❌ Recusar',()=>{api.responder(+p.id,false).catch(()=>{});emitEv('propResp',{para:o.id,ok:0,c:p.c})}]])}
+ if(p.k==='propResp'&&p.para===eu.id){if(+p.ok){api.perfil(eu.id).then(m=>{if(m){aplicarEstado(m);eu.carros=m.carros||[];eu.carro=m.carro;if(eu.parkLoc&&!eu.carros.includes(eu.parkLoc.c)){parados.delete(eu.id);eu.parkLoc=null;emitEv('unpark',{})}refreshHud()}}).catch(()=>{});Som.play('moeda');toast('🤝 '+o.nome+' comprou seu '+(CARS[p.c]?CARS[p.c].nome:'carro')+' por '+money(+p.v||0)+'!',4000)}else toast(o.nome+' recusou a proposta.',3000)}}
 /* ----- provador / entrar ----- */
 function abrirProvador(){$('enter').textContent='Entrar na cidade';renderProv();$('mProv').classList.remove('hidden');setTimeout(()=>$('provName').focus(),50)}
 let contaModo='nova',contaDepois=null;
