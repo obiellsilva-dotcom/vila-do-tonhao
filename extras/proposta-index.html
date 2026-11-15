@@ -688,7 +688,7 @@ function cabeloF(c,cab,cam,fr,d,hair,oo={}){const pf=!!(oo.perfil||oo.lado);
  const S=FEM[cab]||FEM.comprido,costas=cam==='costas',tras=cam==='tras',esc=shade(hair,-42),cla=shade(hair,32),hs=k=>{const t=Math.sin(k*91.7)*4375.85;return t-Math.floor(t)};
  const liso=(P,o={})=>{const y0=o.y0??-10,y1=o.y1??10,g=c.createLinearGradient(0,-11,0,16);g.addColorStop(0,cla);g.addColorStop(.22,hair);g.addColorStop(1,shade(hair,-26));c.save();c.fillStyle=g;c.fill(P);c.clip(P);c.lineCap='round';
   if(o.crespo){for(let k=0;k<200;k++){c.fillStyle=k%2?esc:cla;c.globalAlpha=.3;c.beginPath();c.arc((hs(k)-.5)*24,y0+hs(k+3)*(y1-y0),.35+hs(k+5)*.3,0,7);c.fill()}}
-  else if(o.cachos){const lw=o.lw??20;c.globalAlpha=1;for(let col=0;col*1.7<lw+2;col++){const x0=-lw/2+col*1.7+(col%2)*.4,ph=hs(col)*1.4;for(let y=y0+ph;y<y1+1;y+=1.25){const x=x0+Math.sin(y*.5+col)*.35;c.strokeStyle=esc;c.lineWidth=.55;c.beginPath();c.moveTo(x-.85,y+.25);c.quadraticCurveTo(x,y+1.05,x+.85,y+.25);c.stroke();c.strokeStyle=shade(hair,22);c.lineWidth=.5;c.beginPath();c.moveTo(x-.8,y);c.quadraticCurveTo(x,y-.75,x+.8,y);c.stroke()}}}
+  else if(o.cachos){const lw=o.lw??20;c.globalAlpha=1;c.lineCap='round';for(let col=0;col*2.6<lw+2;col++){const x0=-lw/2+col*2.6+hs(col)*.8,ph=hs(col+4)*6;c.beginPath();for(let y=y0;y<=y1+1;y+=.4){const x=x0+Math.sin((y+ph)*.9)*.75;y===y0?c.moveTo(x,y):c.lineTo(x,y)}c.strokeStyle=col%2?esc:shade(hair,-28);c.globalAlpha=.6;c.lineWidth=.42;c.stroke();c.beginPath();for(let y=y0;y<=y1+1;y+=.4){const x=x0+.6+Math.sin((y+ph)*.9)*.75;y===y0?c.moveTo(x,y):c.lineTo(x,y)}c.strokeStyle=cla;c.globalAlpha=.35;c.lineWidth=.32;c.stroke()}c.globalAlpha=1}
   else{const n=o.n??14,cx=o.cx??0,w=o.w??15;for(let k=0;k<n;k++){const u=(k+.5)/n-.5,x0=cx+u*w*.7,x1=cx+u*w*(1+(o.abre??0));c.strokeStyle=k%2?esc:cla;c.globalAlpha=k%2?.22:.16;c.lineWidth=.35;c.beginPath();c.moveTo(x0,y0+1);
    if(o.ondas)c.bezierCurveTo(x0+1.4,y0+(y1-y0)*.35,x1-1.4,y0+(y1-y0)*.65,x1,y1);else c.quadraticCurveTo(x1,y0+(y1-y0)*.4,x1,y1);c.stroke()}}
   // faixa de brilho
@@ -741,7 +741,7 @@ function cabeloF(c,cab,cam,fr,d,hair,oo={}){const pf=!!(oo.perfil||oo.lado);
  // ---------- cacheado / black ----------
  if(S.cachos){const w=S.w,L=S.L;const P=new Path2D(),x=ox;
   if(tras||costas){if(S.cachos===2)P.ellipse(x,(L-8)/2,w,(L+15)/2,0,0,7);else P.addPath(massa(L,8.6,1.6));
-   liso(P,S.cachos===2?{crespo:1,y0:-13,y1:L+4}:{cachos:1,y0:-12,y1:L+4,lw:w*2.2});if(S.cachos===1){const W2=8.6+1.6*.6;c.lineCap='round';for(let xx=-W2;xx<=W2+.1;xx+=1.7){const yy=L+2.2*(1-(xx/W2)**2)-.4,X=x+xx;c.fillStyle=shade(hair,-12);c.beginPath();c.arc(X,yy,.85,0,7);c.fill();c.strokeStyle=shade(hair,22);c.lineWidth=.45;c.beginPath();c.arc(X,yy,.55,3.6,6);c.stroke()}for(const sg of [-1,1])for(let yy=0;yy<L;yy+=1.6){const X=x+sg*(8.6+1.6*(yy/L)*.8);c.fillStyle=shade(hair,-6);c.beginPath();c.arc(X,yy,.8,0,7);c.fill();c.strokeStyle=esc;c.lineWidth=.35;c.beginPath();c.arc(X,yy,.5,.3,2.8);c.stroke()}}if(tras)return}
+   liso(P,S.cachos===2?{crespo:1,y0:-13,y1:L+4}:{cachos:1,y0:-12,y1:L+4,lw:w*2.2});if(tras)return}
   if(!costas){const P=casco(S.cachos===2?'preso':'meio');if(S.cachos===1){const xs=fr?[-1,1]:[-d,d];for(const sg of xs){const ins=sg===d&&!fr;P.moveTo(sg*6.3,-3);P.lineTo(sg*(ins?7.4:8.4),-3);P.quadraticCurveTo(sg*(ins?8:9.2),L*.5,sg*(ins?7.2:8.6),Math.min(L,6));P.lineTo(sg*6.3,Math.min(L,6)-1);P.closePath()}}liso(P,S.cachos===2?{crespo:1,y0:-11,y1:0}:{cachos:1,y0:-11,y1:L,lw:18})}
   return}
  // ---------- pixie ----------
