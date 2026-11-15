@@ -598,7 +598,7 @@ function drawHead(c,v,o,dir,back){
   if(cab==='moicano'){rr(c,-1.7,-10.5,3.4,15,1.5);c.fill()}
   cabNovo();
   if(cab==='careca'){c.fillStyle='rgba(0,0,0,.08)';circ(c,0,2,5)}
-  if(o.c34){c.fillStyle=skin;c.beginPath();c.ellipse(dir*5.4,2.4,2.2,3.4,dir*.3,0,7);c.fill();c.fillStyle=shade(skin,-8);c.beginPath();c.ellipse(dir*6.6,.8,1.4,2.1,0,0,7);c.fill();c.fillStyle=shade(skin,-36);c.beginPath();c.ellipse(dir*6.3,.9,.55,1.1,0,0,7);c.fill()}
+  // (costas na diagonal: só a nuca, sem orelha)
   if(ex2==='brinco'||ex2==='argola'){c.fillStyle='#f3c13a';circ(c,-6.9,3,1.1);circ(c,6.9,3,1.1)}
  }else{
   {const orelha=(x,sg)=>{c.fillStyle=shade(skin,-8);c.beginPath();c.ellipse(x,1.2,1.55,2.25,0,0,7);c.fill();c.fillStyle=shade(skin,-36);c.beginPath();c.ellipse(x+sg*.35,1.35,.6,1.25,0,0,7);c.fill()};if(fr){orelha(-6.95,1);orelha(6.95,-1)}else if(o.perfil)orelha(-dir*1.6,dir);else orelha(-dir*6.7,dir)}
@@ -1988,7 +1988,7 @@ function nameTag(c,x,y,text,mine,online,vip){c.font='600 7px Fredoka, sans-serif
 const vipP=p=>!!(p&&p.vip_ate&&Date.parse(p.vip_ate)>Date.now());
 const headTop=r=>r.y-(r.sit?39:46)*PS*(r.belly?1.03:1)-(estilo('chapeu',r.v)==='cartola'?9*PS:0);
 function vistaDe(p){const dx=p.x-(p._lx??p.x),dy=p.y-(p._ly??p.y);p._lx=p.x;p._ly=p.y;const sx=(dx-dy)*IA,sy=(dx+dy)*IB;if(Math.hypot(sx,sy)>.25){const a=Math.atan2(sy,Math.abs(sx))*180/Math.PI;p._vs=a>67.5?'f':a>22.5?'l':a>-22.5?'p':a>-67.5?'cl':'c';if(Math.abs(sx)>.2)p._vd=sx>0?1:-1}return p._vs||'f'}
-const VISTA_OPC=vs=>vs==='f'?{cara:true}:vs==='p'?{perfil:true}:vs==='cl'?{back:true,c34:true}:vs==='c'?{back:true}:{};
+const VISTA_OPC=vs=>vs==='f'?{cara:true}:vs==='p'?{}:vs==='cl'?{back:true,c34:true}:vs==='c'?{back:true}:{};
 function personOpts(r){const vs=vistaDe(r),anda=r.state==='walk',vo=anda||(!r.sit&&!r.back)?VISTA_OPC(vs):{};const bk=anda?!!vo.back:!!r.back||!!vo.back;return{perfil:!!vo.perfil,c34:!!vo.c34,cara:bk?false:(r.sit&&!anda)?!!r.frente:!!vo.cara,s:PS,dir:anda&&r._vd?r._vd:r.dir,walk:anda?r.ph:null,sit:r.sit&&!anda,back:bk,frente:r.sit&&r.frente&&r.state!=='walk',beer:r.beer&&r.place==='bar'&&r.phase!=='toOrder',suit:r.suit,belly:r.belly,ring:selected===r,blink:r.blinkT<0}}
 function drawPlayer(p){
  const car=carOf(p);
@@ -3890,7 +3890,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261120e';
+const VERSAO_JOGO='v20261120f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
