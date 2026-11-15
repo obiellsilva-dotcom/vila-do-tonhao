@@ -2691,7 +2691,6 @@ const api=ONLINE?(()=>{
   propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
   responder:(id,ok)=>rpc('responder_proposta',{p_id:id,p_aceitar:ok}),
   cidade:()=>ONLINE?q(sb.from('cidade').select('prefeito,desde,moradores(nome)').eq('id',1).maybeSingle()):Promise.resolve(null),
-  assumirPref:()=>rpc('assumir_prefeitura'),
   guardar:i=>rpc('guardar_item',{p_item:i}),
   usar:i=>rpc('usar_item',{p_item:i}),
   venderPeixes:()=>rpc('vender_peixes'),
@@ -2961,7 +2960,7 @@ function abrirLugar(b){
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
    botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})});
   if(eu.carros.length){eu.carros.filter(c=>CARS[c]&&!CARS[c].premium).forEach(c=>botao(box,`💸 Vender ${CARS[c].nome} para a loja: ${money(Math.floor(CARS[c].preco/2))}`,()=>venderLoja(c),{ghost:true}));botao(box,'🤝 Vender um carro para outro jogador',()=>venderJogador(),{ghost:true})}}
- if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Assumir o cargo de prefeito'+(PREF_NOME?' (hoje: '+PREF_NOME+')':''),()=>{if(!souP)assumirPrefeitura()},{off:souP});if(!sub)sub='Quem tem o maior nível online pode assumir a prefeitura.'}
+ if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(!sub)sub='O prefeito é sempre o TOP 1 do ranking 🏆. Quem passar o prefeito assume o cargo na hora.'}
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
   if(eu.nivel<J.nivel_min)botao(box,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
@@ -3247,7 +3246,7 @@ function onEv(p){
  if(p.k==='kick'||p.k==='admAviso')onAdmin(o,p);
  if(p.k==='anuncio'&&ehAdm(o.id)&&typeof p.t==='string')bannerGrande('📢 AVISO DO ADMIN',esc(p.t.slice(0,90)));
  if(p.k==='proposta'||p.k==='propResp')onProposta(o,p);
- if(p.k==='prefeito'){PREF_ID=o.id;PREF_NOME=o.nome;bannerGrande('🏛️ NOVO PREFEITO!','🏆 '+o.nome+' assumiu a Cidade do Tonhão')}
+ if(p.k==='prefeito')carregaPref();
  if(/^sin(Conv|Resp|Tiro|Sai)$/.test(p.k))onSinuca(o,p);
  if(p.k==='resp')onResp(o,p);
  if(p.k==='inter')onInter(o,p);
@@ -3764,7 +3763,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116q';
+const VERSAO_JOGO='v20261116r';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -3829,13 +3828,14 @@ setInterval(()=>{if(eu)$('zcarro').setAttribute('data-l',eu.driving?'Descer do c
 
 /* ----- prefeito da cidade ----- */
 let PREF_ID=null,PREF_NOME='';
-function carregaPref(){api.cidade().then(r=>{if(!r)return;const novo=r.prefeito||null;PREF_ID=novo;PREF_NOME=r.moradores?r.moradores.nome:''}).catch(()=>{})}
-setInterval(carregaPref,60000);setTimeout(carregaPref,1500);
+let PREF_OK=false;
+function carregaPref(){api.cidade().then(r=>{if(!r)return;const novo=r.prefeito||null,nome=r.moradores?r.moradores.nome:'',mudou=PREF_OK&&novo&&novo!==PREF_ID;PREF_ID=novo;PREF_NOME=nome;PREF_OK=true;
+ if(mudou&&eu){const sou=novo===eu.id;bannerGrande('🏛️ NOVO PREFEITO!',sou?'👑 Você é o TOP 1 e assumiu a Cidade do Tonhão':'🏆 '+nome+' virou o TOP 1 e assumiu a cidade');log('🏛️ '+nome+' é o novo prefeito!')}}).catch(()=>{})}
+setInterval(carregaPref,20000);setTimeout(carregaPref,1500);
 function bannerGrande(t1,t2){const el=document.createElement('div');el.className='bannerPref';el.innerHTML='<div class="bp1">'+t1+'</div>'+(t2?'<div class="bp2">'+t2+'</div>':'');document.body.appendChild(el);try{Som.play('nivel')}catch(_){}setTimeout(()=>el.classList.add('sai'),3600);setTimeout(()=>el.remove(),4300)}
 function trofeu(c,x,y){const k=(Math.sin(now*4)+1)/2,b=Math.sin(now*3)*1.2;c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y+b,0,x,y+b,13);g.addColorStop(0,`rgba(255,215,64,${.5+.4*k})`);g.addColorStop(1,'rgba(255,200,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y+b,13,0,7);c.fill();c.restore();
  c.save();c.font='11px sans-serif';c.textAlign='center';c.textBaseline='middle';c.shadowColor='#ffd23f';c.shadowBlur=6+k*6;c.fillText('🏛️',x,y+b);c.restore();
  for(let i=0;i<3;i++){const a=now*2+i*2.1,r=8;c.fillStyle=`rgba(255,240,170,${.5+.5*Math.sin(now*5+i)})`;c.beginPath();c.arc(x+Math.cos(a)*r,y+b+Math.sin(a)*r*.5,.8,0,7);c.fill()}}
-function assumirPrefeitura(){acao(async()=>{const r=await api.assumirPref();PREF_ID=eu.id;PREF_NOME=eu.nome;emitEv('prefeito',{});bannerGrande('🏛️ NOVO PREFEITO!','👑 '+eu.nome+' assumiu a Cidade do Tonhão');log('🏛️ '+eu.nome+' é o novo prefeito!');closePlace()})}
 
 /* ----- formulário genérico ----- */
 function abrirForm(tit,html,depois){$('fTit').textContent=tit;$('fBody').innerHTML=html;$('mForm').classList.remove('hidden');if(depois)depois($('fBody'))}
