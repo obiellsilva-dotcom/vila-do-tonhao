@@ -903,7 +903,9 @@ const bank=addB({kind:'banco',x:37,y:15,w:8,h:6});
 const igreja=addB({kind:'igreja',x:48,y:40,w:7,h:8});
 const conc=addB({kind:'concessionaria',x:86,y:23,w:10,h:6});
 const ofic=addB({kind:'oficina',x:105,y:23,w:6,h:6});
-const posto=addB({kind:'posto',x:112,y:24,w:6,h:5});
+const posto=addB({kind:'posto',x:113,y:23,w:4,h:2});
+for(let y=25;y<=29;y++)for(let x=111;x<=118;x++)grid[y][x]=G.ROAD; // pátio do posto
+const BOMBAS=[{x:T(113.5),y:T(27)},{x:T(116.5),y:T(27)}];
 const fab=addB({kind:'fabrica',x:15,y:66,w:12,h:9});
 const pref=addB({kind:'prefeitura',x:39,y:67,w:10,h:8});
 const deleg=addB({kind:'delegacia',x:60,y:65,w:10,h:6});
@@ -1163,7 +1165,6 @@ function drawShop(c,b){
   if(b.kind==='concessionaria'){drawCarShape(c,wx+19,wy+17,k?'opala':'fusca',1,.55);addWindow(wx,wy,38,18);return}
   if(b.kind==='oficina'||b.kind==='posto'){c.fillStyle='#555';for(let i=0;i<3;i++)c.fillRect(wx+6+i*11,wy+6,6,10);addWindow(wx,wy,38,18);return}
   for(let i=0;i<7;i++){c.fillStyle=b.kind==='padaria'?hpick(['#d9a35b','#c8873f','#f0c987'],i,k,5):hpick(['#e74c3c','#f1c40f','#2ecc71','#e67e22'],i,k,6);circ(c,wx+5+i*5,wy+13,2.6)}addWindow(wx,wy,38,18)});
- if(b.kind==='posto'){for(const px of [x+14,x+w-24]){c.fillStyle='#c0392b';rr(c,px,y+h-26,10,22,2);c.fill();c.fillStyle='#fff';c.fillRect(px+2,y+h-22,6,5)}}
  if(b.kind==='barbearia'){const px=x+w-14,py=y+h-34;c.fillStyle='#fff';rr(c,px,py,7,26,3);c.fill();c.strokeStyle='#c0392b';c.lineWidth=2;for(let i=0;i<5;i++){c.beginPath();c.moveTo(px,py+3+i*5);c.lineTo(px+7,py+7+i*5);c.stroke()}}
 }
 function drawBank(c,b,label,roof,roof2,juros){
@@ -1590,6 +1591,19 @@ function artFatia(c,a,xa,xb,ya,yb){xa=Math.max(xa,a.x0);xb=Math.min(xb,a.x0+a.w)
 const ROOF_KIND={mercadinho:'#b03a2e',padaria:'#8e5a3c',barbearia:'#2c3e50',banco:'#4a5a7a',igreja:'#2e6f95',concessionaria:'#5b6770',oficina:'#6b6b75',posto:'#c0392b',fabrica:'#6d6d78',prefeitura:'#7a5038',delegacia:'#2b3a55',hospital:'#7fc8c0'};
 const R0=b=>(b.kind==='casa'||b.kind==='mansao')?b.h*TILE*.3:0;
 // feirinha (no lugar da loja do mercadinho): barracas baixas com toldo listrado e caixas de frutas
+function drawBomba(c,b){const X=b.x,Y=b.y;isoBox(c,X-T(.45),Y-T(.2),X+T(.45),Y+T(.2),0,6,'#bfc5cc');isoBox(c,X-T(.18),Y-T(.12),X+T(.18),Y+T(.12),6,34,'#e8e8e8');
+ const q=isoP(X,Y+T(.12));c.fillStyle='#d62828';c.fillRect(q[0]-6,q[1]-32,12,8);c.fillStyle='#1d2a3a';c.fillRect(q[0]-5,q[1]-22,10,6);c.fillStyle='#7CFC00';c.font='700 5px monospace';c.textAlign='center';c.fillText('5,89',q[0],q[1]-17.5);
+ c.fillStyle='#222';c.fillRect(q[0]+6,q[1]-20,2,10);
+ if(eu&&eu.driving&&Math.hypot(eu.x-X,eu.y-Y)<T(4)){const g=isoP(X,Y+T(.9)),a=.5+Math.sin(now*5)*.3;c.strokeStyle='rgba(255,210,63,'+a+')';c.lineWidth=3;c.beginPath();c.ellipse(g[0],g[1],26,13,0,0,7);c.stroke();c.fillStyle='#fff';c.font='700 9px Fredoka,sans-serif';c.strokeStyle='#3a1d10';c.lineWidth=3;c.strokeText('⛽ Pare aqui',g[0],g[1]-16);c.fillText('⛽ Pare aqui',g[0],g[1]-16)}
+ c.textAlign='left'}
+function drawCobertura(c){const x0=T(111.6),x1=T(118.4),y0=T(25.9),y1=T(28.3),H=74;
+ for(const [px,py] of [[x0+T(.3),y0+T(.3)],[x1-T(.3),y0+T(.3)],[x0+T(.3),y1-T(.3)],[x1-T(.3),y1-T(.3)]])isoBox(c,px-4,py-4,px+4,py+4,0,H,'#f2f2f2');
+ const sob=eu&&eu.x>x0&&eu.x<x1&&eu.y>y0-T(1)&&eu.y<y1+T(1);c.save();c.globalAlpha=sob?.45:1;
+ isoBox(c,x0,y0,x1,y1,H,H+12,'#f4f4f4');const A=isoP(x0,y1),Bq=isoP(x1,y1);c.fillStyle='#1e8f3e';c.beginPath();c.moveTo(A[0],A[1]-H-3);c.lineTo(Bq[0],Bq[1]-H-3);c.lineTo(Bq[0],Bq[1]-H-9);c.lineTo(A[0],A[1]-H-9);c.fill();
+ c.fillStyle='#f1c40f';c.beginPath();c.moveTo(A[0],A[1]-H-9);c.lineTo(Bq[0],Bq[1]-H-9);c.lineTo(Bq[0],Bq[1]-H-12);c.lineTo(A[0],A[1]-H-12);c.fill();
+ const m=isoP((x0+x1)/2,y1);c.translate(m[0],m[1]-H-4);c.transform(1,(Bq[1]-A[1])/(Bq[0]-A[0]),0,1,0,0);c.fillStyle='#fff';c.font='700 8px Fredoka,sans-serif';c.textAlign='center';c.fillText('POSTO DO TONHÃO',0,3);c.restore();
+ const pl=isoP(T(119.6),T(24.6));c.fillStyle='#888';c.fillRect(pl[0]-2,pl[1]-70,4,70);c.fillStyle='#1e8f3e';rr(c,pl[0]-20,pl[1]-108,40,40,5);c.fill();c.fillStyle='#f1c40f';c.font='700 8px Fredoka,sans-serif';c.fillText('⛽ TONHÃO',pl[0],pl[1]-96);
+ c.fillStyle='#111';c.fillRect(pl[0]-16,pl[1]-91,32,19);c.fillStyle='#ff5a36';c.font='700 7px monospace';c.fillText('G 5,89',pl[0],pl[1]-83);c.fillText('E 3,99',pl[0],pl[1]-75);c.textAlign='left'}
 function drawFeira(c,b){const X0=T(b.x),Y0=T(b.y),Y1=T(b.y+b.h),n=4,w=(T(b.w)-12)/n,cores=[['#e74c3c','#fff'],['#2e86c1','#fff'],['#27ae60','#fff7d6'],['#f39c12','#fff']],fr=['#e74c3c','#f1c40f','#27ae60','#e67e22','#8e44ad','#f5b041'];
  for(let i=0;i<n;i++){const x0=X0+6+i*w,x1=x0+w-8,ym=Y0+T(1.2),yf=Y1-6;
   sombraChao(c,x0,ym-4,x1,yf);
@@ -2383,6 +2397,7 @@ function drawCena(){
  for(const [pid,pc] of parados){if(!vis(pc.x,pc.y)||!CARS[pc.c])continue;const dono=pid===(eu&&eu.id)?eu:others.get(pid);if(dono&&dono.driving)continue;list.push({x:pc.x,y:pc.y,f:()=>{CAR_COR_ATUAL=pc.cor;drawCarStack(ctx,pc.x,pc.y,pc.c,pc.ang,null,{freio:0});CAR_COR_ATUAL=null}})}
  for(const a of animais)if(vis(a.x,a.y))list.push({x:a.x,y:a.y,f:()=>drawAnimal(ctx,a)});
  for(const f of FRUTAS)if(vis(f.x,f.y))list.push({x:f.x,y:f.y,f:()=>drawFruteira(ctx,f)});
+ if(vis(T(115),T(27))){for(const bb of BOMBAS)list.push({x:bb.x,y:bb.y,cam:1,f:()=>drawBomba(ctx,bb)});list.push({x:T(118),y:T(28.6),k:T(118)+T(28.6)+40,cam:1,f:()=>drawCobertura(ctx)})}
  if(vis(FOGUEIRA.x,FOGUEIRA.y)){list.push({x:FOGUEIRA.x,y:FOGUEIRA.y,f:()=>drawFogueira(ctx)});for(const [tx,col,ty] of [[-13.2,'#e67e22',38.8],[-6.6,'#2e86c1',38.6]])list.push({x:T(tx),y:T(ty),f:()=>drawBarraca(ctx,T(tx),T(ty),col)})}
  if(vis(T(46),T(-12))){ctx.save();ctx.beginPath();ctx.rect(T(36),T(-14.6),T(22),T(12));ctx.clip();drawCachoeira(ctx);ctx.restore();
   list.push({x:T(46.5),y:T(-15.2),cam:1,f:()=>drawPenhasco(ctx)})}
@@ -2618,6 +2633,7 @@ const LOJA={
  coxinha:{nome:'uma coxinha',preco:7,local:'padaria',fome:20},agua:{nome:'uma garrafa de água',preco:3,local:'mercadinho',fome:0,sede:40},banana:{nome:'um cacho de banana',preco:3,local:'mercadinho',fome:10,sede:2},laranja:{nome:'umas laranjas',preco:4,local:'mercadinho',fome:8,sede:15},melancia:{nome:'uma fatia de melancia',preco:5,local:'mercadinho',fome:10,sede:25},biscoito:{nome:'um pacote de biscoito',preco:6,local:'mercadinho',fome:15},queijo:{nome:'um pedaço de queijo',preco:9,local:'mercadinho',fome:22},sanduiche:{nome:'um sanduíche natural',preco:12,local:'mercadinho',fome:32,sede:5},cesta:{nome:'uma cesta básica',preco:60,local:'mercadinho',fome:100}};
 const ICON={cerveja:'🍺',pinga:'🥃',guarana:'🥤',pastel:'🥟',pf:'🍛',porcao:'🍟',rodada:'🍻',cafe:'☕',pao:'🍞',coxinha:'🍗',cesta:'🧺',agua:'💧',agua_bar:'💧',suco:'🧃',banana:'🍌',laranja:'🍊',melancia:'🍉',biscoito:'🍪',queijo:'🧀',sanduiche:'🥪'};
 const precoTanque=c=>c==='moto'?15:['fusca','kombi','fusca_ouro'].includes(c)?25:['opala','caminhonete','kombi_tonhao'].includes(c)?35:45;
+setInterval(()=>{if(!eu||!eu.driving||lugarAtual||eu.moving){if(eu&&!eu.driving)eu.naBomba=false;return}const nb=BOMBAS.some(bb=>Math.hypot(eu.x-bb.x,eu.y-(bb.y+T(.9)))<T(1.3));if(nb&&!eu.naBomba){eu.naBomba=true;abrirLugar(Object.assign(Object.create(SHOPS.posto),{bomba:1}))}else if(!nb)eu.naBomba=false},300);
 setInterval(()=>{if(eu&&eu.gas!=null&&eu.gas!==eu.gasSalvo){eu.gasSalvo=eu.gas;api.salvarGas&&api.salvarGas(Math.round(eu.gas*10)/10).catch(()=>{})}},30000);
 const CARS={moto:{nome:'Motoca',preco:1800,nivel_min:1},fusca:{nome:'Fusca',preco:3000,nivel_min:1},kombi:{nome:'Kombi',preco:5500,nivel_min:3},opala:{nome:'Opala',preco:12000,nivel_min:6},caminhonete:{nome:'Caminhonete',preco:25000,nivel_min:10},sedan:{nome:'Sedã',preco:45000,nivel_min:13},jipe:{nome:'Jipe',preco:70000,nivel_min:16},esportivo:{nome:'Esportivo',preco:120000,nivel_min:20}};
 const CAR_SHAPE={sedan:'opala',jipe:'caminhonete',esportivo:'opala',fusca_ouro:'fusca',kombi_tonhao:'caminhonete',neon:'opala'};
@@ -2981,7 +2997,8 @@ function abrirLugar(b){
    c.innerHTML=`<span class="e">${ICON[id]||'🍽️'}</span>${nm}<span class="pr">${money(it.preco)}</span><span class="tg">${it.fome?'🍗'+it.fome+' ':''}${it.sede?'💧'+it.sede:''}</span>`+(id!=='rodada'?'<span class="mo" title="Guardar na mochila">🎒</span>':'');
    c.onclick=e=>{Som.play('clique');if(e.target.classList.contains('mo'))guardarItem(id);else comprarItem(id)};g.appendChild(c)});
   const d=document.createElement('div');d.style.cssText='font-size:11px;opacity:.7;text-align:center;margin-top:4px';d.textContent='Toque para consumir agora · 🎒 guarda na mochila';box.appendChild(d)}
- if(k==='posto'&&eu.carros.length){const g=Math.round(eu.gas??100),c=Math.max(2,Math.ceil(precoTanque(eu.carro||eu.carros[0])*(100-g)/100));sub='Tanque com '+g+'% de gasolina.';botao(box,g>=99?'⛽ Tanque cheio':`⛽ Encher o tanque: ${money(c)}`,()=>acao(async()=>{const r=tratar(await api.abastecer(eu.gas??100));eu.gas=100;Som.play('compra');floatText(eu.x,eu.y-30,'-'+money(r.custo)+' ⛽','#ff9a8a');toast('⛽ Tanque cheio!',2500);closePlace()}),{off:g>=99||eu.dinheiro<c})}
+ if(k==='posto'&&eu.carros.length&&!b.bomba){sub='Para abastecer, pare o carro embaixo da cobertura, numa bomba ⛽.'}
+ if(k==='posto'&&eu.carros.length&&b.bomba){const g=Math.round(eu.gas??100),c=Math.max(2,Math.ceil(precoTanque(eu.carro||eu.carros[0])*(100-g)/100));sub='Tanque com '+g+'% de gasolina.';botao(box,g>=99?'⛽ Tanque cheio':`⛽ Encher o tanque: ${money(c)}`,()=>acao(async()=>{const r=tratar(await api.abastecer(eu.gas??100));eu.gas=100;Som.play('compra');floatText(eu.x,eu.y-30,'-'+money(r.custo)+' ⛽','#ff9a8a');toast('⛽ Tanque cheio!',2500);closePlace()}),{off:g>=99||eu.dinheiro<c})}
  if(k==='mercadinho'&&eu.peixes>0)botao(boxPrin.querySelector('#ptabs')?box:boxPrin,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
  if(k==='concessionaria'){sub='Comprou, saiu dirigindo. Para descer ou dirigir de novo, toque em você.';
   closePlace();abrirVitrine();return;
@@ -3792,7 +3809,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261118a';
+const VERSAO_JOGO='v20261118b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
