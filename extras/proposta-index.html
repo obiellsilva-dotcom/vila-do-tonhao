@@ -519,8 +519,8 @@ const ESTILO_BASE={listrada:'camiseta',colete:'camiseta',camisaJeans:'social',ag
 const OPC={
  cabelo:{m:[['Careca','careca'],['Curto','curto'],['Topete','topete'],['Comprido','comprido','x'],['Black power','black','x'],['Coque','coque'],['Rabo de cavalo','rabo','x'],['Moicano','moicano','x'],['Trança','tranca'],['Cacheado','cacheado'],['Degradê','degrade'],['Social de lado','lateral'],['Surfista','surfista','x'],['Dreads','dreads'],['Mullet','mullet'],['Raspado','raspado'],['Espetado','espetado'],['Crop texturizado','crop'],['Undercut','undercut'],['Cachos com degradê','cachosfade']],
   f:[['Comprido','comprido'],['Coque','coque'],['Rabo de cavalo','rabo'],['Trança','tranca','x'],['Cacheado','cacheado'],['Black power','black'],['French bob','chanel'],['Comprido com franja','franja'],['Maria-chiquinha','chiquinha','x'],['Pixie','curto'],['Butterfly (camadas)','butterfly'],['Long bob','lob'],['Ondas boho','ondas'],['Box braids','boxbraids'],['Comprido com cortininha','cortina'],['Meio preso','meiopreso'],['Cachos longos','cachoslongos'],['Duas tranças','duas','x'],['Coque bagunçado','coqueB']]},
- calca:{m:[['Jeans','jeans'],['Preta','preta'],['Marrom','marrom'],['Bege','bege'],['Verde','verde'],['Bermuda jeans','bermudaJeans'],['Bermuda cáqui','bermudaCaqui'],['Calça de moletom','moletomCalca'],['Calça cargo','cargo']],
-  f:[['Calça jeans','jeans'],['Legging','legging'],['Saia jeans','saiaJeans'],['Saia rodada','saiaRodada'],['Short jeans','shortJeans'],['Calça branca','branca'],['Saia preta','saiaPreta'],['Saia longa','saiaLonga'],['Calça cargo','cargo']]},
+ calca:{m:[['Jeans','jeans'],['Preta','preta'],['Marrom','marrom'],['Bege','bege'],['Verde','verde'],['Bermuda jeans','bermudaJeans'],['Bermuda cáqui','bermudaCaqui'],['Calça de moletom','moletomCalca'],['Calça cargo','cargo'],['Jeans baggy','baggy'],['Calça wide leg','wide'],['Jeans barrel','barrel'],['Jogger','jogger'],['Cargo larga','cargoLarga'],['Jeans skinny','skinny'],['Alfaiataria','alfaiataria'],['Bermuda cargo','bermudaCargo'],['Short tactel','tactel']],
+  f:[['Calça jeans','jeans'],['Legging','legging'],['Saia jeans','saiaJeans'],['Saia rodada','saiaRodada'],['Short jeans','shortJeans'],['Calça branca','branca'],['Saia preta','saiaPreta'],['Saia longa','saiaLonga'],['Calça cargo','cargo'],['Wide leg','wide'],['Jeans baggy','baggy'],['Flare','flare'],['Pantalona','pantalona'],['Jeans barrel','barrel'],['Jogger','jogger'],['Alfaiataria','alfaiataria']]},
  chapeu:{vip:[['Coroa','coroa'],['Boné de ouro','boneOuro']],m:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Capacete','capacete'],['Cartola','cartola'],['Chapéu de cowboy','cowboy'],['Boné aba reta','boneReto'],['Chapéu de pescador','pescador']],
   f:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Tiara','tiara'],['Flor no cabelo','flor'],['Chapéu de cowboy','cowboy'],['Laço','laco'],['Chapéu de pescador','pescador']]},
  extra:{vip:[['Corrente de diamante','diamante']],m:[['Nada','nada'],['Óculos','oculos'],['Bigode','bigode'],['Óculos escuros','escuros'],['Barba','barba'],['Palito na boca','palito'],['Corrente de ouro','corrente'],['Brinco','brinco']],
@@ -918,12 +918,15 @@ function drawPersonReal0(c,x,y,v,o={}){
  {const sw0=o.belly?11:8.5;c.save();c.scale(1,.32);const g=c.createRadialGradient(1.5,0,0,1.5,0,sw0);g.addColorStop(0,'rgba(0,0,0,.34)');g.addColorStop(.7,'rgba(0,0,0,.16)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;circ(c,1.5,0,sw0);c.restore()}
  const skin=PELE[v.pele],skinD=shade(skin,-22);
  const shirt=o.policia?'#25406e':o.tonhao?'#3f9a4a':roupaR==='camisaJeans'?'#4a6fa5':roupaR==='banda'?'#1d1d22':roupaR==='couro'?'#2a2220':roupaR==='ternoBranco'?'#f2f2f2':corRoupa(v.camisa),shirtD=shade(shirt,-28),shirtL=shade(shirt,22);
- const PANT={jeans:'#2d4a7a',preta:'#26262b',marrom:'#6b4a2e',bege:'#c7b48a',verde:'#2f5d43',bermudaJeans:'#3f5f8f',bermudaCaqui:'#b59d70',moletomCalca:'#6b6b72',legging:'#1d1d22',saiaJeans:'#3f5f8f',saiaRodada:CAMISA[((v.camisa%10)+4)%10],shortJeans:'#5577aa',branca:'#ece8df',saiaPreta:'#222226',saiaLonga:CAMISA[((v.camisa%10)+2)%10]};
+ const PANT={jeans:'#2d4a7a',preta:'#26262b',marrom:'#6b4a2e',bege:'#c7b48a',verde:'#2f5d43',bermudaJeans:'#3f5f8f',bermudaCaqui:'#b59d70',moletomCalca:'#6b6b72',legging:'#1d1d22',saiaJeans:'#3f5f8f',saiaRodada:CAMISA[((v.camisa%10)+4)%10],shortJeans:'#5577aa',branca:'#ece8df',saiaPreta:'#222226',saiaLonga:CAMISA[((v.camisa%10)+2)%10],baggy:'#6f8fbf',wide:'#3b3b40',barrel:'#4d6a96',flare:'#35558a',jogger:'#2f3036',cargoLarga:'#5c6146',skinny:'#1f2f4f',pantalona:'#efe6d6',alfaiataria:'#2a2d36',bermudaCargo:'#7a7550',tactel:CAMISA[((v.camisa%10)+3)%10],shortSaia:CAMISA[((v.camisa%10)+6)%10]};
+ // modelagem da calça: largura no quadril, no joelho e no tornozelo (x largura da perna) + detalhes
+ const FITS={legging:[.95,.9,.82],skinny:[1,.92,.82],jeans:[1.14,1.1,1.08,'vinco'],preta:[1.14,1.1,1.08,'vinco'],marrom:[1.14,1.1,1.08,'vinco'],bege:[1.14,1.1,1.08,'vinco'],verde:[1.14,1.1,1.08,'vinco'],branca:[1.14,1.1,1.1,'vinco'],moletomCalca:[1.28,1.22,.92,'punho'],jogger:[1.28,1.22,.92,'punho'],cargo:[1.42,1.42,1.36,'cargo'],cargoLarga:[1.48,1.48,1.42,'cargo'],baggy:[1.5,1.52,1.58,'dobras'],wide:[1.36,1.5,1.92,'vinco'],pantalona:[1.4,1.56,2,'vinco'],alfaiataria:[1.2,1.18,1.16,'vinco'],barrel:[1.42,1.7,1.04,'dobras'],flare:[1.04,.98,1.8,'vinco'],bermudaJeans:[1.3,1.3,1.3],bermudaCaqui:[1.3,1.3,1.3],bermudaCargo:[1.45,1.45,1.45,'cargo'],tactel:[1.4,1.4,1.4],shortJeans:[1.15,1.15,1.15]};
+ const FIT=FITS[baixoR]||FITS[baixo]||[1,.95,.86],cobre=FIT[2]>=1.3;
  const macacao=roupa==='macacao',vest=roupa==='vestido'||roupa==='vestidoLongo';
  const pants=o.policia?'#1d2433':o.tonhao?'#2d4a7a':o.suit?'#2a2f3a':CC||(baixoR==='cargo'?'#6b6b4a':PANT[baixo])||'#2d4a7a',pantsD=shade(pants,-25);
  const saia=!macacao&&(vest||baixo.startsWith('saia')),saiaLonga=roupa==='vestidoLongo'||baixo==='saiaLonga';
  const pernaCor=k=>{if(saia)return skin;return pants};
- const corte=macacao||vest?0:baixo==='shortJeans'?4.5:(baixo==='bermudaJeans'||baixo==='bermudaCaqui')?7.5:0;
+ const corte=macacao||vest?0:baixo==='shortJeans'?4.5:baixo==='tactel'?5.5:(baixo==='bermudaJeans'||baixo==='bermudaCaqui'||baixo==='bermudaCargo')?7.5:0;
  const sw=ph!=null?Math.sin(ph):0,dy=sit?7:0,F=!sit&&(!!o.cara||back)&&!o.arms&&!o.c34,rotK=F?0:1;
  const shoe=(sx,sy2)=>{
   if(calc==='chinelo'){c.fillStyle=skin;rr(c,sx-2.6,sy2-1.6,5.4,1.8,.9);c.fill();c.fillStyle=SC||CAMISA[((v.camisa%10)+5)%10];c.fillRect(sx-1.2,sy2-2,2.6,.9);c.fillStyle='#4a3a2a';c.fillRect(sx-2.8,sy2-.4,5.8,.6);return}
@@ -947,24 +950,24 @@ function drawPersonReal0(c,x,y,v,o={}){
     shoe(kx+dir*.8,k?-.6:0)}}
  }else{
   const lw=baixo==='legging'||fem?3.8:4.2,anda=ph!=null;
-  const seg=(x0,y0,ang,len,w,cor)=>{c.save();c.translate(x0,y0);c.rotate(-dir*ang);c.fillStyle=cor;rr(c,-w/2,-.7,w,len+1.4,w/2.2);c.fill();VOLG(c,-w/2,-.7,w,len+1.4,.9);c.restore()};
+  const seg=(x0,y0,ang,len,w,cor,wB,det,rotAbs)=>{wB=wB??w;c.save();c.translate(x0,y0);c.rotate(rotAbs??-dir*ang);const P=new Path2D(),r=Math.min(w,wB)/2.4;P.moveTo(-w/2+r*.5,-.7);P.lineTo(w/2-r*.5,-.7);P.quadraticCurveTo(w/2,-.7,w/2,r*.4);P.lineTo(wB/2,len+.7-r*.3);P.quadraticCurveTo(wB/2,len+.7,wB/2-r*.5,len+.7);P.lineTo(-wB/2+r*.5,len+.7);P.quadraticCurveTo(-wB/2,len+.7,-wB/2,len+.7-r*.3);P.lineTo(-w/2,r*.4);P.quadraticCurveTo(-w/2,-.7,-w/2+r*.5,-.7);P.closePath();c.fillStyle=cor;c.fill(P);c.save();c.clip(P);VOLG(c,-Math.max(w,wB)/2,-.7,Math.max(w,wB),len+1.4,.9);if(det&&cor!==skin){c.lineCap='round';const tipo=FIT[3];if(tipo==='vinco'){c.strokeStyle='rgba(255,255,255,.16)';c.lineWidth=.3;c.beginPath();c.moveTo(-w*.08,0);c.lineTo(-wB*.08,len);c.stroke()}if(tipo==='dobras'||tipo==='cargo'||FIT[1]>1.3){c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.35;const n=det==='canela'?3:2;for(let i=0;i<n;i++){const yy=len*(det==='canela'?.45+i*.2:.55+i*.2),ww=w+(wB-w)*(yy/len);c.beginPath();c.moveTo(-ww/2+.3,yy+(i%2?.6:-.2));c.quadraticCurveTo(0,yy-.9,ww/2-.4,yy+(i%2?-.2:.5));c.stroke()}c.strokeStyle='rgba(255,255,255,.12)';c.beginPath();c.moveTo(-w*.3,len*.3);c.quadraticCurveTo(0,len*.2,w*.3,len*.32);c.stroke()}if(tipo==='cargo'&&det==='coxa'){c.fillStyle='rgba(0,0,0,.16)';rr(c,w*.05,len*.3,w*.42,len*.42,.6);c.fill();c.fillStyle=shade(cor,8);rr(c,w*.05,len*.3,w*.42,len*.12,.4);c.fill()}if(tipo==='punho'&&det==='canela'){c.fillStyle=shade(cor,-22);c.fillRect(-wB/2-.1,len-1.4,wB+.2,2.2);c.strokeStyle='rgba(0,0,0,.25)';c.lineWidth=.2;for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(i*wB*.18,len-1.3);c.lineTo(i*wB*.18,len+.6);c.stroke()}c.strokeStyle='rgba(0,0,0,.18)';c.lineWidth=.3;c.beginPath();c.moveTo(-wB/2,len-2.4);c.quadraticCurveTo(0,len-1.6,wB/2,len-2.6);c.stroke()}if(det==='canela'&&cobre){c.fillStyle=shade(cor,-16);c.fillRect(-wB/2-.1,len,wB+.2,.8)}}c.restore();c.restore()};
+  const barra=(x,y,cor)=>{if(!cobre||saia||corte)return;const wb=lw*FIT[2];c.fillStyle=shade(cor,-10);rr(c,x-wb/2,y-2.2,wb,1.9,.6);c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x-wb/2,y-.6,wb,.3)};
   if(o.mv!=null&&anda){const ux=Math.cos(o.mv),uy=Math.sin(o.mv),A=5.6*(o.amp||1),pern=[];
    for(const k of [-1,1]){const pk=(ph||0)+(k>0?0:Math.PI),s1=Math.sin(pk),sw=Math.max(0,Math.cos(pk)),hx=k*((fem?2.2:2.5)*Math.abs(uy)+.7),hy=-16;
     const fx=hx+ux*A*s1,fy=uy*A*.4*s1-Math.abs(uy)*A*.4-sw*2,bend=.8+sw*2.2,kx2=(hx+fx)/2+ux*bend,ky2=(hy+fy)/2+uy*bend*.5;pern.push({k,hx,hy,fx,fy,kx2,ky2})}
    pern.sort((a,b)=>a.fy-b.fy);
    for(const L of pern){const back2=L!==pern[1],cor0=pernaCor(L.k),cor=back2&&!saia?shade(cor0,-22):cor0;c.lineCap='round';c.lineJoin='round';
-    c.strokeStyle=cor;c.lineWidth=lw*1.12/BX;c.beginPath();c.moveTo(L.hx,L.hy);c.lineTo(L.kx2,L.ky2);c.stroke();
-    c.strokeStyle=corte?skin:cor;c.lineWidth=lw*1.02/BX;c.beginPath();c.moveTo(L.kx2,L.ky2);c.lineTo(L.fx,L.fy-1);c.stroke();
+    {const a1=Math.atan2(L.kx2-L.hx,L.ky2-L.hy),l1=Math.hypot(L.kx2-L.hx,L.ky2-L.hy),a2=Math.atan2(L.fx-L.kx2,L.fy-1-L.ky2),l2=Math.hypot(L.fx-L.kx2,L.fy-1-L.ky2);seg(L.hx,L.hy,0,l1,lw*1.08*FIT[0]/BX,cor,lw*1.04*FIT[1]/BX,'coxa',-a1);seg(L.kx2,L.ky2,0,l2,lw*FIT[1]/BX,corte?skin:cor,lw*FIT[2]/BX,'canela',-a2)}
     if(corte){c.strokeStyle=skin;c.lineWidth=lw*1/BX;c.beginPath();c.moveTo((L.hx+L.kx2)/2,(L.hy+L.ky2)/2);c.lineTo(L.kx2,L.ky2);c.stroke()}
-    shoe(L.fx,Math.min(0,L.fy))}}
+    shoe(L.fx,Math.min(0,L.fy));barra(L.fx,Math.min(0,L.fy),cor)}}
  else for(const k of (F?[-1,1]:[dir,-dir])){const hx=F?k*(fem?2.3:2.6):k*(fem?.7:.9),pk=(ph||0)+(k>0?0:Math.PI),th=anda?Math.sin(pk)*.55*(o.amp||1):0,kn=anda?Math.max(0,Math.cos(pk))*.85*(o.amp||1)+(o.flex||0):0,L1=8.2,L2=7.9;
-   if(F){const lift=anda?Math.max(0,Math.sin(pk))*2.4*(o.amp||1):0,cor=pernaCor(k),ky=-16+L1-lift*.4;seg(hx,-16,0,L1-lift*.4,lw,cor);if(corte&&corte<L1)seg(hx,-16+corte,0,L1-corte-lift*.4,lw*.92,skin);seg(hx,ky,0,L2-lift*.6,lw*.94,corte?skin:cor);if(!corte&&!saia&&lift>.5){c.fillStyle=pantsD;circ(c,hx,ky,lw*.3)}shoe(hx,-lift);continue}
+   if(F){const lift=anda?Math.max(0,Math.sin(pk))*2.4*(o.amp||1):0,cor=pernaCor(k),ky=-16+L1-lift*.4;seg(hx,-16,0,L1-lift*.4,lw*FIT[0],cor,lw*FIT[1],'coxa');if(corte&&corte<L1)seg(hx,-16+corte,0,L1-corte-lift*.4,lw*.92,skin);seg(hx,ky,0,L2-lift*.6,corte?lw*.94:lw*FIT[1],corte?skin:cor,corte?lw*.94:lw*FIT[2],'canela');if(!corte&&!saia&&lift>.5&&FIT[1]<1.2){c.fillStyle=pantsD;circ(c,hx,ky,lw*.3)}shoe(hx,-lift);barra(hx,-lift,cor);continue}
    const kx=hx+dir*L1*Math.sin(th),ky=-16+L1*Math.cos(th),a2=th-kn,fx=kx+dir*L2*Math.sin(a2),fy=ky+L2*Math.cos(a2);
-   const cor=k===dir&&!saia?shade(pernaCor(k),-28):pernaCor(k);seg(hx,-16,th,L1,lw,cor);
+   const cor=k===dir&&!saia?shade(pernaCor(k),-28):pernaCor(k);seg(hx,-16,th,L1,lw*FIT[0],cor,lw*FIT[1],'coxa');
    if(corte&&corte<L1)seg(hx+dir*corte*Math.sin(th),-16+corte*Math.cos(th),th,L1-corte,lw*.92,skin);
-   seg(kx,ky,a2,L2,lw*.94,corte?skin:cor);
-   if(!corte&&!saia){c.fillStyle=pantsD;circ(c,kx,ky,lw*.32)}
-   shoe(fx,Math.min(0,fy))}
+   seg(kx,ky,a2,L2,corte?lw*.94:lw*FIT[1],corte?skin:cor,corte?lw*.94:lw*FIT[2],'canela');
+   if(!corte&&!saia&&FIT[1]<1.2){c.fillStyle=pantsD;circ(c,kx,ky,lw*.32)}
+   shoe(fx,Math.min(0,fy));barra(fx,Math.min(0,fy),cor)}
  }
  // corpo balança ao andar e respira parado
  {const anda2=ph!=null&&!sit;const bob=anda2?(Math.abs(Math.cos(ph))*1.3-.65):Math.sin(now*2.2+x*.13)*.28;c.translate(0,-bob);
