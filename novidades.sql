@@ -74,3 +74,4 @@ grant execute on function public.criar_morador(text, text) to authenticated;
 -- ===================== ETAPA 22: Esportivo passa a se chamar Rover =====================
 update public.loja set nome = 'Rover' where id = 'esportivo' and tipo = 'carro';
 update public.produtos set nome = 'Lambordini' where id = 'carro_neon';
+update public.loja set nome = 'Jipe Renegado' where id = 'jipe' and tipo = 'carro';
