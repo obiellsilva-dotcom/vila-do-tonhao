@@ -1289,22 +1289,25 @@ const FRUTAS=[[50,88],[54,88],[58,88],[62,88],[50,92],[54,92],[58,92],[62,92],[1
 FRUTAS.forEach(f=>noTree.add(Math.floor(f.x/TILE)+','+Math.floor(f.y/TILE)));
 // ===== Condomínio Vila Tonhão: na mata, ao norte, à esquerda da lagoa =====
 // muro em volta, portão com cancela do lado da estrada de terra, pátio grande para estacionar e 4 blocos de 4 andares (sem elevador)
-const CONDO={x0:0,y0:-19,x1:30,y1:-4,portao:[-11,-10]};
+const CONDO={x0:0,y0:-19,x1:30,y1:-4,portao:[-11,-10],portao2:[12,13]};
 for(let y=CONDO.y0;y<=CONDO.y1;y++)for(let x=CONDO.x0;x<=CONDO.x1;x++){const borda=x===CONDO.x0||x===CONDO.x1||y===CONDO.y0||y===CONDO.y1;
- setTile(x,y,borda&&!(x===CONDO.x1&&CONDO.portao.includes(y))?G.BLD:G.WALK);for(let e=-1;e<=1;e++)for(let f=-1;f<=1;f++)noTree.add((x+e)+','+(y+f))}
+ setTile(x,y,borda&&!(x===CONDO.x1&&CONDO.portao.includes(y))&&!(y===CONDO.y1&&CONDO.portao2.includes(x))?G.BLD:G.WALK);for(let e=-1;e<=1;e++)for(let f=-1;f<=1;f++)noTree.add((x+e)+','+(y+f))}
 for(let y=-13;y<=-8;y++)for(let x=10;x<=30;x++)setTile(x,y,G.ROAD); // pátio / estacionamento (dá para entrar de carro)
 for(let y=-11;y<=-10;y++)setTile(30,y,G.ROAD);
+for(let y=-7;y<=-4;y++)for(const x of [12,13])setTile(x,y,G.ROAD); // entrada de baixo até o pátio
+for(let y=-3;y<=-1;y++)for(const x of [12,13]){setTile(x,y,G.TRAIL);noTree.add(x+','+y)}
 // estrada de terra: sai do fim do asfalto, vai até o portão do condomínio e continua até a lagoa
 for(let y=-12;y<=-1;y++)for(let x=31;x<=33;x++){setTile(x,y,G.TRAIL);for(let e=-1;e<=1;e++)noTree.add((x+e)+','+y)}
 for(let y=-3;y<=-1;y++)for(let x=34;x<=36;x++){setTile(x,y,G.TRAIL);noTree.add(x+','+y)}
 // lazer: playground, churrasqueira e quadra
-for(let y=-7;y<=-5;y++){for(let x=2;x<=8;x++)setTile(x,y,G.GRASS);for(let x=11;x<=16;x++)setTile(x,y,G.GRASS);for(let x=19;x<=28;x++)setTile(x,y,G.FIELD)}
+for(let y=-7;y<=-5;y++){for(let x=2;x<=8;x++)setTile(x,y,G.GRASS);for(let x=15;x<=19;x++)setTile(x,y,G.GRASS);for(let x=21;x<=28;x++)setTile(x,y,G.FIELD)}
 const BLOCOS=[{nome:'A',x:2,y:-18},{nome:'B',x:12,y:-18},{nome:'C',x:22,y:-18},{nome:'D',x:1,y:-12}].map((b,i)=>Object.assign(b,{w:7,h:4,i,cor:['#e9d8b4','#cfe0d2','#f0cdb0','#d6d9ea'][i],front:[b.x+3,b.y+4]}));
 for(const b of BLOCOS)for(let y=b.y;y<b.y+b.h;y++)for(let x=b.x;x<b.x+b.w;x++)setTile(x,y,G.BLD);
 setTile(29,-12,G.BLD); // guarita (portaria)
 // 4 blocos × 4 andares × 4 apartamentos = 64. Blocos A, B e C = kitnet (pequeno); Bloco D = 2 quartos (médio, um pouco mais caro). Número no banco: 1000 + bloco×100 + andar×10 + final
 const APTOS=[];BLOCOS.forEach((b,bi)=>{for(let a=1;a<=4;a++)for(let k=1;k<=4;k++)APTOS.push({n:1000+(bi+1)*100+a*10+k,num:a*100+k,bloco:b,kind:bi<3?'kit':'ap2',apto:true,front:b.front,preco:bi<3?4000:6000,aluguel:bi<3?250:350})});
 const aptoDe=n=>APTOS.find(a=>a.n===+n);
+for(let y=-20;y<=1;y++)for(let x=108;x<=139;x++)noTree.add(x+','+y); // salas dos apartamentos e da imobiliária: nada de árvore na porta
 // zones
 for(let y=15;y<=28;y++)for(let x=37;x<=54;x++)grid[y][x]=G.WALK; // centro de empregos
 for(let y=33;y<=35;y++)for(let x=16;x<=31;x++)grid[y][x]=G.PLAZA; // praça na frente do bar (a linha 32 fica de calçada)
@@ -1467,7 +1470,7 @@ function baseColor(x,y){
 function paintCondo(c){c.save();c.strokeStyle='rgba(255,255,255,.75)';c.lineWidth=1.5;
  for(let x=11;x<=29;x++){c.beginPath();c.moveTo(T(x),T(-13));c.lineTo(T(x),T(-12.2));c.moveTo(T(x),T(-8));c.lineTo(T(x),T(-8.8));c.stroke()}
  c.fillStyle='rgba(255,255,255,.55)';c.font='700 16px Fredoka,sans-serif';c.textAlign='center';c.fillText('ESTACIONAMENTO',T(20),T(-10.2));
- c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=2;c.strokeRect(T(19)+4,T(-7)+4,T(10)-8,T(3)-8);c.beginPath();c.moveTo(T(24),T(-7)+4);c.lineTo(T(24),T(-4)-4);c.stroke();c.beginPath();c.arc(T(24),T(-5.5),18,0,7);c.stroke();c.restore()}
+ c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=2;c.strokeRect(T(21)+4,T(-7)+4,T(8)-8,T(3)-8);c.beginPath();c.moveTo(T(25),T(-7)+4);c.lineTo(T(25),T(-4)-4);c.stroke();c.beginPath();c.arc(T(25),T(-5.5),18,0,7);c.stroke();c.restore()}
 function paintTile(c,x,y){
  const px=x*TILE,py=y*TILE,b=baseColor(x,y),h=k=>hsh(x,y,k);
  const COL={road:'#45444a',walk:'#d9cdb5',plaza:'#ead8a9',terr:'#c9714d',sand:'#f0d89a',water:'#3d8cc4',field:'#c9a56b',path:'#d2bf98',wood:'#b8763d',wood2:'#8f5a2e',bridge:'#a8743f',forest:'#2c5e2e',trail:'#c8a274',hill:'#9fd36b',rock:'#7fb85a',horta:'#7a5236'};
@@ -4145,22 +4148,29 @@ function blocoFatia(b,i,fade){const X0=T(b.x),Y0=T(b.y),Y1=T(b.y+b.h),xa=X0+i*TI
   const m=isoP((xa+xb)/2,Y1);ctx.fillStyle='#2a3a4a';rr(ctx,m[0]-17,m[1]-31,34,9,2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 7px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillText('BLOCO '+b.nome,m[0],m[1]-24.5)}
  // platibanda (borda do telhado)
  isoBox(ctx,xa,Y0,xb,Y0+5,Hb,Hb+5,shade(b.cor,-25));isoBox(ctx,xa,Y1-5,xb,Y1,Hb,Hb+5,shade(b.cor,-25));ctx.globalAlpha=1}
+// cancela: poste em (px,py) e o braço deitado até (ex,ey); levanta quando alguém chega perto
+function cancela(list,id,px,py,ex,ey){const mx=(px+ex)/2,my=(py+ey)/2,perto=[eu,...others.values()].some(p=>p&&!p.hidden&&!p.rm&&Math.hypot(p.x-mx,p.y-my)<T(3.5));
+ const k='_'+id;cancela[k]=Math.max(0,Math.min(1,(cancela[k]||0)+(perto?.08:-.05)));
+ list.push({x:mx,y:my,k:Math.max(px+py,ex+ey)+4,cam:1,f:()=>{const ab=cancela[k],P=isoP(px,py),E=isoP(ex,ey),dx=E[0]-P[0],dy=E[1]-P[1],L=Math.hypot(dx,dy),
+   ang0=Math.atan2(dy,dx),ang1=-Math.PI/2,ang=ang0+(((ang1-ang0+Math.PI*3)%(Math.PI*2))-Math.PI)*ab,h=12,bx=P[0]+Math.cos(ang)*L,by=P[1]-h+Math.sin(ang)*L;
+  ctx.fillStyle='#d8d8d8';ctx.fillRect(P[0]-3,P[1]-h-4,6,h+4);ctx.fillStyle='#e03b2c';ctx.fillRect(P[0]-4,P[1]-h-6,8,5);
+  ctx.lineCap='round';ctx.strokeStyle='#fff';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(P[0],P[1]-h);ctx.lineTo(bx,by);ctx.stroke();
+  ctx.strokeStyle='#e03b2c';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(P[0],P[1]-h);ctx.lineTo(bx,by);ctx.stroke();ctx.setLineDash([])}})}
 function condoItens(list){const C=CONDO,cx=T((C.x0+C.x1)/2),cy=T((C.y0+C.y1)/2);if(!vis(cx,cy)&&!vis(T(C.x0),T(C.y1))&&!vis(T(C.x1),T(C.y1))&&!vis(T(C.x0),T(C.y0))&&!vis(T(C.x1),T(C.y0)))return;
  const mid=v=>T(v)+12;
- for(let x=C.x0;x<=C.x1;x++){list.push({x:T(x+.5),y:mid(C.y0),k:T(x+.5)+mid(C.y0),cam:1,f:()=>muroSeg(T(x),mid(C.y0),T(x+1),mid(C.y0)+8)});list.push({x:T(x+.5),y:mid(C.y1),k:T(x+.5)+mid(C.y1)+8,cam:1,f:()=>muroSeg(T(x),mid(C.y1),T(x+1),mid(C.y1)+8)})}
+ for(let x=C.x0;x<=C.x1;x++){list.push({x:T(x+.5),y:mid(C.y0),k:T(x+.5)+mid(C.y0),cam:1,f:()=>muroSeg(T(x),mid(C.y0),T(x+1),mid(C.y0)+8)});if(!C.portao2.includes(x))list.push({x:T(x+.5),y:mid(C.y1),k:T(x+.5)+mid(C.y1)+8,cam:1,f:()=>muroSeg(T(x),mid(C.y1),T(x+1),mid(C.y1)+8)})}
  for(let y=C.y0;y<=C.y1;y++){list.push({x:mid(C.x0),y:T(y+.5),k:mid(C.x0)+T(y+.5),cam:1,f:()=>muroSeg(mid(C.x0),T(y),mid(C.x0)+8,T(y+1))});if(!C.portao.includes(y))list.push({x:mid(C.x1),y:T(y+.5),k:mid(C.x1)+T(y+.5)+8,cam:1,f:()=>muroSeg(mid(C.x1),T(y),mid(C.x1)+8,T(y+1))})}
  // portaria com cancela (sobe quando alguém chega perto)
  {const gx=T(29),gy=T(-12);list.push({x:gx+16,y:gy+32,k:gx+gy+40,cam:1,f:()=>{isoBox(ctx,gx+3,gy+4,gx+29,gy+30,0,30,'#eae4d6');const A=isoP(gx+3,gy+30),B2=isoP(gx+29,gy+30);ctx.fillStyle=darkness()>.3?'#ffd98a':'#7fb3d5';ctx.beginPath();ctx.moveTo(A[0]+3,A[1]-12);ctx.lineTo(B2[0]-3,B2[1]-12);ctx.lineTo(B2[0]-3,B2[1]-24);ctx.lineTo(A[0]+3,A[1]-24);ctx.fill();isoBox(ctx,gx+1,gy+2,gx+31,gy+32,30,34,'#9a4a3a');
    const m=isoP(gx+16,gy+30);ctx.fillStyle='#2a3a4a';rr(ctx,m[0]-24,m[1]-46,48,10,2);ctx.fill();ctx.fillStyle='#ffd23f';ctx.font='700 6.5px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillText('PORTARIA',m[0],m[1]-39)}});
-  const perto=[eu,...others.values()].some(p=>p&&!p.hidden&&Math.hypot(p.x-T(31),p.y-T(-10))<T(4));condoItens.ab=Math.max(0,Math.min(1,(condoItens.ab||0)+(perto?.08:-.05)));
-  const bx=T(30)+16,by=T(-12)+30;list.push({x:bx,y:by,k:bx+by+4,cam:1,f:()=>{const p=isoP(bx,by),a=-Math.PI/2*condoItens.ab,L=58;ctx.fillStyle='#555';ctx.fillRect(p[0]-2,p[1]-14,4,14);const ex=p[0]+Math.cos(a)*L*.55,ey=p[1]-12+Math.sin(a)*L+ (1-condoItens.ab)*L*.45;
-   ctx.strokeStyle='#fff';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(p[0],p[1]-12);ctx.lineTo(ex,ey);ctx.stroke();ctx.strokeStyle='#e03b2c';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(p[0],p[1]-12);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([])}})}
+  cancela(list,'ab1',T(30.5),T(-11),T(30.5),T(-9))}
+ cancela(list,'ab2',T(12),T(-3.5),T(14),T(-3.5));
  // blocos
  for(const b of BLOCOS){const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h);let fade=1;if(eu&&!eu.hidden&&!eu.rm&&eu.x>X0-T(1)&&eu.x<X1+T(1)&&eu.y<Y0&&eu.y>Y0-T(6))fade=.3;
   for(let i=0;i<b.w;i++){const xa=X0+i*TILE;list.push({x:xa+16,y:Y1,k:xa+16+Y1-2,cam:1,f:()=>blocoFatia(b,i,fade)})}}
  // playground (escorregador e balanço) e churrasqueira coberta
  list.push({x:T(5),y:T(-5.5),k:T(5)+T(-5.5),cam:1,f:()=>{const X=T(3),Y=T(-6.5);isoBox(ctx,X,Y,X+8,Y+8,0,22,'#e74c3c');isoBox(ctx,X+8,Y,X+30,Y+8,0,8,'#f1c40f');isoBox(ctx,X+60,Y-4,X+63,Y-1,0,26,'#3498db');isoBox(ctx,X+90,Y-4,X+93,Y-1,0,26,'#3498db');isoBox(ctx,X+60,Y-4,X+93,Y-1,26,28,'#2c3e50');isoBox(ctx,X+72,Y-3,X+80,Y,8,10,'#8e5a3c')}});
- list.push({x:T(13.5),y:T(-5),k:T(13.5)+T(-5),cam:1,f:()=>{const X=T(11.4),Y=T(-6.6);for(const [a,b2] of [[0,0],[150,0],[0,60],[150,60]])isoBox(ctx,X+a,Y+b2,X+a+4,Y+b2+4,0,30,'#7a5a3a');isoBox(ctx,X-4,Y-4,X+158,Y+68,30,34,'#a0522d');isoBox(ctx,X+10,Y+6,X+34,Y+20,0,16,'#b5533c');isoBox(ctx,X+50,Y+20,X+120,Y+40,0,10,'#8e6a44');
+ list.push({x:T(17.3),y:T(-5),k:T(17.3)+T(-5),cam:1,f:()=>{const X=T(15.2),Y=T(-6.6);for(const [a,b2] of [[0,0],[150,0],[0,60],[150,60]])isoBox(ctx,X+a,Y+b2,X+a+4,Y+b2+4,0,30,'#7a5a3a');isoBox(ctx,X-4,Y-4,X+158,Y+68,30,34,'#a0522d');isoBox(ctx,X+10,Y+6,X+34,Y+20,0,16,'#b5533c');isoBox(ctx,X+50,Y+20,X+120,Y+40,0,10,'#8e6a44');
   const m=isoP(X+80,Y+68);ctx.fillStyle='#fff';ctx.font='700 7px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillText('CHURRASQUEIRA',m[0],m[1]-38)}});
 }
 function salaItens(list,R){const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(R.y0),Y1=T(R.y1+1);
@@ -4955,7 +4965,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261121b';
+const VERSAO_JOGO='v20261121c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
