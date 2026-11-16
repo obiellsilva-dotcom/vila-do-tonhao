@@ -3628,7 +3628,7 @@ function iniciarTurno(k,ini,dur){
   const pts=[...CRUZ].sort(()=>Math.random()-.5).slice(0,4);trabalho.ronda={i:0,pts};$('workGiro').classList.remove('hidden');Som.play('sirene');toast('🚓 Passe com a viatura pelos 4 pontos azuis. A seta mostra o caminho.',5000)}
  else if(k==='pescador'){eu.x=LAGOA.x+rand(-T(3),T(3));eu.y=LAGOA.y;eu.fish=true;eu.dir=1}
  else{const b=SHOPS[lugarDoJob(k)]||SHOPS.prefeitura;eu.hidden=true;eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE}
- if(TAREFAS[k]){trabalho.feitas=0;trabalho.porTarefa=true;trabalho.ganhou=0;trabalho.xp=0;trabalho.peixes=0;abrirTarefa()}
+ if(TAREFAS[k]){trabalho.feitas=0;trabalho.porTarefa=true;trabalho.ganhou=0;trabalho.xp=0;trabalho.peixes=0;if(RUA[k])proxRua();else abrirTarefa()}
  follow=eu;$('workStop').textContent=trabalho.porTarefa?'✅ Encerrar turno':'Largar o turno';$('work').classList.remove('hidden');renderWork();sendPos(true);
 }
 /* ----- atividades dos empregos (janela com o interior do lugar) ----- */
@@ -3684,9 +3684,27 @@ function geraInspecao(){const k=pk(Object.keys(INSP)),I=INSP[k],ruins=emb(I.ruim
 function lugarInspecao(k){if(k==='praca')return[T(23.9),T(34.6)];const b=SHOPS[k==='feirinha'?'mercadinho':k];return b?[(b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE]:[T(23.9),T(34.6)]}
 function comecarInspecao(carro){const g=geraInspecao(),[x,y]=lugarInspecao(g.k);fecharTarefa();eu.hidden=false;eu.path=[];const b=SHOPS.prefeitura,jaNoCarro=trabalho.duster&&carro;trabalho.duster=!!carro;if(b&&!jaNoCarro){eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE;if(carro){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}}}
  const ct=carro&&nearestCarTile(x,y,10);trabalho.entrega={x,y,rotulo:g.I.ic+' '+g.I.n,insp:g,cx:ct?(ct[0]+.5)*TILE:null,cy:ct?(ct[1]+.5)*TILE:null};follow=eu;sendPos(true);toast((carro?'🚙 Duster da prefeitura! ':'🔎 Vistoria! ')+'Vá até: '+g.I.ic+' '+g.I.n+'. Siga a seta amarela.',3500)}
+
+/* ----- empregos no mapa: cada tarefa começa indo a um lugar (seta amarela) e lá abre a ação ----- */
+const frente=k=>{const b=SHOPS[k];return b?[(b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE]:[T(23.9),T(34.6)]};
+const pertoDe=(L,x,y,n)=>pk(L.slice().sort((a,b)=>Math.hypot(a[0]-x,a[1]-y)-Math.hypot(b[0]-x,b[1]-y)).slice(0,n));
+const LUGS=()=>Object.keys(INSP).map(k=>lugarInspecao(k));
+const RUA={
+ posto:()=>{const b=pk(BOMBAS);return[{x:b.x,y:b.y+T(.9),r:'⛽ Cliente na bomba',f:'Bom dia! Vai abastecer?'}]},
+ mercadinho:()=>{const bc=pk(BANCAS);return[{p:calcadaPerto(T(37.2),T(27.5)),r:'📦 Pegar a caixa',f:'Peguei a caixa! 📦'},{x:T((bc.x0+bc.x1)/2),y:T(25.5),r:'🍎 Levar à barraca',f:'Chegou mercadoria!'}]},
+ concessionaria:()=>{const b=SHOPS.concessionaria;return[{p:calcadaPerto(T(b.x+1+Math.random()*(b.w-2)),T(b.y+b.h+.6)),r:'🧍 Cliente olhando carros',f:'Posso ajudar? 😄'}]},
+ oficina:()=>{const [x,y]=frente('oficina'),c=pertoDe(CRUZ.map(q=>[q.x,q.y]),x,y,5);return[{p:calcadaPerto(c[0],c[1]),r:'🚗💨 Carro quebrado',f:'Deixa comigo! 🔧'}]},
+ enfermeiro:()=>{const [x,y]=frente('hospital');return[{p:pertoDe(LUGS(),x,y,6),r:'🤒 Paciente passando mal',f:'Calma, a enfermagem chegou! 🩺'}]},
+ medico:()=>{const [x,y]=frente('hospital');return[{p:pertoDe(LUGS(),x,y,6),r:'🚑 Chamado de emergência',f:'Sou médico(a), pode deixar! 🩺'}]},
+ banco:()=>{const b=SHOPS.banco;return[{p:calcadaPerto(T(b.x-.5),T(b.y+b.h-1)),r:'💰 Buscar malote no cofre',f:'Malote na mão! 💰'},{p:frente('banco'),r:'🏦 Atender no caixa',f:'Próximo! 🙋'}]},
+ gerente:()=>{const [x,y]=frente('banco');return[{p:pertoDe(LUGS(),x,y,5),r:'💼 Visitar cliente',f:'Vamos falar de empréstimo? 💼'}]},
+ prefeitura:()=>{const k=pk(Object.keys(INSP));return[{p:lugarInspecao(k),r:'📄 Entregar ofício: '+INSP[k].ic+' '+INSP[k].n,f:'Ofício da prefeitura! 📄'},{p:frente('prefeitura'),r:'🏛️ Voltar pra mesa',f:'De volta à papelada.'}]},
+ delegado:()=>{const [x,y]=frente('delegacia'),c=pertoDe(CRUZ.map(q=>[q.x,q.y]),x,y,6);return[{p:calcadaPerto(c[0],c[1]),r:'🔍 Local do crime',f:'Hmm… pistas por aqui. 🕵️'},{p:frente('delegacia'),r:'🚓 Voltar à delegacia',f:'Vamos ver os suspeitos.'}]}};
+function proxRua(){if(!trabalho||!RUA[trabalho.job])return;fecharTarefa();trabalho.legs=RUA[trabalho.job]().map(l=>l.p?{x:l.p[0],y:l.p[1],r:l.r,f:l.f}:l);ruaLeg()}
+function ruaLeg(){const l=trabalho.legs[0];trabalho.entrega={x:l.x,y:l.y,rotulo:l.r,rua:true};follow=eu;sendPos(true);toast(l.r+' · siga a seta amarela.',2500)}
 function comecarEntrega(e){if(!trabalho)return;const [mx,my]=inTables[e.mesa];trabalho.entrega={x:T(mx),y:T(my),n:e.mesa+1,item:e.item};fecharTarefa();eu.beer=true;sendPos(true);
  toast(`🍽️ Leve ${e.item} até a <b>mesa ${e.mesa+1}</b>! Siga a seta amarela.`.replace(/<\/?b>/g,''),3500)}
-function checaEntrega(){const e=trabalho&&trabalho.entrega;if(!e||!eu)return;if(e.insp&&(Math.hypot(eu.x-e.x,eu.y-e.y)<T(1.8)||(carOf(eu)==='duster'&&e.cx!=null&&Math.hypot(eu.x-e.cx,eu.y-e.cy)<T(1.6)))){trabalho.entrega=null;trabalho.forcar=e.insp;say(eu,'🔎 Vistoria da prefeitura!',2.5,true);Som.play('clique');abrirTarefa();return}if(Math.hypot(eu.x-e.x,eu.y-e.y)<T(1.5)){trabalho.entrega=null;eu.beer=false;sendPos(true);
+function checaEntrega(){const e=trabalho&&trabalho.entrega;if(!e||!eu)return;if(e.rua){if(Math.hypot(eu.x-e.x,eu.y-e.y)<T(1.5)){const l=trabalho.legs.shift();say(eu,l.f,2.2,true);Som.play('clique');if(trabalho.legs.length)ruaLeg();else{trabalho.entrega=null;abrirTarefa()}}return}if(e.insp&&(Math.hypot(eu.x-e.x,eu.y-e.y)<T(1.8)||(carOf(eu)==='duster'&&e.cx!=null&&Math.hypot(eu.x-e.cx,eu.y-e.cy)<T(1.6)))){trabalho.entrega=null;trabalho.forcar=e.insp;say(eu,'🔎 Vistoria da prefeitura!',2.5,true);Som.play('clique');abrirTarefa();return}if(Math.hypot(eu.x-e.x,eu.y-e.y)<T(1.5)){trabalho.entrega=null;eu.beer=false;sendPos(true);
  Som.play('moeda');say(eu,pick(['Aqui está! 😄','Bom apetite!','Saindo quentinho!','Prontinho!']),2,true);tarAcertou(true)}}
 setInterval(checaEntrega,150);
 function drawEntrega(c,e){e=e||(trabalho&&trabalho.entrega);if(!e)return;const b=Math.abs(Math.sin(now*4))*8;
@@ -3701,7 +3719,7 @@ function tarAcertou(reabrir){if(!trabalho)return;const tr=trabalho;tr.feitas++;i
   floatText(eu.x,eu.y-34,(r.pago?'+'+money(r.pago)+'  ':'')+(r.peixes_ganhos?'+🐟  ':'')+'+'+r.xp_ganho+' XP','#9dff7a');renderWork();
   if(r.cansado&&trabalho===tr){fimTurno();if(!r.morreu)toast('😩 Você está cansado(a) e com fome. Coma alguma coisa antes de voltar!',4500)}})
   .catch(e=>{if(/calma/i.test(e.message))setTimeout(vai,800);else toast(e.message,3000)});
- vai();setTimeout(()=>{if(trabalho===tr){if(reabrir)abrirTarefa();else proxTarefa()}},reabrir?900:Math.max(600,2600-(Date.now()-t0)))}
+ vai();setTimeout(()=>{if(trabalho===tr){if(RUA[tr.job]&&!reabrir)proxRua();else if(reabrir)abrirTarefa();else proxTarefa()}},reabrir?900:Math.max(600,2600-(Date.now()-t0)))}
 function proxTarefa(){cancelAnimationFrame(tarAnim);const T0=TAREFAS[trabalho.job],fz=trabalho.forcar;trabalho.forcar=null;const g=fz?{tipo:'marcar',tit:'🔎 Vistoria: '+fz.I.ic+' '+fz.I.n+' · marque TODOS os problemas',ped:'<span class="cli">📋</span>Marque o que está <b>irregular</b> e toque em Concluir.',itens:fz.itens}:T0.gerar(),box=$('tBox'),TP=g.tipo||T0.tipo;let trava=false;$('tTit').textContent=g.tit||T0.tit;
  if(g.campo){box.innerHTML=`<div class="ped">${g.ped}</div><div class="ops"></div>`;const b=document.createElement('button');b.className='op';b.innerHTML='🚶 Ir a pé fazer a vistoria';b.onclick=()=>comecarInspecao(false);box.querySelector('.ops').appendChild(b);const b2=document.createElement('button');b2.className='op';b2.innerHTML='🚙 Usar veículo da prefeitura (Duster)';b2.onclick=()=>comecarInspecao(true);box.querySelector('.ops').appendChild(b2);return}
  if(TP==='marcar'){box.innerHTML=`<div class="ped">${g.ped}</div><div class="ops"></div>`;const ops=box.querySelector('.ops'),sel=new Set();
@@ -4352,7 +4370,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116h';
+const VERSAO_JOGO='v20261116i';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
