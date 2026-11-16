@@ -2497,7 +2497,7 @@ function drawPlayer(p){
  if(it){if(it.t==='abraco'){arms=[1.45,1.6];headRot=.18}if(it.t==='beijo'){arms=[1.05,1.25];headRot=.28;olhos=true}if(it.t==='toca'){const k2=(it.ate-now);arms=[.2,k2>1.4?2.6:1.9]}}
  let LY=0,LZ=0;{const dt=p===eu?eu.deitado:p.deitado;if(dt){const L=lieDe(dt>4?'colchao':'cama',(dt-1)&3);rot=L.ang;LZ=L.z*(SALA_ON?1.25:1);LY=1;walk=null}else if(p.sit&&(p===eu?eu.mz:p.mz))hop=(p===eu?eu.mz:p.mz)*(SALA_ON?1.25:1)}
  ctx.save();ctx.translate(p.x+dx,p.y-LZ);ctx.rotate(rot);ctx.scale(1,sy);
- const vs=vistaDe(p),vo=LY?{cara:true}:p.sit||p.danca?{}:VISTA_OPC(vs);drawPerson(ctx,0,-hop,p.v,{mv:p.moving&&!p.sit&&!p.danca&&p._mvA!=null?p._mvA:null,lado:!!vo.lado,perfil:!!vo.perfil,c34:!!vo.c34,cara:p.sit?!!p.frente:(!!p.danca||!!vo.cara),s:SALA_ON?PS*1.35:PS,dir:p.moving&&p._vd?p._vd:dir,walk:arms?(p.danca?walk:null):walk,amp:p.danca&&!p.moving?amp:1,flex:p.danca&&!p.moving?flex:0,sit:!!p.sit,back:p.sit?!!p.back:!!vo.back,frente:!!(p.sit&&p.frente),bebado:p===eu?eu.bebK:p.bebado,beer:p.beer,policia:p===eu?!!(trabalho&&trabalho.job==='policia'):p.work==='policia',apron:p===eu?eu.apron:p.work==='bar',ring:selected===p,blink:olhos,arms,headRot,maosRosto:maos});
+ const vs=vistaDe(p),vo=LY?{cara:true}:(p.sit&&(p===eu?eu.sv:p.sv))?VISTA_OPC((p===eu?eu.sv:p.sv)===2?'cl':'l'):p.sit||p.danca?{}:VISTA_OPC(vs);drawPerson(ctx,0,-hop,p.v,{mv:p.moving&&!p.sit&&!p.danca&&p._mvA!=null?p._mvA:null,lado:!!vo.lado,perfil:!!vo.perfil,c34:!!vo.c34,cara:p.sit?!!p.frente:(!!p.danca||!!vo.cara),s:SALA_ON?PS*1.35:PS,dir:p.moving&&p._vd?p._vd:dir,walk:arms?(p.danca?walk:null):walk,amp:p.danca&&!p.moving?amp:1,flex:p.danca&&!p.moving?flex:0,sit:!!p.sit,back:p.sit?!!p.back:!!vo.back,frente:!!(p.sit&&p.frente),bebado:p===eu?eu.bebK:p.bebado,beer:p.beer,policia:p===eu?!!(trabalho&&trabalho.job==='policia'):p.work==='policia',apron:p===eu?eu.apron:p.work==='bar',ring:selected===p,blink:olhos,arms,headRot,maosRosto:maos});
  ctx.restore();
  const topo=p.y-36;ctx.save();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.fillStyle='#000';
  if(gs){ctx.font='14px sans-serif';ctx.textAlign='center';const ic={acenar:'👋',comemorar:'🙌',rir:'🤣',chorar:'😭'}[gs];ctx.fillText(ic,p.x+(gs==='acenar'?Math.sin(gt*10)*4:0),topo-hop-4);
@@ -2985,7 +2985,7 @@ function drawCena(){
  }
  if(vis(ball.x,ball.y))list.push({x:ball.x,y:ball.y,f:()=>{ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(ball.x,ball.y,3,1.2,0,0,7);ctx.fill();ctx.fillStyle='#fff';circ(ctx,ball.x,ball.y-2.4-ball.z,2.6);ctx.fillStyle='#222';circ(ctx,ball.x+.6,ball.y-2.8-ball.z,.9)}});
  for(const r of residents){if(r.hidden||!vis(r.x,r.y))continue;list.push({x:r.x,y:r.y,f:()=>drawResident(r)})}
- for(const p of plist)if(vis(p.x,p.y))list.push({x:p.x,y:p.y,k:p.x+p.y+((p===eu?eu.deitado:p.deitado)?70:(p.sit&&(p===eu?eu.mz:p.mz))?(p.frente?30:-20):0),f:()=>drawPlayer(p)});
+ for(const p of plist)if(vis(p.x,p.y))list.push({x:p.x,y:p.y,k:p.x+p.y+((p===eu?eu.deitado:p.deitado)?70:(p.sit&&(p===eu?eu.mz:p.mz))?(p.back?-20:30):0),f:()=>drawPlayer(p)});
  for(const v of VAGAS){const i=vagasInfo.get(v.id);if(!i||!i.ativo||!CAR_COLOR[i.carro]||!vis(v.x,v.y))continue;if(eu&&i.morador===eu.id&&eu.driving)continue;list.push({x:v.x,y:v.y,f:()=>{const dono=eu&&i.morador===eu.id?eu:others.get(i.morador)||perfis.get(i.morador);CAR_COR_ATUAL=corCarroDe(dono,i.carro)||(dono&&dono.carro_cores&&dono.carro_cores[i.carro])||null;CAR_MOD_ATUAL=modsDe(dono,i.carro);drawCarShape(ctx,v.x,v.y,i.carro,1,0.83,null);CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null}})}
  for(const [pid,pc] of parados){if(!vis(pc.x,pc.y)||!CARS[pc.c])continue;const dono=pid===(eu&&eu.id)?eu:others.get(pid);if(dono&&dono.driving)continue;list.push({x:pc.x,y:pc.y,f:()=>{CAR_COR_ATUAL=pc.cor;CAR_MOD_ATUAL=modsDe(dono,pc.c);drawCarStack(ctx,pc.x,pc.y,pc.c,pc.ang,null,{freio:0});CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null}})}
  for(const a of animais)if(vis(a.x,a.y))list.push({x:a.x,y:a.y,f:()=>drawAnimal(ctx,a)});
@@ -3155,6 +3155,7 @@ function tap(sx,sy){const [wx,wy]=toWorld(sx,sy);let best=null,bd=1e9;const tol=
  if(Math.hypot(wx-chopp.x,wy-chopp.y+4)<12){toast(chopp.sleep?'Esse é o Chopp, o cachorro do bar. Dormindo, como sempre. 🐶':'O Chopp acordou! Milagre! 🐶');return}
  if(eu&&eu.rm&&MOB.ativo){tocarSala(wx,wy);return}
  if(eu&&eu.rm&&eu.casaAcao)levantarCasa();
+ if(eu&&eu.rm&&usarMovelToque(wx,wy))return;
  if(eu&&livre()){closeCard();const car=carOf(eu),tx=Math.floor(wx/TILE),ty=Math.floor(wy/TILE);
   if(car&&car!=='viatura'&&SERVICO(car)){if(carOk(tx,ty))irPara(wx,wy);else{const t=nearestCarTile(wx,wy,10);if(t)irPara((t[0]+.5)*TILE,(t[1]+.5)*TILE);else toast('O veículo só anda na rua. 🚙',1600)}return}
    if(car==='viatura'){if(carOk(tx,ty))irPara(wx,wy);else toast('A viatura só anda na rua e nas trilhas. 🚓',1600);return}
@@ -3875,16 +3876,20 @@ function salaItens(list,R){const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(
  (eu.rm.moveis||[]).forEach((m,k)=>{if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t]||(MOB.modo==='mover'&&MOB.i===k))return;const [w,h]=movTam(m.t,m.r|0),X=T(R.x0+m.x),Y=T(R.y0+m.y);list.push({x:X+w*16,y:Y+h*16,k:MOV[m.t].anda?-1e8:X+Y+(w+h)*16,cam:1,f:()=>{desenhaMovel(ctx,m.t,X,Y,m.r|0,m);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f')}})});
  if(MOB.modo==='novo'||MOB.modo==='mover'){const [w,h]=movTam(MOB.t,MOB.r),X=T(R.x0+MOB.x),Y=T(R.y0+MOB.y),ok=movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.modo==='mover'?MOB.i:-1);list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*16+5,cam:1,f:()=>{movMoldura(X,Y,w,h,ok?'#5dff7a':'#ff5a5a');desenhaMovel(ctx,MOB.t,X,Y,MOB.r,null,.72)}})}
  {const i=casasInfo.get(eu.rm.n)||{},tt=(i.nome?'🏠 Casa de '+i.nome:(eu.rm.b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+eu.rm.n);list.push({x:X0,y:Y0,k:-1e9,cam:1,f:()=>{const a=isoP((X0+X1)/2,Y0);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#2a1a14';ctx.strokeText(tt,a[0],a[1]-H-10);ctx.fillStyle='#fff';ctx.fillText(tt,a[0],a[1]-H-10);ctx.textAlign='left'}})}}
-function levantarCasa(){if(!eu||!eu.casaAcao)return;eu.casaAcao=null;eu.sit=false;eu.deitado=0;eu.mz=0;eu.frente=false;eu.back=false;eu.vendoTV=null;const n=nearestWalk(Math.floor(eu.x/TILE),Math.floor(eu.y/TILE),walkP);if(n){eu.x=T(n[0]+.5);eu.y=T(n[1]+.5)}sendPos(true)}
+function levantarCasa(){if(!eu||!eu.casaAcao)return;eu.casaAcao=null;eu.sv=0;eu.sit=false;eu.deitado=0;eu.mz=0;eu.frente=false;eu.back=false;eu.vendoTV=null;const n=nearestWalk(Math.floor(eu.x/TILE),Math.floor(eu.y/TILE),walkP);if(n){eu.x=T(n[0]+.5);eu.y=T(n[1]+.5)}sendPos(true)}
 const MOB={ativo:false,modo:null};
 const FRENTE=[[0,1],[1,0],[0,-1],[-1,0]],CABECA=[[0,-1],[-1,0],[0,1],[1,0]];
 function lieDe(t,r){const D=MOV[t],[dx,dy]=CABECA[r&3],sx=(dx-dy)*IA,sy=(dx+dy)*IB;return{ang:Math.atan2(sx,-sy),z:D.deita||10}}
-function movPerto(){const R=eu.rm.R;let best=null,bd=T(1.05);(eu.rm.moveis||[]).forEach((m,k)=>{if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t])return;const [w,h]=movTam(m.t,m.r|0),x0=T(R.x0+m.x),y0=T(R.y0+m.y),qx=Math.max(x0,Math.min(eu.x,x0+w*32)),qy=Math.max(y0,Math.min(eu.y,y0+h*32)),d=Math.hypot(eu.x-qx,eu.y-qy);if(d<bd){bd=d;best=m}});return best}
+function movPerto(){const R=eu.rm.R;let best=null,bd=T(1.4);(eu.rm.moveis||[]).forEach((m,k)=>{if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t])return;const [w,h]=movTam(m.t,m.r|0),x0=T(R.x0+m.x),y0=T(R.y0+m.y),qx=Math.max(x0,Math.min(eu.x,x0+w*32)),qy=Math.max(y0,Math.min(eu.y,y0+h*32)),d=Math.hypot(eu.x-qx,eu.y-qy);if(d<bd){bd=d;best=m}});return best}
 function noMovel(m,tipo,fala){const R=eu.rm.R,[w,h]=movTam(m.t,m.r|0),X=T(R.x0+m.x),Y=T(R.y0+m.y),r=m.r|0;levantarCasa();eu.path=[];eu.onArrive=null;eu.casaAcao=tipo;
  if(tipo==='cama'){const [dx,dy]=CABECA[r];eu.x=X+w*16-dx*30;eu.y=Y+h*16-dy*30;eu.deitado=1+r+(m.t==='colchao'?4:0);eu.sit=false}
- else if(tipo==='sofa'){const [fx,fy]=FRENTE[r];let tx=Math.max(0,Math.min(w-1,Math.floor((eu.x-X)/32))),ty=Math.max(0,Math.min(h-1,Math.floor((eu.y-Y)/32)));eu.x=X+tx*32+16-fx*4;eu.y=Y+ty*32+16-fy*4;eu.sit=true;eu.mz=m.t==='cadeira'?6:m.t==='caixote'?8:8;const sx=(fx-fy)*IA,sy=(fx+fy)*IB;eu.frente=sy>0;eu.back=sy<=0;eu.dir=sx>=0?1:-1}
+ else if(tipo==='sofa'){const [fx,fy]=FRENTE[r];let tx=Math.max(0,Math.min(w-1,Math.floor((eu.x-X)/32))),ty=Math.max(0,Math.min(h-1,Math.floor((eu.y-Y)/32)));eu.x=X+tx*32+16-fx*4;eu.y=Y+ty*32+16-fy*4;eu.sit=true;eu.mz=m.t==='cadeira'?6:m.t==='caixote'?8:8;const sx=(fx-fy)*IA,sy=(fx+fy)*IB;eu.sv=sy>0?1:2;eu.frente=false;eu.back=sy<=0;eu.dir=sx>=0?1:-1}
  else if(tipo==='tv'){eu.vendoTV=m}
  say(eu,fala,3,true);sendPos(true)}
+function acaoDe(m){const D=MOV[m.t];if(D.deita)return()=>noMovel(m,'cama','💤 Hora de dormir…');if(D.senta)return()=>noMovel(m,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']));if(D.tv)return()=>noMovel(m,'tv','📺 Bora ver TV!');if(D.gel)return()=>((casasInfo.get(eu.rm.n)||{}).dono===eu.id?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000));return null}
+function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Math.floor(wy/TILE)-R.y0;let m=null;for(const q of (eu.rm.moveis||[])){if((q.a|0)!==(eu.rm.andar|0)||!MOV[q.t]||MOV[q.t].anda)continue;const [w,h]=movTam(q.t,q.r|0);if(tx>=q.x&&tx<q.x+w&&ty>=q.y&&ty<q.y+h){m=q;break}}
+ if(!m)return false;const fn=acaoDe(m);if(!fn)return false;const [w,h]=movTam(m.t,m.r|0);let best=null,bd=1e9;for(let y=m.y-1;y<=m.y+h;y++)for(let x=m.x-1;x<=m.x+w;x++){if(x>=m.x&&x<m.x+w&&y>=m.y&&y<m.y+h)continue;const ax=R.x0+x,ay=R.y0+y;if(!walkP(ax,ay))continue;const d=Math.hypot(T(ax+.5)-wx,T(ay+.5)-wy);if(d<bd){bd=d;best=[ax,ay]}}
+ if(!best){toast('Não dá para chegar nesse móvel.',1800);return true}irPara(T(best[0]+.5),T(best[1]+.5),fn);return true}
 function salaOpcoes(){const o=[],dono=(casasInfo.get(eu.rm.n)||{}).dono===eu.id;if(MOB.ativo)return[];
  if(eu.casaAcao){o.push(['🧍 Levantar',levantarCasa]);if(eu.casaAcao==='tv')o.push(['📺 Mudar de canal',()=>say(eu,pick(['📺 Jornal da Vila','📺 Novela das 8','⚽ Futebol!','📺 Desenho animado','🎤 Programa de auditório']),3,true)]);return o}
  const best=movPerto();if(best){const D=MOV[best.t];if(D.deita)o.push(['😴 Deitar',()=>noMovel(best,'cama','💤 Hora de dormir…')]);else if(D.senta)o.push(['🪑 Sentar',()=>noMovel(best,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']))]);else if(D.tv)o.push(['📺 Ver TV',()=>noMovel(best,'tv','📺 Bora ver TV!')]);else if(D.gel)o.push(['🧊 Abrir geladeira',()=>dono?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000)]);else if(D.juke&&typeof Som!=='undefined'&&Som.faixa)o.push(['🎵 Trocar a música',()=>{Som.iniciarMusica&&Som.iniciarMusica();Som.faixa(Math.floor(Math.random()*5))}])}
@@ -3992,7 +3997,7 @@ function aplicarRemoto(p){
 let lastSent=0,lastKey='';
 function sendPos(force){
  if(!canal||!eu)return;const t=performance.now();if(!force&&t-lastSent<220)return;
- const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:eu.giro?1:0,i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0,rm:eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0,dt:eu.deitado|0,mz:eu.mz|0};
+ const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:eu.giro?1:0,i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0,rm:eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0,dt:eu.deitado|0,mz:eu.mz|0,sv:eu.sv|0};
  const key=JSON.stringify(p);if(!force&&key===lastKey&&t-lastSent<4000)return;
  lastKey=key;lastSent=t;canal.send({type:'broadcast',event:'pos',payload:p}).catch(()=>{});
 }
@@ -4000,7 +4005,7 @@ function onPos(p){
  if(!p||typeof p.i!=='string')return;const o=others.get(p.i);if(!o)return;
  const x=clamp(+p.x||0,WX0,WX1),y=clamp(+p.y||0,WY0,WY1);
  if(!o.seen){o.x=x;o.y=y;o.seen=true}
- o.tx=x;o.ty=y;o.giro=!!p.gf;o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c\d+s?$/.test(p.rm)?p.rm:0;o.deitado=Math.max(0,Math.min(8,p.dt|0));o.mz=Math.max(0,Math.min(20,p.mz|0));
+ o.tx=x;o.ty=y;o.giro=!!p.gf;o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c\d+s?$/.test(p.rm)?p.rm:0;o.deitado=Math.max(0,Math.min(8,p.dt|0));o.mz=Math.max(0,Math.min(20,p.mz|0));o.sv=p.sv===1||p.sv===2?p.sv:0;
 }
 function emitEv(k,data){if(canal&&eu)canal.send({type:'broadcast',event:'ev',payload:Object.assign({i:eu.id,k},data)}).catch(()=>{})}
 function onEv(p){
@@ -4546,7 +4551,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116n';
+const VERSAO_JOGO='v20261116o';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
