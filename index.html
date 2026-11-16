@@ -241,7 +241,8 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 
 /* layout novo: topo numa linha, menu embaixo abrindo para cima */
 body.jogando #top{right:131px}body.jogando #top .row:first-child{flex-wrap:nowrap}
-#irBtn{padding:6px 10px;font-size:16px}
+#irBtn{padding:5px 9px;font-size:15px}#fomeP.ok,#sedeP.ok{display:none}
+body.jogando #top .row:first-child{gap:5px}body.jogando #top .row:first-child .pill{padding:5px 7px;font-size:12.5px}body.jogando .lvl i{width:26px}body.jogando #top{right:127px}
 .irLista{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:46vh;overflow-y:auto}
 .irLista button{text-align:left;font-size:13.5px;padding:8px 9px}
 #zoom{top:auto!important;transform:none!important;left:max(10px,env(safe-area-inset-left,0px));right:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));flex-direction:column-reverse}
@@ -260,9 +261,9 @@ body.joyEsq #painelEsq{top:150px}
 <div id="top">
   <div class="row">
     <div class="brand">🍺 Cidade do Tonhão</div>
-    <div class="pill lvl hidden" id="lvl"><span id="lvlTxt">⭐ Nv 1</span><i><b id="lvlBar"></b></i></div><div class="pill money hidden" id="money">💰 R$ 0</div><div class="pill clock" id="clock">--:--</div>
+    <div class="pill lvl hidden" id="lvl"><span id="lvlTxt">⭐ Nv 1</span><i><b id="lvlBar"></b></i></div><div class="pill money hidden" id="money">💰 R$ 0</div><div class="pill clock" id="clock">--:--</div><button id="irBtn" class="btn ghost hidden" aria-label="ir para">🔍</button>
   </div>
-  <div class="row"><button id="irBtn" class="btn ghost hidden" aria-label="ir para">🔍</button><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill hidden" id="sedeP">💧 100%</div><div class="pill hidden" id="gasP">⛽ 100%</div><div class="pill small hidden" id="salaPill"></div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
+  <div class="row"><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill hidden" id="sedeP">💧 100%</div><div class="pill hidden" id="gasP">⛽ 100%</div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
 </div>
 
 <div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" style="display:none" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Perfil e fotos" aria-label="meu perfil">👤</button><button id="zin" style="display:none" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" style="display:none" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b;display:none">🛡️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
@@ -276,7 +277,7 @@ body.joyEsq #painelEsq{top:150px}
 <div id="cfgVip" class="hint" style="border:1px solid #d4af37;border-radius:12px;padding:10px"></div>
 <div style="display:flex;gap:6px"><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
 <div id="mIr" class="modal hidden"><div class="box" style="width:min(400px,100%)"><button class="x" data-close="mIr">×</button><h2>🔍 Ir para...</h2>
-<div class="pill" id="pop" style="text-align:center;margin-bottom:8px">👥 0 moradores</div>
+<div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px"><div class="pill" id="pop">👥 0 moradores</div><div class="pill hidden" id="salaPill"></div></div>
 <div style="display:flex;gap:6px;margin-bottom:8px"><input id="q" placeholder="procure um morador" autocomplete="off" style="flex:1;min-width:0"><button id="go" class="btn">ir</button></div>
 <div style="display:flex;gap:6px;margin-bottom:10px"><button id="zme" class="btn ghost hidden" style="flex:1">📍 Ir até mim</button><button id="rankBtn" class="btn ghost" style="flex:1">🏆 Ranking</button></div>
 <div id="irLista" class="irLista"></div><div style="display:none"><select id="places" aria-label="lugares">
@@ -3277,7 +3278,7 @@ $('cardFollow').onclick=()=>{follow=follow===selected?null:selected;refreshCard(
 $('cardStory').onclick=()=>{if(selected)openStory(selected)};
 const inBar=()=>residents.filter(r=>r.place==='bar'&&(r.state==='stay'||r.phase==='toSeat'||r.phase==='toStand'||r.phase==='fromWc'||r.phase==='toWc'||r.phase==='toOrder'&&r.y<T(27))).length;
 function uiTick(){
- $('clock').textContent='🕒 '+clockStr();
+ $('clock').textContent=(eu?'':'🕒 ')+clockStr();
  $('pop').textContent='👥 '+(residents.length+(eu?1:0)+others.size)+' moradores';refreshHud();
  $('barstat').textContent=`🍺 Caixa do bar hoje: ${money(caixa)} · 📒 fiado: ${money(fiadoDia)} · 🪑 no bar agora: ${inBar()}`;
  refreshCard();
@@ -3721,7 +3722,7 @@ function refreshHud(){
  $('money').textContent='💰 '+money(eu.dinheiro)+(eu.peixes?` · 🐟 ${eu.peixes}`:'');
  const b=LV.base(eu.nivel),nx=LV.base(Math.min(eu.nivel+1,NIVEL_MAX));
  $('lvlTxt').textContent=`⭐ Nv ${eu.nivel}`;$('lvlBar').style.width=(eu.nivel>=NIVEL_MAX?100:Math.max(4,Math.min(100,(eu.xp-b)/(nx-b)*100)))+'%';$('lvl').title=`${eu.xp-b} / ${nx-b} XP para o nível ${eu.nivel+1}`;
- const f=Math.max(0,Math.round(eu.fome));$('fomeP').textContent='🍗 '+f+'%';$('fomeP').classList.toggle('baixa',f<30);const sd=Math.max(0,Math.round(eu.sede??100));$('sedeP').textContent='💧 '+sd+'%';$('sedeP').classList.toggle('baixa',sd<30);{const gp=$('gasP'),gc=carOf(eu),gv=Math.round(eu.gas??100);gp.classList.toggle('hidden',!gc||SERVICO(gc));gp.textContent='⛽ '+gv+'%';gp.classList.toggle('baixa',gv<20)}
+ const f=Math.max(0,Math.round(eu.fome));$('fomeP').textContent='🍗 '+f+'%';$('fomeP').classList.toggle('baixa',f<30);$('fomeP').classList.toggle('ok',f>=50);const sd=Math.max(0,Math.round(eu.sede??100));$('sedeP').textContent='💧 '+sd+'%';$('sedeP').classList.toggle('baixa',sd<30);$('sedeP').classList.toggle('ok',sd>=50);{const gp=$('gasP'),gc=carOf(eu),gv=Math.round(eu.gas??100);gp.classList.toggle('hidden',!gc||SERVICO(gc));gp.textContent='⛽ '+gv+'%';gp.classList.toggle('baixa',gv<20)}
  document.body.classList.toggle('faminto',f<15);
  $('salaPill').textContent=ONLINE?(sala?`🌐 Sala ${sala} · ${others.size+1} online`:'🌐 conectando…'):'🧪 Modo teste';
 }
