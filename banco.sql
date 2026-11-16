@@ -1135,7 +1135,7 @@ begin
   select * into t from trabalhos where id = m.trabalho;
   extra := greatest(0, m.nivel - t.nivel_min);
   pago  := round(t.salario / 6.0 * (1 + 0.06 * extra));
-  ganho := greatest(2, round(t.xp / 6.0 * (1 + 0.04 * extra)));
+  ganho := greatest(1, round(t.xp / 20.0 * (1 + 0.04 * extra)));  -- XP reduzido (era /6)
   if t.id = 'pescador' then pago := 0; peixes_ganhos := (random() < 0.6)::integer; end if;
   novo_xp := m.xp + ganho;
   novo_nivel := nivel_de(novo_xp);
