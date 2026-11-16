@@ -1686,3 +1686,9 @@ select nome, preco from public.loja where tipo = 'carro' order by preco;
 -- Amarok (no lugar da Caminhonete) e Lamborghini (no lugar do Esportivo Neon). Quem já tem continua com o carro.
 update public.loja set nome = 'Amarok', preco = 45000 where id = 'caminhonete' and tipo = 'carro';
 update public.produtos set nome = 'Lamborghini', preco = 19.90 where id = 'carro_neon';
+
+-- Emprego novo: Lixeiro(a) (na Prefeitura, nível 4)
+insert into public.trabalhos(id, nome, salario, duracao, nivel_min, xp, fome) values
+  ('lixeiro', 'Lixeiro(a)', 65, 60, 4, 25, 12)
+on conflict (id) do update set nome = excluded.nome, salario = excluded.salario, duracao = excluded.duracao,
+  nivel_min = excluded.nivel_min, xp = excluded.xp, fome = excluded.fome;
