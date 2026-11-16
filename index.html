@@ -3109,7 +3109,7 @@ function drawCena(){
  if(SALA){const ax=T(SALA.x0)-4,bx=T(SALA.x1+1)+4,ay=T(SALA.y0)-4,by=T(SALA.y1+2);for(let i=list.length-1;i>=0;i--){const o=list[i];if(!(o.x>=ax&&o.x<=bx&&o.y>=ay&&o.y<=by))list.splice(i,1)}salaItens(list,SALA)}
  for(const o of list)if(o.k==null)o.k=o.x+o.y;
  LUZES_FRAME.length=0;
- list.sort((a,b)=>a.k-b.k).forEach(o=>{if(o.cam)setCam(ctx);else if(o.w!=null)wallSet(ctx,o.w);else if(o.g)setWorld(ctx);else bbSet(ctx,o.x,o.y);o.f()});setWorld(ctx);
+ list.sort((a,b)=>a.k-b.k).forEach(o=>{if(o.cam)setCam(ctx);else if(o.w!=null)wallSet(ctx,o.w);else if(o.g)setWorld(ctx);else bbSet(ctx,o.x,o.y);try{ctx.save();o.f()}catch(e){erroTela(e,'obj')}finally{ctx.restore()}});setWorld(ctx);
  {const dtF=Math.min(.1,now-(drawCena._t||now));drawCena._t=now;if(!SALA)drawFolhas(ctx,vx0,vy0,vx1,vy1,dtF)}
  ctx.strokeStyle='#2a1a14';ctx.lineWidth=.8;bulbsLines.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.quadraticCurveTo((a[0]+b[0])/2,(a[1]+b[1])/2+24,b[0],b[1]);ctx.stroke()});
  const d=darkness();
@@ -5116,7 +5116,8 @@ residents.forEach(placeNow);
 log('🍺 O Tonhão abriu o bar. A geladeira de 1987 ainda tá funcionando.');
 let last=performance.now();
 let mediaQ=16,contaQ=0;
-function frame(t){if(CFG.graf==='baixo'&&t-last<30){requestAnimationFrame(frame);return}const dt=Math.min(.1,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(frame)}
+let ERRO_TELA=null;function erroTela(e,onde){const m=onde+': '+((e&&e.message)||e);if(ERRO_TELA!==m){ERRO_TELA=m;console.error(m,e);try{toast('⚠️ Erro na tela ('+m.slice(0,90)+'). Tire um print e mande ao admin.',6000)}catch(_){}}}
+function frame(t){requestAnimationFrame(frame);if(CFG.graf==='baixo'&&t-last<30)return;const dt=Math.min(.1,(t-last)/1000);last=t;try{update(dt)}catch(e){erroTela(e,'update')}try{draw()}catch(e){erroTela(e,'draw')}}
 function begin(){buildBg();uiTick();requestAnimationFrame(t=>{last=t;frame(t)});setTimeout(()=>{const l=$('loading');l.style.opacity=0;setTimeout(()=>l.remove(),450)},350)}
 (document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]):Promise.resolve()).then(begin).then(iniciarOnline);
 window.__dbg={houses,comprarCasa,residents,tonhao,queue,get gm(){return gm},set gm(v){gmOff+=v-gm;gm=v},cam,get eu(){return eu},others,get trabalho(){return trabalho},get L(){return L},VAGAS,vagasInfo,CRUZ};
