@@ -1333,8 +1333,6 @@ const ofic=addB({kind:'oficina',x:105,y:23,w:6,h:6});
 const posto=addB({kind:'posto',x:96,y:21,w:4,h:2});
 for(let y=23;y<=29;y++)for(let x=96;x<=100;x++)grid[y][x]=G.ROAD; // pátio do posto
 const BOMBAS=[{x:T(97.3),y:T(25.4)},{x:T(99.7),y:T(25.4)}];
-for(let y=23;y<=29;y++)for(let x=111;x<=115;x++)grid[y][x]=G.ROAD; // mecânica aberta (ao lado da oficina)
-const MEC_BLIP={x:T(113.5),y:T(26)};
 const fab=addB({kind:'fabrica',x:15,y:66,w:12,h:9});
 const pref=addB({kind:'prefeitura',x:39,y:67,w:10,h:8});
 const deleg=addB({kind:'delegacia',x:60,y:65,w:10,h:6});
@@ -2051,20 +2049,6 @@ function drawBomba(c,b){const X=b.x,Y=b.y;isoBox(c,X-T(.45),Y-T(.2),X+T(.45),Y+T
  c.fillStyle='#222';c.fillRect(q[0]+6,q[1]-20,2,10);
  if(eu&&eu.driving&&Math.hypot(eu.x-X,eu.y-Y)<T(4)){const g=isoP(X,Y+T(.9)),a=.5+Math.sin(now*5)*.3;c.strokeStyle='rgba(255,210,63,'+a+')';c.lineWidth=3;c.beginPath();c.ellipse(g[0],g[1],26,13,0,0,7);c.stroke();c.fillStyle='#fff';c.font='700 9px Fredoka,sans-serif';c.strokeStyle='#3a1d10';c.lineWidth=3;c.strokeText('⛽ Pare aqui',g[0],g[1]-16);c.fillText('⛽ Pare aqui',g[0],g[1]-16)}
  c.textAlign='left'}
-function drawMecBlip(c){const {x,y}=MEC_BLIP,t=now*3,A=isoP(T(111.1),T(23.1)),B=isoP(T(115.9),T(23.1)),C=isoP(T(115.9),T(29)),D=isoP(T(111.1),T(29));
- c.fillStyle='#8f949a';c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.lineTo(C[0],C[1]);c.lineTo(D[0],D[1]);c.closePath();c.fill();
- c.strokeStyle='#f1c40f';c.lineWidth=2;c.setLineDash([6,5]);c.stroke();c.setLineDash([]);
- const p=isoP(x,y),pul=(Math.sin(t)+1)/2;c.save();c.strokeStyle=`rgba(255,140,30,${.55+pul*.4})`;c.lineWidth=3;c.beginPath();c.ellipse(p[0],p[1],34+pul*5,17+pul*2.5,0,0,7);c.stroke();
- c.fillStyle='rgba(255,140,30,.18)';c.fill();c.restore()}
-function drawMecanica(c){const x0=T(111.1),x1=T(115.9),y0=T(23.1),y1=T(29),H=80;
- isoBox(c,x0,y0,x1,y0+T(.35),0,34,'#d9d4cc');
- for(const [bx,col] of [[111.6,'#c0392b'],[112.7,'#2e86c1']])isoBox(c,T(bx),y0+T(.4),T(bx+.8),y0+T(1),0,16,col);
- for(const k of [0,1,2]){const px=T(114.4+k*.42),py=y0+T(.8);isoBox(c,px-5,py-5,px+5,py+5,0,6,'#222');isoBox(c,px-5,py-5,px+5,py+5,6,12,'#2b2b2b')}
- for(const [px,py] of [[x0+T(.25),y0+T(.25)],[x1-T(.25),y0+T(.25)],[x0+T(.25),y1-T(.25)],[x1-T(.25),y1-T(.25)]])isoBox(c,px-4,py-4,px+4,py+4,0,H,'#4a4f57');
- const sob=eu&&eu.x>x0-T(1)&&eu.x<x1+T(1)&&eu.y>y0-T(1)&&eu.y<y1+T(1.5);c.save();c.globalAlpha=sob?.3:.95;
- isoBox(c,x0,y0,x1,y1,H,H+10,'#6b6b75');const A=isoP(x0,y1),Bq=isoP(x1,y1);c.fillStyle='#e67e22';c.beginPath();c.moveTo(A[0],A[1]-H-1);c.lineTo(Bq[0],Bq[1]-H-1);c.lineTo(Bq[0],Bq[1]-H-9);c.lineTo(A[0],A[1]-H-9);c.fill();
- const m=isoP((x0+x1)/2,y1);c.translate(m[0],m[1]-H-3);c.transform(1,(Bq[1]-A[1])/(Bq[0]-A[0]),0,1,0,0);c.fillStyle='#fff';c.font='700 7px Fredoka,sans-serif';c.textAlign='center';c.fillText('🔧 MECÂNICA DO TONHÃO',0,3);c.restore();
- const p=isoP(MEC_BLIP.x,MEC_BLIP.y),b=Math.sin(now*4)*4;if(!sob||!carOf(eu)){c.font='18px sans-serif';c.textAlign='center';c.fillText('🔧',p[0],p[1]-40+b);c.textAlign='left'}}
 function drawCobertura(c){const x0=T(96.2),x1=T(100.8),y0=T(24.2),y1=T(26.6),H=74;
  for(const [px,py] of [[x0+T(.3),y0+T(.3)],[x1-T(.3),y0+T(.3)],[x0+T(.3),y1-T(.3)],[x1-T(.3),y1-T(.3)]])isoBox(c,px-4,py-4,px+4,py+4,0,H,'#f2f2f2');
  const sob=eu&&eu.x>x0&&eu.x<x1&&eu.y>y0-T(1)&&eu.y<y1+T(1);c.save();c.globalAlpha=sob?.45:1;
@@ -2655,7 +2639,7 @@ function drawCarStack(c,x,y,kind,ang,v,o={}){if(kind==='duster'&&!SPR_DUSTER.nat
 }
 // movimento: direção suave pela velocidade real, esterço, inclinação na curva, fumaça e rastro
 const FUMACA=[];
-function dirigir(c,p,car){CAR_COR_ATUAL=SERVICO(car)?null:corCarroDe(p,car);CAR_MOD_ATUAL=SERVICO(car)?null:modsDe(p,car);CAR_SOM_ATUAL=!!(p.somLigado&&CAR_MOD_ATUAL&&CAR_MOD_ATUAL.som);try{return dirigir0(c,p,car)}finally{CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null;CAR_SOM_ATUAL=false}}
+function dirigir(c,p,car){CAR_COR_ATUAL=SERVICO(car)?null:corCarroDe(p,car);CAR_MOD_ATUAL=SERVICO(car)?null:(m=>m&&m.som?{som:true}:null)(modsDe(p,car));CAR_SOM_ATUAL=!!(p.somLigado&&CAR_MOD_ATUAL&&CAR_MOD_ATUAL.som);try{return dirigir0(c,p,car)}finally{CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null;CAR_SOM_ATUAL=false}}
 function dirigir0(c,p,car){
  const m=p._mov||(p._mov={x:p.x,y:p.y,vx:0,vy:0,v:0,ac:0,t:now,fu:0,ang:(p.dir||1)>0?0:Math.PI,w:0,st:0,rl:0,pt:0});
  const dt=Math.max(.001,Math.min(.1,now-m.t));m.t=now;
@@ -2932,7 +2916,6 @@ function drawCena(){
  for(const f of FRUTAS)if(vis(f.x,f.y))list.push({x:f.x,y:f.y,f:()=>drawFruteira(ctx,f)});
  if(vis(T(131.5),T(32))){list.push({x:T(131.5),y:T(32.4),k:T(128)+T(30.6),cam:1,f:()=>deckMirante(ctx)});for(const bx of [129.2,131.4])list.push({x:T(bx),y:T(31.6),k:T(bx)+T(31.6)+6,cam:1,f:()=>bancoIso(ctx,T(bx),T(31.1))});list.push({x:T(134),y:T(31.8),k:T(134)+T(31.8)+6,cam:1,f:()=>lunetaIso(ctx,T(134),T(31.8))})}
  if(vis(T(98),T(25))){for(const bb of BOMBAS)list.push({x:bb.x,y:bb.y,cam:1,f:()=>drawBomba(ctx,bb)});list.push({x:T(100.8),y:T(26.9),k:T(100.8)+T(26.9)+40,cam:1,f:()=>drawCobertura(ctx)})}
- if(vis(T(113.5),T(26))){list.push({x:T(111),y:T(23),k:T(111)+T(23)-400,cam:1,f:()=>drawMecBlip(ctx)});list.push({x:T(115.9),y:T(29),k:T(115.9)+T(29)+40,cam:1,f:()=>drawMecanica(ctx)})}
  if(vis(FOGUEIRA.x,FOGUEIRA.y)){list.push({x:FOGUEIRA.x,y:FOGUEIRA.y,f:()=>drawFogueira(ctx)});for(const [tx,col,ty] of [[-13.2,'#e67e22',38.8],[-6.6,'#2e86c1',38.6]])list.push({x:T(tx),y:T(ty),f:()=>drawBarraca(ctx,T(tx),T(ty),col)})}
  if(vis(T(46),T(-12))){ctx.save();ctx.beginPath();ctx.rect(T(36),T(-14.6),T(22),T(12));ctx.clip();drawCachoeira(ctx);ctx.restore();
   list.push({x:T(46.5),y:T(-15.2),cam:1,f:()=>drawPenhasco(ctx)})}
@@ -4117,8 +4100,7 @@ const joyV={x:0,y:0};
 let pertoKey='';
 function seatPerto(){let best=null,bd=28;for(const s of seats){if(s.occ||!(s.kind==='mesa'||s.kind==='fora'||s.kind==='banqueta'))continue;const d=Math.hypot(T(s.x)-eu.x,T(s.y)-eu.y);if(d<bd){bd=d;best=s}}return best}
 function pertoOpcoes(){
- if(eu&&!trabalho&&!emCasa&&!sinucaAberta&&carOf(eu)&&!SERVICO(carOf(eu))&&eu.carro&&Math.hypot(eu.x-MEC_BLIP.x,eu.y-MEC_BLIP.y)<T(1.6))return[['🔧 Personalizar carro',()=>{mecCar=eu.carro;abrirMecanica()}]];
-  if(!eu||trabalho||emCasa||sinucaAberta||carOf(eu))return[];
+ if(!eu||trabalho||emCasa||sinucaAberta||carOf(eu))return[];
  const o=[],perto=(x,y,r)=>Math.hypot(eu.x-x,eu.y-y)<r;
  if(eu.seat){o.push(['🧍 Levantar',levantar]);if(eu.seat.kind!=='praca')o.push(['🍺 Pedir ao Tonhão',()=>abrirLugar({kind:'bar'})]);return o}
  {const ps=PRACA_SEATS.filter(s=>!s.occ&&perto(T(s.x),T(s.y),T(1.2))).sort((a,b)=>Math.hypot(eu.x-T(a.x),eu.y-T(a.y))-Math.hypot(eu.x-T(b.x),eu.y-T(b.y)))[0];if(ps)o.push(['🪑 Sentar no banco',()=>{sentar(ps);say(eu,pick(['Que sombra boa!','Daqui eu vejo a cidade toda.','Descansando um pouquinho…']),3,true)}])}
@@ -4132,7 +4114,7 @@ function pertoOpcoes(){
  for(const [k,b] of Object.entries(SHOPS))if(perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.8))||(k==='mercadinho'&&eu.x>T(38)&&eu.x<T(52)&&eu.y>T(24.6)&&eu.y<T(26.4)))o.push([PLACE_TITLE[k],()=>abrirLugar(b)]);
  for(const f of FEATURES)if(perto(f.a.x,f.a.y,T(2.8)))o.push([PLACE_TITLE[f.kind],()=>abrirLugar(f)]);
  if(casaEm(eu.x,eu.y)===lojaRoupa&&eu.y<T(lojaRoupa.y+lojaRoupa.h-1))o.push(['👕 Ver as roupas',()=>abrirLojaRoupa()]);
- if(casaEm(eu.x,eu.y)===ofic&&eu.y<T(ofic.y+ofic.h-1))o.push(['🔧 Personalizar meu carro',()=>abrirMecanica()]);
+ 
  {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  for(const b of houses)if(!b.off&&!casaEm(eu.x,eu.y)&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3))){const i=casasInfo.get(b.n)||{};o.push([i.dono&&i.dono===eu.id?'🏠 Minha casa':i.dono?'🏠 Casa de '+(i.nome||'alguém'):'🔑 Casa '+b.n+' à venda',()=>abrirLugar(b)]);break}
  for(const f of FRUTAS)if(perto(f.x,f.y+8,T(1.4))&&!(frutaCD[f.id]>Date.now())){o.push([f.tipo==='manga'?'🥭 Pegar manga':'🍐 Pegar goiaba',()=>comerFruta(f)]);break}
@@ -4365,7 +4347,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116e';
+const VERSAO_JOGO='v20261116f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
