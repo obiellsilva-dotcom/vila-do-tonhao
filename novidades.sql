@@ -43,3 +43,92 @@ insert into public.trabalhos(id, nome, salario, duracao, nivel_min, xp, fome) va
   ('lixeiro', 'Lixeiro(a)', 65, 60, 4, 25, 12)
 on conflict (id) do update set nome = excluded.nome, salario = excluded.salario, duracao = excluded.duracao,
   nivel_min = excluded.nivel_min, xp = excluded.xp, fome = excluded.fome;
+
+-- ===== ETAPA D: casas vazias, loja de móveis e geladeira =====
+-- Cada casa guarda os móveis colocados (tipo, x, y, andar) e o que tem na geladeira.
+alter table public.casas add column if not exists moveis jsonb not null default '[]'::jsonb;
+alter table public.casas add column if not exists geladeira jsonb not null default '{}'::jsonb;
+
+-- Preços dos móveis (dinheiro do jogo). O preço vale aqui, não no jogo.
+create or replace function public.preco_movel(p_tipo text) returns integer
+language sql immutable as $$
+  select case p_tipo
+    when 'caixote' then 80 when 'cadeira' then 150 when 'planta' then 200 when 'colchao' then 300
+    when 'abajur' then 350 when 'mesa' then 600 when 'pia' then 800 when 'estante' then 900
+    when 'fogao' then 1200 when 'sofa' then 1500 when 'geladeira' then 1800 when 'tv' then 2000
+    when 'cama' then 2500 when 'somcx' then 3000 when 'led' then 4000 when 'aquario' then 6000
+    when 'homet' then 8000 when 'jukebox' then 12000 else null end
+$$;
+
+create or replace function public.comprar_movel(p_tipo text, p_x integer, p_y integer, p_andar integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; pr integer;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id;
+  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  pr := preco_movel(p_tipo);
+  if pr is null then raise exception 'Móvel inválido.'; end if;
+  if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_andar not in (0, 1) then raise exception 'Lugar inválido.'; end if;
+  if jsonb_array_length(c.moveis) >= 60 then raise exception 'Sua casa já tem móveis demais (máximo 60).'; end if;
+  if exists (select 1 from jsonb_array_elements(c.moveis) e where (e->>'x')::int = p_x and (e->>'y')::int = p_y and (e->>'a')::int = p_andar) then
+    raise exception 'Já tem um móvel nesse lugar.'; end if;
+  if m.dinheiro < pr then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', pr; end if;
+  update moradores set dinheiro = dinheiro - pr where id = m.id;
+  update casas set moveis = moveis || jsonb_build_array(jsonb_build_object('t', p_tipo, 'x', p_x, 'y', p_y, 'a', p_andar)) where id = c.id;
+  return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
+end $$;
+
+-- Mover um móvel (de graça) ou vender de volta (devolve metade do preço)
+create or replace function public.mexer_movel(p_i integer, p_x integer, p_y integer, p_vender boolean) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; e jsonb; a integer;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id;
+  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
+  e := c.moveis -> p_i; a := (e->>'a')::int;
+  if p_vender then
+    update moradores set dinheiro = dinheiro + coalesce(preco_movel(e->>'t'), 0) / 2 where id = m.id;
+    update casas set moveis = moveis - p_i where id = c.id;
+  else
+    if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 then raise exception 'Lugar inválido.'; end if;
+    if exists (select 1 from jsonb_array_elements(c.moveis) with ordinality q(v, k)
+               where k - 1 <> p_i and (v->>'x')::int = p_x and (v->>'y')::int = p_y and (v->>'a')::int = a) then
+      raise exception 'Já tem um móvel nesse lugar.'; end if;
+    update casas set moveis = jsonb_set(moveis, array[p_i::text], e || jsonb_build_object('x', p_x, 'y', p_y)) where id = c.id;
+  end if;
+  return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
+end $$;
+
+-- Geladeira: guarda um item da mochila ou pega de volta para a mochila (só o dono)
+create or replace function public.geladeira(p_item text, p_guardar boolean) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; q integer; g integer;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id;
+  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  if not exists (select 1 from jsonb_array_elements(c.moveis) e where e->>'t' = 'geladeira') then
+    raise exception 'Sua casa não tem geladeira. Compre uma na loja de móveis!'; end if;
+  if not exists (select 1 from loja where id = p_item and tipo = 'consumo') then raise exception 'Item inválido.'; end if;
+  q := coalesce((m.mochila->>p_item)::integer, 0);
+  g := coalesce((c.geladeira->>p_item)::integer, 0);
+  if p_guardar then
+    if q <= 0 then raise exception 'Você não tem isso na mochila.'; end if;
+    if g >= 30 then raise exception 'A geladeira já tem 30 desse item.'; end if;
+    update moradores set mochila = case when q - 1 > 0 then mochila || jsonb_build_object(p_item, q - 1) else mochila - p_item end where id = m.id;
+    update casas set geladeira = geladeira || jsonb_build_object(p_item, g + 1) where id = c.id;
+  else
+    if g <= 0 then raise exception 'A geladeira não tem isso.'; end if;
+    if q >= 20 then raise exception 'Sua mochila já tem 20 desse item.'; end if;
+    update moradores set mochila = mochila || jsonb_build_object(p_item, q + 1) where id = m.id;
+    update casas set geladeira = case when g - 1 > 0 then geladeira || jsonb_build_object(p_item, g - 1) else geladeira - p_item end where id = c.id;
+  end if;
+  return json_build_object('geladeira', (select geladeira from casas where id = c.id), 'mochila', (select mochila from moradores where id = m.id), 'eu', _estado(m.id));
+end $$;
+
+grant execute on function public.comprar_movel(text, integer, integer, integer) to authenticated;
+grant execute on function public.mexer_movel(integer, integer, integer, boolean) to authenticated;
+grant execute on function public.geladeira(text, boolean) to authenticated;
