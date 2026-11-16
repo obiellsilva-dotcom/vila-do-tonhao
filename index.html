@@ -230,6 +230,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 #painelEsq{position:fixed;left:max(8px,env(safe-area-inset-left,0px));top:150px;z-index:7;display:flex;flex-direction:column;gap:6px;align-items:flex-start;pointer-events:none}
 #painelEsq>#work,#painelEsq>#missao{position:relative;left:auto;top:auto;pointer-events:auto}
 #work .btn{display:block;width:100%;margin-top:5px;font-size:12px;padding:5px 8px}
+#viatPainel{margin-top:4px;background:rgba(0,0,0,.25);border-radius:10px;padding:4px 6px}#viatPainel .vl{display:flex;align-items:center;gap:4px;margin:3px 0}#viatPainel span{flex:0 0 64px;text-align:left;font-size:11.5px}#viatPainel i{flex:1;font-style:normal;font-size:11.5px;padding:4px 0;border-radius:8px;background:rgba(255,255,255,.08);cursor:pointer}#viatPainel i.on{background:#ffc94a;color:#2a1a10;font-weight:700}
 #workMin,#msMin{position:absolute;top:2px;right:2px;background:none;border:0;color:var(--gold);font-size:16px;padding:3px 6px;cursor:pointer;line-height:1}
 #missao #msX{right:22px}
 #work.min,#missao.min{width:auto;padding:5px 26px 5px 10px}
@@ -338,7 +339,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
   <button id="workMin" aria-label="minimizar tarefas">▾</button>
   <div id="workTxt"></div>
   <div class="bar"><i id="workBar"></i></div>
-  <button class="btn hidden" id="workGiro">🚨 Ligar giroflex</button><button class="btn hidden" id="workVeic">🚚 Usar veículo do trabalho</button><button class="btn ghost" id="workStop">Largar</button>
+  <button class="btn hidden" id="workGiro">🚨 Luzes e sirene ▾</button><div id="viatPainel" class="hidden"><div class="vl"><span>🚨 Luz</span><i data-g="0">Desl.</i><i data-g="1">Dupla</i><i data-g="2">Rápida</i></div><div class="vl"><span>📢 Sirene</span><i data-s="0">Desl.</i><i data-s="2">Longa</i><i data-s="3">Rápida</i></div></div><button class="btn hidden" id="workVeic">🚚 Usar veículo do trabalho</button><button class="btn ghost" id="workStop">Largar</button>
 </div>
 
 <div id="mSocial" class="modal hidden">
@@ -2669,8 +2670,8 @@ const SPR_VIP=new Image();SPR_VIP.src='data:image/webp;base64,UklGRqJPAQBXRUJQVl
 const GIRO_PTS=[[-3,-12,53,'255,30,30','L',40,0],[-3,-4.5,53,'255,255,255','B',28,0],[-3,4.5,53,'255,255,255','B',28,0],[-3,12,53,'255,30,30','R',40,0],
  [60,-6.5,29,'255,30,30','L',22,1],[60,6.5,29,'255,255,255','R',20,1],[60,-11,24,'255,30,30','R',14,1],[60,11,24,'255,30,30','L',14,1],
  [-56,-9,44,'255,30,30','R',20,-1],[-56,9,44,'255,30,30','L',20,-1]],GIRO_FRAME=[];
-function giroflexV(c,x0,y0,k,i){const EL=.663,se=Math.sin(EL),ce=Math.cos(EL),th=-Math.PI+i*Math.PI/16,yaw=Math.atan2(Math.sin(th)/se,Math.cos(th)),cy=Math.cos(yaw),sy=Math.sin(yaw),C=FAROL_POS.viatura[6],
-  t=(now%0.9)/0.9,on=(a0,a1)=>t>=a0&&t<a1,F={L:on(0,.07)||on(.12,.19),R:on(.45,.52)||on(.57,.64),B:on(.3,.34)||on(.8,.84)},P=(X,Z,h)=>[x0+(80+X*cy-Z*sy)*k,y0+((X*sy+Z*cy)*se-h*ce+C)*k];
+function giroflexV(c,x0,y0,k,i,md){const EL=.663,se=Math.sin(EL),ce=Math.cos(EL),th=-Math.PI+i*Math.PI/16,yaw=Math.atan2(Math.sin(th)/se,Math.cos(th)),cy=Math.cos(yaw),sy=Math.sin(yaw),C=FAROL_POS.viatura[6],
+  t=md===2?(now%0.6)/0.6:(now%0.9)/0.9,on=(a0,a1)=>t>=a0&&t<a1,F=md===2?{L:on(0,.05)||on(.09,.14)||on(.18,.23),R:on(.5,.55)||on(.59,.64)||on(.68,.73),B:on(.3,.36)||on(.82,.88)}:{L:on(0,.07)||on(.12,.19),R:on(.45,.52)||on(.57,.64),B:on(.3,.34)||on(.8,.84)},P=(X,Z,h)=>[x0+(80+X*cy-Z*sy)*k,y0+((X*sy+Z*cy)*se-h*ce+C)*k];
  c.save();
  // a barra apagada (vermelha escura) entre as duas pontas
  {const [ax,ay]=P(-3,-13,53),[bx,by]=P(-3,13,53);c.lineCap='round';c.strokeStyle='rgba(120,10,10,.55)';c.lineWidth=3*k;c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.stroke()}
@@ -2722,14 +2723,14 @@ function drawRodas(c,x0,y0,k,i,R,giro,ro,anda){const EL=.663,se=Math.sin(EL),ce=
 function drawCarSprite(c,x,y,img,ang,o,off=0){const N=32,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
  if(!o.semSombra){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.fillStyle='rgba(0,0,0,.3)';rr(c,-30,-13,62,28,8);c.fill();c.restore()}
  const bob=(o.pitch||0)*6;const Y0=o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob;c.drawImage(quadro(img,CAR_MOD_ATUAL,i),0,0,320,320,x-T/2,Y0,T,T);if(o.rodasImg){const ri=o.rodasImg[((Math.floor(-(o.giroRoda||0)*.35/(Math.PI*2/5/4))%4)+4)%4];if(ri&&ri.naturalWidth)c.drawImage(quadro(ri,null,i),0,0,320,320,x-T/2,Y0,T,T)}if(o.farol){const q=farolQuadro(o.farol,i,o.freio,quadro(img,CAR_MOD_ATUAL,i));if(q){c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.75;c.drawImage(q,0,0,q.width,q.height,x-T/2,Y0,T,T);c.restore();LUZES_FRAME.push([q,x-T/2,Y0,T,c.getTransform()])}}if(!o.farol&&o.luzImg&&o.luzImg.naturalWidth){const q=quadro(o.luzImg,null,i);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.4;c.drawImage(q,0,0,320,320,x-T/2,Y0,T,T);c.restore();LUZES_FRAME.push([q,x-T/2,Y0,T,c.getTransform()])}else if(o.rodas)drawRodas(c,x-T/2,Y0,T/160,i,o.rodas,o.giroRoda||0,CAR_MOD_ATUAL?CAR_MOD_ATUAL.roda|0:0,o.rodaAnda);
- if(o.giroV){giroflexV(c,x-T/2,Y0,T/160,i);GIRO_FRAME.push([x-T/2,Y0,T/160,i,c.getTransform()])}
+ if(o.giroV){giroflexV(c,x-T/2,Y0,T/160,i,o.giroV);GIRO_FRAME.push([x-T/2,Y0,T/160,i,c.getTransform(),o.giroV])}
  if(o.freio&&!o.farol){const cs=Math.cos(ang),sn=Math.sin(ang);c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,40,40,.35)';c.beginPath();c.ellipse(x-cs*30*CK,y-sn*30*SY*CK-8*CK,5,3,0,0,7);c.fill();c.restore()}}
 const SP_OK=k=>{const im={duster:SPR_DUSTER,sw4:SPR_SW4,frontier:SPR_FRONT,caminhao:SPR_CAMINHAO,lixo:SPR_LIXO}[k];return im&&im.naturalWidth};
 function drawCarStack(c,x,y,kind,ang,v,o={}){if((kind==='duster'||kind==='sw4')&&!SP_OK(kind))kind='viatura';if((kind==='frontier'||kind==='caminhao'||kind==='lixo')&&!SP_OK(kind))kind='caminhonete';
  if(CAR_SOM_ATUAL){const t=now*2.2;c.save();c.globalCompositeOperation='lighter';for(let k=0;k<3;k++){const f=(t+k/3)%1;c.strokeStyle=`rgba(255,80,200,${(1-f)*.55})`;c.lineWidth=2.2;c.beginPath();c.ellipse(x,y-6,20+f*46,9+f*21,0,0,7);c.stroke()}c.restore();c.font='14px sans-serif';c.textAlign='center';c.fillText(['🎵','🎶','🔊'][Math.floor(now*2)%3],x+Math.sin(now*3)*18,y-48-((now*30)%18))}
  const SP3={fusca:[SPR_FUSCA,SPR_FUSCA_M],sedan:[SPR_SEDAN,SPR_SEDAN_M],moto:[SPR_MOTO,SPR_MOTO_M],opala:[SPR_OPALA,SPR_OPALA_M],esportivo:[SPR_ESP,SPR_ESP_M],kombi_tonhao:[SPR_KT,SPR_KT_M],viatura:[SPR_VIAT,null],duster:[SPR_DUSTER,null],caminhonete:[SPR_AMAROK,SPR_AMAROK_M],sw4:[SPR_SW4,null],frontier:[SPR_FRONT,null],caminhao:[SPR_CAMINHAO,null],lixo:[SPR_LIXO,null],neon:[SPR_LAMBO,SPR_LAMBO_M],jipe:[SPR_JIPE,SPR_JIPE_M],gto:[SPR_GTO,null]}[kind];
  if(SP3&&SP3[0].complete&&SP3[0].naturalWidth){const sp=SP3[1]?spriteCor(SP3[0],SP3[1],o.cor||CAR_COR_ATUAL||CAR_COLOR[kind]):SP3[0];if(sp){const th=Math.atan2((Math.cos(ang)+Math.sin(ang))*IB,(Math.cos(ang)-Math.sin(ang))*IA);{const cs=Math.cos(ang),sn=Math.sin(ang),E0=CAR_ESC[kind]||1,L=(kind==='moto'?14:21)*CK*E0,Wd=(kind==='moto'?3.5:8.5)*CK*E0,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];c.fillStyle='rgba(10,10,20,.22)';c.beginPath();[[L,Wd],[L,-Wd],[-L,-Wd],[-L,Wd]].forEach(([u,w],k2)=>{const q=P(cs*u-sn*w,sn*u+cs*w);k2?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fill()}
-   {const oy=({caminhao:19,lixo:11.5}[kind]||0)*77*CK*(CAR_ESC[kind]||1)/160;drawCarSprite(c,x,y-oy,sp,th,Object.assign({},o,{semSombra:1,chao:1,esc:CAR_ESC[kind]||1,rodas:RODAS[kind],rodasImg:RODA_IMG[kind],luzImg:o.luz?LUZ_IMG[kind]:null,farol:o.luz&&FAROL_POS[kind]?kind:null,giroV:kind==='viatura'&&o.giro}))}if(kind==='moto'&&v)drawPerson(c,x,y-9,v,{s:.62,sit:true,dir:Math.cos(th)>=0?1:-1,back:Math.sin(th)<-.4});return}}
+   {const oy=({caminhao:19,lixo:11.5}[kind]||0)*77*CK*(CAR_ESC[kind]||1)/160;drawCarSprite(c,x,y-oy,sp,th,Object.assign({},o,{semSombra:1,chao:1,esc:CAR_ESC[kind]||1,rodas:RODAS[kind],rodasImg:RODA_IMG[kind],luzImg:o.luz?LUZ_IMG[kind]:null,farol:o.luz&&FAROL_POS[kind]?kind:null,giroV:kind==='viatura'&&o.giro?o.giro:0}))}if(kind==='moto'&&v)drawPerson(c,x,y-9,v,{s:.62,sit:true,dir:Math.cos(th)>=0?1:-1,back:Math.sin(th)<-.4});return}}
  ang+=Math.PI/4;
 {const ANT=kind==='caminhonete'?[SPR_PICK,0]:kind==='neon'?[SPR_VIP,16]:null;
  if(ANT&&ANT[0].complete&&ANT[0].naturalWidth){const a0=ang-Math.PI/4,th0=Math.atan2((Math.cos(a0)+Math.sin(a0))*IB,(Math.cos(a0)-Math.sin(a0))*IA),th=Math.atan2(Math.sin(th0)/.78,Math.cos(th0)),cs=Math.cos(a0),sn=Math.sin(a0),L=(kind==='caminhonete'?25:22)*CK*(CAR_ESC[kind]||1)/1.1,Wd=9.5*CK*(CAR_ESC[kind]||1)/1.1,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];
@@ -2842,7 +2843,7 @@ function dirigir0(c,p,car){
  if(vel>90){c.strokeStyle=`rgba(255,255,255,${Math.min(.3,(vel-90)/400)})`;c.lineWidth=1.2;const ux=cs,uy=sn*SY;
   for(const o of [-f.W*.7,f.W*.7]){const px=p.x-ux*f.L-sn*o,py=p.y-uy*f.L+cs*o*SY;c.beginPath();c.moveTo(px,py);c.lineTo(px-ux*(10+vel*.06),py-uy*(10+vel*.06));c.stroke()}}
  const bob=anda?Math.sin(now*22+p.x*.05)*.35:Math.sin(now*30)*.12;
- drawCarStack(c,p.x,p.y+bob,car,m.ang,p.v,{luz:1,giroRoda:-(m.odo||0)/6,rodaAnda:anda,giro:car==='viatura'&&(p===eu?eu.giro:p.giro),steer:m.st,roll:m.rl,pitch:m.pt,freio:!anda||m.ac<-60});
+ drawCarStack(c,p.x,p.y+bob,car,m.ang,p.v,{luz:1,giroRoda:-(m.odo||0)/6,rodaAnda:anda,giro:car==='viatura'?((p===eu?eu.gM:p.gM)|0):0,steer:m.st,roll:m.rl,pitch:m.pt,freio:!anda||m.ac<-60});
 }
 function drawCarShape(c,x,y,kind,dir,s,v){
  if(s>=.7){drawCarStack(c,x,y,kind,dir>0?0:Math.PI,v,{freio:1});return}
@@ -3130,7 +3131,7 @@ function drawCena(){
   ctx.globalCompositeOperation='lighter';
   for(const [q,x0,y0,T,m] of LUZES_FRAME){ctx.save();ctx.setTransform(m);ctx.globalAlpha=Math.min(1,d*1.3);ctx.drawImage(q,0,0,q.width,q.height,x0,y0,T,T);ctx.restore()}
   for(const [x,y,rad] of [...barLights.map(([x,y])=>[T(x),T(y),70]),...lamps.map(l=>[l.x+5,l.y-30,50])]){if(!vis(x,y-150))continue;const g=ctx.createRadialGradient(x,y,0,x,y,rad);g.addColorStop(0,`rgba(255,170,70,${.2*d})`);g.addColorStop(1,'rgba(255,170,70,0)');ctx.fillStyle=g;ctx.fillRect(x-rad,y-rad,rad*2,rad*2)}
-  for(const [x0,y0,k,i,m] of GIRO_FRAME){ctx.save();ctx.setTransform(m);giroflexV(ctx,x0,y0,k,i);ctx.restore()}
+  for(const [x0,y0,k,i,m,md] of GIRO_FRAME){ctx.save();ctx.setTransform(m);giroflexV(ctx,x0,y0,k,i,md);ctx.restore()}
   ctx.globalCompositeOperation='source-over';
   windows.forEach(w=>{if(winOn(w)&&w.b!==minhaC&&vis(w.x,T(w.b.y+w.b.h))){wallSet(ctx,T(w.b.y+w.b.h));ctx.fillStyle=`rgba(255,214,110,${Math.min(1,d*1.6)})`;ctx.fillRect(w.x,w.y,w.w,w.h)}});setWorld(ctx);
  }
@@ -3999,7 +4000,7 @@ $('workVeic').onclick=()=>{if(!trabalho)return;
  if(trabalho.job==='policia'||trabalho.job==='prefeito'){const pol=trabalho.job==='policia';eu.path=[];
   if(!pol&&!trabalho.duster){trabalho.duster=true;trabalho.ape=false}else trabalho.ape=!trabalho.ape;
   if(!trabalho.ape){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null;Som.play('porta');toast(pol?'🚓 De volta à viatura!':'🚙 De volta à Duster!',2000)}
-  else{const [px,py]=calcadaPerto(eu.x,eu.y);eu.x=px;eu.y=py;Som.play('porta');if(eu.giro&&pol)$('workGiro').click();toast('🚶 A pé! Toque no botão de novo para voltar ao veículo.',2500)}
+  else{const [px,py]=calcadaPerto(eu.x,eu.y);eu.x=px;eu.y=py;Som.play('porta');if(pol&&(eu.giro||eu.sirM))viatSet(0,0);toast('🚶 A pé! Toque no botão de novo para voltar ao veículo.',2500)}
   $('workVeic').textContent=trabalho.ape?(pol?'🚓 Voltar à viatura':'🚙 Voltar à Duster'):(pol?'🚶 Descer da viatura':'🚶 Descer da Duster');sendPos(true);return}
  if(!VEIC_JOB[trabalho.job])return;trabalho.veic=!trabalho.veic;eu.path=[];
  if(trabalho.veic){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null;Som.play('buzina');toast('🚚 Veículo do trabalho! Toque na rua para dirigir.',2500)}
@@ -4067,8 +4068,11 @@ for(const [b,pn,k] of [['workMin','work','cidadeTonhao.workMin'],['msMin','missa
  const set=v=>{el.classList.toggle('min',v);bt.textContent=v?'▸':'▾';try{localStorage.setItem(k,v?'1':'')}catch(e){}};
  try{if(localStorage.getItem(k))set(true)}catch(e){}
  bt.onclick=ev=>{ev.stopPropagation();set(!el.classList.contains('min'))}}
-$('workGiro').onclick=()=>{eu.sirM=((eu.sirM||0)+1)%4;eu.giro=eu.sirM>0;$('workGiro').textContent=['🚨 Ligar giroflex','📢 Sirene longa','📢 Sirene rápida','🔕 Desligar tudo'][eu.sirM];clearInterval(giroT);toast(['🔕 Giroflex desligado','🚨 Giroflex ligado (só as luzes)','📢 Sirene longa','📢 Sirene rápida'][eu.sirM],1200);sendPos(true)};
-function fimTurno(){eu.giro=false;eu.sirM=0;clearInterval(giroT);$('workGiro').classList.add('hidden');$('workGiro').textContent='🚨 Ligar giroflex';
+function viatPinta(){const p=$('viatPainel');p.querySelectorAll('[data-g]').forEach(e=>e.classList.toggle('on',+e.dataset.g===(eu.gM|0)));p.querySelectorAll('[data-s]').forEach(e=>e.classList.toggle('on',+e.dataset.s===(eu.sirM|0)));$('workGiro').textContent=(eu.gM||eu.sirM?'🚨 Luz '+['desl.','dupla','rápida'][eu.gM|0]+' · sirene '+(['desl.','','longa','rápida'][eu.sirM|0]):'🚨 Luzes e sirene')+(p.classList.contains('hidden')?' ▾':' ▴')}
+function viatSet(g,sm){if(g!=null)eu.gM=g;if(sm!=null)eu.sirM=sm;eu.giro=(eu.gM|0)>0;viatPinta();sendPos(true)}
+$('workGiro').onclick=()=>{$('viatPainel').classList.toggle('hidden');viatPinta()};
+$('viatPainel').onclick=e=>{const t=e.target;if(t.dataset.g!=null)viatSet(+t.dataset.g,null);else if(t.dataset.s!=null)viatSet(null,+t.dataset.s)};
+function fimTurno(){eu.giro=false;eu.sirM=0;eu.gM=0;$('viatPainel').classList.add('hidden');clearInterval(giroT);$('workGiro').classList.add('hidden');$('workGiro').textContent='🚨 Luzes e sirene ▾';
  if(trabalho&&trabalho.job==='bar'){eu.x=T(22.5);eu.y=T(20.9)}
  trabalho=null;fecharTarefa();eu.hidden=false;eu.apron=false;eu.beer=false;eu.fish=false;eu.path=[];$('work').classList.add('hidden');sendPos(true);
 }
@@ -4233,7 +4237,7 @@ function aplicarRemoto(p){
 let lastSent=0,lastKey='';
 function sendPos(force){
  if(!canal||!eu)return;const t=performance.now();if(!force&&t-lastSent<220)return;
- const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:eu.giro?(eu.sirM||1):0,i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0,rm:eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0,dt:eu.deitado|0,mz:eu.mz|0,sv:eu.sv|0};
+ const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:(eu.gM|0)+10*(eu.sirM|0),i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0,rm:eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0,dt:eu.deitado|0,mz:eu.mz|0,sv:eu.sv|0};
  const key=JSON.stringify(p);if(!force&&key===lastKey&&t-lastSent<4000)return;
  lastKey=key;lastSent=t;canal.send({type:'broadcast',event:'pos',payload:p}).catch(()=>{});
 }
@@ -4241,7 +4245,7 @@ function onPos(p){
  if(!p||typeof p.i!=='string')return;const o=others.get(p.i);if(!o)return;
  const x=clamp(+p.x||0,WX0,WX1),y=clamp(+p.y||0,WY0,WY1);
  if(!o.seen){o.x=x;o.y=y;o.seen=true}
- o.tx=x;o.ty=y;o.giro=!!p.gf;o.sirM=p.gf|0;o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c\d+s?$/.test(p.rm)?p.rm:0;o.deitado=Math.max(0,Math.min(8,p.dt|0));o.mz=Math.max(0,Math.min(20,p.mz|0));o.sv=p.sv===1||p.sv===2?p.sv:0;
+ o.tx=x;o.ty=y;o.gM=(p.gf|0)%10;o.giro=o.gM>0;o.sirM=Math.floor((p.gf|0)/10);o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c\d+s?$/.test(p.rm)?p.rm:0;o.deitado=Math.max(0,Math.min(8,p.dt|0));o.mz=Math.max(0,Math.min(20,p.mz|0));o.sv=p.sv===1||p.sv===2?p.sv:0;
 }
 function emitEv(k,data){if(canal&&eu)canal.send({type:'broadcast',event:'ev',payload:Object.assign({i:eu.id,k},data)}).catch(()=>{})}
 function onEv(p){
@@ -4551,7 +4555,7 @@ $('zsom').onclick=()=>{Som.toggle();pintaSom();Som.play('clique');toast(Som.on?'
  document.querySelectorAll('.cfgg button').forEach(b=>b.onclick=()=>{CFG.graf=b.dataset.g;salvaCfg();resize();pinta()})})();
 $('zmus').onclick=()=>{const m=Som.toggleMusica();pintaSom();toast(m?'🎵 Música ligada':'🎵 Música desligada (os outros sons continuam)',1800)};pintaSom();
 function sonsMotores(){
- {const minha=eu&&eu.giro&&carOf(eu)==='viatura'?(eu.sirM||1):0;Som.sirene('eu',minha,1);let sb=null,sd=520;if(eu)for(const o of others.values()){if(!o.giro||!o.seen||o.hidden||(o.sirM|0)<2)continue;const d=Math.hypot(o.x-eu.x,o.y-eu.y);if(d<sd){sd=d;sb=o}}Som.sirene('outro',sb?sb.sirM:0,sb?Math.max(0,1-sd/520)*.8:0)}
+ {const minha=eu&&carOf(eu)==='viatura'?(eu.sirM|0):0;Som.sirene('eu',minha,1);let sb=null,sd=520;if(eu)for(const o of others.values()){if(!o.seen||o.hidden||(o.sirM|0)<2||carOf(o)!=='viatura')continue;const d=Math.hypot(o.x-eu.x,o.y-eu.y);if(d<sd){sd=d;sb=o}}Som.sirene('outro',sb?sb.sirM:0,sb?Math.max(0,1-sd/520)*.8:0)}
  if(!eu){Som.motor('eu',null,0,0);Som.motor('outro',null,0,0);return}
  const c=carOf(eu);let rpm=.1;if(c&&eu.moving){const N=c==='moto'?5:['esportivo','neon'].includes(c)?6:4,v=.2+.8*(eu.acel||0)**2,fr=Math.min(N-.001,v*N),g=Math.floor(fr),w=fr-g;rpm=(g?.35:.15)+(g?.65:.85)*w;if(g!==eu.marcha){if(eu.marcha!=null&&g>eu.marcha)eu.trocaT=now;eu.marcha=g}if(now-(eu.trocaT||-9)<.18)rpm*=.6}else eu.marcha=null;Som.motor('eu',c,rpm,1);
  let best=null,bd=380;for(const o of others.values()){const k=carOf(o);if(!k||!o.seen||o.hidden)continue;const d=Math.hypot(o.x-eu.x,o.y-eu.y);if(d<bd){bd=d;best=[k,o]}}
@@ -4825,7 +4829,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119f';
+const VERSAO_JOGO='v20261119g';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
