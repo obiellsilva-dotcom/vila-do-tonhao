@@ -224,6 +224,19 @@ body:has(#zoom:not(.min)) #joy{display:none!important}
 @media (max-width:480px){#q{width:104px!important}#places{max-width:138px}#rankBtn{padding:7px 10px}.lvl i{width:34px}#top .row:first-child{flex-wrap:nowrap}.brand{font-size:14px;padding:6px 9px;white-space:nowrap}#q{width:130px}.pill{font-size:12.5px;padding:6px 8px;white-space:nowrap}.pill.small{font-size:11.5px;white-space:normal}.prov{flex-direction:column;align-items:center}.prov canvas{width:120px;height:152px}.opts{width:100%}.opt .lab{width:96px}}
 body:has(#tarefa:not(.hidden)) #joy{display:none}
 input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
+
+/* painel de tarefas e de missão: pequeno no canto esquerdo e minimizável */
+#work,#missao{left:max(8px,env(safe-area-inset-left,0px));transform:none;width:min(220px,56vw);text-align:left;font-size:12.5px;padding:8px 26px 8px 10px;border-radius:12px;animation:none}
+#painelEsq{position:fixed;left:max(8px,env(safe-area-inset-left,0px));top:150px;z-index:7;display:flex;flex-direction:column;gap:6px;align-items:flex-start;pointer-events:none}
+#painelEsq>#work,#painelEsq>#missao{position:relative;left:auto;top:auto;pointer-events:auto}
+#work .btn{display:block;width:100%;margin-top:5px;font-size:12px;padding:5px 8px}
+#workMin,#msMin{position:absolute;top:2px;right:2px;background:none;border:0;color:var(--gold);font-size:16px;padding:3px 6px;cursor:pointer;line-height:1}
+#missao #msX{right:22px}
+#work.min,#missao.min{width:auto;padding:5px 26px 5px 10px}
+#work.min #workTxt,#work.min .btn,#missao.min #msTxt,#missao.min #msIr,#missao.min #msX{display:none}
+#work.min::before{content:'💼 Tarefas';font-weight:700;color:var(--gold)}
+#work.min .bar{margin:4px 0 0;width:110px;height:6px}
+#missao.min #msTit{font-size:12px}
 </style>
 </head>
 <body>
@@ -281,7 +294,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 <div style="display:flex;gap:6px"><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
 <div id="joy" class="hidden" aria-hidden="true"><div id="joyK"></div></div>
 <div id="perto" class="hidden"></div>
-<div id="missao" class="hidden"><button id="msX" aria-label="pular missão">✕</button><div id="msTit"></div><div id="msTxt"></div><div id="msBar"><i></i></div><button class="btn" id="msIr">🚶 Me leve até lá</button></div>
+<div id="missao" class="hidden"><button id="msMin" aria-label="minimizar missão">▾</button><button id="msX" aria-label="pular missão">✕</button><div id="msTit"></div><div id="msTxt"></div><div id="msBar"><i></i></div><button class="btn" id="msIr">🚶 Me leve até lá</button></div>
 
 <div id="bottom">
   <div id="ticker"></div>
@@ -322,6 +335,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 
 <div id="tarefa" class="hidden"><div class="tcena" id="tCena"><div class="tdeco" id="tDeco"></div><div class="ttit" id="tTit"></div><div id="tBox"></div><div class="tfb" id="tFb"></div></div></div>
 <div id="work" class="hidden">
+  <button id="workMin" aria-label="minimizar tarefas">▾</button>
   <div id="workTxt"></div>
   <div class="bar"><i id="workBar"></i></div>
   <button class="btn hidden" id="workGiro">🚨 Giroflex e sirene</button><button class="btn hidden" id="workVeic">🚚 Usar veículo do trabalho</button><button class="btn ghost" id="workStop">Largar</button>
@@ -3471,7 +3485,7 @@ addEventListener('error',e=>{try{toast('⚠️ '+(e.message||'erro'),4000)}catch
 function makePlayer(id,nome,v){return{id,nome,v,x:T(24),y:T(29.5),tx:null,ty:null,path:[],dir:1,ph:0,moving:false,hidden:false,beer:false,driving:false,carro:null,carros:[],dinheiro:0,xp:0,nivel:1,fome:100,peixes:0,isPlayer:true,bub:null,blinkT:rand(1,4),fomeAviso:0}}
 const VEIC_JOB={delegado:'sw4',oficina:'frontier',padaria:'caminhao',fabrica:'caminhao',lixeiro:'lixo'};
 const SERVICO=c=>c==='viatura'||c==='duster'||c==='sw4'||c==='frontier'||c==='caminhao'||c==='lixo';
-const carOf=p=>{if(p===eu){if(trabalho&&trabalho.job==='policia')return'viatura';if(trabalho&&trabalho.job==='prefeito'&&trabalho.duster)return'duster';if(trabalho&&trabalho.veic&&VEIC_JOB[trabalho.job])return VEIC_JOB[trabalho.job];return eu.driving&&eu.carro&&CARS[eu.carro]?eu.carro:null}return p.driving&&CAR_COLOR[p.driving]?p.driving:null};
+const carOf=p=>{if(p===eu){if(trabalho&&trabalho.job==='policia')return trabalho.ape?null:'viatura';if(trabalho&&trabalho.job==='prefeito'&&trabalho.duster)return trabalho.ape?null:'duster';if(trabalho&&trabalho.veic&&VEIC_JOB[trabalho.job])return VEIC_JOB[trabalho.job];return eu.driving&&eu.carro&&CARS[eu.carro]?eu.carro:null}return p.driving&&CAR_COLOR[p.driving]?p.driving:null};
 const livre=()=>eu&&!emCasa&&!sinucaAberta&&(!trabalho||trabalho.job==='policia'||!!trabalho.entrega);
 function aplicarEstado(e){
  if(!e||!eu)return;
@@ -3858,7 +3872,7 @@ function iniciarTurno(k,ini,dur){
  else if(k==='pescador'){eu.x=LAGOA.x+rand(-T(3),T(3));eu.y=LAGOA.y;eu.fish=true;eu.dir=1}
  else{const b=SHOPS[lugarDoJob(k)]||SHOPS.prefeitura;eu.hidden=!RUA[k];eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE}
  if(TAREFAS[k]){trabalho.feitas=0;trabalho.porTarefa=true;trabalho.ganhou=0;trabalho.xp=0;trabalho.peixes=0;if(RUA[k])proxRua();else abrirTarefa()}
- $('workVeic').classList.toggle('hidden',!VEIC_JOB[k]);trabalho.veic=false;$('workVeic').textContent='🚚 Usar veículo do trabalho';follow=eu;$('workStop').textContent=trabalho.porTarefa?'✅ Encerrar turno':'Largar o turno';$('work').classList.remove('hidden');renderWork();sendPos(true);
+ $('workVeic').classList.toggle('hidden',!VEIC_JOB[k]&&k!=='policia'&&k!=='prefeito');trabalho.veic=false;trabalho.ape=false;$('workVeic').textContent=k==='policia'?'🚶 Descer da viatura':k==='prefeito'?'🚙 Usar a Duster':'🚚 Usar veículo do trabalho';follow=eu;$('workStop').textContent=trabalho.porTarefa?'✅ Encerrar turno':'Largar o turno';$('work').classList.remove('hidden');renderWork();sendPos(true);
 }
 /* ----- atividades dos empregos (janela com o interior do lugar) ----- */
 const pk=a=>a[Math.floor(Math.random()*a.length)],emb=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
@@ -3912,7 +3926,7 @@ const INSP={feirinha:{n:'Feirinha',ic:'🍎',bom:['🍎 Frutas fresquinhas','⚖
  praca:{n:'Praça',ic:'🌳',bom:['🪑 Bancos inteiros','💡 Postes acesos','🎄 Árvore enfeitada','🌸 Canteiros regados'],ruim:['🗑️ Lixo espalhado','💡 Lâmpada queimada','🪑 Banco quebrado','🐕 Sujeira de cachorro']}};
 function geraInspecao(){const k=pk(Object.keys(INSP)),I=INSP[k],ruins=emb(I.ruim).slice(0,1+Math.floor(Math.random()*2)),bons=emb(I.bom).slice(0,4-ruins.length);return{k,I,itens:emb([...ruins.map(t=>({t,ok:true})),...bons.map(t=>({t,ok:false}))])}}
 function lugarInspecao(k){if(k==='praca')return[T(23.9),T(34.6)];const b=SHOPS[k==='feirinha'?'mercadinho':k];return b?[(b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE]:[T(23.9),T(34.6)]}
-function comecarInspecao(carro){const g=geraInspecao(),[x,y]=lugarInspecao(g.k);fecharTarefa();eu.hidden=false;eu.path=[];const b=SHOPS.prefeitura,jaNoCarro=trabalho.duster&&carro;trabalho.duster=!!carro;if(b&&!jaNoCarro){eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE;if(carro){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}}}
+function comecarInspecao(carro){const g=geraInspecao(),[x,y]=lugarInspecao(g.k);fecharTarefa();eu.hidden=false;eu.path=[];const b=SHOPS.prefeitura,jaNoCarro=trabalho.duster&&carro&&!trabalho.ape;trabalho.duster=!!carro;trabalho.ape=false;$('workVeic').textContent=carro?'🚶 Descer da Duster':'🚙 Usar a Duster';if(b&&!jaNoCarro){eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE;if(carro){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}}}
  const ct=carro&&nearestCarTile(x,y,10);trabalho.entrega={x,y,rotulo:g.I.ic+' '+g.I.n,insp:g,cx:ct?(ct[0]+.5)*TILE:null,cy:ct?(ct[1]+.5)*TILE:null};follow=eu;sendPos(true);toast((carro?'🚙 Duster da prefeitura! ':'🔎 Vistoria! ')+'Vá até: '+g.I.ic+' '+g.I.n+'. Siga a seta amarela.',3500)}
 
 /* ----- empregos no mapa: cada tarefa começa indo a um lugar (seta amarela) e lá abre a ação ----- */
@@ -3921,7 +3935,7 @@ const pertoDe=(L,x,y,n)=>pk(L.slice().sort((a,b)=>Math.hypot(a[0]-x,a[1]-y)-Math
 const LUGS=()=>Object.keys(INSP).map(k=>lugarInspecao(k));
 const RUA={
  posto:()=>{const b=pk(BOMBAS);return[{x:b.x,y:b.y+T(.9),r:'⛽ Cliente na bomba',f:'Bom dia! Vai abastecer?'}]},
- mercadinho:()=>{const bc=pk(BANCAS);return[{p:calcadaPerto(T(37.2),T(27.5)),r:'📦 Pegar a caixa',f:'Peguei a caixa! 📦'},{x:T((bc.x0+bc.x1)/2),y:T(25.5),r:'🍎 Levar à barraca',f:'Chegou mercadoria!'}]},
+ mercadinho:()=>{const bc=pk(BANCAS.filter(q=>!q.fundo));return[{p:calcadaPerto(T(37.2),T(27.5)),r:'📦 Pegar a caixa',f:'Peguei a caixa! 📦'},{x:T((bc.x0+bc.x1)/2),y:T(bc.y+1.45),r:'🍎 Levar à barraca',f:'Chegou mercadoria!'}]},
  concessionaria:()=>{const b=SHOPS.concessionaria;return[{p:calcadaPerto(T(b.x+1+Math.random()*(b.w-2)),T(b.y+b.h+.6)),r:'🧍 Cliente olhando carros',f:'Posso ajudar? 😄'}]},
  oficina:()=>{const [x,y]=frente('oficina'),c=pertoDe(CRUZ.map(q=>[q.x,q.y]),x,y,5);return[{p:calcadaPerto(c[0],c[1]),r:'🚗💨 Carro quebrado',f:'Deixa comigo! 🔧'}]},
  enfermeiro:()=>{const [x,y]=frente('hospital');return[{p:pertoDe(LUGS(),x,y,6),r:'🤒 Paciente passando mal',f:'Calma, a enfermagem chegou! 🩺'}]},
@@ -3933,7 +3947,14 @@ const RUA={
  fabrica:()=>{const k=pk(['posto','feirinha','praca','padaria']);return[{p:lugarInspecao(k),r:'🧊 Entregar gelo',f:'Gelo entregue! 🧊'},{p:frente('fabrica'),r:'🏭 Voltar à fábrica',f:'Próximo bloco!'}]},
  lixeiro:()=>{const [x,y]=frente('prefeitura'),L=LUGS(),a=pertoDe(L,x,y,8),b2=pertoDe(L,a[0],a[1],4);return[{p:calcadaPerto(a[0]+T(1),a[1]),r:'🗑️ Recolher o lixo',f:'Lixo recolhido! 🗑️'},{p:calcadaPerto(b2[0]-T(1),b2[1]),r:'🗑️ Recolher o lixo',f:'Mais um saco! ♻️'}]},
  delegado:()=>{const [x,y]=frente('delegacia'),c=pertoDe(CRUZ.map(q=>[q.x,q.y]),x,y,6);return[{p:calcadaPerto(c[0],c[1]),r:'🔍 Local do crime',f:'Hmm… pistas por aqui. 🕵️'},{p:frente('delegacia'),r:'🚓 Voltar à delegacia',f:'Vamos ver os suspeitos.'}]}};
-$('workVeic').onclick=()=>{if(!trabalho||!VEIC_JOB[trabalho.job])return;trabalho.veic=!trabalho.veic;eu.path=[];
+$('workVeic').onclick=()=>{if(!trabalho)return;
+ // policial e prefeito: descer e voltar para a viatura/Duster sem largar o turno (bom para abordagens)
+ if(trabalho.job==='policia'||trabalho.job==='prefeito'){const pol=trabalho.job==='policia';eu.path=[];
+  if(!pol&&!trabalho.duster){trabalho.duster=true;trabalho.ape=false}else trabalho.ape=!trabalho.ape;
+  if(!trabalho.ape){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null;Som.play('porta');toast(pol?'🚓 De volta à viatura!':'🚙 De volta à Duster!',2000)}
+  else{const [px,py]=calcadaPerto(eu.x,eu.y);eu.x=px;eu.y=py;Som.play('porta');if(eu.giro&&pol)$('workGiro').click();toast('🚶 A pé! Toque no botão de novo para voltar ao veículo.',2500)}
+  $('workVeic').textContent=trabalho.ape?(pol?'🚓 Voltar à viatura':'🚙 Voltar à Duster'):(pol?'🚶 Descer da viatura':'🚶 Descer da Duster');sendPos(true);return}
+ if(!VEIC_JOB[trabalho.job])return;trabalho.veic=!trabalho.veic;eu.path=[];
  if(trabalho.veic){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null;Som.play('buzina');toast('🚚 Veículo do trabalho! Toque na rua para dirigir.',2500)}
  else{const [px,py]=calcadaPerto(eu.x,eu.y);eu.x=px;eu.y=py;Som.play('porta')}
  $('workVeic').textContent=trabalho.veic?'🚶 Descer do veículo':'🚚 Usar veículo do trabalho';sendPos(true)};
@@ -3992,6 +4013,13 @@ async function receber(tent){
  catch(e){if(/faltam/i.test(e.message)&&tent<5)setTimeout(()=>receber(tent+1),1500);else{toast(e.message,3500);fimTurno()}}
 }
 let giroT=null;
+
+// minimizar painel de tarefas e missão (fica guardado no aparelho)
+{const pe=document.createElement('div');pe.id='painelEsq';document.body.appendChild(pe);pe.appendChild($('work'));pe.appendChild($('missao'))}
+for(const [b,pn,k] of [['workMin','work','cidadeTonhao.workMin'],['msMin','missao','cidadeTonhao.msMin']]){const el=$(pn),bt=$(b);
+ const set=v=>{el.classList.toggle('min',v);bt.textContent=v?'▸':'▾';try{localStorage.setItem(k,v?'1':'')}catch(e){}};
+ try{if(localStorage.getItem(k))set(true)}catch(e){}
+ bt.onclick=ev=>{ev.stopPropagation();set(!el.classList.contains('min'))}}
 $('workGiro').onclick=()=>{eu.giro=!eu.giro;$('workGiro').textContent=eu.giro?'🔕 Desligar giroflex':'🚨 Giroflex e sirene';clearInterval(giroT);if(eu.giro){Som.play('sirene');giroT=setInterval(()=>{if(eu&&eu.giro)Som.play('sirene')},1600)}sendPos(true)};
 function fimTurno(){eu.giro=false;clearInterval(giroT);$('workGiro').classList.add('hidden');$('workGiro').textContent='🚨 Giroflex e sirene';
  if(trabalho&&trabalho.job==='bar'){eu.x=T(22.5);eu.y=T(20.9)}
@@ -4712,7 +4740,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261118a';
+const VERSAO_JOGO='v20261118b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -4956,7 +4984,7 @@ function msAtiva(){return !!eu&&(eu.missao===0||eu.missao===1)}
 function msAlvo(){if(!msAtiva())return null;const b=eu.missao===0?SHOPS.mercadinho:SHOPS.padaria,x=(b.front[0]+.5)*TILE,y=(b.front[1]+.5)*TILE-2;
  return{b,x,y,rotulo:eu.missao===0?'💼 Trabalhe aqui':'🥖 Coma aqui',perto:Math.hypot(eu.x-x,eu.y-y)<T(3),seta:!trabalho&&!emCasa&&!(eu.missao===0&&msTar>=MS_META)}}
 function msRender(){const el=$('missao'),on=msAtiva()&&!eu.tutoPend&&$('tuto').classList.contains('hidden')&&!sinucaAberta;el.classList.toggle('hidden',!on);if(!on){$('perto').style.top='';return}
- const a=msAlvo(),w=$('work'),wOn=!w.classList.contains('hidden');el.style.top=(wOn?Math.round(w.getBoundingClientRect().bottom+6):150)+'px';
+ const a=msAlvo(),w=$('work'),wOn=!w.classList.contains('hidden');el.style.top='';
  let tit,txt,ir=false,pct;
  if(eu.missao===0){tit='🎯 MISSÃO 1: ganhe seu primeiro dinheiro';pct=Math.min(1,msTar/MS_META);
   if(msTar>=MS_META)txt='Recebendo seu bônus…';
