@@ -230,7 +230,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 #painelEsq{position:fixed;left:max(8px,env(safe-area-inset-left,0px));top:150px;z-index:7;display:flex;flex-direction:column;gap:6px;align-items:flex-start;pointer-events:none}
 #painelEsq>#work,#painelEsq>#missao{position:relative;left:auto;top:auto;pointer-events:auto}
 #work .btn{display:block;width:100%;margin-top:5px;font-size:12px;padding:5px 8px}
-#viatPainel{margin-top:4px;background:rgba(0,0,0,.25);border-radius:10px;padding:4px 6px}#viatPainel .vl{display:flex;align-items:center;gap:4px;margin:3px 0}#viatPainel span{flex:0 0 64px;text-align:left;font-size:11.5px}#viatPainel i{flex:1;font-style:normal;font-size:11.5px;padding:4px 0;border-radius:8px;background:rgba(255,255,255,.08);cursor:pointer}#viatPainel i.on{background:#ffc94a;color:#2a1a10;font-weight:700}
+#viatPainel{margin-top:3px;background:rgba(0,0,0,.25);border-radius:8px;padding:2px 4px}#viatPainel .vl{display:flex;align-items:center;gap:3px;margin:2px 0}#viatPainel span{flex:0 0 18px;font-size:11px}#viatPainel i{flex:1;font-style:normal;font-size:10px;padding:2px 0;border-radius:6px;background:rgba(255,255,255,.08);cursor:pointer}#viatPainel i.on{background:#ffc94a;color:#2a1a10;font-weight:700}
 #workMin,#msMin{position:absolute;top:2px;right:2px;background:none;border:0;color:var(--gold);font-size:16px;padding:3px 6px;cursor:pointer;line-height:1}
 #missao #msX{right:22px}
 #work.min,#missao.min{width:auto;padding:5px 26px 5px 10px}
@@ -339,7 +339,7 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
   <button id="workMin" aria-label="minimizar tarefas">▾</button>
   <div id="workTxt"></div>
   <div class="bar"><i id="workBar"></i></div>
-  <button class="btn hidden" id="workGiro">🚨 Luzes e sirene ▾</button><div id="viatPainel" class="hidden"><div class="vl"><span>🚨 Luz</span><i data-g="0">Desl.</i><i data-g="1">Dupla</i><i data-g="2">Rápida</i></div><div class="vl"><span>📢 Sirene</span><i data-s="0">Desl.</i><i data-s="2">Longa</i><i data-s="3">Rápida</i></div></div><button class="btn hidden" id="workVeic">🚚 Usar veículo do trabalho</button><button class="btn ghost" id="workStop">Largar</button>
+  <button class="btn hidden" id="workGiro">🚨 Luzes e sirene ▾</button><div id="viatPainel" class="hidden"><div class="vl"><span>🚨</span><i data-g="0">Desl.</i><i data-g="1">Pisca</i><i data-g="2">Gira</i></div><div class="vl"><span>📢</span><i data-s="0">Desl.</i><i data-s="2">Longa</i><i data-s="3">Rápida</i></div></div><button class="btn hidden" id="workVeic">🚚 Usar veículo do trabalho</button><button class="btn ghost" id="workStop">Largar</button>
 </div>
 
 <div id="mSocial" class="modal hidden">
@@ -2676,6 +2676,16 @@ function giroflexV(c,x0,y0,k,i,md){const EL=.663,se=Math.sin(EL),ce=Math.cos(EL)
  // a barra apagada (vermelha escura) entre as duas pontas
  {const [ax,ay]=P(-3,-13,53),[bx,by]=P(-3,13,53);c.lineCap='round';c.strokeStyle='rgba(120,10,10,.55)';c.lineWidth=3*k;c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.stroke()}
  c.globalCompositeOperation='lighter';
+ if(md===2){const w=now*Math.PI*2*1.6;
+  for(const [Z,ph] of [[-11,0],[11,Math.PI]]){const a=w+ph,int=Math.pow(Math.max(0,Math.cos(a)),3)*.8+.2,[px,py]=P(-3,Z,53);
+   // facho girando: ponto de luz que corre pelo chão em volta da viatura
+   const dX=Math.cos(a)*70,dZ=Math.sin(a)*70+Z,[fx,fy]=P(dX,dZ,0),R=30*k;let g=c.createRadialGradient(fx,fy,0,fx,fy,R);g.addColorStop(0,'rgba(255,30,30,.35)');g.addColorStop(1,'rgba(255,30,30,0)');c.fillStyle=g;c.beginPath();c.ellipse(fx,fy,R,R*.5,0,0,7);c.fill();
+   const R2=24*k*(.6+int);g=c.createRadialGradient(px,py,0,px,py,R2);g.addColorStop(0,`rgba(255,40,30,${.95*int})`);g.addColorStop(.3,`rgba(255,30,30,${.4*int})`);g.addColorStop(1,'rgba(255,30,30,0)');c.fillStyle=g;c.fillRect(px-R2,py-R2,R2*2,R2*2);
+   c.fillStyle=`rgba(255,${120+120*int},${120+120*int},${.5+.5*int})`;c.beginPath();c.ellipse(px,py,2.6*k,1.3*k,0,0,7);c.fill()}
+  // grade e traseira acompanham o giro, devagar
+  for(const [X,Z,h,cr,fs,R0,lado] of GIRO_PTS){if(!lado)continue;const vis=lado*sy;if(vis<-.05)continue;const int=Math.pow(Math.max(0,Math.cos(w+(Z<0?0:Math.PI))),3);if(int<.15)continue;const [px,py]=P(X,Z,h),R=R0*k*.55*Math.max(.4,vis);
+   const g=c.createRadialGradient(px,py,0,px,py,R);g.addColorStop(0,`rgba(${cr},${.95*int})`);g.addColorStop(1,`rgba(${cr},0)`);c.fillStyle=g;c.fillRect(px-R,py-R,R*2,R*2)}
+  c.restore();return}
  for(const [X,Z,h,cr,fs,R0,lado] of GIRO_PTS){if(!F[fs])continue;const vis=lado?lado*sy:1;if(vis<-.05)continue;const [px,py]=P(X,Z,h),R=R0*k*.55*(lado?Math.max(.4,vis):1);
   const g=c.createRadialGradient(px,py,0,px,py,R);g.addColorStop(0,`rgba(${cr},.95)`);g.addColorStop(.22,`rgba(${cr},.4)`);g.addColorStop(1,`rgba(${cr},0)`);c.fillStyle=g;c.fillRect(px-R,py-R,R*2,R*2);
   c.fillStyle='#fff';c.beginPath();c.ellipse(px,py,(lado?1.3:2.4)*k,(lado?.8:1.1)*k,0,0,7);c.fill()}
@@ -4068,7 +4078,7 @@ for(const [b,pn,k] of [['workMin','work','cidadeTonhao.workMin'],['msMin','missa
  const set=v=>{el.classList.toggle('min',v);bt.textContent=v?'▸':'▾';try{localStorage.setItem(k,v?'1':'')}catch(e){}};
  try{if(localStorage.getItem(k))set(true)}catch(e){}
  bt.onclick=ev=>{ev.stopPropagation();set(!el.classList.contains('min'))}}
-function viatPinta(){const p=$('viatPainel');p.querySelectorAll('[data-g]').forEach(e=>e.classList.toggle('on',+e.dataset.g===(eu.gM|0)));p.querySelectorAll('[data-s]').forEach(e=>e.classList.toggle('on',+e.dataset.s===(eu.sirM|0)));$('workGiro').textContent=(eu.gM||eu.sirM?'🚨 Luz '+['desl.','dupla','rápida'][eu.gM|0]+' · sirene '+(['desl.','','longa','rápida'][eu.sirM|0]):'🚨 Luzes e sirene')+(p.classList.contains('hidden')?' ▾':' ▴')}
+function viatPinta(){const p=$('viatPainel');p.querySelectorAll('[data-g]').forEach(e=>e.classList.toggle('on',+e.dataset.g===(eu.gM|0)));p.querySelectorAll('[data-s]').forEach(e=>e.classList.toggle('on',+e.dataset.s===(eu.sirM|0)));$('workGiro').textContent=(eu.gM||eu.sirM?'🚨 '+['—','Pisca','Gira'][eu.gM|0]+' · 📢 '+(['—','','Longa','Rápida'][eu.sirM|0]):'🚨 Luzes e sirene')+(p.classList.contains('hidden')?' ▾':' ▴')}
 function viatSet(g,sm){if(g!=null)eu.gM=g;if(sm!=null)eu.sirM=sm;eu.giro=(eu.gM|0)>0;viatPinta();sendPos(true)}
 $('workGiro').onclick=()=>{$('viatPainel').classList.toggle('hidden');viatPinta()};
 $('viatPainel').onclick=e=>{const t=e.target;if(t.dataset.g!=null)viatSet(+t.dataset.g,null);else if(t.dataset.s!=null)viatSet(null,+t.dataset.s)};
@@ -4829,7 +4839,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119g';
+const VERSAO_JOGO='v20261119h';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
