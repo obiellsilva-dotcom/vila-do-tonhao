@@ -1342,7 +1342,7 @@ const houses=HOUSE_DEFS.map((p,i)=>(HOUSE_OFF.has(i)?(o=>(o.front=[o.x+Math.floo
 // loja de roupas no Centro de Empregos, com interior (usa o mesmo sistema das casas)
 // imobiliária ao lado da igreja: por fora é um prédio; por dentro é uma sala em outra dimensão (como as casas)
 const imob=addB({kind:'imobiliaria',x:38,y:41,w:7,h:5,wall:'#eef4f8',roof:'#2e6f95'});
-const IMOB={n:'imob',kind:'imob',front:imob.front,fixos:[{t:'estante',x:0,y:0},{t:'estante',x:6,y:0},{t:'mesa',x:3,y:1},{t:'cadeira',x:3,y:3},{t:'cadeira',x:4,y:3},{t:'sofa',x:5,y:4},{t:'planta',x:7,y:2},{t:'tv',x:0,y:2,r:1}]};
+const IMOB={n:'imob',kind:'imob',front:imob.front,fixos:[{t:'estante',x:0,y:0},{t:'estante',x:6,y:0},{t:'mesa',x:3,y:1},{t:'cadeira',x:3,y:3,r:2},{t:'cadeira',x:4,y:3,r:2},{t:'sofa',x:5,y:4},{t:'planta',x:7,y:2},{t:'tv',x:0,y:2,r:1}]};
 const lojaRoupa=addB({kind:'roupas',loja:true,n:'roupas',x:52,y:23,w:4,h:5,wall:'#fbe7f0',roof:'#b0306a'});
 // interiores das casas: piso andável, móveis bloqueiam, entrada só pela porta
 const casaTile=new Map(),portas=new Map([['roupas',true]]);
@@ -4972,7 +4972,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261121d';
+const VERSAO_JOGO='v20261121e';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
