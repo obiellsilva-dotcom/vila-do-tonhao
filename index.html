@@ -137,6 +137,7 @@ body:has(#emoBox:not(.hidden)) #joy,body:has(#card:not(.hidden)) #joy,body:has(.
 .bannerPref{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%) scale(.6);opacity:0;z-index:70;text-align:center;padding:18px 26px;border-radius:22px;background:linear-gradient(135deg,#3a2508,#7a5a10 50%,#3a2508);border:3px solid #ffd23f;box-shadow:0 0 40px rgba(255,210,63,.6),0 14px 40px rgba(0,0,0,.6);animation:bpIn .45s cubic-bezier(.2,1.6,.4,1) forwards;width:min(92vw,560px);pointer-events:none}
 .bannerPref .bp1{font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(24px,6.5vw,40px);color:#ffd23f;text-shadow:0 3px 0 #3a1d10}.bannerPref .bp2{color:#fff;font-size:clamp(15px,4vw,20px);margin-top:4px}
 .bannerPref.sai{animation:bpOut .6s forwards}@keyframes bpIn{to{transform:translate(-50%,-50%) scale(1);opacity:1}}@keyframes bpOut{to{transform:translate(-50%,-80%) scale(.9);opacity:0}}
+.vipMsg,#ticker div.cv{background:radial-gradient(circle at 12% 30%,rgba(255,255,255,.55) 0 1.2px,transparent 2px),radial-gradient(circle at 48% 70%,rgba(190,240,255,.6) 0 1.4px,transparent 2.2px),radial-gradient(circle at 82% 25%,rgba(255,255,255,.5) 0 1px,transparent 1.8px),repeating-linear-gradient(135deg,rgba(80,170,255,.18) 0 6px,rgba(20,60,140,.12) 6px 12px),linear-gradient(90deg,#123a7a,#0b2150)!important;border:1px solid #6fd3ff!important;box-shadow:0 0 12px rgba(80,190,255,.55),inset 0 0 8px rgba(160,230,255,.25)}.vcroa{display:inline-block;filter:hue-rotate(185deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 4px #5fd0ff);animation:vbril 1.6s ease-in-out infinite}.vnome,#ticker div.cv b{color:#bff0ff!important;text-shadow:0 0 6px #5fd0ff,0 0 12px #2f9bff}@keyframes vbril{50%{filter:hue-rotate(185deg) saturate(2.2) brightness(1.6) drop-shadow(0 0 7px #9fe8ff)}}
 .prefMsg{background:linear-gradient(90deg,rgba(255,210,63,.32),rgba(122,90,16,.25))!important;border:1px solid #ffd23f!important;box-shadow:0 0 10px rgba(255,210,63,.35)}
 #ticker div.ca{background:linear-gradient(90deg,#8e1b1b,#3a0e0e);border:1px solid #ff6b6b}.admMsg{background:linear-gradient(90deg,rgba(214,48,49,.4),rgba(90,15,15,.3))!important;border:1px solid #ff6b6b!important;box-shadow:0 0 10px rgba(255,80,80,.35)}
 #ticker div.cp{background:linear-gradient(90deg,#7a5a10,#3a2a08);border:1px solid #ffd23f}
@@ -2285,6 +2286,7 @@ const SALAS={casa:{x0:123,y0:82,x1:132,y1:89,porta:[127,90],parede:'#efe2c8',pis
 for(const R of Object.values(SALAS)){for(let y=R.y0-1;y<=R.y1+1;y++)for(let x=R.x0-1;x<=R.x1+1;x++)setTile(x,y,(x<R.x0||x>R.x1||y<R.y0||y>R.y1)?G.BLD:G.FLOOR);if(R.porta)setTile(R.porta[0],R.porta[1],G.FLOOR)}
 const movAqui=m=>!m.g&&(m.a|0)===((eu&&eu.rm&&eu.rm.andar)|0);
 const naEsc=(R,tx,ty)=>!!R.esc&&tx>=R.esc.x0&&tx<=R.esc.x1&&ty>=R.esc.y0&&ty<=R.esc.y1;
+const casaTipo=b=>(b.preco>=50000?'mansao':b.preco>=10000?'media':'barata');
 const salaDe=(b,a)=>b.kind==='mansao'?(a?SALAS.mansao2:SALAS.mansao):SALAS.casa;
 // móveis da casa: guardados no banco (posição relativa à sala e andar)
 // ===== móveis das casas: modelos detalhados (caixas e bolas em 3D isométrico), com 4 giros =====
@@ -2473,6 +2475,7 @@ function bubble(c,x,y,text){
 }
 function nameTag(c,x,y,text,mine,online,vip){c.font='600 7px Fredoka, sans-serif';c.textAlign='center';c.lineWidth=2.4;c.strokeStyle='rgba(30,15,20,.85)';c.strokeText(text,x,y);if(vip){c.save();c.shadowColor='#ffd54a';c.shadowBlur=6;c.fillStyle='#ffd700';c.fillText(text,x,y);c.restore()}else{c.fillStyle=mine?'#ffc94a':online?'#9fe3ff':'#fff';c.fillText(text,x,y)}c.textAlign='left'}
 const vipP=p=>!!(p&&p.vip_ate&&Date.parse(p.vip_ate)>Date.now());
+const vipId=id=>id&&eu&&id===eu.id?vipP(eu):vipP(others.get(id)||perfis.get(id));
 const headTop=r=>r.y-(r.sit?39:46)*PS*(r.belly?1.03:1)-(estilo('chapeu',r.v)==='cartola'?9*PS:0);
 function vistaDe(p){const dx=p.x-(p._lx??p.x),dy=p.y-(p._ly??p.y);p._lx=p.x;p._ly=p.y;const sx=(dx-dy)*IA,sy=(dx+dy)*IB;if(Math.hypot(sx,sy)>.25){p._mvA=Math.round(Math.atan2(sy,sx)/(Math.PI/8))*(Math.PI/8);const a=Math.atan2(sy,Math.abs(sx))*180/Math.PI;p._vs=a>67.5?'f':a>22.5?'l':a>-22.5?'p':a>-67.5?'cl':'c';if(Math.abs(sx)>.2)p._vd=sx>0?1:-1}return p._vs||'f'}
 const VISTA_OPC=vs=>vs==='f'?{cara:true}:vs==='p'?{lado:true}:vs==='cl'?{back:true,c34:true}:vs==='c'?{back:true}:{};
@@ -2944,7 +2947,7 @@ function drawCena(){
  const barVis=(()=>{const a=toScreen(T(24),T(22));return a[0]>-700*cam.z&&a[0]<cw+700*cam.z&&a[1]>-500*cam.z&&a[1]<ch+500*cam.z})();
  const BARA=barVis?artDe('bar',T(16),T(15)-12,T(17),T(14.5)+12,c=>paintBar(c)):null;
  if(BARA){ctx.save();ctx.beginPath();ctx.rect(T(16),T(18),T(17),T(12));ctx.clip();ctx.drawImage(BARA.cv,BARA.x0,BARA.y0,BARA.w,BARA.h);ctx.restore()}
- const minhaC=(window.__casa!=null?houses[window.__casa]:null)||(eu&&!eu.hidden?casaEm(eu.x,eu.y):null);if(minhaC)drawInterior(ctx,minhaC);
+ const minhaC=(eu&&!eu.hidden&&!eu.rm?(c=>c&&c.loja?c:null)(casaEm(eu.x,eu.y)):null);if(minhaC)drawInterior(ctx,minhaC);
  drawPocas(vx0,vy0,vx1,vy1);
  desenhaBrilhos(ctx);
  const plist=[];if(eu&&!eu.hidden)plist.push(eu);for(const o of others.values())if(o.seen&&!o.hidden&&salaKey(o)===salaKey(eu)){const oc=casaEm(o.x,o.y);if(!oc||oc===minhaC)plist.push(o)}
@@ -3066,7 +3069,7 @@ function drawCena(){
  if(cam.z>=.9)for(const b of houses){if(b.off)continue;const hx=T(b.x+b.w/2);if(!vis(hx,T(b.y+b.h)))continue;const info=casasInfo.get(b.n);
   bbSet(ctx,hx,T(b.y+b.h));if(info&&info.dono){if(info.nome)nameTag(ctx,hx,T(b.y+b.h)-b.h*TILE*WK-4,'🏠 '+info.nome,eu&&info.dono===eu.id,true)}
   else if(eu){const px=T(b.front[0])+22,py=T(b.y+b.h)-18;ctx.fillStyle='#6d4426';ctx.fillRect(px+13,py+8,2,9);ctx.fillStyle='#c0392b';rr(ctx,px,py,28,9,2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 5.5px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('VENDE-SE',px+14,py+6.4);ctx.textAlign='left'}}
- for(const p of plist){if(!vis(p.x,p.y))continue;bbSet(ctx,p.x,p.y);const top=p.y-(carOf(p)?(p.sit?0:26):(p.sit?39:46)*PS*(SALA_ON?SALA_ESC:1))-3-((p===eu?eu.deitado:p.deitado)?-10:0);const vp=p.vip_ate&&Date.parse(p.vip_ate)>Date.now(),lb=(vp?'👑VIP ':'')+'⭐'+(p.nivel||1)+' '+p.nome;if(p.foto){ctx.font='600 7px Fredoka, sans-serif';fotoMini(ctx,p.foto,p.x-ctx.measureText(lb).width/2-7,top-2.4,5.2,vp)}nameTag(ctx,p.x,top,lb,p===eu,true,vp);const ehP=PREF_ID&&p.id===PREF_ID,ehA=ehAdm(p.id);if(ehA)tagAdm(ctx,p.x,top-12);if(ehP)trofeu(ctx,p.x,top-(ehA?24:13));if(vp&&(p.moving||p.driving)&&Math.random()<.5)brilhos.push({x:p.x+rand(-5,5),y:p.y-rand(0,8),t:now});if(p.bub&&p.bub.until>now)bubble(ctx,p.x,top-(ehP||ehA?(ehP&&ehA?36:24):8),p.bub.t)}
+ for(const p of plist){if(!vis(p.x,p.y))continue;bbSet(ctx,p.x,p.y);const top=p.y-(carOf(p)?(p.sit?0:26):(p.sit?39:46)*PS*(SALA_ON?SALA_ESC:1))-3-((p===eu?eu.deitado:p.deitado)?-10:0);const vp=p.vip_ate&&Date.parse(p.vip_ate)>Date.now(),lb='⭐'+(p.nivel||1)+' '+p.nome;if(p.foto){ctx.font='600 7px Fredoka, sans-serif';fotoMini(ctx,p.foto,p.x-ctx.measureText(lb).width/2-7,top-2.4,5.2,vp)}nameTag(ctx,p.x,top,lb,p===eu,true,vp);const ehP=PREF_ID&&p.id===PREF_ID,ehA=ehAdm(p.id);{let yy=top-(ehA?24:12)-(ehP?13:0);if(vp){coroaVip(ctx,p.x,yy+2);yy-=12}if(!ehP&&TOP_ID&&p.id===TOP_ID)trofeuTop(ctx,p.x,yy+1)}if(ehA)tagAdm(ctx,p.x,top-12);if(ehP)trofeu(ctx,p.x,top-(ehA?24:13));if(vp&&(p.moving||p.driving)&&Math.random()<.5)brilhos.push({x:p.x+rand(-5,5),y:p.y-rand(0,8),t:now});if(p.bub&&p.bub.until>now)bubble(ctx,p.x,top-(ehP||ehA?(ehP&&ehA?36:24):8),p.bub.t)}
  if(cam.z>=1.3)for(const v of VAGAS){const i=vagasInfo.get(v.id);if(i&&i.ativo&&i.nome&&vis(v.x,v.y)&&!(eu&&i.morador===eu.id&&eu.driving)){bbSet(ctx,v.x,v.y);nameTag(ctx,v.x,v.y-26,'🅿️ '+i.nome,eu&&i.morador===eu.id,true)}}
  setWorld(ctx);
  if(trabalho&&trabalho.ronda&&trabalho.ronda.i<4){const p=trabalho.ronda.pts[trabalho.ronda.i],k=(now*1.5)%1;
@@ -3086,7 +3089,7 @@ function winOn(w){const h=hour();if(h>=18&&h<23.5)return w.on;if(h>=23.5||h<7)re
 /* ================= UI ================= */
 const $=id=>document.getElementById(id);
 function toast(t,ms=2600){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),ms)}
-function renderTicker(){const el=$('ticker'),vis=feed.filter(f=>f.until>now).slice(-5);for(const n of [...el.children])if(!vis.includes(n._f))n.remove();vis.forEach(f=>{if(!f.el){const d=document.createElement('div');d.className=f.kind==='chata'?'c ca':f.kind==='chatp'?'c cp':f.kind==='chat'?'c':'e';if(f.nome){const b=document.createElement('b');b.textContent=f.nome+' ';d.appendChild(b)}d.appendChild(document.createTextNode(f.texto));d._f=f;f.el=d}if(f.el.parentNode!==el)el.appendChild(f.el)})}
+function renderTicker(){const el=$('ticker'),vis=feed.filter(f=>f.until>now).slice(-5);for(const n of [...el.children])if(!vis.includes(n._f))n.remove();vis.forEach(f=>{if(!f.el){const d=document.createElement('div');d.className=f.kind==='chata'?'c ca':f.kind==='chatp'?'c cp':f.kind==='chatv'?'c cv':f.kind==='chat'?'c':'e';if(f.nome){const b=document.createElement('b');b.textContent=f.nome+' ';d.appendChild(b)}d.appendChild(document.createTextNode(f.texto));d._f=f;f.el=d}if(f.el.parentNode!==el)el.appendChild(f.el)})}
 setInterval(renderTicker,2000);
 function statusOf(r){
  if(r.isPlayer){const w=r===eu?(trabalho&&trabalho.job):r.work;if(w==='sinuca')return'🎱 Jogando sinuca no bar';if(w==='policia')return'🚓 Fazendo ronda de viatura';if(r.sit)return'🪑 Sentado(a) no bar';if((r===eu?r.bebK:r.bebado)>0)return'🥴 Bêbado(a)';if(w==='pescador')return'🎣 Pescando na lagoa';if(w&&JOBS[w])return'💼 Trabalhando de '+JOBS[w].nome;if(r===eu&&emCasa)return'🛋️ Descansando em casa';if(r.hidden)return'🚪 Lá dentro de algum lugar';const car=carOf(r);if(car)return'🚗 Dirigindo '+(car==='moto'?'a ':'o ')+CARS[car].nome;return r.moving?'🚶 Andando pela cidade':'🧍 Parado(a) na cidade'}
@@ -3221,22 +3224,22 @@ const MAX_SALA=CONF.maxPorSala||50;
 const JOBS={
  bar:{nome:'Garçom do Tonhão',salario:45,duracao:40,nivel_min:1,xp:15,fome:8},
  mercadinho:{nome:'Repositor',salario:50,duracao:45,nivel_min:1,xp:18,fome:9},
- posto:{nome:'Frentista',salario:50,duracao:40,nivel_min:2,xp:18,fome:8},
- padaria:{nome:'Padeiro',salario:55,duracao:50,nivel_min:3,xp:21,fome:9},
- pescador:{nome:'Pescador',salario:0,duracao:45,nivel_min:3,xp:18,fome:8},
- barbearia:{nome:'Barbeiro',salario:60,duracao:50,nivel_min:4,xp:22,fome:10},
- lixeiro:{nome:'Lixeiro(a)',salario:65,duracao:60,nivel_min:4,xp:25,fome:12},
- prefeitura:{nome:'Servidor público',salario:70,duracao:60,nivel_min:5,xp:27,fome:10},
- oficina:{nome:'Mecânico',salario:80,duracao:60,nivel_min:6,xp:30,fome:12},
- policia:{nome:'Policial',salario:95,duracao:60,nivel_min:15,xp:33,fome:12},
- banco:{nome:'Caixa do banco',salario:90,duracao:75,nivel_min:8,xp:38,fome:12},
- concessionaria:{nome:'Vendedor de carros',salario:100,duracao:90,nivel_min:10,xp:45,fome:14},
- fabrica:{nome:'Operário da fábrica',salario:110,duracao:90,nivel_min:12,xp:48,fome:15},
- enfermeiro:{nome:'Enfermeiro(a)',salario:125,duracao:90,nivel_min:13,xp:50,fome:14},
- gerente:{nome:'Gerente do banco',salario:140,duracao:100,nivel_min:15,xp:56,fome:15},
- delegado:{nome:'Delegado(a)',salario:155,duracao:100,nivel_min:17,xp:62,fome:16},
- medico:{nome:'Médico(a)',salario:175,duracao:110,nivel_min:19,xp:70,fome:16},
- prefeito:{nome:'Prefeito(a)',salario:200,duracao:120,nivel_min:20,xp:78,fome:16}};
+ posto:{nome:'Frentista',salario:50,duracao:40,nivel_min:3,xp:18,fome:8},
+ padaria:{nome:'Padeiro',salario:55,duracao:50,nivel_min:5,xp:21,fome:9},
+ pescador:{nome:'Pescador',salario:0,duracao:45,nivel_min:4,xp:18,fome:8},
+ barbearia:{nome:'Barbeiro',salario:60,duracao:50,nivel_min:7,xp:22,fome:10},
+ lixeiro:{nome:'Lixeiro(a)',salario:65,duracao:60,nivel_min:6,xp:25,fome:12},
+ prefeitura:{nome:'Servidor público',salario:70,duracao:60,nivel_min:10,xp:27,fome:10},
+ oficina:{nome:'Mecânico',salario:80,duracao:60,nivel_min:12,xp:30,fome:12},
+ policia:{nome:'Policial',salario:95,duracao:60,nivel_min:23,xp:33,fome:12},
+ banco:{nome:'Caixa do banco',salario:90,duracao:75,nivel_min:15,xp:38,fome:12},
+ concessionaria:{nome:'Vendedor de carros',salario:100,duracao:90,nivel_min:18,xp:45,fome:14},
+ fabrica:{nome:'Operário da fábrica',salario:110,duracao:90,nivel_min:20,xp:48,fome:15},
+ enfermeiro:{nome:'Enfermeiro(a)',salario:125,duracao:90,nivel_min:21,xp:50,fome:14},
+ gerente:{nome:'Gerente do banco',salario:140,duracao:100,nivel_min:25,xp:56,fome:15},
+ delegado:{nome:'Delegado(a)',salario:155,duracao:100,nivel_min:27,xp:62,fome:16},
+ medico:{nome:'Médico(a)',salario:175,duracao:110,nivel_min:29,xp:70,fome:16},
+ prefeito:{nome:'Prefeito(a)',salario:200,duracao:120,nivel_min:30,xp:78,fome:16}};
 const JOB_LUGAR={lixeiro:'prefeitura',pescador:'lagoa',policia:'delegacia',enfermeiro:'hospital',medico:'hospital',gerente:'banco',delegado:'delegacia',prefeito:'prefeitura'};
 const lugarDoJob=j=>JOB_LUGAR[j]||j;
 const LOJA={
@@ -3316,11 +3319,11 @@ const api=ONLINE?(()=>{
   async casas(){return(await q(sb.from('casas').select('id,dono,aberta,moradores(nome)'))).map(c=>({id:c.id,dono:c.dono,aberta:c.aberta,nome:c.moradores?c.moradores.nome:null}))},
   porta:(n,a)=>rpc('porta_casa',{p_casa:n,p_aberta:a}),
   async casa(n){return(await q(sb.from('casas').select('moveis,geladeira').eq('id',n)))[0]||null},
-  comprarMovel:(t,x,y,a,r)=>rpc('comprar_movel',{p_tipo:t,p_x:x,p_y:y,p_andar:a,p_r:r}),
-  mexerMovel:(i,x,y,r,v)=>rpc('mexer_movel',{p_i:i,p_x:x,p_y:y,p_r:r,p_vender:v}),
-  geladeira:(it,g)=>rpc('geladeira',{p_item:it,p_guardar:g}),
-  guardarMovel:i=>rpc('guardar_movel',{p_i:i}),
-  colocarMovel:(i,x,y,r,a)=>rpc('colocar_movel',{p_i:i,p_x:x,p_y:y,p_r:r,p_andar:a}),
+  comprarMovel:(t,x,y,a,r)=>rpc('comprar_movel',{p_casa:eu.rm.n,p_tipo:t,p_x:x,p_y:y,p_andar:a,p_r:r}),
+  mexerMovel:(i,x,y,r,v)=>rpc('mexer_movel',{p_casa:eu.rm.n,p_i:i,p_x:x,p_y:y,p_r:r,p_vender:v}),
+  geladeira:(it,g)=>rpc('geladeira',{p_casa:eu.rm.n,p_item:it,p_guardar:g}),
+  guardarMovel:i=>rpc('guardar_movel',{p_casa:eu.rm.n,p_i:i}),
+  colocarMovel:(i,x,y,r,a)=>rpc('colocar_movel',{p_casa:eu.rm.n,p_i:i,p_x:x,p_y:y,p_r:r,p_andar:a}),
   usarPet:p=>rpc('usar_pet',{p_pet:p}),
   async pix(produto){const {data,error}=await sb.functions.invoke('pix',{body:{produto}});if(error){let m=error.message;try{const j=await error.context.json();m=j.erro||m}catch(_){}throw new Error(m)}if(data&&data.erro)throw new Error(data.erro);return data},
   async pedido(id){const {data,error}=await sb.functions.invoke('pix',{body:{verificar:id}});if(error)return null;return data},
@@ -3344,7 +3347,11 @@ const api=ONLINE?(()=>{
   comprarRoupa:(p,i)=>rpc('comprar_roupa',{p_peca:p,p_item:i}),
   propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
   responder:(id,ok)=>rpc('responder_proposta',{p_id:id,p_aceitar:ok}),
-  cidade:()=>ONLINE?q(sb.from('cidade').select('prefeito,desde,moradores(nome)').eq('id',1).maybeSingle()):Promise.resolve(null),
+  assumirPref:()=>rpc('assumir_prefeitura'),
+   deixarPref:()=>rpc('deixar_prefeitura'),
+   vistoNovidades:v=>ONLINE?rpc('visto_novidades',{p_v:v}):Promise.resolve(null),
+   minhaNovidade:async()=>{if(!ONLINE)return null;const r=await q(sb.from('moradores').select('novidades').eq('id',eu.id));return r[0]?r[0].novidades:null},
+   cidade:()=>ONLINE?q(sb.from('cidade').select('prefeito,desde,moradores(nome)').eq('id',1).maybeSingle()):Promise.resolve(null),
   guardar:i=>rpc('guardar_item',{p_item:i}),
   usar:i=>rpc('usar_item',{p_item:i}),
   venderPeixes:()=>rpc('vender_peixes'),
@@ -3403,16 +3410,17 @@ const api=ONLINE?(()=>{
   async comprarCarro(c){const m=lme(),it=CARS[c];if(m.nivel<it.nivel_min)fail(`Esse carro libera no nível ${it.nivel_min}.`);if(m.carros.includes(c))fail('Você já tem esse carro.');if(m.dinheiro<it.preco)fail('Dinheiro insuficiente para esse carro.');m.dinheiro-=it.preco;m.carros.push(c);m.carro=c;lsave();return{carro:c,eu:lest()}},
   async usarCarro(c){lme().carro=c;if(L.vaga&&c)L.vaga.carro=c;lsave();return{carro:c}},
   async estacionar(v,c){const vg=VAGAS.find(x=>x.id===v);if(!vg)fail('Essa vaga não existe.');if(vg.casa&&lme().casa_id!==vg.casa)fail('Essa garagem é de outra pessoa.');L.vaga={id:v,carro:c};lsave();return{vaga:v}},
-  async sairVaga(){L.vaga=null;lsave()},
+  async assumirPref(){if(lme().nivel<30)fail('A prefeitura libera no nível 30.');return{}},async deixarPref(){return{}},async vistoNovidades(){return null},async minhaNovidade(){return null},
+   async sairVaga(){L.vaga=null;lsave()},
    async casa(n){L.cm=L.cm||{};return L.cm[n]||{moveis:[],geladeira:{}}},
-   async comprarMovel(t,x,y,a,r){const m=lme();if(!m.casa_id)fail('Você precisa ter uma casa.');const pr=(MOV[t]||{}).pr;if(!pr)fail('Móvel inválido.');L.cm=L.cm||{};const c=L.cm[m.casa_id]=L.cm[m.casa_id]||{moveis:[],geladeira:{}};if(m.dinheiro<pr)fail('Dinheiro insuficiente.');m.dinheiro-=pr;c.moveis.push({t,x,y,a,r});lsave();return{moveis:c.moveis,eu:lest()}},
-   async mexerMovel(i,x,y,r,v){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');if(v){m.dinheiro+=Math.floor((MOV[c.moveis[i].t]||{pr:0}).pr/2);c.moveis.splice(i,1)}else{c.moveis[i].x=x;c.moveis[i].y=y;c.moveis[i].r=r;delete c.moveis[i].g}lsave();return{moveis:c.moveis,eu:lest()}},
-   async guardarMovel(i){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');c.moveis[i].g=true;lsave();return{moveis:c.moveis,eu:lest()}},
-   async colocarMovel(i,x,y,r,a){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');Object.assign(c.moveis[i],{x,y,r,a});delete c.moveis[i].g;lsave();return{moveis:c.moveis,eu:lest()}},
-   async geladeira(it,g){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis.some(e=>e.t==='geladeira'))fail('Sua casa não tem geladeira.');m.mochila=m.mochila||{};const q=m.mochila[it]|0,gq=c.geladeira[it]|0;if(g){if(q<=0)fail('Você não tem isso na mochila.');m.mochila[it]=q-1;if(!m.mochila[it])delete m.mochila[it];c.geladeira[it]=gq+1}else{if(gq<=0)fail('A geladeira não tem isso.');m.mochila[it]=q+1;c.geladeira[it]=gq-1;if(!c.geladeira[it])delete c.geladeira[it]}lsave();return{geladeira:c.geladeira,mochila:m.mochila,eu:lest()}},
+   async comprarMovel(t,x,y,a,r){const m=lme();if(!L.casas[eu.rm.n])fail('Essa casa não é sua.');const pr=(MOV[t]||{}).pr;if(!pr)fail('Móvel inválido.');L.cm=L.cm||{};const c=L.cm[eu.rm.n]=L.cm[eu.rm.n]||{moveis:[],geladeira:{}};if(m.dinheiro<pr)fail('Dinheiro insuficiente.');m.dinheiro-=pr;c.moveis.push({t,x,y,a,r});lsave();return{moveis:c.moveis,eu:lest()}},
+   async mexerMovel(i,x,y,r,v){const m=lme(),c=(L.cm||{})[eu.rm.n];if(!c||!c.moveis[i])fail('Móvel não encontrado.');if(v){m.dinheiro+=Math.floor((MOV[c.moveis[i].t]||{pr:0}).pr/2);c.moveis.splice(i,1)}else{c.moveis[i].x=x;c.moveis[i].y=y;c.moveis[i].r=r;delete c.moveis[i].g}lsave();return{moveis:c.moveis,eu:lest()}},
+   async guardarMovel(i){const m=lme(),c=(L.cm||{})[eu.rm.n];if(!c||!c.moveis[i])fail('Móvel não encontrado.');c.moveis[i].g=true;lsave();return{moveis:c.moveis,eu:lest()}},
+   async colocarMovel(i,x,y,r,a){const m=lme(),c=(L.cm||{})[eu.rm.n];if(!c||!c.moveis[i])fail('Móvel não encontrado.');Object.assign(c.moveis[i],{x,y,r,a});delete c.moveis[i].g;lsave();return{moveis:c.moveis,eu:lest()}},
+   async geladeira(it,g){const m=lme(),c=(L.cm||{})[eu.rm.n];if(!c||!c.moveis.some(e=>e.t==='geladeira'))fail('Sua casa não tem geladeira.');m.mochila=m.mochila||{};const q=m.mochila[it]|0,gq=c.geladeira[it]|0;if(g){if(q<=0)fail('Você não tem isso na mochila.');m.mochila[it]=q-1;if(!m.mochila[it])delete m.mochila[it];c.geladeira[it]=gq+1}else{if(gq<=0)fail('A geladeira não tem isso.');m.mochila[it]=q+1;c.geladeira[it]=gq-1;if(!c.geladeira[it])delete c.geladeira[it]}lsave();return{geladeira:c.geladeira,mochila:m.mochila,eu:lest()}},
   async comprarCasa(n){const m=lme(),b=houses[n-1];if(m.casa_id===n)fail('Essa casa já é sua.');if(b.preco>=90000&&m.nivel<MANSAO_NIVEL)fail(`Essa casa libera no nível ${MANSAO_NIVEL}.`);
-   const volta=m.casa_id?Math.floor(houses[m.casa_id-1].preco/2):0;if(m.dinheiro+volta<b.preco)fail('Dinheiro insuficiente para essa casa.');
-   if(m.casa_id){delete L.casas[m.casa_id];if(L.vaga&&L.vaga.id==='g'+m.casa_id)L.vaga=null}L.casas[n]=1;m.casa_id=n;m.dinheiro+=volta-b.preco;lsave();return{casa:n,devolvido:volta,eu:lest()}},
+   const ant=Object.keys(L.casas||{}).map(Number).find(k=>houses[k-1]&&casaTipo(houses[k-1])===casaTipo(b)),volta=ant?Math.floor(houses[ant-1].preco/2):0;if(m.dinheiro+volta<b.preco)fail('Dinheiro insuficiente para essa casa.');
+   if(ant){delete L.casas[ant];if(L.vaga&&L.vaga.id==='g'+ant)L.vaga=null}L.casas[n]=1;m.casa_id=n;m.dinheiro+=volta-b.preco;lsave();return{casa:n,devolvido:volta,eu:lest()}},
   async msg(s,t){return{id:'l'+Date.now(),morador:'local',nome:L.me.nome,texto:t.slice(0,140),criado_em:new Date().toISOString()}},
   async atualizarPerfil(f,r,t,i){const m=lme();f=(f||'').trim();t=(t||'').trim();i=(i||'').trim().replace(/^@/,'');
    if(f.length>60)fail('A frase pode ter até 60 letras.');if(i&&!/^[A-Za-z0-9._]{1,30}$/.test(i))fail('Instagram inválido. Use só letras, números, ponto e _.');
@@ -3435,8 +3443,8 @@ const carOf=p=>{if(p===eu){if(trabalho&&trabalho.job==='policia')return'viatura'
 const livre=()=>eu&&!emCasa&&!sinucaAberta&&(!trabalho||trabalho.job==='policia'||!!trabalho.entrega);
 function aplicarEstado(e){
  if(!e||!eu)return;
- eu.vip_ate=e.vip_ate||null;eu.pets=e.pets||[];eu.pet=e.pet||null;(e.carros||[]).forEach(c=>{if(CARS_PREMIUM[c])CARS[c]=CARS_PREMIUM[c]});if(!souVip()&&ehVip(eu.v))eu.v=semVip(eu.v);
- Object.assign(eu,{dinheiro:e.dinheiro,xp:e.xp,nivel:e.nivel,fome:+e.fome,sede:e.sede!=null?+e.sede:100,gas:e.gasolina!=null?+e.gasolina:(eu.gas??100),peixes:e.peixes,carros:e.carros||[],carro:e.carro,casa_id:e.casa_id,mortes:e.mortes||0,foto:e.foto||null,frase:e.frase||null,relacionamento:e.relacionamento||null,time_coracao:e.time_coracao||null,insta:e.insta||null});
+ eu.vip_ate=e.vip_ate||null;eu.pets=e.pets||[];eu.pet=e.pet||null;(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()?['neon']:[]).forEach(c=>{if(CARS_PREMIUM[c])CARS[c]=CARS_PREMIUM[c]});if(!souVip()&&ehVip(eu.v))eu.v=semVip(eu.v);
+ Object.assign(eu,{dinheiro:e.dinheiro,xp:e.xp,nivel:e.nivel,fome:+e.fome,sede:e.sede!=null?+e.sede:100,gas:e.gasolina!=null?+e.gasolina:(eu.gas??100),peixes:e.peixes,carros:(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()&&!(e.carros||[]).includes('neon')?['neon']:[]),carro:e.carro,casa_id:e.casa_id,mortes:e.mortes||0,foto:e.foto||null,frase:e.frase||null,relacionamento:e.relacionamento||null,time_coracao:e.time_coracao||null,insta:e.insta||null});
  refreshHud();
 }
 function tratar(r){if(!r)return r;if(r.bonus_hora)toast('⏰ +50 XP por 1 hora jogando!',4000);if(r.eu)aplicarEstado(r.eu);if(r.subiu>0)subiuNivel(r.premio);if(r.morreu)morreu();return r}
@@ -3455,8 +3463,30 @@ function morreu(){
  toast('💀 Você desmaiou de fome ou sede e acordou no Hospital. Perdeu 30% do XP do nível e pagou R$ 30. Vá comer alguma coisa!',7000);
  log(`💀 ${eu.nome} morreu de fome`);emitEv('morte',{});sendPos(true);
 }
+
+/* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
+const NOVID='v20261117';
+const NOV_SLIDES=[
+ {t:'🏠 Casas em outra dimensão',x:'Entre em casa e ela vira um cômodo grande, só seu. Toque em <b>🛋️ Decorar</b>: 25 móveis novos, girar, mover, guardar no 📦 inventário e até <b>paredes e portas</b> para fazer quarto, cozinha e banheiro. Deite na cama, sente no sofá, veja TV e guarde comida na geladeira!',d:(g,t)=>{const L=['cama','sofa','tv','aquario','geladeira','homet'],k=Math.floor(t/1.6)%L.length;const o=NOV_OFF||(NOV_OFF=document.createElement('canvas'));previaMovel(o,L[k],Math.floor(t*1.25)%4);g.drawImage(o,160-o.width*.75,100-o.height*.75,o.width*1.5,o.height*1.5)}},
+ {t:'🏰 Mansão com 2 andares',x:'A mansão ganhou uma <b>escada de concreto</b>: suba e o andar de baixo some, mostrando só o andar de cima. Cada andar tem seus móveis.',d:(g,t)=>{g.font='70px sans-serif';g.textAlign='center';g.fillText('🏰',160,120+Math.sin(t*2)*6);g.font='30px sans-serif';g.fillText('⬆️',230,80-((t*30)%40))}},
+ {t:'🚗 Carros novos',x:'<b>Lamborghini</b> (no lugar do Esportivo Neon), <b>Amarok</b> (no lugar da Caminhonete) e veículos de trabalho: Duster da prefeitura, SW4 do delegado, Frontier do mecânico, caminhão do padeiro e do operário e o caminhão de lixo. E as rodas agora giram!',d:(g,t)=>{const L=['neon','caminhonete','duster','sw4','frontier','caminhao','lixo'],k=Math.floor(t/1.7)%L.length;g.save();g.setTransform(1.25,0,0,1.25,160,128);try{drawCarStack(g,0,0,L[k],t*1.2,null,{giroRoda:t*6,rodaAnda:true})}catch(e){}g.restore()}},
+ {t:'💼 Empregos no mapa',x:'Agora as tarefas acontecem na cidade: siga a <b>seta amarela</b>. Frentista, repositor, mecânico, médico, delegado, padeiro (entregas), operário e o emprego novo de <b>🗑️ Lixeiro</b>. Os empregos liberam em níveis mais altos (vai até o 50).',d:(g,t)=>{g.font='54px sans-serif';g.textAlign='center';const E=['⛽','📦','🔧','🩺','🕵️','🥖','🧊','🗑️'];g.fillText(E[Math.floor(t/.9)%E.length],160,120);g.fillStyle='#ffd23f';g.beginPath();const y=150+Math.sin(t*5)*5;g.moveTo(160,y+20);g.lineTo(148,y);g.lineTo(172,y);g.fill()}},
+ {t:'👑 VIP novo',x:'O VIP agora tem <b>coroa azul brilhante</b> em cima do nome, faixa de diamantes no chat e <b>libera a Lamborghini</b> enquanto estiver ativo!',d:(g,t)=>{g.save();g.translate(160,55);g.scale(3.2,3.2);coroaVip(g,0,0);g.restore();g.save();g.setTransform(1,0,0,1,160,170);try{drawCarStack(g,0,0,'neon',t,null,{})}catch(e){}g.restore()}},
+ {t:'🏛️ Prefeitura e 🏆 Top 1',x:'No <b>nível 30</b>, quem chegar primeiro assume a prefeitura. Quem tem o maior nível da cidade ganha um <b>🏆 brilhando</b> em cima do nome.',d:(g,t)=>{g.save();g.translate(110,110);g.scale(3,3);trofeu(g,0,0);g.restore();g.font='54px sans-serif';g.textAlign='center';g.fillText('🏆',220,128+Math.sin(t*3)*5)}}];
+let novAnim=null,NOV_OFF=null;
+async function mostrarNovidades(){if(!eu)return;const kk='cidadeTonhao.novid.'+NOVID+'.'+eu.id;try{if(localStorage.getItem(kk))return}catch(_){}
+ const marca=()=>{try{localStorage.setItem(kk,'1')}catch(_){}api.vistoNovidades(NOVID).catch(()=>{})};
+ if(!(eu.xp>0)){marca();return}
+ try{if(await api.minhaNovidade()===NOVID){try{localStorage.setItem(kk,'1')}catch(_){}return}}catch(_){}
+ let i=0,t0=performance.now(),auto=performance.now();const el=document.createElement('div');el.id='novid';
+ el.innerHTML=`<style>#novid{position:fixed;inset:0;z-index:80;background:rgba(10,5,8,.78);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Fredoka,sans-serif}#novid .bx{width:min(420px,100%);background:linear-gradient(#3a2129,#24141a);border:2px solid #ffc94a;border-radius:20px;padding:14px;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.6)}#novid .tag{color:#ffd23f;font-weight:700;font-size:13px;letter-spacing:.5px}#novid h3{margin:4px 0 8px;font-size:20px}#novid canvas{width:100%;height:auto;border-radius:14px;background:radial-gradient(circle at 50% 40%,#4a3040,#1c1016)}#novid p{font-size:14px;line-height:1.4;min-height:84px;margin:8px 0}#novid .ds{display:flex;gap:5px;justify-content:center;margin:6px 0}#novid .ds i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}#novid .ds i.on{background:#ffd23f}#novid .bt{display:flex;gap:8px}#novid button{flex:1;border:0;border-radius:12px;padding:10px;font:700 14px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}#novid button.g{flex:.5;background:rgba(255,255,255,.12);color:#fff}</style><div class="bx"><div class="tag">🆕 NOVIDADES DA ATUALIZAÇÃO</div><h3></h3><canvas width="320" height="200"></canvas><p></p><div class="ds"></div><div class="bt"><button class="g" data-a="v">◀</button><button data-a="p"></button></div></div>`;
+ document.body.appendChild(el);const cv2=el.querySelector('canvas'),g=cv2.getContext('2d');
+ const pinta=()=>{const S=NOV_SLIDES[i];el.querySelector('h3').textContent=S.t;el.querySelector('p').innerHTML=S.x;el.querySelector('.ds').innerHTML=NOV_SLIDES.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');el.querySelector('[data-a=p]').textContent=i<NOV_SLIDES.length-1?'▶ Próximo':'✔ Bora jogar!';t0=performance.now();auto=performance.now()};
+ const fecha=()=>{cancelAnimationFrame(novAnim);el.remove();marca()};
+ el.querySelector('[data-a=p]').onclick=()=>{if(i<NOV_SLIDES.length-1){i++;pinta()}else fecha()};el.querySelector('[data-a=v]').onclick=()=>{if(i>0){i--;pinta()}};
+ const loop=()=>{if(!el.isConnected)return;const t=(performance.now()-t0)/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,320,200);try{NOV_SLIDES[i].d(g,t)}catch(e){}if(performance.now()-auto>9000&&i<NOV_SLIDES.length-1){i++;pinta()}novAnim=requestAnimationFrame(loop)};pinta();loop()}
 async function aplicarPerfil(m,anunciar){
- const novo=!eu;
+ const novo=!eu;if(novo)setTimeout(()=>mostrarNovidades(),3500);
  if(novo)eu=makePlayer(m.id,m.nome,decode(m.visual)||randomVis());
  eu.nome=m.nome;eu.v=decode(m.visual)||eu.v;aplicarEstado(m);eu.admin=!!m.admin;if(m.missao!=null)eu.missao=+m.missao;else if(anunciar&&eu.missao==null)eu.missao=0;eu.mochila=m.mochila||eu.mochila||{};eu.carCores=m.carro_cores||eu.carCores||{};api.meusMods().then(x=>{eu.carMods=x||{}}).catch(()=>{});
  if(m.casa_id)casasInfo.set(m.casa_id,{dono:m.id,nome:m.nome});
@@ -3643,7 +3673,7 @@ function abrirLugar(b){
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
    botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})});
   if(eu.carros.length){eu.carros.filter(c=>CARS[c]&&!CARS[c].premium).forEach(c=>botao(box,`💸 Vender ${CARS[c].nome} para a loja: ${money(Math.floor(CARS[c].preco/2))}`,()=>venderLoja(c),{ghost:true}));botao(box,'🤝 Vender um carro para outro jogador',()=>venderJogador(),{ghost:true})}}
- if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏆 Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(!sub)sub='Prefeito só a partir do nível 20: quem tiver mais XP entre os nível 20 assume o cargo 🏆.'}
+ if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏛️ Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(souP)botao(box,'🚪 Deixar o cargo de prefeito',()=>confirmar('🚪 Deixar a prefeitura?','Outra pessoa do nível 30+ poderá assumir.',()=>acao(async()=>{await api.deixarPref();if(trabalho&&trabalho.job==='prefeito')fimTurno();emitEv('prefeito',{});carregaPref();closePlace();toast('Você deixou a prefeitura.',2500)})),{ghost:true});else if(!PREF_ID)botao(box,eu.nivel>=30?'🏛️ Assumir a prefeitura':'🔒 Prefeitura: libera no nível 30',()=>{if(eu.nivel<30)return;acao(async()=>{await api.assumirPref();emitEv('prefeito',{});carregaPref();closePlace();toast('🏛️ Você agora é o prefeito da cidade!',3500)})},{off:eu.nivel<30});if(!sub)sub='A partir do nível 30, quem chegar primeiro assume a prefeitura 🏛️. Quem tem o maior nível da cidade ganha um 🏆 brilhando no nome.'}
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
   if(eu.nivel<J.nivel_min)botao(boxJob,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
@@ -3711,7 +3741,7 @@ function comerFruta(f){acao(async()=>{
  catch(e){const m=/faltam (\d+)/.exec(e.message);if(m)frutaCD[f.id]=Date.now()+(+m[1])*1000;throw e}})}
 function comprarCasa(b){acao(async()=>{
  const r=tratar(await api.comprarCasa(b.n));if(eu.casa_id!==b.n)return;
- for(const [id] of casasInfo)if(casasInfo.get(id).dono===eu.id&&id!==b.n)casasInfo.set(id,{dono:null});
+ for(const [id] of casasInfo)if(casasInfo.get(id).dono===eu.id&&id!==b.n&&houses[id-1]&&casaTipo(houses[id-1])===casaTipo(b))casasInfo.set(id,{dono:null});
  casasInfo.set(b.n,{dono:eu.id,nome:eu.nome});floatText(eu.x,eu.y-30,'🏠 CASA NOVA!','#ffc94a');
  toast(`🎉 A ${b.kind==='mansao'?'mansão':'casa'} ${b.n} agora é sua!`+(r.devolvido?` (recebeu ${money(r.devolvido)} pela antiga)`:''),4500);
  log(`🏠 ${eu.nome} comprou a casa ${b.n}!`);emitEv('casa',{n:b.n});abrirLugar(b)})}
@@ -4027,7 +4057,7 @@ function syncPresence(){
 }
 function aplicarRemoto(p){
  const o=others.get(p.id);if(!o)return;o.carCores=p.carro_cores||{};o.carMods=p.carro_mods||{};o.nome=p.nome;o.pet=PETS[p.pet]?p.pet:null;o.vip_ate=p.vip_ate;o.v=decode(p.visual)||o.v;if(!(p.vip_ate&&Date.parse(p.vip_ate)>Date.now()))o.v=semVip(o.v);o.casa_id=p.casa_id;o.nivel=p.nivel||1;o.foto=p.foto;o.frase=p.frase;o.relacionamento=p.relacionamento;o.time_coracao=p.time_coracao;o.insta=p.insta;
- if(o.novo){o.novo=false;log(`👋 ${p.nome} está na cidade`);if(PREF_ID&&p.id===PREF_ID)bannerGrande('🏛️ O PREFEITO ENTROU NA CIDADE!','🏆 '+p.nome)}
+ if(o.novo){o.novo=false;log(`👋 ${p.nome} está na cidade`);if(PREF_ID&&p.id===PREF_ID){let n=0;const kk='cidadeTonhao.prefAviso.'+new Date().toDateString();try{n=+localStorage.getItem(kk)||0}catch(_){}if(n<2){try{localStorage.setItem(kk,n+1)}catch(_){}bannerGrande('🏛️ O PREFEITO ENTROU NA CIDADE!','🏛️ '+p.nome)}}}
 }
 let lastSent=0,lastKey='';
 function sendPos(force){
@@ -4075,14 +4105,14 @@ const hhmm=d=>{const t=d?new Date(d):new Date();return String(t.getHours()).padS
 function onChat(r,hist){
  if(!r||vistos.has(r.id))return;vistos.add(r.id);chatMsgs.push(r);if(chatMsgs.length>50)chatMsgs.shift();
  if(!hist){const o=eu&&r.morador===eu.id?eu:others.get(r.morador);if(o)say(o,short(r.texto),5,true);Som.play('msg',300)}
- pushFeed(ehAdm(r.morador)?'chata':PREF_ID&&r.morador===PREF_ID?'chatp':'chat',(ehAdm(r.morador)?'🛡️ ADM ':PREF_ID&&r.morador===PREF_ID?'🏛️ Prefeito ':'')+r.nome,r.texto,hist?8:40);pintaPainel();
+ pushFeed(ehAdm(r.morador)?'chata':PREF_ID&&r.morador===PREF_ID?'chatp':vipId(r.morador)?'chatv':'chat',(ehAdm(r.morador)?'🛡️ ADM ':PREF_ID&&r.morador===PREF_ID?'🏛️ ':vipId(r.morador)?'👑 ':'')+r.nome,r.texto,hist?8:40);pintaPainel();
  if(!$('mChat').classList.contains('hidden'))renderChat();
 }
 function renderChat(){
  const box=$('chatList');box.innerHTML='';
  chatMsgs.forEach(m=>{const d=document.createElement('div'),b=document.createElement('b'),t=document.createElement('time');
   t.textContent=hhmm(m.criado_em);b.textContent=m.nome;b.onclick=()=>{const p=eu&&m.morador===eu.id?eu:others.get(m.morador);if(p&&(p===eu||p.seen)){$('mChat').classList.add('hidden');follow=p;cam.z=Math.max(cam.z,1.4);openCard(p)}else toast(m.nome+' não está na cidade agora.',2000)};
-  if(ehAdm(m.morador)){d.className='admMsg';b.textContent='🛡️ ADM '+m.nome}else if(PREF_ID&&m.morador===PREF_ID){d.className='prefMsg';b.textContent='🏛️ Prefeito '+m.nome}d.append(t,b,document.createTextNode(' '+m.texto));box.appendChild(d)});
+  if(ehAdm(m.morador)){d.className='admMsg';b.textContent='🛡️ ADM '+m.nome}else if(PREF_ID&&m.morador===PREF_ID){d.className='prefMsg';b.textContent='🏛️ '+m.nome}else if(vipId(m.morador)){d.className='vipMsg';b.innerHTML='<span class="vcroa">👑</span> ';b.appendChild(Object.assign(document.createElement('span'),{className:'vnome',textContent:m.nome}))}d.append(t,b,document.createTextNode(' '+m.texto));box.appendChild(d)});
  if(!chatMsgs.length){const d=document.createElement('div');d.textContent='Ninguém falou nada ainda. Puxa assunto!';box.appendChild(d)}
  $('chatSub').textContent=ONLINE?`Sala ${sala||'…'} · últimas ${chatMsgs.length} mensagens. Toque num nome para ir até a pessoa. Quem pegar pesado pode ser denunciado.`:'Modo teste: só você vê suas mensagens.';
  box.scrollTop=box.scrollHeight;
@@ -4586,7 +4616,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116t';
+const VERSAO_JOGO='v20261117b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -4655,9 +4685,14 @@ setInterval(()=>{if(eu)$('zcarro').setAttribute('data-l',eu.driving?'Descer do c
 let PREF_ID=null,PREF_NOME='';
 let PREF_OK=false;
 function carregaPref(){api.cidade().then(r=>{if(!r)return;const novo=r.prefeito||null,nome=r.moradores?r.moradores.nome:'',mudou=PREF_OK&&novo&&novo!==PREF_ID;PREF_ID=novo;PREF_NOME=nome;PREF_OK=true;
- if(mudou&&eu){const sou=novo===eu.id;bannerGrande('🏛️ NOVO PREFEITO!',sou?'👑 Você é o TOP 1 e assumiu a Cidade do Tonhão':'🏆 '+nome+' virou o TOP 1 e assumiu a cidade');log('🏛️ '+nome+' é o novo prefeito!')}}).catch(()=>{})}
+ if(mudou&&eu){const sou=novo===eu.id;bannerGrande('🏛️ NOVO PREFEITO!',sou?'🏛️ Você assumiu a Cidade do Tonhão':'🏛️ '+nome+' assumiu a cidade');log('🏛️ '+nome+' é o novo prefeito!')}}).catch(()=>{})}
 setInterval(carregaPref,20000);setTimeout(carregaPref,1500);
 function bannerGrande(t1,t2){const el=document.createElement('div');el.className='bannerPref';el.innerHTML='<div class="bp1">'+t1+'</div>'+(t2?'<div class="bp2">'+t2+'</div>':'');document.body.appendChild(el);try{Som.play('nivel')}catch(_){}setTimeout(()=>el.classList.add('sai'),3600);setTimeout(()=>el.remove(),4300)}
+let TOP_ID=null;function carregaTop(){api.ranking().then(r=>{TOP_ID=r&&r[0]?r[0].id:null;if(TOP_ID==='local'&&eu)TOP_ID=eu.id}).catch(()=>{})}setInterval(carregaTop,120000);setTimeout(carregaTop,4000);
+function coroaVip(c,x,y){const k=(Math.sin(now*4)+1)/2,b=Math.sin(now*3)*1;c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y+b,0,x,y+b,11);g.addColorStop(0,`rgba(90,200,255,${.45+.4*k})`);g.addColorStop(1,'rgba(40,140,255,0)');c.fillStyle=g;c.beginPath();c.arc(x,y+b,11,0,7);c.fill();c.restore();
+ c.save();c.translate(x,y+b);c.fillStyle='#2f8bff';c.strokeStyle='#0b2a6a';c.lineWidth=.8;c.beginPath();c.moveTo(-6,3);c.lineTo(-7,-3);c.lineTo(-3.5,0);c.lineTo(0,-5);c.lineTo(3.5,0);c.lineTo(7,-3);c.lineTo(6,3);c.closePath();c.fill();c.stroke();
+ c.fillStyle='#9fe8ff';c.fillRect(-6,1.6,12,1.6);for(const [px,py] of [[-7,-3],[0,-5],[7,-3]]){c.fillStyle='#e8fbff';c.beginPath();c.arc(px,py,1.1,0,7);c.fill()}if(k>.7){c.fillStyle='#fff';c.fillRect(-.4,-8,.8,2.4);c.fillRect(-1.2,-7.2,2.4,.8)}c.restore()}
+function trofeuTop(c,x,y){const k=(Math.sin(now*4)+1)/2,b=Math.sin(now*3)*1;c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y+b,0,x,y+b,11);g.addColorStop(0,`rgba(255,215,64,${.45+.4*k})`);g.addColorStop(1,'rgba(255,200,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y+b,11,0,7);c.fill();c.restore();c.font='11px sans-serif';c.textAlign='center';c.fillText('🏆',x,y+b+4);c.textAlign='left'}
 function trofeu(c,x,y){const k=(Math.sin(now*4)+1)/2,b=Math.sin(now*3)*1.2;c.save();c.globalCompositeOperation='lighter';const g=c.createRadialGradient(x,y+b,0,x,y+b,13);g.addColorStop(0,`rgba(255,215,64,${.5+.4*k})`);g.addColorStop(1,'rgba(255,200,0,0)');c.fillStyle=g;c.beginPath();c.arc(x,y+b,13,0,7);c.fill();c.restore();
  c.save();c.font='11px sans-serif';c.textAlign='center';c.textBaseline='middle';c.shadowColor='#ffd23f';c.shadowBlur=6+k*6;c.fillText('🏛️',x,y+b);c.restore();
  for(let i=0;i<3;i++){const a=now*2+i*2.1,r=8;c.fillStyle=`rgba(255,240,170,${.5+.5*Math.sin(now*5+i)})`;c.beginPath();c.arc(x+Math.cos(a)*r,y+b+Math.sin(a)*r*.5,.8,0,7);c.fill()}}

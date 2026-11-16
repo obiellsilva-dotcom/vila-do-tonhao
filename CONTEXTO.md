@@ -129,3 +129,21 @@ Tudo abaixo está SÓ em `extras/proposta-index.html` (ramo `ccr-e150a3c5-3uuba3
 4. **Criação de personagem**: só 4 opções grátis de cada peça (camisa, calça, calçado, chapéu) + estampa lisa e mais 1; o resto se compra na loja. Quem já joga mantém o que usa.
 5. Depois: **mapinha** no canto de cima (toca e abre o mapa grande), oficina de carros, acessórios/coroa, poupança.
 6. SQL continua acumulando em `novidades.sql`; só mandar quando ele disser "vamos subir a nova versão".
+
+## SITUAÇÃO EM 17/11/2026 (quarta sessão) — LEIA PRIMEIRO
+Versão VERSAO_JOGO v20261117b. Ramo `ccr-c5db5bd8-0bdems`. Para subir: `index.html` + `musicas/` (site.zip) e rodar `novidades.sql` (pequeno) no Supabase.
+Se a pessoa NÃO tiver rodado o SQL da sessão anterior, rodar o banco completo pelo celular: `sql-celular/banco-parte1..4.sql` em ordem.
+### O que entrou
+- Duster branca da prefeitura (vistoria). Veículos de trabalho com botão "🚚 Usar veículo do trabalho": SW4 (delegado), Frontier (mecânico), caminhão baú (padeiro e operário), caminhão de lixo (lixeiro, emprego novo nível 6). Ambulância pendente: o arquivo veio em .max (pedir .glb/.fbx/.obj/.blend).
+- Amarok (id `caminhonete`, R$ 45.000, 5% menor que a Hilux) e Lamborghini (id `neon`, Pix R$ 19,90; VIP libera enquanto ativo, função `_tem_carro`).
+- Rodas girando (`drawRodas`, medidas em `RODAS`). Personalização de carros REMOVIDA (só cor e som continuam).
+- XP por tarefa = t.xp/20 (meta ~8 níveis/dia). Empregos em níveis maiores (prefeito 30, médico 29… ver tabela `NV`).
+- Empregos no mapa (`RUA`, `proxRua`): tarefa começa indo a um ponto (seta amarela), depois minijogo. Padeiro/operário fazem entregas.
+- Casas em "outra dimensão": salas em `SALAS` (casa, mansão térreo e mansão andar de cima) num canto da mata; `entrarSala/sairSala`, visibilidade por `rm` no pos. Personagem 1.8x maior dentro (`SALA_ESC`). Escada de concreto na mansão (`R.esc`).
+- Móveis novos detalhados (`MOV`, `desenhaMovel`, 4 giros), painel Decorar (`abrirMobilia`, `MOB`), inventário (📦 guardar/colocar), paredes/portas (`desenhaParede`, emendam e ficam transparentes por trás), deitar/sentar/TV/geladeira. Banco: `casas.moveis`, `casas.geladeira`, funções comprar/mexer/guardar/colocar_movel e geladeira (todas recebem p_casa).
+- Até 1 casa de cada tipo (barata/intermediária/mansão; coluna gerada `casas.tipo`).
+- Prefeito: qualquer um no nível 30 assume se não houver prefeito (ou se sumir 3 dias); pode deixar o cargo. Aviso "prefeito entrou" no máximo 2x por dia. Top 1 de XP ganha 🏆 brilhando (some se for prefeito).
+- VIP R$ 15,99: coroa azul em cima do nome (`coroaVip`), faixa azul de diamantes no chat, sem a palavra VIP. Prefeito no chat só com 🏛️.
+- Tela de novidades (`mostrarNovidades`, `NOVID`) aparece 1 vez por pessoa (localStorage + coluna `moradores.novidades`).
+### Ideias pendentes
+Braço do sofá por cima das pernas e lugares fixos no sofá; aumentar cadeira/poltrona; interiores das lojas em outra dimensão; ambulância.

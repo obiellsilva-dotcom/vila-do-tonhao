@@ -52,7 +52,10 @@ create table if not exists public.casas (
 );
 alter table public.casas add column if not exists nivel_min integer not null default 1;
 alter table public.casas add column if not exists aberta boolean not null default false;
-create unique index if not exists casas_um_dono on public.casas(dono) where dono is not null;
+-- cada jogador pode ter no máximo 1 casa de cada tipo (barata, intermediária, mansão)
+alter table public.casas add column if not exists tipo text generated always as (case when preco >= 50000 then 'mansao' when preco >= 10000 then 'media' else 'barata' end) stored;
+drop index if exists public.casas_um_dono;
+create unique index if not exists casas_um_por_tipo on public.casas(dono, tipo) where dono is not null;
 
 create table if not exists public.trabalhos (
   id       text primary key,
@@ -711,7 +714,7 @@ begin
   if c.dono = m.id then raise exception 'Essa casa já é sua.'; end if;
   if c.dono is not null then raise exception 'Essa casa já tem dono.'; end if;
   if m.nivel < c.nivel_min then raise exception 'Essa casa libera no nível %.', c.nivel_min; end if;
-  select * into antiga from casas where dono = m.id for update;
+  select * into antiga from casas where dono = m.id and tipo = c.tipo for update;
   if found then volta := antiga.preco / 2; end if;
   if m.dinheiro + volta < c.preco then raise exception 'Dinheiro insuficiente para essa casa.'; end if;
   if antiga.id is not null then
@@ -1699,6 +1702,11 @@ alter table public.casas add column if not exists moveis jsonb not null default 
 alter table public.casas add column if not exists geladeira jsonb not null default '{}'::jsonb;
 drop function if exists public.comprar_movel(text, integer, integer, integer);
 drop function if exists public.mexer_movel(integer, integer, integer, boolean);
+drop function if exists public.comprar_movel(text, integer, integer, integer, integer);
+drop function if exists public.mexer_movel(integer, integer, integer, integer, boolean);
+drop function if exists public.geladeira(text, boolean);
+drop function if exists public.guardar_movel(integer);
+drop function if exists public.colocar_movel(integer, integer, integer, integer, integer);
 
 -- Preços dos móveis (dinheiro do jogo). O preço vale aqui, não no jogo.
 create or replace function public.preco_movel(p_tipo text) returns integer
@@ -1713,13 +1721,13 @@ language sql immutable as $$
     when 'aquario' then 6000 when 'homet' then 9000 when 'jukebox' then 12000 else null end
 $$;
 
-create or replace function public.comprar_movel(p_tipo text, p_x integer, p_y integer, p_andar integer, p_r integer) returns json
+create or replace function public.comprar_movel(p_casa integer, p_tipo text, p_x integer, p_y integer, p_andar integer, p_r integer) returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; c public.casas; pr integer;
 begin
   m := _eu();
-  select * into c from casas where dono = m.id;
-  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  select * into c from casas where id = p_casa and dono = m.id;
+  if c.id is null then raise exception 'Essa casa não é sua.'; end if;
   pr := preco_movel(p_tipo);
   if pr is null then raise exception 'Móvel inválido.'; end if;
   if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_andar not in (0, 1) or p_r not between 0 and 3 then raise exception 'Lugar inválido.'; end if;
@@ -1731,13 +1739,13 @@ begin
 end $$;
 
 -- Mover/girar um móvel (de graça) ou vender de volta (devolve metade do preço)
-create or replace function public.mexer_movel(p_i integer, p_x integer, p_y integer, p_r integer, p_vender boolean) returns json
+create or replace function public.mexer_movel(p_casa integer, p_i integer, p_x integer, p_y integer, p_r integer, p_vender boolean) returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; c public.casas; e jsonb;
 begin
   m := _eu();
-  select * into c from casas where dono = m.id;
-  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  select * into c from casas where id = p_casa and dono = m.id;
+  if c.id is null then raise exception 'Essa casa não é sua.'; end if;
   if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
   e := c.moveis -> p_i;
   if p_vender then
@@ -1751,13 +1759,13 @@ begin
 end $$;
 
 -- Geladeira: guarda um item da mochila ou pega de volta para a mochila (só o dono)
-create or replace function public.geladeira(p_item text, p_guardar boolean) returns json
+create or replace function public.geladeira(p_casa integer, p_item text, p_guardar boolean) returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; c public.casas; q integer; g integer;
 begin
   m := _eu();
-  select * into c from casas where dono = m.id;
-  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  select * into c from casas where id = p_casa and dono = m.id;
+  if c.id is null then raise exception 'Essa casa não é sua.'; end if;
   if not exists (select 1 from jsonb_array_elements(c.moveis) e where e->>'t' = 'geladeira') then
     raise exception 'Sua casa não tem geladeira. Compre uma na loja de móveis!'; end if;
   if not exists (select 1 from loja where id = p_item and tipo = 'consumo') then raise exception 'Item inválido.'; end if;
@@ -1777,35 +1785,134 @@ begin
   return json_build_object('geladeira', (select geladeira from casas where id = c.id), 'mochila', (select mochila from moradores where id = m.id), 'eu', _estado(m.id));
 end $$;
 
-grant execute on function public.comprar_movel(text, integer, integer, integer, integer) to authenticated;
-grant execute on function public.mexer_movel(integer, integer, integer, integer, boolean) to authenticated;
-grant execute on function public.geladeira(text, boolean) to authenticated;
+grant execute on function public.comprar_movel(integer, text, integer, integer, integer, integer) to authenticated;
+grant execute on function public.mexer_movel(integer, integer, integer, integer, integer, boolean) to authenticated;
+grant execute on function public.geladeira(integer, text, boolean) to authenticated;
 
 -- Guardar um móvel no inventário da casa (some do chão) ou tirar de lá (volta ao ser colocado)
-create or replace function public.guardar_movel(p_i integer) returns json
+create or replace function public.guardar_movel(p_casa integer, p_i integer) returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; c public.casas;
 begin
   m := _eu();
-  select * into c from casas where dono = m.id;
-  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  select * into c from casas where id = p_casa and dono = m.id;
+  if c.id is null then raise exception 'Essa casa não é sua.'; end if;
   if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
   update casas set moveis = jsonb_set(moveis, array[p_i::text], (moveis -> p_i) || '{"g": true}'::jsonb) where id = c.id;
   return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
 end $$;
-grant execute on function public.guardar_movel(integer) to authenticated;
+grant execute on function public.guardar_movel(integer, integer) to authenticated;
 
 -- Colocar um móvel guardado no inventário (em qualquer andar)
-create or replace function public.colocar_movel(p_i integer, p_x integer, p_y integer, p_r integer, p_andar integer) returns json
+create or replace function public.colocar_movel(p_casa integer, p_i integer, p_x integer, p_y integer, p_r integer, p_andar integer) returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; c public.casas;
 begin
   m := _eu();
-  select * into c from casas where dono = m.id;
-  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  select * into c from casas where id = p_casa and dono = m.id;
+  if c.id is null then raise exception 'Essa casa não é sua.'; end if;
   if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
   if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_r not between 0 and 3 or p_andar not in (0, 1) then raise exception 'Lugar inválido.'; end if;
   update casas set moveis = jsonb_set(moveis, array[p_i::text], ((moveis -> p_i) - 'g') || jsonb_build_object('x', p_x, 'y', p_y, 'r', p_r, 'a', p_andar)) where id = c.id;
   return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
 end $$;
-grant execute on function public.colocar_movel(integer, integer, integer, integer, integer) to authenticated;
+grant execute on function public.colocar_movel(integer, integer, integer, integer, integer, integer) to authenticated;
+
+-- ===== ETAPA F: prefeito pelo nível 30, níveis dos empregos, VIP com Lamborghini e novidades =====
+-- Prefeito: não é mais automático. Qualquer um no nível 30+ assume se a cidade estiver sem prefeito
+-- (ou se o prefeito sumir por mais de 3 dias). Quem é prefeito pode deixar o cargo.
+drop trigger if exists prefeito_top1 on public.moradores;
+drop function if exists public._atualiza_prefeito() cascade;
+create or replace function public.assumir_prefeitura() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; atual public.moradores;
+begin
+  m := _eu();
+  if m.nivel < 30 then raise exception 'A prefeitura libera no nível 30.'; end if;
+  select mo.* into atual from cidade c join moradores mo on mo.id = c.prefeito where c.id = 1;
+  if atual.id = m.id then raise exception 'Você já é o prefeito!'; end if;
+  if atual.id is not null and not atual.banido and atual.visto_em > now() - interval '3 days' then
+    raise exception 'A cidade já tem prefeito: %.', atual.nome; end if;
+  insert into cidade(id, prefeito, desde) values (1, m.id, now())
+  on conflict (id) do update set prefeito = m.id, desde = now();
+  return json_build_object('prefeito', m.id, 'nome', m.nome);
+end $$;
+create or replace function public.deixar_prefeitura() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores;
+begin
+  m := _eu();
+  update cidade set prefeito = null, desde = null where id = 1 and prefeito = m.id;
+  update moradores set trabalho = null where id = m.id and trabalho = 'prefeito';
+  return json_build_object('prefeito', null);
+end $$;
+grant execute on function public.assumir_prefeitura() to authenticated;
+grant execute on function public.deixar_prefeitura() to authenticated;
+
+-- Empregos liberam em níveis mais altos (agora vai até o 50)
+update public.trabalhos set nivel_min = v.n from (values
+  ('bar',1),('mercadinho',1),('posto',3),('pescador',4),('padaria',5),('lixeiro',6),('barbearia',7),
+  ('prefeitura',10),('oficina',12),('banco',15),('concessionaria',18),('fabrica',20),('enfermeiro',21),
+  ('policia',23),('gerente',25),('delegado',27),('medico',29),('prefeito',30)) as v(id, n)
+where trabalhos.id = v.id;
+
+-- VIP: R$ 15,99 e libera a Lamborghini enquanto estiver ativo
+update public.produtos set preco = 15.99 where tipo = 'vip';
+create or replace function public._tem_carro(m public.moradores, p_carro text) returns boolean
+language sql stable as $$
+  select p_carro = any(m.carros) or (p_carro = 'neon' and m.vip_ate is not null and m.vip_ate > now())
+$$;
+create or replace function public.usar_carro(p_carro text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores;
+begin
+  m := _eu();
+  if p_carro is not null and not _tem_carro(m, p_carro) then raise exception 'Esse carro não é seu.'; end if;
+  update moradores set carro = p_carro where id = m.id;
+  update vagas set carro = p_carro where morador = m.id and p_carro is not null;
+  return json_build_object('carro', p_carro);
+end $$;
+
+create or replace function public.estacionar(p_vaga text, p_carro text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; v public.vagas; dono_casa uuid; visto timestamptz;
+begin
+  m := _eu();
+  if not _tem_carro(m, p_carro) then raise exception 'Esse carro não é seu.'; end if;
+  select * into v from vagas where id = p_vaga for update;
+  if not found then raise exception 'Essa vaga não existe.'; end if;
+  if v.casa is not null then
+    select dono into dono_casa from casas where id = v.casa;
+    if dono_casa is distinct from m.id then raise exception 'Essa garagem é de outra pessoa.'; end if;
+  elsif v.morador is not null and v.morador <> m.id then
+    select visto_em into visto from moradores where id = v.morador;
+    if visto > now() - interval '30 minutes' then raise exception 'Vaga ocupada.'; end if;
+  end if;
+  update vagas set morador = null, carro = null, desde = null where morador = m.id and id <> p_vaga;
+  update vagas set morador = m.id, carro = p_carro, desde = now() where id = p_vaga;
+  return json_build_object('vaga', p_vaga);
+end $$;
+
+create or replace function public.cor_carro(p_carro text, p_cor text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores;
+begin
+  m := _eu();
+  if not _tem_carro(m, p_carro) then raise exception 'Esse carro não é seu.'; end if;
+  if p_cor not in ('#3c78d8','#c0392b','#2b2b30','#eeeeee','#aeb3b8','#f1c40f','#27ae60','#e67e22','#e84393','#7b241c') then
+    raise exception 'Cor inválida.'; end if;
+  update moradores set carro_cores = carro_cores || jsonb_build_object(p_carro, p_cor) where id = m.id;
+  return json_build_object('ok', true);
+end $$;
+
+-- Novidades: guarda a última tela de novidades que a pessoa já viu (aparece só 1 vez)
+alter table public.moradores add column if not exists novidades text;
+create or replace function public.visto_novidades(p_v text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores;
+begin
+  m := _eu();
+  update moradores set novidades = left(p_v, 20) where id = m.id;
+  return json_build_object('novidades', left(p_v, 20));
+end $$;
+grant execute on function public.visto_novidades(text) to authenticated;
