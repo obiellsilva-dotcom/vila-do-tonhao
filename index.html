@@ -4616,7 +4616,7 @@ const Som=(()=>{
   m.g.gain.setTargetAtTime(tipo?P[8]*.8*(.55+.45*forca)*vol:0,t,.15);
  }
  // gravações reais de motor (pasta sons/): carregam na primeira vez que o carro aparece
- const GRAV={gto:'gto',neon:'neon',esportivo:'esportivo',opala:'opala',moto:'moto',sw4:'diesel',kombi_tonhao:'diesel',caminhonete:'diesel',viatura:'diesel'};
+ const GRAV={fusca:'fusca',fusca_ouro:'fusca',sedan:'sedan',jipe:'sedan',gto:'gto',neon:'neon',esportivo:'esportivo',opala:'opala',moto:'moto',sw4:'diesel',kombi_tonhao:'diesel',caminhonete:'diesel',viatura:'diesel'};
  const GRAV_RPM={moto:[.8,1.9],diesel:[.85,1.45]},GBUF={},GLOAD={};
  function gravacao(n){if(GBUF[n])return GBUF[n];if(!GLOAD[n]){GLOAD[n]=1;fetch('sons/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,er)=>ac.decodeAudioData(b,ok,er))).then(d=>{GBUF[n]=d}).catch(()=>{})}return null}
  // Música calma: violão em compasso lento, progressões que variam, melodia solta e pausas.
@@ -5001,7 +5001,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122h';
+const VERSAO_JOGO='v20261122i';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
