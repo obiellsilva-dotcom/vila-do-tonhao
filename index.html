@@ -5117,7 +5117,7 @@ log('🍺 O Tonhão abriu o bar. A geladeira de 1987 ainda tá funcionando.');
 let last=performance.now();
 let mediaQ=16,contaQ=0;
 let ERRO_TELA=null;function erroTela(e,onde){const m=onde+': '+((e&&e.message)||e);if(ERRO_TELA!==m){ERRO_TELA=m;console.error(m,e);try{toast('⚠️ Erro na tela ('+m.slice(0,90)+'). Tire um print e mande ao admin.',6000)}catch(_){}}}
-function frame(t){requestAnimationFrame(frame);if(CFG.graf==='baixo'&&t-last<30)return;const dt=Math.min(.1,(t-last)/1000);last=t;try{update(dt)}catch(e){erroTela(e,'update')}try{draw()}catch(e){erroTela(e,'draw')}}
+function frame(t){requestAnimationFrame(frame);if(CFG.graf==='baixo'&&t-last<30)return;const dt=Math.min(.1,(t-last)/1000);last=t;if(eu&&!(isFinite(eu.x)&&isFinite(eu.y))){eu.rm=null;eu.path=[];eu.x=T(25);eu.y=T(29.5)}if(!(isFinite(cam.x)&&isFinite(cam.y)&&isFinite(cam.z)&&cam.z>0)){cam.x=eu?eu.x:T(25);cam.y=eu?eu.y:T(29.5);cam.z=1.5}for(const o of others.values())if(!(isFinite(o.x)&&isFinite(o.y))){o.x=T(25);o.y=T(29.5);o.hidden=true}try{update(dt)}catch(e){erroTela(e,'update')}try{draw()}catch(e){erroTela(e,'draw')}}
 function begin(){buildBg();uiTick();requestAnimationFrame(t=>{last=t;frame(t)});setTimeout(()=>{const l=$('loading');l.style.opacity=0;setTimeout(()=>l.remove(),450)},350)}
 (document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]):Promise.resolve()).then(begin).then(iniciarOnline);
 window.__dbg={houses,comprarCasa,residents,tonhao,queue,get gm(){return gm},set gm(v){gmOff+=v-gm;gm=v},cam,get eu(){return eu},others,get trabalho(){return trabalho},get L(){return L},VAGAS,vagasInfo,CRUZ};
