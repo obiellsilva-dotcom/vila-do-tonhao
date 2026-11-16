@@ -4610,14 +4610,14 @@ const Som=(()=>{
   if(buf){
    if(m.gn!==gn){if(m.rs){try{m.rs.stop()}catch(e){}}if(!m.rg){m.rg=ac.createGain();m.rg.gain.value=0;m.rg.connect(sfxG)}
     m.rs=ac.createBufferSource();m.rs.buffer=buf;m.rs.loop=true;m.rs.loopStart=.06;m.rs.loopEnd=buf.duration-.06;m.rs.connect(m.rg);m.rs.start(t,.06);m.gn=gn}
-   const R=GRAV_RPM[gn]||[.8,1.6];m.rs.playbackRate.setTargetAtTime(R[0]+(R[1]-R[0])*Math.max(0,Math.min(1,forca)),t,.08);
-   m.rg.gain.setTargetAtTime(.55*(.5+.5*forca)*vol,t,.15);m.g.gain.setTargetAtTime(0,t,.1);return}
+   const R=GRAV_RPM[gn]||[.92,1.3];m.rs.playbackRate.setTargetAtTime(R[0]+(R[1]-R[0])*Math.max(0,Math.min(1,forca)),t,.3);
+   m.rg.gain.setTargetAtTime(.2*(.7+.3*forca)*vol,t,.25);m.g.gain.setTargetAtTime(0,t,.1);return}
   if(m.rg)m.rg.gain.setTargetAtTime(0,t,.1);
   m.g.gain.setTargetAtTime(tipo?P[8]*.8*(.55+.45*forca)*vol:0,t,.15);
  }
  // gravações reais de motor (pasta sons/): carregam na primeira vez que o carro aparece
  const GRAV={fusca:'fusca',fusca_ouro:'fusca',sedan:'sedan',jipe:'sedan',gto:'gto',neon:'neon',esportivo:'esportivo',opala:'opala',moto:'moto',sw4:'diesel',kombi_tonhao:'diesel',caminhonete:'diesel',viatura:'diesel'};
- const GRAV_RPM={moto:[.8,1.9],diesel:[.85,1.45]},GBUF={},GLOAD={};
+ const GRAV_RPM={moto:[.9,1.45],diesel:[.93,1.22]},GBUF={},GLOAD={};
  function gravacao(n){if(GBUF[n])return GBUF[n];if(!GLOAD[n]){GLOAD[n]=1;fetch('sons/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,er)=>ac.decodeAudioData(b,ok,er))).then(d=>{GBUF[n]=d}).catch(()=>{})}return null}
  // Música calma: violão em compasso lento, progressões que variam, melodia solta e pausas.
  const PROGS=[[[261.6,329.6,392],[220,261.6,329.6],[174.6,220,261.6],[196,246.9,293.7]],[[174.6,220,261.6],[261.6,329.6,392],[196,246.9,293.7],[220,261.6,329.6]],[[220,261.6,329.6],[174.6,220,261.6],[261.6,329.6,392],[196,246.9,293.7]]];
