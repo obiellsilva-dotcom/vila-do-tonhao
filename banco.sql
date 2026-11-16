@@ -1682,3 +1682,7 @@ drop trigger if exists limpa_mods on public.moradores;
 create trigger limpa_mods before update of carros on public.moradores for each row execute function public._limpa_mods();
 
 select nome, preco from public.loja where tipo = 'carro' order by preco;
+
+-- Amarok (no lugar da Caminhonete) e Lamborghini (no lugar do Esportivo Neon). Quem já tem continua com o carro.
+update public.loja set nome = 'Amarok', preco = 45000 where id = 'caminhonete' and tipo = 'carro';
+update public.produtos set nome = 'Lamborghini', preco = 19.90 where id = 'carro_neon';

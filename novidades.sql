@@ -31,3 +31,7 @@ begin
   return json_build_object('pago', pago, 'xp_ganho', ganho, 'subiu', novo_nivel - m.nivel, 'premio', premio,
     'peixes_ganhos', peixes_ganhos, 'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
 end $$;
+
+-- ===== ETAPA B: Amarok (no lugar da Caminhonete) e Lamborghini (no lugar do Esportivo Neon) =====
+update public.loja set nome = 'Amarok', preco = 45000 where id = 'caminhonete' and tipo = 'carro';
+update public.produtos set nome = 'Lamborghini', preco = 19.90 where id = 'carro_neon';
