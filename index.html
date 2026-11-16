@@ -2262,6 +2262,13 @@ function drawNatal(c){const x=T(NATAL.x),y=T(NATAL.y),cores=['#ff3b3b','#ffd23f'
 // pisca-pisca nas árvores da praça
 function piscaArvore(c,t){if(!(t.x>T(15)&&t.x<T(33)&&t.y>T(31)&&t.y<T(37)))return;const cores=['#ff3b3b','#ffd23f','#3bc4ff','#ff7ad9','#7dff6b'];
  for(let i=0;i<12;i++){if(!pisca(i+t.x))continue;const a=i/12*Math.PI*2,xx=t.x+Math.cos(a)*14*t.s,yy=t.y-24*t.s+Math.sin(a)*9*t.s+(i%3)*3;c.fillStyle=cores[(i+Math.floor(now*2))%5];circ(c,xx,yy,1.5)}}
+// ===== salas: interiores das casas em "outra dimensão" (canto escondido da mata) =====
+const SALAS={casa:{x0:123,y0:82,x1:132,y1:89,porta:[127,90],parede:'#efe2c8',piso:['#b07a4a','#a56f40'],
+  moveis:[[123,82,'cama'],[124,82,'abajur'],[126,82,'estante'],[129,82,'tv'],[129,84,'sofa'],[131,82,'geladeira'],[132,82,'fogao'],[132,84,'pia'],[125,86,'mesa'],[123,89,'planta'],[132,89,'planta']]},
+ mansao:{x0:121,y0:92,x1:138,y1:98,porta:[129,99],parede:'#f4ead8',piso:['#d8c7a8','#cdb995'],
+  moveis:[[121,92,'cama'],[122,92,'abajur'],[124,92,'cama'],[125,92,'abajur'],[127,92,'estante'],[130,92,'tv'],[131,92,'tv'],[130,94,'sofa'],[131,94,'sofa'],[134,92,'geladeira'],[135,92,'fogao'],[136,92,'pia'],[137,92,'geladeira'],[123,96,'mesa'],[134,96,'mesa'],[121,98,'planta'],[138,98,'planta'],[127,95,'planta']]}};
+for(const R of Object.values(SALAS)){for(let y=R.y0-1;y<=R.y1+1;y++)for(let x=R.x0-1;x<=R.x1+1;x++)setTile(x,y,(x<R.x0||x>R.x1||y<R.y0||y>R.y1)?G.BLD:G.FLOOR);setTile(R.porta[0],R.porta[1],G.FLOOR);for(const [x,y] of R.moveis)setTile(x,y,G.BLD)}
+const salaDe=b=>SALAS[b.kind==='mansao'?'mansao':'casa'];
 // mata fechada: árvores de verdade em cima do verde (sprite em cache, sem balanço)
 const MATA=new Map();
 for(let y=-MY;y<H+MY;y++){const row=[];for(let x=-MX;x<W+MX;x++){if(tileAt(x,y)!==G.FOREST)continue;const h=hsh(x,y,31);if(h>.62)continue;row.push({x:(x+.2+hsh(x,y,32)*.6)*TILE,y:(y+.3+hsh(x,y,33)*.6)*TILE,s:1.25+hsh(x,y,34)*.6,c:h<.1?3:h<.3?1:h<.5?2:0,v:Math.floor(hsh(x,y,35)*3)})}if(row.length)MATA.set(y,row)}
@@ -2848,7 +2855,7 @@ function efeitoBebado(){
   if(bk>.4){ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=.2*bk;ctx.drawImage(cv,Math.sin(now*1.3)*8*bk*dpr,Math.cos(now*1.1)*3*bk*dpr);ctx.globalAlpha=1}}
  else if(cv.dataset.beb){cv.style.filter='';cv.style.transform='';delete cv.dataset.beb}
 }
-function sobTeto(){return !!eu&&(emCasa||!!casaEm(eu.x,eu.y)||(eu.x>T(18)&&eu.x<T(30)&&eu.y>T(17.5)&&eu.y<T(26.4)))}
+function sobTeto(){return !!eu&&(emCasa||!!eu.rm||!!casaEm(eu.x,eu.y)||(eu.x>T(18)&&eu.x<T(30)&&eu.y>T(17.5)&&eu.y<T(26.4)))}
 function drawPocas(vx0,vy0,vx1,vy1){if(!(chuva>.05&&cam.z>.5)||sobTeto())return;const tx0=Math.floor(vx0/TILE),tx1=Math.ceil(vx1/TILE),ty0=Math.floor(vy0/TILE),ty1=Math.ceil(vy1/TILE);
   for(let y=ty0;y<=ty1;y++)for(let x=tx0;x<=tx1;x++){const t=tileAt(x,y);if(t!==G.ROAD&&t!==G.WALK&&t!==G.PLAZA)continue;const h=hsh(x,y,77);if(h>.22)continue;
    const px=(x+.2+hsh(x,y,78)*.6)*TILE,py=(y+.3+hsh(x,y,79)*.5)*TILE,rx=(6+h*40)*Math.min(1,chuva*1.4),ry=rx*.42;
@@ -2861,13 +2868,14 @@ function drawCena(){
  setWorld(ctx);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
  const q4=[toWorld(-60,-60),toWorld(cw+60,-60),toWorld(-60,ch+120),toWorld(cw+60,ch+120)],vx0=Math.min(...q4.map(q=>q[0])),vx1=Math.max(...q4.map(q=>q[0])),vy0=Math.min(...q4.map(q=>q[1])),vy1=Math.max(...q4.map(q=>q[1]));
  drawGround(vx0,vy0,vx1,vy1);
+ const SALA=eu&&eu.rm?eu.rm.R:null;if(SALA)drawSalaChao(SALA);
  const barVis=(()=>{const a=toScreen(T(24),T(22));return a[0]>-700*cam.z&&a[0]<cw+700*cam.z&&a[1]>-500*cam.z&&a[1]<ch+500*cam.z})();
  const BARA=barVis?artDe('bar',T(16),T(15)-12,T(17),T(14.5)+12,c=>paintBar(c)):null;
  if(BARA){ctx.save();ctx.beginPath();ctx.rect(T(16),T(18),T(17),T(12));ctx.clip();ctx.drawImage(BARA.cv,BARA.x0,BARA.y0,BARA.w,BARA.h);ctx.restore()}
  const minhaC=(window.__casa!=null?houses[window.__casa]:null)||(eu&&!eu.hidden?casaEm(eu.x,eu.y):null);if(minhaC)drawInterior(ctx,minhaC);
  drawPocas(vx0,vy0,vx1,vy1);
  desenhaBrilhos(ctx);
- const plist=[];if(eu&&!eu.hidden)plist.push(eu);for(const o of others.values())if(o.seen&&!o.hidden){const oc=casaEm(o.x,o.y);if(!oc||oc===minhaC)plist.push(o)}
+ const plist=[];if(eu&&!eu.hidden)plist.push(eu);for(const o of others.values())if(o.seen&&!o.hidden&&salaKey(o)===salaKey(eu)){const oc=casaEm(o.x,o.y);if(!oc||oc===minhaC)plist.push(o)}
  const vis=(x,y)=>{const q=toScreen(x,y);return q[0]>-90&&q[0]<cw+90&&q[1]>-70&&q[1]<ch+130};
  ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=1.2;
  for(let i=0;i<95;i++){const x=WX0+((i*173+now*14)%(MW+60))-30,y=T(53.3)+((i*47)%112);if(!vis(x,y))continue;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+10,y);ctx.stroke()}
@@ -2934,9 +2942,10 @@ function drawCena(){
  {const a=msAlvo();if(a&&a.seta){list.push({x:a.x,y:a.y,k:1e9,f:()=>drawEntrega(ctx,a)});list.push({x:eu.x,y:eu.y,k:1e9+1,f:()=>drawSetaPe(ctx,a)})}}
  {const px=T(111.5)+Math.cos(now*.25)*58,py=T(67.6)+Math.sin(now*.25)*28;if(vis(px,py))list.push({x:px,y:py,f:()=>{ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(px,py-4,11,5,0,0,7);ctx.fill();ctx.beginPath();ctx.arc(px+(Math.sin(now*.25)>0?-8:8),py-12,3,0,7);ctx.fill();ctx.fillRect(px+(Math.sin(now*.25)>0?-9:7),py-12,2.4,8);ctx.fillStyle='#f39c12';ctx.fillRect(px+(Math.sin(now*.25)>0?-13:10),py-13,3,1.6)}})}
  if(marker&&now-marker.t<1.1&&vis(marker.x,marker.y)){const k=(now-marker.t)/1.1;ctx.strokeStyle=`rgba(255,201,74,${1-k})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(marker.x,marker.y,6+k*10,2.5+k*4,0,0,7);ctx.stroke()}
+ if(SALA){const ax=T(SALA.x0)-4,bx=T(SALA.x1+1)+4,ay=T(SALA.y0)-4,by=T(SALA.y1+2);for(let i=list.length-1;i>=0;i--){const o=list[i];if(!(o.x>=ax&&o.x<=bx&&o.y>=ay&&o.y<=by))list.splice(i,1)}salaItens(list,SALA)}
  for(const o of list)if(o.k==null)o.k=o.x+o.y;
  list.sort((a,b)=>a.k-b.k).forEach(o=>{if(o.cam)setCam(ctx);else if(o.w!=null)wallSet(ctx,o.w);else if(o.g)setWorld(ctx);else bbSet(ctx,o.x,o.y);o.f()});setWorld(ctx);
- {const dtF=Math.min(.1,now-(drawCena._t||now));drawCena._t=now;drawFolhas(ctx,vx0,vy0,vx1,vy1,dtF)}
+ {const dtF=Math.min(.1,now-(drawCena._t||now));drawCena._t=now;if(!SALA)drawFolhas(ctx,vx0,vy0,vx1,vy1,dtF)}
  ctx.strokeStyle='#2a1a14';ctx.lineWidth=.8;bulbsLines.forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.quadraticCurveTo((a[0]+b[0])/2,(a[1]+b[1])/2+24,b[0],b[1]);ctx.stroke()});
  const d=darkness();
  if(d>.01){
@@ -3775,6 +3784,23 @@ function fimTurno(){eu.giro=false;clearInterval(giroT);$('workGiro').classList.a
  if(trabalho&&trabalho.job==='bar'){eu.x=T(22.5);eu.y=T(20.9)}
  trabalho=null;fecharTarefa();eu.hidden=false;eu.apron=false;eu.beer=false;eu.fish=false;eu.path=[];$('work').classList.add('hidden');sendPos(true);
 }
+function entrarSala(b){const R=salaDe(b);eu.rm={n:b.n,b,R};eu.path=[];eu.onArrive=null;eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7);eu.dir=1;follow=eu;eu._zoomAntes=cam.z;cam.z=Math.max(cam.z,1.5);cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');closeCard();sendPos(true);
+ const i=casasInfo.get(b.n)||{};toast('🏠 '+(i.nome?'Casa de '+i.nome:(b.kind==='mansao'?'Mansão ':'Casa ')+b.n)+' · para sair, ande até a porta.',2500)}
+function sairSala(){const b=eu.rm.b;eu.rm=null;eu.path=[];eu.onArrive=null;eu.x=T(b.front[0]+.5);eu.y=T(b.front[1]+.6);follow=eu;if(eu._zoomAntes)cam.z=eu._zoomAntes;cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');sendPos(true)}
+let salaFade=0;
+setInterval(()=>{if(!eu||eu.driving||eu.hidden)return;if(!eu.rm){const b=casaEm(eu.x,eu.y);if(b&&!b.loja&&!b.off&&houses.includes(b))entrarSala(b)}else if(Math.floor(eu.x/TILE)===eu.rm.R.porta[0]&&Math.floor(eu.y/TILE)===eu.rm.R.porta[1])sairSala()},120);
+const salaKey=p=>p===eu?(eu.rm?'c'+eu.rm.n:0):(p.rm||0);
+function drawSalaChao(R){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#120c10';ctx.fillRect(0,0,cv.width,cv.height);setWorld(ctx);
+ for(let y=R.y0;y<=R.y1;y++)for(let x=R.x0;x<=R.x1;x++){for(let k=0;k<2;k++){ctx.fillStyle=R.piso[(x*2+k+y)%2];ctx.fillRect(T(x)+k*16,T(y),16,TILE)}}
+ ctx.strokeStyle='rgba(0,0,0,.15)';ctx.lineWidth=1;for(let y=R.y0;y<=R.y1+1;y++){ctx.beginPath();ctx.moveTo(T(R.x0),T(y));ctx.lineTo(T(R.x1+1),T(y));ctx.stroke()}
+ const [px,py]=R.porta;ctx.fillStyle='#8a3b3b';ctx.fillRect(T(px)-6,T(py)-12,TILE+12,14);ctx.fillStyle='#3a2414';ctx.fillRect(T(px),T(py),TILE,TILE*.5)}
+function salaItens(list,R){const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(R.y0),Y1=T(R.y1+1);
+ for(let x=R.x0;x<=R.x1;x++)list.push({x:T(x+.5),y:Y0,k:T(x+.5)+Y0-30,cam:1,f:()=>{isoBox(ctx,T(x),Y0-6,T(x+1),Y0,0,H,cor);if(x%3===1){const a=isoP(T(x)+6,Y0),b=isoP(T(x+1)-6,Y0);ctx.fillStyle=darkness()>.3?'#ffd98a':'#9fd3f2';ctx.beginPath();ctx.moveTo(a[0],a[1]-26);ctx.lineTo(b[0],b[1]-26);ctx.lineTo(b[0],b[1]-50);ctx.lineTo(a[0],a[1]-50);ctx.fill()}}});
+ for(let y=R.y0;y<=R.y1;y++)list.push({x:X0,y:T(y+.5),k:X0+T(y+.5)-30,cam:1,f:()=>isoBox(ctx,X0-6,T(y),X0,T(y+1),0,H,shade(cor,-8))});
+ for(let x=R.x0;x<=R.x1;x++)if(x!==R.porta[0])list.push({x:T(x+.5),y:Y1,k:T(x+.5)+Y1+6,cam:1,f:()=>isoBox(ctx,T(x),Y1,T(x+1),Y1+6,0,12,shade(cor,-15))});
+ for(let y=R.y0;y<=R.y1;y++)list.push({x:X1,y:T(y+.5),k:X1+T(y+.5)+6,cam:1,f:()=>isoBox(ctx,X1,T(y),X1+6,T(y+1),0,12,shade(cor,-15))});
+ for(const [mx,my,t] of R.moveis)list.push({x:T(mx)+16,y:T(my)+16,cam:1,f:()=>movelIso(ctx,t,T(mx),T(my))});
+ {const i=casasInfo.get(eu.rm.n)||{},tt=(i.nome?'🏠 Casa de '+i.nome:(eu.rm.b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+eu.rm.n);list.push({x:X0,y:Y0,k:-1e9,cam:1,f:()=>{const a=isoP((X0+X1)/2,Y0);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#2a1a14';ctx.strokeText(tt,a[0],a[1]-H-10);ctx.fillStyle='#fff';ctx.fillText(tt,a[0],a[1]-H-10);ctx.textAlign='left'}})}}
 function entrarCasa(b){Som.play('porta');closePlace();emCasa=true;eu.hidden=true;$('workTxt').textContent=`🛋️ Descansando na ${b.kind==='mansao'?'mansão':'casa'} ${b.n}. Ninguém te vê aqui dentro.`;$('workBar').style.width='0';$('workStop').textContent='🚪 Sair de casa';$('work').classList.remove('hidden');sendPos(true)}
 function trocarPorta(b,a){acao(async()=>{await api.porta(b.n,a);portas.set(b.n,a);Som.play('porta');toast(a?'🔓 Porta aberta: qualquer um pode entrar.':'🔒 Porta trancada: só você entra.',2500)})}
 function sairCasa(){emCasa=false;eu.hidden=false;$('work').classList.add('hidden');sendPos(true)}
@@ -3833,7 +3859,7 @@ function aplicarRemoto(p){
 let lastSent=0,lastKey='';
 function sendPos(force){
  if(!canal||!eu)return;const t=performance.now();if(!force&&t-lastSent<220)return;
- const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:eu.giro?1:0,i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0};
+ const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:eu.giro?1:0,i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0,rm:eu.rm?'c'+eu.rm.n:0};
  const key=JSON.stringify(p);if(!force&&key===lastKey&&t-lastSent<4000)return;
  lastKey=key;lastSent=t;canal.send({type:'broadcast',event:'pos',payload:p}).catch(()=>{});
 }
@@ -3841,7 +3867,7 @@ function onPos(p){
  if(!p||typeof p.i!=='string')return;const o=others.get(p.i);if(!o)return;
  const x=clamp(+p.x||0,WX0,WX1),y=clamp(+p.y||0,WY0,WY1);
  if(!o.seen){o.x=x;o.y=y;o.seen=true}
- o.tx=x;o.ty=y;o.giro=!!p.gf;o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));
+ o.tx=x;o.ty=y;o.giro=!!p.gf;o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c\d+$/.test(p.rm)?p.rm:0;
 }
 function emitEv(k,data){if(canal&&eu)canal.send({type:'broadcast',event:'ev',payload:Object.assign({i:eu.id,k},data)}).catch(()=>{})}
 function onEv(p){
@@ -4385,7 +4411,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116k';
+const VERSAO_JOGO='v20261116l';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
