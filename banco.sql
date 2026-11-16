@@ -1693,23 +1693,26 @@ insert into public.trabalhos(id, nome, salario, duracao, nivel_min, xp, fome) va
 on conflict (id) do update set nome = excluded.nome, salario = excluded.salario, duracao = excluded.duracao,
   nivel_min = excluded.nivel_min, xp = excluded.xp, fome = excluded.fome;
 
--- ===== ETAPA D: casas vazias, loja de móveis e geladeira =====
--- Cada casa guarda os móveis colocados (tipo, x, y, andar) e o que tem na geladeira.
+-- ===== ETAPA D: casas vazias, loja de móveis (com giro) e geladeira =====
+-- Cada casa guarda os móveis colocados (tipo, x, y, andar, giro) e o que tem na geladeira.
 alter table public.casas add column if not exists moveis jsonb not null default '[]'::jsonb;
 alter table public.casas add column if not exists geladeira jsonb not null default '{}'::jsonb;
+drop function if exists public.comprar_movel(text, integer, integer, integer);
+drop function if exists public.mexer_movel(integer, integer, integer, boolean);
 
 -- Preços dos móveis (dinheiro do jogo). O preço vale aqui, não no jogo.
 create or replace function public.preco_movel(p_tipo text) returns integer
 language sql immutable as $$
   select case p_tipo
-    when 'caixote' then 80 when 'cadeira' then 150 when 'planta' then 200 when 'colchao' then 300
-    when 'abajur' then 350 when 'mesa' then 600 when 'pia' then 800 when 'estante' then 900
-    when 'fogao' then 1200 when 'sofa' then 1500 when 'geladeira' then 1800 when 'tv' then 2000
-    when 'cama' then 2500 when 'somcx' then 3000 when 'led' then 4000 when 'aquario' then 6000
-    when 'homet' then 8000 when 'jukebox' then 12000 else null end
+    when 'caixote' then 80 when 'cadeira' then 150 when 'planta' then 250 when 'colchao' then 300
+    when 'tapete' then 400 when 'abajur' then 350 when 'criado' then 450 when 'mesinha' then 500
+    when 'mesa' then 900 when 'pia' then 1100 when 'estante' then 1200 when 'fogao' then 1300
+    when 'poltrona' then 1400 when 'armario' then 1600 when 'geladeira' then 1800 when 'sofa' then 2200
+    when 'tv' then 2500 when 'cama' then 3000 when 'somcx' then 3000 when 'led' then 2000
+    when 'aquario' then 6000 when 'homet' then 9000 when 'jukebox' then 12000 else null end
 $$;
 
-create or replace function public.comprar_movel(p_tipo text, p_x integer, p_y integer, p_andar integer) returns json
+create or replace function public.comprar_movel(p_tipo text, p_x integer, p_y integer, p_andar integer, p_r integer) returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; c public.casas; pr integer;
 begin
@@ -1718,35 +1721,30 @@ begin
   if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
   pr := preco_movel(p_tipo);
   if pr is null then raise exception 'Móvel inválido.'; end if;
-  if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_andar not in (0, 1) then raise exception 'Lugar inválido.'; end if;
-  if jsonb_array_length(c.moveis) >= 60 then raise exception 'Sua casa já tem móveis demais (máximo 60).'; end if;
-  if exists (select 1 from jsonb_array_elements(c.moveis) e where (e->>'x')::int = p_x and (e->>'y')::int = p_y and (e->>'a')::int = p_andar) then
-    raise exception 'Já tem um móvel nesse lugar.'; end if;
+  if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_andar not in (0, 1) or p_r not between 0 and 3 then raise exception 'Lugar inválido.'; end if;
+  if jsonb_array_length(c.moveis) >= 80 then raise exception 'Sua casa já tem móveis demais (máximo 80).'; end if;
   if m.dinheiro < pr then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', pr; end if;
   update moradores set dinheiro = dinheiro - pr where id = m.id;
-  update casas set moveis = moveis || jsonb_build_array(jsonb_build_object('t', p_tipo, 'x', p_x, 'y', p_y, 'a', p_andar)) where id = c.id;
+  update casas set moveis = moveis || jsonb_build_array(jsonb_build_object('t', p_tipo, 'x', p_x, 'y', p_y, 'a', p_andar, 'r', p_r)) where id = c.id;
   return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
 end $$;
 
--- Mover um móvel (de graça) ou vender de volta (devolve metade do preço)
-create or replace function public.mexer_movel(p_i integer, p_x integer, p_y integer, p_vender boolean) returns json
+-- Mover/girar um móvel (de graça) ou vender de volta (devolve metade do preço)
+create or replace function public.mexer_movel(p_i integer, p_x integer, p_y integer, p_r integer, p_vender boolean) returns json
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores; c public.casas; e jsonb; a integer;
+declare m public.moradores; c public.casas; e jsonb;
 begin
   m := _eu();
   select * into c from casas where dono = m.id;
   if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
   if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
-  e := c.moveis -> p_i; a := (e->>'a')::int;
+  e := c.moveis -> p_i;
   if p_vender then
     update moradores set dinheiro = dinheiro + coalesce(preco_movel(e->>'t'), 0) / 2 where id = m.id;
     update casas set moveis = moveis - p_i where id = c.id;
   else
-    if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 then raise exception 'Lugar inválido.'; end if;
-    if exists (select 1 from jsonb_array_elements(c.moveis) with ordinality q(v, k)
-               where k - 1 <> p_i and (v->>'x')::int = p_x and (v->>'y')::int = p_y and (v->>'a')::int = a) then
-      raise exception 'Já tem um móvel nesse lugar.'; end if;
-    update casas set moveis = jsonb_set(moveis, array[p_i::text], e || jsonb_build_object('x', p_x, 'y', p_y)) where id = c.id;
+    if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_r not between 0 and 3 then raise exception 'Lugar inválido.'; end if;
+    update casas set moveis = jsonb_set(moveis, array[p_i::text], e || jsonb_build_object('x', p_x, 'y', p_y, 'r', p_r)) where id = c.id;
   end if;
   return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
 end $$;
@@ -1778,6 +1776,6 @@ begin
   return json_build_object('geladeira', (select geladeira from casas where id = c.id), 'mochila', (select mochila from moradores where id = m.id), 'eu', _estado(m.id));
 end $$;
 
-grant execute on function public.comprar_movel(text, integer, integer, integer) to authenticated;
-grant execute on function public.mexer_movel(integer, integer, integer, boolean) to authenticated;
+grant execute on function public.comprar_movel(text, integer, integer, integer, integer) to authenticated;
+grant execute on function public.mexer_movel(integer, integer, integer, integer, boolean) to authenticated;
 grant execute on function public.geladeira(text, boolean) to authenticated;
