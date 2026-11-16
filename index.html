@@ -3800,7 +3800,7 @@ function abrirLugar(b){
 function closePlace(){$('place').classList.add('hidden');lugarAtual=null}
 $('placeX').onclick=closePlace;
 const EMOTES=['🔥','😎','💸','🍻','👑','😂','🥳','❤️','👋','🤠'];
-const NOMES_MUS=['O Campeão','Charrete','Futilidades Entre Nós','Forró do Dragão','Festa Boa'];
+const NOMES_MUS=['O Campeão','Charrete','Futilidades Entre Nós'];
 function confirmar(titulo,texto,sim,ops){$('confT').textContent=titulo;$('confP').innerHTML=texto;const box=$('confOps');box.innerHTML='';
  $('confSim').classList.toggle('hidden',!!ops);(ops||[]).forEach(([t,fn])=>{const b=document.createElement('button');b.className='btn';b.textContent=t;b.onclick=()=>{$('mConf').classList.add('hidden');fn()};box.appendChild(b)});
  $('confSim').onclick=()=>{$('mConf').classList.add('hidden');sim&&sim()};$('confNao').onclick=()=>$('mConf').classList.add('hidden');$('mConf').classList.remove('hidden')}
@@ -4422,7 +4422,7 @@ const Som=(()=>{
  }
  function loopMus(){musTick();setTimeout(loopMus,60000/PIS[pv].bpm/4)}
  // músicas de verdade (pasta "musicas" ao lado do index.html); se não carregarem, toca a batida sintetizada
- const FAIXAS=['o-campeao','charrete','futilidades-entre-nos','forro-do-dragao','festa-boa'].map(n=>'musicas/'+n+'.mp3');
+ const FAIXAS=['o-campeao','charrete','futilidades-entre-nos'].map(n=>'musicas/'+n+'.mp3');
  let player=null,fila=[],falhas=0,sintetico=false,jukeG=null,tocando=false;
  // som de proximidade: a música sai da jukebox do bar; perto = alto, longe = some
  let somPerto=0;
