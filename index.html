@@ -3085,7 +3085,7 @@ function drawPocas(vx0,vy0,vx1,vy1){if(!(chuva>.05&&cam.z>.5)||sobTeto())return;
 }
 function drawCena(){
  ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#2b1a20';ctx.fillRect(0,0,cv.width,cv.height);
- setWorld(ctx);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+ setWorld(ctx);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='low';
  const q4=[toWorld(-60,-60),toWorld(cw+60,-60),toWorld(-60,ch+120),toWorld(cw+60,ch+120)],vx0=Math.min(...q4.map(q=>q[0])),vx1=Math.max(...q4.map(q=>q[0])),vy0=Math.min(...q4.map(q=>q[1])),vy1=Math.max(...q4.map(q=>q[1]));
  drawGround(vx0,vy0,vx1,vy1);
  const SALA=eu&&eu.rm?eu.rm.R:null;SALA_ON=!!SALA;if(SALA)drawSalaChao(SALA);
@@ -4992,7 +4992,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261121e';
+const VERSAO_JOGO='v20261122a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
