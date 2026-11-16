@@ -2283,6 +2283,7 @@ const SALAS={casa:{x0:123,y0:82,x1:132,y1:89,porta:[127,90],parede:'#efe2c8',pis
  mansao:{x0:121,y0:92,x1:138,y1:98,porta:[129,99],esc:{x0:137,y0:92,x1:138,y1:95},parede:'#f4ead8',piso:['#d8c7a8','#cdb995']},
  mansao2:{x0:-19,y0:92,x1:-2,y1:98,porta:null,esc:{x0:-3,y0:92,x1:-2,y1:95},parede:'#e8eef4',piso:['#c9b08a','#bfa47c'],cima:1}};
 for(const R of Object.values(SALAS)){for(let y=R.y0-1;y<=R.y1+1;y++)for(let x=R.x0-1;x<=R.x1+1;x++)setTile(x,y,(x<R.x0||x>R.x1||y<R.y0||y>R.y1)?G.BLD:G.FLOOR);if(R.porta)setTile(R.porta[0],R.porta[1],G.FLOOR)}
+const movAqui=m=>!m.g&&(m.a|0)===((eu&&eu.rm&&eu.rm.andar)|0);
 const naEsc=(R,tx,ty)=>!!R.esc&&tx>=R.esc.x0&&tx<=R.esc.x1&&ty>=R.esc.y0&&ty<=R.esc.y1;
 const salaDe=(b,a)=>b.kind==='mansao'?(a?SALAS.mansao2:SALAS.mansao):SALAS.casa;
 // móveis da casa: guardados no banco (posição relativa à sala e andar)
@@ -2334,10 +2335,10 @@ function desenhaMovel(c,t,X,Y,r,m,alpha,cam){const D=MOV[t];if(!D)return;const [
  c.globalAlpha=1}
 
 function salaTiles(){if(!eu||!eu.rm)return;const R=eu.rm.R;for(let y=R.y0;y<=R.y1;y++)for(let x=R.x0;x<=R.x1;x++)setTile(x,y,G.FLOOR);if(R.esc&&R.cima)for(let y=R.esc.y0+1;y<=R.esc.y1;y++)for(let x=R.esc.x0;x<=R.esc.x1;x++)setTile(x,y,G.BLD);
- for(const m of (eu.rm.moveis||[])){if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t]||MOV[m.t].anda)continue;const [w,h]=movTam(m.t,m.r|0);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(R.x0+m.x+x<=R.x1&&R.y0+m.y+y<=R.y1)setTile(R.x0+m.x+x,R.y0+m.y+y,G.BLD)}}
+ for(const m of (eu.rm.moveis||[])){if(!movAqui(m)||!MOV[m.t]||MOV[m.t].anda)continue;const [w,h]=movTam(m.t,m.r|0);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(R.x0+m.x+x<=R.x1&&R.y0+m.y+y<=R.y1)setTile(R.x0+m.x+x,R.y0+m.y+y,G.BLD)}}
 function movLivre(t,r,x,y,ign){const R=eu.rm.R,[w,h]=movTam(t,r),an=MOV[t].anda;if(x<0||y<0||R.x0+x+w-1>R.x1||R.y0+y+h-1>R.y1)return false;
  for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){const tx=R.x0+x+xx,ty=R.y0+y+yy;if(naEsc(R,tx,ty))return false;if(R.porta&&tx===R.porta[0]&&ty===R.porta[1]-1)return false;if(!an&&Math.floor(eu.x/TILE)===tx&&Math.floor(eu.y/TILE)===ty)return false}
- return !(eu.rm.moveis||[]).some((m,k)=>{if(k===ign||(m.a|0)!==(eu.rm.andar|0)||!MOV[m.t])return false;if(an!==!!MOV[m.t].anda)return false;const [w2,h2]=movTam(m.t,m.r|0);return x<m.x+w2&&m.x<x+w&&y<m.y+h2&&m.y<y+h})}
+ return !(eu.rm.moveis||[]).some((m,k)=>{if(k===ign||!movAqui(m)||!MOV[m.t])return false;if(an!==!!MOV[m.t].anda)return false;const [w2,h2]=movTam(m.t,m.r|0);return x<m.x+w2&&m.x<x+w&&y<m.y+h2&&m.y<y+h})}
 async function carregaMoveis(){if(!eu||!eu.rm)return;const n=eu.rm.n;try{const c=await api.casa(n);if(eu.rm&&eu.rm.n===n){eu.rm.moveis=(c&&c.moveis)||[];eu.rm.geladeira=(c&&c.geladeira)||{};salaTiles()}}catch(e){}}
 // mata fechada: árvores de verdade em cima do verde (sprite em cache, sem balanço)
 const MATA=new Map();
@@ -3318,6 +3319,8 @@ const api=ONLINE?(()=>{
   comprarMovel:(t,x,y,a,r)=>rpc('comprar_movel',{p_tipo:t,p_x:x,p_y:y,p_andar:a,p_r:r}),
   mexerMovel:(i,x,y,r,v)=>rpc('mexer_movel',{p_i:i,p_x:x,p_y:y,p_r:r,p_vender:v}),
   geladeira:(it,g)=>rpc('geladeira',{p_item:it,p_guardar:g}),
+  guardarMovel:i=>rpc('guardar_movel',{p_i:i}),
+  colocarMovel:(i,x,y,r,a)=>rpc('colocar_movel',{p_i:i,p_x:x,p_y:y,p_r:r,p_andar:a}),
   usarPet:p=>rpc('usar_pet',{p_pet:p}),
   async pix(produto){const {data,error}=await sb.functions.invoke('pix',{body:{produto}});if(error){let m=error.message;try{const j=await error.context.json();m=j.erro||m}catch(_){}throw new Error(m)}if(data&&data.erro)throw new Error(data.erro);return data},
   async pedido(id){const {data,error}=await sb.functions.invoke('pix',{body:{verificar:id}});if(error)return null;return data},
@@ -3403,7 +3406,9 @@ const api=ONLINE?(()=>{
   async sairVaga(){L.vaga=null;lsave()},
    async casa(n){L.cm=L.cm||{};return L.cm[n]||{moveis:[],geladeira:{}}},
    async comprarMovel(t,x,y,a,r){const m=lme();if(!m.casa_id)fail('Você precisa ter uma casa.');const pr=(MOV[t]||{}).pr;if(!pr)fail('Móvel inválido.');L.cm=L.cm||{};const c=L.cm[m.casa_id]=L.cm[m.casa_id]||{moveis:[],geladeira:{}};if(m.dinheiro<pr)fail('Dinheiro insuficiente.');m.dinheiro-=pr;c.moveis.push({t,x,y,a,r});lsave();return{moveis:c.moveis,eu:lest()}},
-   async mexerMovel(i,x,y,r,v){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');if(v){m.dinheiro+=Math.floor((MOV[c.moveis[i].t]||{pr:0}).pr/2);c.moveis.splice(i,1)}else{c.moveis[i].x=x;c.moveis[i].y=y;c.moveis[i].r=r}lsave();return{moveis:c.moveis,eu:lest()}},
+   async mexerMovel(i,x,y,r,v){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');if(v){m.dinheiro+=Math.floor((MOV[c.moveis[i].t]||{pr:0}).pr/2);c.moveis.splice(i,1)}else{c.moveis[i].x=x;c.moveis[i].y=y;c.moveis[i].r=r;delete c.moveis[i].g}lsave();return{moveis:c.moveis,eu:lest()}},
+   async guardarMovel(i){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');c.moveis[i].g=true;lsave();return{moveis:c.moveis,eu:lest()}},
+   async colocarMovel(i,x,y,r,a){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis[i])fail('Móvel não encontrado.');Object.assign(c.moveis[i],{x,y,r,a});delete c.moveis[i].g;lsave();return{moveis:c.moveis,eu:lest()}},
    async geladeira(it,g){const m=lme(),c=(L.cm||{})[m.casa_id];if(!c||!c.moveis.some(e=>e.t==='geladeira'))fail('Sua casa não tem geladeira.');m.mochila=m.mochila||{};const q=m.mochila[it]|0,gq=c.geladeira[it]|0;if(g){if(q<=0)fail('Você não tem isso na mochila.');m.mochila[it]=q-1;if(!m.mochila[it])delete m.mochila[it];c.geladeira[it]=gq+1}else{if(gq<=0)fail('A geladeira não tem isso.');m.mochila[it]=q+1;c.geladeira[it]=gq-1;if(!c.geladeira[it])delete c.geladeira[it]}lsave();return{geladeira:c.geladeira,mochila:m.mochila,eu:lest()}},
   async comprarCasa(n){const m=lme(),b=houses[n-1];if(m.casa_id===n)fail('Essa casa já é sua.');if(b.preco>=90000&&m.nivel<MANSAO_NIVEL)fail(`Essa casa libera no nível ${MANSAO_NIVEL}.`);
    const volta=m.casa_id?Math.floor(houses[m.casa_id-1].preco/2):0;if(m.dinheiro+volta<b.preco)fail('Dinheiro insuficiente para essa casa.');
@@ -3888,21 +3893,21 @@ function salaItens(list,R){const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(
  if(R.esc){const E=R.esc,X0=T(E.x0),X1=T(E.x1+1);if(!R.cima){const n=8,st=T(E.y1-E.y0+1)/n;for(let k=0;k<n;k++){const y1=T(E.y1+1)-k*st,y0=y1-st,zh=(k+1)*7;list.push({x:(X0+X1)/2,y:y1,k:X0+y0-8,cam:1,f:()=>{isoBox(ctx,X0,y0,X1,y1,0,zh,k%2?'#b8b8b8':'#c9c9c9');isoBox(ctx,X1-3,y0,X1,y1,zh,zh+16,'#7a7a7a')}})}
   list.push({x:X0,y:T(E.y0),k:-1e9+1,cam:1,f:()=>{const a=isoP(X0+32,T(E.y0)+10);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.strokeStyle='#2a1a14';ctx.lineWidth=3;ctx.strokeText('⬆️ subir',a[0],a[1]-72);ctx.fillText('⬆️ subir',a[0],a[1]-72);ctx.textAlign='left'}})}
  else for(const [ax,ay,bx,by] of [[X0,T(E.y1+1),X1,T(E.y1+1)+3],[X1,T(E.y0+1),X1+3,T(E.y1+1)]])list.push({x:(ax+bx)/2,y:(ay+by)/2,k:ax+ay+10,cam:1,f:()=>{isoBox(ctx,ax,ay,bx,by,0,26,'#8a8f96');isoBox(ctx,ax-1,ay-1,bx+1,by+1,26,29,'#5a4030')}})}
- (eu.rm.moveis||[]).forEach((m,k)=>{if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t]||(MOB.modo==='mover'&&MOB.i===k))return;const [w,h]=movTam(m.t,m.r|0),X=T(R.x0+m.x),Y=T(R.y0+m.y);const sen=MOV[m.t].senta;list.push({x:X+w*16,y:Y+h*16,k:MOV[m.t].anda&&m.t!=='porta'?-1e8:X+Y+(w+h)*16,cam:1,f:()=>{desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,sen?'tras':null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f')}});if(sen)list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*32-4,cam:1,f:()=>desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,'frente')})});
+ (eu.rm.moveis||[]).forEach((m,k)=>{if(!movAqui(m)||!MOV[m.t]||(MOB.modo==='mover'&&MOB.i===k))return;const [w,h]=movTam(m.t,m.r|0),X=T(R.x0+m.x),Y=T(R.y0+m.y);const sen=MOV[m.t].senta;list.push({x:X+w*16,y:Y+h*16,k:MOV[m.t].anda&&m.t!=='porta'?-1e8:X+Y+(w+h)*16,cam:1,f:()=>{const pa=(m.t==='parede'||m.t==='porta')&&eu.x+eu.y<X+Y+(w+h)*16+8&&Math.hypot(eu.x-X-w*16,eu.y-Y-h*16)<T(4.5);desenhaMovel(ctx,m.t,X,Y,m.r|0,m,pa?.28:null,sen?'tras':null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f')}});if(sen)list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*32-4,cam:1,f:()=>desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,'frente')})});
  if(MOB.modo==='novo'||MOB.modo==='mover'){const [w,h]=movTam(MOB.t,MOB.r),X=T(R.x0+MOB.x),Y=T(R.y0+MOB.y),ok=movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.modo==='mover'?MOB.i:-1);list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*16+5,cam:1,f:()=>{movMoldura(X,Y,w,h,ok?'#5dff7a':'#ff5a5a');desenhaMovel(ctx,MOB.t,X,Y,MOB.r,null,.72)}})}
  {const i=casasInfo.get(eu.rm.n)||{},tt=(i.nome?'🏠 Casa de '+i.nome:(eu.rm.b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+eu.rm.n);list.push({x:X0,y:Y0,k:-1e9,cam:1,f:()=>{const a=isoP((X0+X1)/2,Y0);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#2a1a14';ctx.strokeText(tt,a[0],a[1]-H-10);ctx.fillStyle='#fff';ctx.fillText(tt,a[0],a[1]-H-10);ctx.textAlign='left'}})}}
 function levantarCasa(){if(!eu||!eu.casaAcao)return;eu.casaAcao=null;eu.sv=0;eu.sit=false;eu.deitado=0;eu.mz=0;eu.frente=false;eu.back=false;eu.vendoTV=null;const n=nearestWalk(Math.floor(eu.x/TILE),Math.floor(eu.y/TILE),walkP);if(n){eu.x=T(n[0]+.5);eu.y=T(n[1]+.5)}sendPos(true)}
 const MOB={ativo:false,modo:null};
 const FRENTE=[[0,1],[1,0],[0,-1],[-1,0]],CABECA=[[0,-1],[-1,0],[0,1],[1,0]];
 function lieDe(t,r){const D=MOV[t],[dx,dy]=CABECA[r&3],sx=(dx-dy)*IA,sy=(dx+dy)*IB;return{ang:Math.atan2(sx,-sy),z:D.deita||10}}
-function movPerto(){const R=eu.rm.R;let best=null,bd=T(1.4);(eu.rm.moveis||[]).forEach((m,k)=>{if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t])return;const [w,h]=movTam(m.t,m.r|0),x0=T(R.x0+m.x),y0=T(R.y0+m.y),qx=Math.max(x0,Math.min(eu.x,x0+w*32)),qy=Math.max(y0,Math.min(eu.y,y0+h*32)),d=Math.hypot(eu.x-qx,eu.y-qy);if(d<bd){bd=d;best=m}});return best}
+function movPerto(){const R=eu.rm.R;let best=null,bd=T(1.4);(eu.rm.moveis||[]).forEach((m,k)=>{if(!movAqui(m)||!MOV[m.t])return;const [w,h]=movTam(m.t,m.r|0),x0=T(R.x0+m.x),y0=T(R.y0+m.y),qx=Math.max(x0,Math.min(eu.x,x0+w*32)),qy=Math.max(y0,Math.min(eu.y,y0+h*32)),d=Math.hypot(eu.x-qx,eu.y-qy);if(d<bd){bd=d;best=m}});return best}
 function noMovel(m,tipo,fala){const R=eu.rm.R,[w,h]=movTam(m.t,m.r|0),X=T(R.x0+m.x),Y=T(R.y0+m.y),r=m.r|0;levantarCasa();eu.path=[];eu.onArrive=null;eu.casaAcao=tipo;
  if(tipo==='cama'){const [dx,dy]=CABECA[r];eu.x=X+w*16-dx*38;eu.y=Y+h*16-dy*38;eu.deitado=1+r+(m.t==='colchao'?4:0);eu.sit=false}
  else if(tipo==='sofa'){const [fx,fy]=FRENTE[r];let tx=Math.max(0,Math.min(w-1,Math.floor((eu.x-X)/32))),ty=Math.max(0,Math.min(h-1,Math.floor((eu.y-Y)/32)));eu.x=X+tx*32+16-fx*4;eu.y=Y+ty*32+16-fy*4;eu.sit=true;eu.mz=m.t==='cadeira'?17:m.t==='caixote'?17:18;const sx=(fx-fy)*IA,sy=(fx+fy)*IB;eu.sv=sy>0?1:2;eu.frente=false;eu.back=sy<=0;eu.dir=sx>=0?1:-1}
  else if(tipo==='tv'){eu.vendoTV=m}
  say(eu,fala,3,true);sendPos(true)}
 function acaoDe(m){const D=MOV[m.t];if(D.deita)return()=>noMovel(m,'cama','💤 Hora de dormir…');if(D.senta)return()=>noMovel(m,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']));if(D.tv)return()=>noMovel(m,'tv','📺 Bora ver TV!');if(D.gel)return()=>((casasInfo.get(eu.rm.n)||{}).dono===eu.id?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000));return null}
-function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Math.floor(wy/TILE)-R.y0;let m=null;for(const q of (eu.rm.moveis||[])){if((q.a|0)!==(eu.rm.andar|0)||!MOV[q.t]||MOV[q.t].anda)continue;const [w,h]=movTam(q.t,q.r|0);if(tx>=q.x&&tx<q.x+w&&ty>=q.y&&ty<q.y+h){m=q;break}}
+function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Math.floor(wy/TILE)-R.y0;let m=null;for(const q of (eu.rm.moveis||[])){if(!movAqui(q)||!MOV[q.t]||MOV[q.t].anda)continue;const [w,h]=movTam(q.t,q.r|0);if(tx>=q.x&&tx<q.x+w&&ty>=q.y&&ty<q.y+h){m=q;break}}
  if(!m)return false;const fn=acaoDe(m);if(!fn)return false;const [w,h]=movTam(m.t,m.r|0);let best=null,bd=1e9;for(let y=m.y-1;y<=m.y+h;y++)for(let x=m.x-1;x<=m.x+w;x++){if(x>=m.x&&x<m.x+w&&y>=m.y&&y<m.y+h)continue;const ax=R.x0+x,ay=R.y0+y;if(!walkP(ax,ay))continue;const d=Math.hypot(T(ax+.5)-wx,T(ay+.5)-wy);if(d<bd){bd=d;best=[ax,ay]}}
  if(!best){toast('Não dá para chegar nesse móvel.',1800);return true}irPara(T(best[0]+.5),T(best[1]+.5),fn);return true}
 function salaOpcoes(){const o=[],dono=(casasInfo.get(eu.rm.n)||{}).dono===eu.id;if(MOB.ativo)return[];
@@ -3928,24 +3933,26 @@ function isoBoxG(c,x0,y0,x1,y1,z0,z1,col){const A=isoP(x0,y1),Bq=isoP(x1,y1),C=i
 function abrirMobilia(){if(!eu||!eu.rm)return;levantarCasa();mobUI();MOB.ativo=true;MOB.modo=null;eu.path=[];follow=null;pertoKey='';$('perto').classList.add('hidden');mobBar();renderSheet();$('mobSheet').classList.remove('hidden')}
 function fecharMob(){MOB.ativo=false;follow=eu;MOB.modo=null;$('mobSheet').classList.add('hidden');$('mobBar').classList.add('hidden');pertoKey=''}
 function renderSheet(){const tb=$('mobTabs'),gr=$('mobGrid');tb.innerHTML='';MOB_CATS.forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.className=k===mobCat?'on':'';b.onclick=()=>{mobCat=k;renderSheet()};tb.appendChild(b)});gr.innerHTML='';
- if(mobCat==='meus'){const L2=(eu.rm.moveis||[]).map((m,i)=>[m,i]).filter(([m])=>(m.a|0)===(eu.rm.andar|0)&&MOV[m.t]);if(!L2.length){gr.innerHTML='<div style="grid-column:1/-1;opacity:.7;padding:10px">Nenhum móvel neste andar ainda.</div>';return}
+ if(mobCat==='meus'){const INV=(eu.rm.moveis||[]).map((m,i)=>[m,i]).filter(([m])=>m.g&&MOV[m.t]);if(INV.length){gr.insertAdjacentHTML('beforeend','<div style="grid-column:1/-1;color:#ffd23f;font-weight:700">📦 Inventário (guardados) — toque para colocar</div>');INV.forEach(([m,i])=>{const d=document.createElement('button');d.className='mobCard';const cv=document.createElement('canvas');d.appendChild(cv);d.insertAdjacentHTML('beforeend',`<div>${MOV[m.t].ic} ${MOV[m.t].n}</div><div class="pr">📦 guardado</div>`);d.onclick=()=>{MOB.modo='mover';MOB.inv=true;MOB.i=i;MOB.t=m.t;MOB.r=m.r|0;[MOB.x,MOB.y]=lugarLivrePerto(m.t,MOB.r);$('mobSheet').classList.add('hidden');mobBar()};gr.appendChild(d);previaMovel(cv,m.t,m.r|0)});gr.insertAdjacentHTML('beforeend','<div style="grid-column:1/-1;color:#ffd23f;font-weight:700;margin-top:6px">🏠 Neste andar</div>')}
+  const L2=(eu.rm.moveis||[]).map((m,i)=>[m,i]).filter(([m])=>movAqui(m)&&MOV[m.t]);if(!L2.length&&!INV.length){gr.innerHTML='<div style="grid-column:1/-1;opacity:.7;padding:10px">Nenhum móvel neste andar ainda.</div>';return}
   L2.forEach(([m,i])=>{const d=document.createElement('button');d.className='mobCard';const cv=document.createElement('canvas');d.appendChild(cv);d.insertAdjacentHTML('beforeend',`<div>${MOV[m.t].n}</div><div class="pr">tocar p/ mexer</div>`);d.onclick=()=>{selMovel(i)};gr.appendChild(d);previaMovel(cv,m.t,m.r|0)});return}
  Object.entries(MOV).filter(([,D])=>D.cat===mobCat).forEach(([k,D])=>{const d=document.createElement('button');d.className='mobCard'+(eu.dinheiro<D.pr?' sem':'');const cv=document.createElement('canvas');d.appendChild(cv);d.insertAdjacentHTML('beforeend',`<div>${D.ic} ${D.n}</div><div class="pr">${money(D.pr)}</div><div style="opacity:.6;font-size:10px">${D.w}×${D.h}</div>`);d.onclick=()=>novoMovel(k);gr.appendChild(d);previaMovel(cv,k,0)})}
 function lugarLivrePerto(t,r){const R=eu.rm.R,[w,h]=movTam(t,r),px=Math.floor(eu.x/TILE)-R.x0,py=Math.floor(eu.y/TILE)-R.y0;let best=null,bd=1e9;for(let y=0;y<=R.y1-R.y0;y++)for(let x=0;x<=R.x1-R.x0;x++){if(!movLivre(t,r,x,y,MOB.modo==='mover'?MOB.i:-1))continue;const d=(x+w/2-px)**2+(y+h/2-py)**2;if(d<bd){bd=d;best=[x,y]}}return best||[0,0]}
-function novoMovel(t){MOB.modo='novo';MOB.t=t;MOB.r=0;[MOB.x,MOB.y]=lugarLivrePerto(t,0);$('mobSheet').classList.add('hidden');mobBar()}
-function selMovel(i){const m=eu.rm.moveis[i];if(!m)return;MOB.modo='sel';MOB.i=i;MOB.t=m.t;MOB.r=m.r|0;MOB.x=m.x;MOB.y=m.y;$('mobSheet').classList.add('hidden');mobBar()}
+function novoMovel(t){MOB.inv=false;MOB.modo='novo';MOB.t=t;MOB.r=0;[MOB.x,MOB.y]=lugarLivrePerto(t,0);$('mobSheet').classList.add('hidden');mobBar()}
+function selMovel(i){const m=eu.rm.moveis[i];if(!m)return;MOB.inv=false;MOB.modo='sel';MOB.i=i;MOB.t=m.t;MOB.r=m.r|0;MOB.x=m.x;MOB.y=m.y;$('mobSheet').classList.add('hidden');mobBar()}
 function mobBar(){const bar=$('mobBar'),D=MOB.t&&MOV[MOB.t];bar.innerHTML='';const B=(t,fn,cl)=>{const b=document.createElement('button');b.textContent=t;if(cl)b.className=cl;b.onclick=fn;bar.appendChild(b)};
  if(!MOB.modo){bar.insertAdjacentHTML('beforeend','<span>Toque num móvel para mexer</span>');B('🛒 Loja',()=>{renderSheet();$('mobSheet').classList.remove('hidden')});B('✔ Pronto',fecharMob,'g')}
  else if(MOB.modo==='novo'||MOB.modo==='mover'){bar.insertAdjacentHTML('beforeend',`<b>${D.ic} ${D.n}</b><span style="opacity:.75;font-size:11px">toque no chão p/ mover</span>`);B('↻ Girar',()=>{MOB.r=(MOB.r+1)&3;if(!movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.modo==='mover'?MOB.i:-1))[MOB.x,MOB.y]=lugarLivrePerto(MOB.t,MOB.r)});
   B(MOB.modo==='novo'?'✔ Comprar '+money(D.pr):'✔ Salvar',confirmaMob);B('✖',()=>{MOB.modo=null;mobBar()},'g')}
  else if(MOB.modo==='sel'){bar.insertAdjacentHTML('beforeend',`<b>${D.ic} ${D.n}</b>`);B('✋ Mover',()=>{MOB.modo='mover';mobBar()});B('↻ Girar',()=>{MOB.modo='mover';MOB.r=(MOB.r+1)&3;if(!movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.i))[MOB.x,MOB.y]=lugarLivrePerto(MOB.t,MOB.r);mobBar()});
-  B('💰 Vender',()=>confirmar('💰 Vender '+D.n+'?','Você recebe '+money(Math.floor(D.pr/2))+' (metade do preço).',()=>acao(async()=>{const i=MOB.i;MOB.modo=null;mobOk(await api.mexerMovel(i,0,0,0,true));Som.play('moeda');mobBar()})),'r');B('✖',()=>{MOB.modo=null;mobBar()},'g')}
+  B('📦 Guardar',()=>acao(async()=>{const i=MOB.i;MOB.modo=null;mobOk(await api.guardarMovel(i));Som.play('clique');toast('📦 Guardado no inventário (aba ✋ Meus móveis).',2200);mobBar()}));B('💰 Vender',()=>confirmar('💰 Vender '+D.n+'?','Você recebe '+money(Math.floor(D.pr/2))+' (metade do preço).',()=>acao(async()=>{const i=MOB.i;MOB.modo=null;mobOk(await api.mexerMovel(i,0,0,0,true));Som.play('moeda');mobBar()})),'r');B('✖',()=>{MOB.modo=null;mobBar()},'g')}
  bar.classList.remove('hidden')}
 function confirmaMob(){if(!movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.modo==='mover'?MOB.i:-1))return toast('Esse lugar está ocupado. Toque em outro lugar do chão.',2200);
- const mo=MOB.modo;acao(async()=>{mobOk(mo==='novo'?await api.comprarMovel(MOB.t,MOB.x,MOB.y,eu.rm.andar|0,MOB.r):await api.mexerMovel(MOB.i,MOB.x,MOB.y,MOB.r,false));Som.play(mo==='novo'?'compra':'clique');MOB.modo=null;mobBar()})}
+ const mo=MOB.modo,inv=MOB.inv,t=MOB.t,r=MOB.r,x=MOB.x,y=MOB.y;acao(async()=>{mobOk(mo==='novo'?await api.comprarMovel(t,x,y,eu.rm.andar|0,r):inv?await api.colocarMovel(MOB.i,x,y,r,eu.rm.andar|0):await api.mexerMovel(MOB.i,x,y,r,false));Som.play(mo==='novo'?'compra':'clique');MOB.modo=null;MOB.inv=false;
+  if(mo==='novo'&&t==='parede'){const nx=x+((r&1)?0:1),ny=y+((r&1)?1:0);MOB.modo='novo';MOB.t=t;MOB.r=r;if(movLivre(t,r,nx,ny,-1)){MOB.x=nx;MOB.y=ny}else[MOB.x,MOB.y]=lugarLivrePerto(t,r);toast('🧱 Próxima parede pronta. Ajuste e confirme, ou ✖ para parar.',2200)}mobBar()})}
 function tocarSala(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Math.floor(wy/TILE)-R.y0;
  if(MOB.modo==='novo'||MOB.modo==='mover'){const [w,h]=movTam(MOB.t,MOB.r);MOB.x=Math.max(0,Math.min(R.x1-R.x0-w+1,tx-Math.floor((w-1)/2)));MOB.y=Math.max(0,Math.min(R.y1-R.y0-h+1,ty-Math.floor((h-1)/2)));return}
- let hit=-1;(eu.rm.moveis||[]).forEach((m,k)=>{if((m.a|0)!==(eu.rm.andar|0)||!MOV[m.t])return;const [w,h]=movTam(m.t,m.r|0);if(tx>=m.x&&tx<m.x+w&&ty>=m.y&&ty<m.y+h&&(hit<0||!MOV[m.t].anda))hit=k});
+ let hit=-1;(eu.rm.moveis||[]).forEach((m,k)=>{if(!movAqui(m)||!MOV[m.t])return;const [w,h]=movTam(m.t,m.r|0);if(tx>=m.x&&tx<m.x+w&&ty>=m.y&&ty<m.y+h&&(hit<0||!MOV[m.t].anda))hit=k});
  if(hit>=0)selMovel(hit);else{MOB.modo=null;mobBar()}}
 function movMoldura(X,Y,w,h,cor){setWorld(ctx);ctx.fillStyle=cor+'33';ctx.fillRect(X+1,Y+1,w*32-2,h*32-2);ctx.strokeStyle=cor;ctx.lineWidth=2;ctx.strokeRect(X+1,Y+1,w*32-2,h*32-2);setCam(ctx)}
 function mobOk(r){if(r&&r.moveis&&eu.rm){eu.rm.moveis=r.moveis;salaTiles();emitEv('moveis',{n:eu.rm.n})}if(r&&r.eu)aplicarEstado(r.eu)}
@@ -4566,7 +4573,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261116r';
+const VERSAO_JOGO='v20261116s';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

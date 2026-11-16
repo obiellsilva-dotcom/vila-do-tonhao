@@ -96,7 +96,7 @@ begin
     update casas set moveis = moveis - p_i where id = c.id;
   else
     if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_r not between 0 and 3 then raise exception 'Lugar inválido.'; end if;
-    update casas set moveis = jsonb_set(moveis, array[p_i::text], e || jsonb_build_object('x', p_x, 'y', p_y, 'r', p_r)) where id = c.id;
+    update casas set moveis = jsonb_set(moveis, array[p_i::text], (e - 'g') || jsonb_build_object('x', p_x, 'y', p_y, 'r', p_r)) where id = c.id;
   end if;
   return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
 end $$;
@@ -131,3 +131,32 @@ end $$;
 grant execute on function public.comprar_movel(text, integer, integer, integer, integer) to authenticated;
 grant execute on function public.mexer_movel(integer, integer, integer, integer, boolean) to authenticated;
 grant execute on function public.geladeira(text, boolean) to authenticated;
+
+-- Guardar um móvel no inventário da casa (some do chão) ou tirar de lá (volta ao ser colocado)
+create or replace function public.guardar_movel(p_i integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id;
+  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
+  update casas set moveis = jsonb_set(moveis, array[p_i::text], (moveis -> p_i) || '{"g": true}'::jsonb) where id = c.id;
+  return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.guardar_movel(integer) to authenticated;
+
+-- Colocar um móvel guardado no inventário (em qualquer andar)
+create or replace function public.colocar_movel(p_i integer, p_x integer, p_y integer, p_r integer, p_andar integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id;
+  if c.id is null then raise exception 'Você precisa ter uma casa.'; end if;
+  if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
+  if p_x < 0 or p_x > 30 or p_y < 0 or p_y > 30 or p_r not between 0 and 3 or p_andar not in (0, 1) then raise exception 'Lugar inválido.'; end if;
+  update casas set moveis = jsonb_set(moveis, array[p_i::text], ((moveis -> p_i) - 'g') || jsonb_build_object('x', p_x, 'y', p_y, 'r', p_r, 'a', p_andar)) where id = c.id;
+  return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.colocar_movel(integer, integer, integer, integer, integer) to authenticated;
