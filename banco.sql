@@ -155,115 +155,115 @@ delete from public.loja where id = 'bar';
 
 -- casas: os números batem com as plaquinhas do mapa (gerado a partir do mapa; não edite os ids)
 insert into public.casas(id,preco,nivel_min) values
-(1,12000,1),
-(2,12000,1),
-(3,12000,1),
-(4,12000,1),
-(5,12000,1),
-(6,12000,1),
-(7,12000,1),
-(8,12000,1),
-(9,12000,1),
-(10,12000,1),
-(11,12000,1),
-(12,12000,1),
-(13,12000,1),
-(14,12000,1),
-(15,12000,1),
-(16,12000,1),
-(17,12000,1),
-(18,12000,1),
-(19,12000,1),
-(20,12000,1),
-(21,12000,1),
-(22,12000,1),
-(23,12000,1),
-(24,12000,1),
-(25,12000,1),
-(26,12000,1),
-(27,12000,1),
-(28,12000,1),
-(29,12000,1),
-(30,12000,1),
-(31,12000,1),
-(32,12000,1),
-(33,12000,1),
-(34,12000,1),
-(35,12000,1),
-(36,12000,1),
-(37,12000,1),
-(38,12000,1),
-(39,12000,1),
-(40,12000,1),
-(41,12000,1),
-(42,12000,1),
-(43,12000,1),
-(44,12000,1),
-(45,12000,1),
-(46,12000,1),
-(47,12000,1),
-(48,12000,1),
-(49,12000,1),
-(50,12000,1),
-(51,12000,1),
-(52,12000,1),
-(53,20000,1),
-(54,20000,1),
-(55,20000,1),
-(56,20000,1),
-(57,20000,1),
-(58,20000,1),
-(59,20000,1),
-(60,20000,1),
-(61,20000,1),
-(62,20000,1),
-(63,20000,1),
-(64,20000,1),
-(65,20000,1),
-(66,20000,1),
-(67,20000,1),
-(68,90000,10),
-(69,90000,10),
-(70,90000,10),
-(71,90000,10),
-(72,90000,10),
-(73,90000,10),
-(74,90000,10),
-(75,90000,10),
-(76,90000,10),
-(77,90000,10),
-(78,8000,1),
-(79,8000,1),
-(80,8000,1),
-(81,8000,1),
-(82,8000,1),
-(83,8000,1),
-(84,8000,1),
-(85,8000,1),
-(86,8000,1),
-(87,8000,1),
-(88,8000,1),
-(89,8000,1),
-(90,8000,1),
-(91,8000,1),
-(92,8000,1),
-(93,8000,1),
-(94,8000,1),
-(95,8000,1),
-(96,8000,1),
-(97,8000,1),
-(98,8000,1),
-(99,8000,1),
-(100,8000,1),
-(101,8000,1),
-(102,8000,1),
-(103,8000,1),
-(104,8000,1),
-(105,8000,1),
-(106,8000,1),
-(107,8000,1),
-(108,8000,1),
-(109,8000,1)
+(1,18000,1),
+(2,18000,1),
+(3,18000,1),
+(4,18000,1),
+(5,18000,1),
+(6,18000,1),
+(7,18000,1),
+(8,18000,1),
+(9,18000,1),
+(10,18000,1),
+(11,18000,1),
+(12,18000,1),
+(13,18000,1),
+(14,18000,1),
+(15,18000,1),
+(16,18000,1),
+(17,18000,1),
+(18,18000,1),
+(19,18000,1),
+(20,18000,1),
+(21,18000,1),
+(22,18000,1),
+(23,18000,1),
+(24,18000,1),
+(25,18000,1),
+(26,18000,1),
+(27,18000,1),
+(28,18000,1),
+(29,18000,1),
+(30,18000,1),
+(31,18000,1),
+(32,18000,1),
+(33,18000,1),
+(34,18000,1),
+(35,18000,1),
+(36,18000,1),
+(37,18000,1),
+(38,18000,1),
+(39,18000,1),
+(40,18000,1),
+(41,18000,1),
+(42,18000,1),
+(43,18000,1),
+(44,18000,1),
+(45,18000,1),
+(46,18000,1),
+(47,18000,1),
+(48,18000,1),
+(49,18000,1),
+(50,18000,1),
+(51,18000,1),
+(52,18000,1),
+(53,30000,1),
+(54,30000,1),
+(55,30000,1),
+(56,30000,1),
+(57,30000,1),
+(58,30000,1),
+(59,30000,1),
+(60,30000,1),
+(61,30000,1),
+(62,30000,1),
+(63,30000,1),
+(64,30000,1),
+(65,30000,1),
+(66,30000,1),
+(67,30000,1),
+(68,135000,10),
+(69,135000,10),
+(70,135000,10),
+(71,135000,10),
+(72,135000,10),
+(73,135000,10),
+(74,135000,10),
+(75,135000,10),
+(76,135000,10),
+(77,135000,10),
+(78,12000,1),
+(79,12000,1),
+(80,12000,1),
+(81,12000,1),
+(82,12000,1),
+(83,12000,1),
+(84,12000,1),
+(85,12000,1),
+(86,12000,1),
+(87,12000,1),
+(88,12000,1),
+(89,12000,1),
+(90,12000,1),
+(91,12000,1),
+(92,12000,1),
+(93,12000,1),
+(94,12000,1),
+(95,12000,1),
+(96,12000,1),
+(97,12000,1),
+(98,12000,1),
+(99,12000,1),
+(100,12000,1),
+(101,12000,1),
+(102,12000,1),
+(103,12000,1),
+(104,12000,1),
+(105,12000,1),
+(106,12000,1),
+(107,12000,1),
+(108,12000,1),
+(109,12000,1)
 on conflict (id) do update set preco=excluded.preco, nivel_min=excluded.nivel_min;
 
 -- vagas de estacionamento (geradas a partir do mapa; não edite os ids)
@@ -1996,3 +1996,139 @@ update public.loja set nome = 'Jipe Renegado' where id = 'jipe' and tipo = 'carr
 -- ===================== ETAPA 23: Ferrarini na loja do Pix (a Lambordini fica só com o VIP) =====================
 insert into public.produtos(id, tipo, item, dias, nome, preco) values ('carro_gto', 'carro', 'gto', 0, 'Ferrarini', 19.90)
 on conflict (id) do update set nome = excluded.nome, preco = excluded.preco, item = excluded.item;
+
+-- ===================== ETAPA 25: Condomínio Vila Tonhão (apartamentos para comprar ou alugar) e casas 50% mais caras =====================
+-- Os apartamentos ficam na mesma tabela das casas (id 1101 a 1444): assim móveis, geladeira e porta funcionam igual.
+-- Número: 1000 + bloco×100 + andar×10 + final. Blocos A, B e C = kitnet; bloco D = 2 quartos.
+create table if not exists public.migracoes (id text primary key, feita_em timestamptz not null default now());
+alter table public.casas add column if not exists alugada boolean not null default false;
+alter table public.casas add column if not exists aluguel_ate timestamptz;
+alter table public.casas add column if not exists valor_aluguel integer;
+
+-- o "tipo" passa a considerar apartamento e os preços novos (casas 50% mais caras)
+drop index if exists public.casas_um_por_tipo;
+alter table public.casas drop column if exists tipo;
+alter table public.casas add column tipo text generated always as (case when id > 1000 then 'apto' when preco >= 75000 then 'mansao' when preco >= 15000 then 'media' else 'barata' end) stored;
+create unique index if not exists casas_um_por_tipo on public.casas(dono, tipo) where dono is not null;
+
+-- casas da cidade 50% mais caras (roda uma vez só)
+-- (no banco completo os preços já estão 50% maiores na lista das casas lá em cima)
+insert into public.migracoes(id) values ('casas_x15') on conflict do nothing;
+
+-- os 64 apartamentos
+insert into public.casas(id, preco, nivel_min, valor_aluguel)
+select 1000 + b * 100 + a * 10 + f, case when b <= 3 then 4000 else 6000 end, 1, case when b <= 3 then 250 else 350 end
+from generate_series(1, 4) b, generate_series(1, 4) a, generate_series(1, 4) f
+on conflict (id) do update set preco = excluded.preco, valor_aluguel = excluded.valor_aluguel;
+
+-- vende os móveis pela metade e deixa o apartamento vago
+create or replace function public._vagar_apto(p_casa integer) returns integer
+language plpgsql security definer set search_path = public as $$
+declare c public.casas; volta integer := 0;
+begin
+  select * into c from casas where id = p_casa and id > 1000 for update;
+  if c.id is null or c.dono is null then return 0; end if;
+  select coalesce(sum(coalesce(preco_movel(e->>'t'), 0) / 2), 0) into volta from jsonb_array_elements(c.moveis) e;
+  update moradores set dinheiro = dinheiro + volta, casa_id = case when casa_id = c.id then null else casa_id end where id = c.dono;
+  update casas set dono = null, comprada_em = null, aberta = false, alugada = false, aluguel_ate = null, moveis = '[]'::jsonb, geladeira = '{}'::jsonb where id = c.id;
+  return volta;
+end $$;
+revoke execute on function public._vagar_apto(integer) from public, anon, authenticated;
+
+-- apartamento alugado e vencido há mais de 3 dias volta a ficar livre
+create or replace function public._limpa_aptos() returns void
+language plpgsql security definer set search_path = public as $$
+declare r record;
+begin
+  for r in select id from casas where id > 1000 and alugada and aluguel_ate < now() - interval '3 days' loop
+    perform _vagar_apto(r.id);
+  end loop;
+end $$;
+revoke execute on function public._limpa_aptos() from public, anon, authenticated;
+
+create or replace function public._pegar_apto(p_casa integer, p_alugar boolean) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; antigo integer; volta integer := 0; custo integer;
+begin
+  m := _eu();
+  perform _limpa_aptos();
+  select * into c from casas where id = p_casa and id > 1000 for update;
+  if not found then raise exception 'Esse apartamento não existe.'; end if;
+  if c.dono = m.id then raise exception 'Esse apartamento já é seu.'; end if;
+  if c.dono is not null then raise exception 'Esse apartamento já tem morador.'; end if;
+  if exists (select 1 from casas where dono = m.id and id < 1000) then raise exception 'Quem tem casa na cidade não pode ter apartamento.'; end if;
+  custo := case when p_alugar then c.valor_aluguel else c.preco end;
+  select id into antigo from casas where dono = m.id and id > 1000;
+  if m.dinheiro < custo then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', custo; end if;
+  if antigo is not null then volta := _vagar_apto(antigo); end if;
+  update casas set dono = m.id, comprada_em = now(), aberta = false, alugada = p_alugar,
+    aluguel_ate = case when p_alugar then now() + interval '7 days' else null end where id = c.id;
+  update moradores set dinheiro = dinheiro - custo, casa_id = c.id where id = m.id;
+  return json_build_object('casa', c.id, 'devolvido', volta, 'eu', _estado(m.id));
+end $$;
+revoke execute on function public._pegar_apto(integer, boolean) from public, anon, authenticated;
+
+create or replace function public.comprar_apto(p_casa integer) returns json
+language sql security definer set search_path = public as $$ select _pegar_apto(p_casa, false) $$;
+create or replace function public.alugar_apto(p_casa integer) returns json
+language sql security definer set search_path = public as $$ select _pegar_apto(p_casa, true) $$;
+grant execute on function public.comprar_apto(integer) to authenticated;
+grant execute on function public.alugar_apto(integer) to authenticated;
+
+create or replace function public.sair_apto() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c integer; volta integer := 0;
+begin
+  m := _eu();
+  select id into c from casas where dono = m.id and id > 1000;
+  if c is null then raise exception 'Você não mora no condomínio.'; end if;
+  volta := _vagar_apto(c);
+  return json_build_object('devolvido', volta, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.sair_apto() to authenticated;
+
+-- cobra o aluguel vencido (o jogo chama ao entrar e a cada 10 minutos)
+create or replace function public.cobrar_aluguel() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; pago integer := 0;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id and id > 1000 and alugada for update;
+  if c.id is null then return json_build_object('ok', true); end if;
+  while c.aluguel_ate <= now() and m.dinheiro >= c.valor_aluguel loop
+    m.dinheiro := m.dinheiro - c.valor_aluguel; pago := pago + c.valor_aluguel; c.aluguel_ate := c.aluguel_ate + interval '7 days';
+  end loop;
+  update moradores set dinheiro = m.dinheiro where id = m.id;
+  update casas set aluguel_ate = c.aluguel_ate where id = c.id;
+  if c.aluguel_ate < now() - interval '3 days' then
+    perform _vagar_apto(c.id);
+    return json_build_object('despejado', true, 'pago', pago, 'eu', _estado(m.id));
+  end if;
+  return json_build_object('pago', pago, 'atrasado', c.aluguel_ate < now(), 'valor', c.valor_aluguel, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.cobrar_aluguel() to authenticated;
+
+-- comprar casa na cidade deixa o apartamento vago (o jogo avisa antes)
+create or replace function public.comprar_casa(p_casa integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; antiga public.casas; volta integer := 0; apto integer;
+begin
+  m := _eu();
+  select * into c from casas where id = p_casa and id < 1000 for update;
+  if not found then raise exception 'Essa casa não existe.'; end if;
+  if c.dono = m.id then raise exception 'Essa casa já é sua.'; end if;
+  if c.dono is not null then raise exception 'Essa casa já tem dono.'; end if;
+  if m.nivel < c.nivel_min then raise exception 'Essa casa libera no nível %.', c.nivel_min; end if;
+  select * into antiga from casas where dono = m.id and tipo = c.tipo for update;
+  if found then volta := antiga.preco / 2; end if;
+  if m.dinheiro + volta < c.preco then raise exception 'Dinheiro insuficiente para essa casa.'; end if;
+  if antiga.id is not null then
+    update casas set dono = null, comprada_em = null, aberta = false where id = antiga.id;
+    update vagas set morador = null, carro = null, desde = null where casa = antiga.id;
+  end if;
+  select id into apto from casas where dono = m.id and id > 1000;
+  if apto is not null then volta := volta + _vagar_apto(apto); end if;
+  update casas set dono = m.id, comprada_em = now(), aberta = false where id = c.id;
+  update moradores set dinheiro = dinheiro + volta - c.preco, casa_id = c.id where id = m.id;
+  return json_build_object('casa', c.id, 'devolvido', volta, 'eu', _estado(m.id));
+end $$;

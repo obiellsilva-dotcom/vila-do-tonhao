@@ -1337,6 +1337,9 @@ HOUSE_DEFS.forEach(p=>p[4]=Math.round(p[4]*1.5)); // casas da cidade 50% mais ca
 const HOUSE_OFF=new Set();{const rows={};HOUSE_DEFS.forEach((p,i)=>{(rows[p[1]]=rows[p[1]]||[]).push(i)});for(const r of Object.values(rows)){r.sort((a,b)=>HOUSE_DEFS[a][0]-HOUSE_DEFS[b][0]);r.forEach((i,k)=>{if(k%2===1&&r.length>2)HOUSE_OFF.add(i)})}}
 const houses=HOUSE_DEFS.map((p,i)=>(HOUSE_OFF.has(i)?(o=>(o.front=[o.x+Math.floor(o.w/2),o.y+o.h],o.off=true,o)):addB)({kind:p[2]>4?'mansao':'casa',x:p[0],y:p[1],w:p[2],h:p[3],preco:p[4],n:i+1,wall:WALLS[Math.floor(hsh(i,3,1)*WALLS.length)],roof:ROOFS[Math.floor(hsh(i,5,2)*ROOFS.length)]}));
 // loja de roupas no Centro de Empregos, com interior (usa o mesmo sistema das casas)
+// imobiliária ao lado da igreja: por fora é um prédio; por dentro é uma sala em outra dimensão (como as casas)
+const imob=addB({kind:'imobiliaria',x:38,y:41,w:7,h:5,wall:'#eef4f8',roof:'#2e6f95'});
+const IMOB={n:'imob',kind:'imob',front:imob.front,fixos:[{t:'estante',x:0,y:0},{t:'estante',x:6,y:0},{t:'mesa',x:3,y:1},{t:'cadeira',x:3,y:3},{t:'cadeira',x:4,y:3},{t:'sofa',x:5,y:4},{t:'planta',x:7,y:2},{t:'tv',x:0,y:2,r:1}]};
 const lojaRoupa=addB({kind:'roupas',loja:true,n:'roupas',x:52,y:23,w:4,h:5,wall:'#fbe7f0',roof:'#b0306a'});
 // interiores das casas: piso andável, móveis bloqueiam, entrada só pela porta
 const casaTile=new Map(),portas=new Map([['roupas',true]]);
@@ -1359,7 +1362,7 @@ function passa(ax,ay,bx,by){const A=casaTile.get(ax+','+ay),Bc=casaTile.get(bx+'
  const porta=(b,x,y,ox,oy)=>b&&x===b.dx&&y===b.y+b.h-1&&ox===b.dx&&oy===b.y+b.h;return porta(A,ax,ay,bx,by)||porta(Bc,bx,by,ax,ay)}
 const casaEm=(px,py)=>casaTile.get(Math.floor(px/TILE)+','+Math.floor(py/TILE))||null;
 const INTER_OK=new Set();
-const podeEntrar=b=>{if(!eu)return false;if(b.loja)return true;if(b.apto&&INTER_OK.has(b.n))return true;const i=casasInfo.get(b.n)||{};return i.dono===eu.id||portas.get(b.n)===true||casaEm(eu.x,eu.y)===b};
+const podeEntrar=b=>{if(!eu)return false;if(b.loja)return true;if(b.apto&&INTER_OK.has(b.n))return true;const i=casasInfo.get(b.n)||{};return i.dono===eu.id||(!i.dono&&!b.off)||portas.get(b.n)===true||casaEm(eu.x,eu.y)===b};
 function drawInterior(c,b){
  const x=T(b.x),y=T(b.y),w=T(b.w),h=T(b.h),ih=T(b.h-(b.loja?0:1));
  c.fillStyle='#2a1a14';c.fillRect(x,y-6,w,h+6);
@@ -1641,7 +1644,7 @@ function drawShop(c,b){
  const x=b.x*TILE,y=b.y*TILE,w=b.w*TILE,h=b.h*TILE,roofH=h*.34;
  const CFG={mercadinho:{wall:'#f3e3bd',roof:'#b94a3a',aw:['#e04b3c','#fff'],name:'MERCADINHO'},padaria:{wall:'#f8dcc8',roof:'#8a5a3b',aw:['#f2b134','#7a4a2a'],name:'PADARIA'},barbearia:{wall:'#dfe9f5',roof:'#34495e',aw:['#2e86c1','#fff'],name:'BARBEARIA'},
   concessionaria:{wall:'#eef3f7',roof:'#1f5a8a',aw:['#1f5a8a','#ffc94a'],name:'CARROS DO ZÉ'},oficina:{wall:'#d9d4cc',roof:'#4a4f57',aw:['#e67e22','#2b2b2b'],name:'OFICINA'},
-  posto:{wall:'#fff7e6',roof:'#c0392b',aw:['#c0392b','#f1c40f'],name:'POSTO'},roupas:{wall:'#fbe7f0',roof:'#b0306a',aw:['#e84393','#fff'],name:'LOJA DE ROUPAS'}};
+  posto:{wall:'#fff7e6',roof:'#c0392b',aw:['#c0392b','#f1c40f'],name:'POSTO'},roupas:{wall:'#fbe7f0',roof:'#b0306a',aw:['#e84393','#fff'],name:'LOJA DE ROUPAS'},imobiliaria:{wall:'#eef4f8',roof:'#2e6f95',aw:['#2e86c1','#fff'],name:'IMOBILIÁRIA'}};
  const cfg=CFG[b.kind];
  c.fillStyle='rgba(0,0,0,.18)';c.fillRect(x+6,y+h-3,w-2,6);
  c.fillStyle=cfg.wall;c.fillRect(x+3,y+roofH-2,w-6,h-roofH+2);
@@ -2159,7 +2162,7 @@ function predioFatias(list,b,dentro){
  let fade=1;if(eu&&!eu.hidden){const pe=isoP(eu.x,eu.y),c4=[isoP(X0,Y1),isoP(X1,Y1),isoP(X1,Y0),isoP(X0,Y0)],top=Hf+R0(b);
   if(X1+Y1>eu.x+eu.y+8&&pe[0]>Math.min(...c4.map(q=>q[0]))-6&&pe[0]<Math.max(...c4.map(q=>q[0]))+6&&pe[1]-40<Math.max(...c4.map(q=>q[1]))&&pe[1]>Math.min(...c4.map(q=>q[1]))-top)fade=.28}
  const a=artDe('b'+B.indexOf(b),X0-12,Y0-46,X1-X0+24,Y1-Y0+56,c=>drawBuilding0(c,b));
- const LOJA=['mercadinho','padaria','barbearia','concessionaria','roupas','oficina','posto'].includes(b.kind),FRONT=['banco','prefeitura','hospital','delegacia'].includes(b.kind),IGR=b.kind==='igreja',FAB=b.kind==='fabrica';
+ const LOJA=['mercadinho','padaria','barbearia','concessionaria','roupas','oficina','posto','imobiliaria'].includes(b.kind),FRONT=['banco','prefeitura','hospital','delegacia'].includes(b.kind),IGR=b.kind==='igreja',FAB=b.kind==='fabrica';
  const ym=(Y0+Y1)/2,ov=5,cropY=casa?Y0+b.h*TILE*.48-2:LOJA?Y0+b.h*TILE*.34-2:Y0-46,Hw2=casa?Hw:LOJA?(Y1-cropY-2)*WK:FRONT?(Y1-Y0-54)*WK:IGR?(Y1-Y0-94)*WK:(Y1-Y0-70)*WK,
   R=casa?b.h*TILE*.3:LOJA?b.h*TILE*.2:FRONT?48*WK:IGR?42*WK:0,xm=(X0+X1)/2,hx=x=>Hw2+R*(1-Math.abs(x-xm)/((X1-X0)/2));
  for(let i=0;i<b.w;i++){const xa=X0+i*TILE,xb=xa+TILE,pri=i===0,ult=i===b.w-1;
@@ -2329,12 +2332,13 @@ const SALAS={casa:{x0:123,y0:82,x1:132,y1:89,porta:[127,90],parede:'#efe2c8',pis
  mansao:{x0:121,y0:92,x1:138,y1:98,porta:[129,99],esc:{x0:137,y0:92,x1:138,y1:95},parede:'#f4ead8',piso:['#d8c7a8','#cdb995']},
  mansao2:{x0:-19,y0:92,x1:-2,y1:98,porta:null,esc:{x0:-3,y0:92,x1:-2,y1:95},parede:'#e8eef4',piso:['#c9b08a','#bfa47c'],cima:1},
  kit:{x0:112,y0:-17,x1:117,y1:-14,porta:[114,-13],parede:'#f1ead9',piso:['#cfc6b8','#c4bbab']},
- ap2:{x0:122,y0:-18,x1:129,y1:-14,porta:[125,-13],parede:'#e6eef2',piso:['#b8946a','#ad8a60']}};
+ ap2:{x0:122,y0:-18,x1:129,y1:-14,porta:[125,-13],parede:'#e6eef2',piso:['#b8946a','#ad8a60']},
+ imob:{x0:112,y0:-8,x1:119,y1:-3,porta:[115,-2],parede:'#e3eef6',piso:['#e2ddd3','#d6d0c4']}};
 for(const R of Object.values(SALAS)){for(let y=R.y0-1;y<=R.y1+1;y++)for(let x=R.x0-1;x<=R.x1+1;x++)setTile(x,y,(x<R.x0||x>R.x1||y<R.y0||y>R.y1)?G.BLD:G.FLOOR);if(R.porta)setTile(R.porta[0],R.porta[1],G.FLOOR)}
 const movAqui=m=>!m.g&&(m.a|0)===((eu&&eu.rm&&eu.rm.andar)|0);
 const naEsc=(R,tx,ty)=>!!R.esc&&tx>=R.esc.x0&&tx<=R.esc.x1&&ty>=R.esc.y0&&ty<=R.esc.y1;
 const casaTipo=b=>(b.apto?'apto':b.preco>=75000?'mansao':b.preco>=15000?'media':'barata');
-const salaDe=(b,a)=>b.kind==='kit'?SALAS.kit:b.kind==='ap2'?SALAS.ap2:b.kind==='mansao'?(a?SALAS.mansao2:SALAS.mansao):SALAS.casa;
+const salaDe=(b,a)=>b.kind==='imob'?SALAS.imob:b.kind==='kit'?SALAS.kit:b.kind==='ap2'?SALAS.ap2:b.kind==='mansao'?(a?SALAS.mansao2:SALAS.mansao):SALAS.casa;
 // móveis da casa: guardados no banco (posição relativa à sala e andar)
 // ===== móveis das casas: modelos detalhados (caixas e bolas em 3D isométrico), com 4 giros =====
 // cada parte: [x0,y0,x1,y1,z0,z1,cor] (em pixels dentro do espaço do móvel, frente virada para +y) ou ['o',cx,cy,cz,raio,cor]
@@ -2388,7 +2392,7 @@ function salaTiles(){if(!eu||!eu.rm)return;const R=eu.rm.R;for(let y=R.y0;y<=R.y
 function movLivre(t,r,x,y,ign){const R=eu.rm.R,[w,h]=movTam(t,r),an=MOV[t].anda;if(x<0||y<0||R.x0+x+w-1>R.x1||R.y0+y+h-1>R.y1)return false;
  for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){const tx=R.x0+x+xx,ty=R.y0+y+yy;if(naEsc(R,tx,ty))return false;if(R.porta&&tx===R.porta[0]&&ty===R.porta[1]-1)return false;if(!an&&Math.floor(eu.x/TILE)===tx&&Math.floor(eu.y/TILE)===ty)return false}
  return !(eu.rm.moveis||[]).some((m,k)=>{if(k===ign||!movAqui(m)||!MOV[m.t])return false;if(an!==!!MOV[m.t].anda)return false;const [w2,h2]=movTam(m.t,m.r|0);return x<m.x+w2&&m.x<x+w&&y<m.y+h2&&m.y<y+h})}
-async function carregaMoveis(){if(!eu||!eu.rm)return;const n=eu.rm.n;try{const c=await api.casa(n);if(eu.rm&&eu.rm.n===n){eu.rm.moveis=(c&&c.moveis)||[];eu.rm.geladeira=(c&&c.geladeira)||{};salaTiles()}}catch(e){}}
+async function carregaMoveis(){if(!eu||!eu.rm||eu.rm.b.fixos){if(eu&&eu.rm)salaTiles();return}const n=eu.rm.n;try{const c=await api.casa(n);if(eu.rm&&eu.rm.n===n){eu.rm.moveis=(c&&c.moveis)||[];eu.rm.geladeira=(c&&c.geladeira)||{};salaTiles()}}catch(e){}}
 // mata fechada: árvores de verdade em cima do verde (sprite em cache, sem balanço)
 const MATA=new Map();
 for(let y=-MY;y<H+MY;y++){const row=[];for(let x=-MX;x<W+MX;x++){if(tileAt(x,y)!==G.FOREST)continue;const h=hsh(x,y,31);if(h>.62)continue;row.push({x:(x+.2+hsh(x,y,32)*.6)*TILE,y:(y+.3+hsh(x,y,33)*.6)*TILE,s:1.25+hsh(x,y,34)*.6,c:h<.1?3:h<.3?1:h<.5?2:0,v:Math.floor(hsh(x,y,35)*3)})}if(row.length)MATA.set(y,row)}
@@ -3843,9 +3847,7 @@ function abrirLugar(b){
   if(info.dono&&info.dono===eu.id){sub='Essa casa é sua! 🎉 A garagem na rua em frente é só sua.';botao(box,'🚪 Entrar em casa',()=>{closePlace();entrarSala(b)})}
   else if(info.dono)sub='Casa de '+(info.nome||'um morador')+'.';
   else if(k==='mansao'&&eu.nivel<MANSAO_NIVEL){sub='À venda por '+money(b.preco)+'.';botao(box,`🔒 Mansão: libera no nível ${MANSAO_NIVEL}`,()=>{},{off:true})}
-  else{const volta=eu.casa_id?Math.floor(houses[eu.casa_id-1].preco/2):0;
-   sub='À venda por '+money(b.preco)+'.'+(volta?` Você recebe ${money(volta)} pela sua casa atual (${eu.casa_id}).`:'');
-   botao(box,'🔑 Comprar por '+money(b.preco),()=>{const falta=b.preco-(eu.dinheiro+volta);if(falta>0){confirmar('💰 Falta dinheiro','Essa casa custa <b>'+money(b.preco)+'</b>. Você tem <b>'+money(eu.dinheiro)+'</b>'+(volta?' + '+money(volta)+' da sua casa atual':'')+'.<br>Faltam <b>'+money(falta)+'</b>. Trabalhe mais um pouco! 💼',null,[['💼 Ver empregos',()=>$('zjobs').click()],['OK',()=>{}]]);return}confirmar('🏠 Comprar casa','Comprar a '+(b.kind==='mansao'?'mansão':'casa')+' '+b.n+' por <b>'+money(b.preco)+'</b>?',()=>comprarCasa(b))})}
+  else{sub='À venda por '+money(b.preco)+'. Pode entrar para dar uma olhada! Para comprar, vá à 🏘️ Imobiliária (ao lado da Igreja).';botao(box,'🚪 Visitar a casa',()=>{closePlace();entrarSala(b)});botao(box,'🏘️ Ir para a Imobiliária',()=>{closePlace();irPara((imob.front[0]+.5)*TILE,(imob.front[1]+.5)*TILE)})}
  }
  const comida=Object.entries(LOJA).filter(([,it])=>it.local===k),temJob=Object.keys(JOBS).some(j=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id));
  const boxPrin=box;let boxJob=box;
@@ -3934,7 +3936,7 @@ function comerFruta(f){acao(async()=>{
 function comprarCasa(b){const ja=meuApto();if(ja&&!b._ok){confirmar('🏢 Você mora no condomínio','Quem tem casa não pode ter apartamento. Se comprar esta casa, o <b>apto '+ja.num+' do Bloco '+ja.bloco.nome+'</b> fica vago e os móveis de lá são vendidos pela metade do preço.',null,[['🏠 Comprar a casa mesmo assim',()=>{b._ok=1;comprarCasa(b);b._ok=0}],['Cancelar',()=>{}]]);return}
  acao(async()=>{
  const r=tratar(await api.comprarCasa(b.n));if(eu.casa_id!==b.n)return;{const ja=meuApto();if(ja){casasInfo.set(ja.n,{dono:null});emitEv('apto',{n:ja.n,v:0})}}
- for(const [id] of casasInfo)if(casasInfo.get(id).dono===eu.id&&id!==b.n&&houses[id-1]&&casaTipo(houses[id-1])===casaTipo(b))casasInfo.set(id,{dono:null});
+ for(const [id] of casasInfo)if(id<1000&&casasInfo.get(id).dono===eu.id&&id!==b.n&&houses[id-1]&&casaTipo(houses[id-1])===casaTipo(b))casasInfo.set(id,{dono:null});
  casasInfo.set(b.n,{dono:eu.id,nome:eu.nome});floatText(eu.x,eu.y-30,'🏠 CASA NOVA!','#ffc94a');
  toast(`🎉 A ${b.kind==='mansao'?'mansão':'casa'} ${b.n} agora é sua!`+(r.devolvido?` (recebeu ${money(r.devolvido)} pela antiga)`:''),4500);
  log(`🏠 ${eu.nome} comprou a casa ${b.n}!`);emitEv('casa',{n:b.n});abrirLugar(b)})}
@@ -4112,8 +4114,9 @@ function fimTurno(){eu.giro=false;eu.sirM=0;eu.gM=0;$('viatPainel').classList.ad
  trabalho=null;fecharTarefa();eu.hidden=false;eu.apron=false;eu.beer=false;eu.fish=false;eu.path=[];$('work').classList.add('hidden');sendPos(true);
 }
 houses.forEach(b=>{if(b.off||b.loja||!b.moveis)return;for(const [x,y] of b.moveis){grid[y][x]=G.CASA;casaTile.set(x+','+y,b)}b.moveis=[]}); // casas vêm vazias (móveis agora ficam na sala)
-function entrarSala(b){if(emCasa){emCasa=false;eu.hidden=false;$('work').classList.add('hidden')}joyV.x=joyV.y=0;salaCD=now+1.2;pertoKey='';const R=salaDe(b,0);eu.rm={n:b.n,b,R,andar:0,moveis:[]};salaTiles();carregaMoveis();eu.path=[];eu.onArrive=null;eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7);eu.dir=1;follow=eu;eu._zoomAntes=cam.z;cam.z=Math.max(cam.z,1.5);cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');closeCard();sendPos(true);
- const i=casasInfo.get(b.n)||{};toast('🏠 '+(i.nome?'Casa de '+i.nome:(b.kind==='mansao'?'Mansão ':'Casa ')+b.n)+' · para sair, ande até a porta.',2500)}
+function entrarSala(b){if(emCasa){emCasa=false;eu.hidden=false;$('work').classList.add('hidden')}joyV.x=joyV.y=0;salaCD=now+1.2;pertoKey='';const R=salaDe(b,0);eu.rm={n:b.n,b,R,andar:0,moveis:b.fixos?b.fixos.map(m=>Object.assign({a:0,r:0},m)):[]};salaTiles();carregaMoveis();eu.path=[];eu.onArrive=null;eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7);eu.dir=1;follow=eu;eu._zoomAntes=cam.z;cam.z=Math.max(cam.z,1.5);cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');closeCard();sendPos(true);
+ const i=casasInfo.get(b.n)||{};toast(salaNome(b,i)+' · para sair, ande até a porta.',2500)}
+function salaNome(b,i){i=i||{};if(b.kind==='imob')return'🏘️ Imobiliária do Tonhão';if(b.apto)return'🏢 Apto '+b.num+' · Bloco '+b.bloco.nome+(i.nome?' ('+i.nome+')':'');return i.nome?'🏠 Casa de '+i.nome:(b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n}
 function sairSala(){if(MOB.ativo)fecharMob();joyV.x=joyV.y=0;salaCD=now+1.5;pertoKey='';const b=eu.rm.b;levantarCasa();eu.rm=null;eu.placing=null;eu.path=[];eu.onArrive=null;eu.x=T(b.front[0]+.5);eu.y=T(b.front[1]+1.1);follow=eu;if(eu._zoomAntes)cam.z=eu._zoomAntes;cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');sendPos(true)}
 let salaFade=0,salaCD=0,SALA_ON=false;const SALA_ESC=1.8;
 setInterval(()=>{if(!eu||eu.driving||eu.hidden||now<salaCD)return;if(eu.rm){const R=eu.rm.R;if(eu.x<T(R.x0-1)||eu.x>T(R.x1+2)||eu.y<T(R.y0-1)||eu.y>T(R.y1+2)){if(R.porta){eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7)}else{eu.x=T(R.esc.x0-.5);eu.y=T(R.esc.y0+.5)}eu.path=[]}}if(!eu.rm){const b=casaEm(eu.x,eu.y);if(b&&!b.loja&&!b.off&&houses.includes(b))entrarSala(b)}else{const R=eu.rm.R,tx=Math.floor(eu.x/TILE),ty=Math.floor(eu.y/TILE);if(R.porta&&tx===R.porta[0]&&ty===R.porta[1])sairSala();else if(R.esc&&ty===R.esc.y0&&tx>=R.esc.x0&&tx<=R.esc.x1)trocaAndar()}},120);
@@ -4170,7 +4173,7 @@ function salaItens(list,R){const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(
  else for(const [ax,ay,bx,by] of [[X0,T(E.y1+1),X1,T(E.y1+1)+3],[X1,T(E.y0+1),X1+3,T(E.y1+1)]])list.push({x:(ax+bx)/2,y:(ay+by)/2,k:ax+ay+10,cam:1,f:()=>{isoBox(ctx,ax,ay,bx,by,0,26,'#8a8f96');isoBox(ctx,ax-1,ay-1,bx+1,by+1,26,29,'#5a4030')}})}
  (eu.rm.moveis||[]).forEach((m,k)=>{if(!movAqui(m)||!MOV[m.t]||(MOB.modo==='mover'&&MOB.i===k))return;const [w,h]=movTam(m.t,m.r|0),X=T(R.x0+m.x),Y=T(R.y0+m.y);const sen=MOV[m.t].senta;list.push({x:X+w*16,y:Y+h*16,k:MOV[m.t].anda&&m.t!=='porta'?-1e8:X+Y+(w+h)*16,cam:1,f:()=>{if(m.t==='parede'||m.t==='porta'){desenhaParede(m,X,Y,atrasDaParede(m,X,Y)?.28:null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f');return}desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,sen?'tras':null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f')}});if(sen)list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*32-4,cam:1,f:()=>desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,'frente')})});
  if(MOB.modo==='novo'||MOB.modo==='mover'){const [w,h]=movTam(MOB.t,MOB.r),X=T(R.x0+MOB.x),Y=T(R.y0+MOB.y),ok=movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.modo==='mover'?MOB.i:-1);list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*16+5,cam:1,f:()=>{movMoldura(X,Y,w,h,ok?'#5dff7a':'#ff5a5a');desenhaMovel(ctx,MOB.t,X,Y,MOB.r,null,.72)}})}
- {const i=casasInfo.get(eu.rm.n)||{},tt=(i.nome?'🏠 Casa de '+i.nome:(eu.rm.b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+eu.rm.n);list.push({x:X0,y:Y0,k:-1e9,cam:1,f:()=>{const a=isoP((X0+X1)/2,Y0);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#2a1a14';ctx.strokeText(tt,a[0],a[1]-H-10);ctx.fillStyle='#fff';ctx.fillText(tt,a[0],a[1]-H-10);ctx.textAlign='left'}})}}
+ {const i=casasInfo.get(eu.rm.n)||{},tt=salaNome(eu.rm.b,i);list.push({x:X0,y:Y0,k:-1e9,cam:1,f:()=>{const a=isoP((X0+X1)/2,Y0);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#2a1a14';ctx.strokeText(tt,a[0],a[1]-H-10);ctx.fillStyle='#fff';ctx.fillText(tt,a[0],a[1]-H-10);ctx.textAlign='left'}})}}
 function levantarCasa(){if(!eu||!eu.casaAcao)return;eu.casaAcao=null;eu.sv=0;eu.sit=false;eu.deitado=0;eu.mz=0;eu.frente=false;eu.back=false;eu.vendoTV=null;const n=nearestWalk(Math.floor(eu.x/TILE),Math.floor(eu.y/TILE),walkP);if(n){eu.x=T(n[0]+.5);eu.y=T(n[1]+.5)}sendPos(true)}
 const MOB={ativo:false,modo:null};
 const FRENTE=[[0,1],[1,0],[0,-1],[-1,0]],CABECA=[[0,-1],[-1,0],[0,1],[1,0]];
@@ -4188,6 +4191,7 @@ function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Ma
 function salaOpcoes(){const o=[],dono=(casasInfo.get(eu.rm.n)||{}).dono===eu.id;if(MOB.ativo)return[];
  if(eu.casaAcao){o.push(['🧍 Levantar',levantarCasa]);if(eu.casaAcao==='tv')o.push(['📺 Mudar de canal',()=>say(eu,pick(['📺 Jornal da Vila','📺 Novela das 8','⚽ Futebol!','📺 Desenho animado','🎤 Programa de auditório']),3,true)]);return o}
  const best=movPerto();if(best){const D=MOV[best.t];if(D.deita)o.push(['😴 Deitar',()=>noMovel(best,'cama','💤 Hora de dormir…')]);else if(D.senta)o.push(['🪑 Sentar',()=>noMovel(best,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']))]);else if(D.tv)o.push(['📺 Ver TV',()=>noMovel(best,'tv','📺 Bora ver TV!')]);else if(D.gel)o.push(['🧊 Abrir geladeira',()=>dono?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000)]);else if(D.juke&&typeof Som!=='undefined'&&Som.faixa)o.push(['🎵 Trocar a música',()=>{Som.iniciarMusica&&Som.iniciarMusica();Som.faixa(Math.floor(Math.random()*5))}])}
+ if(eu.rm.n==='imob')o.unshift(['🏘️ Falar com o corretor',abrirImobiliaria]);
  if(dono)o.push(['🛋️ Decorar',abrirMobilia]);return o.slice(0,3)}
 function mobUI(){let el=$('mobUI');if(el)return el;el=document.createElement('div');el.id='mobUI';el.innerHTML=`<style>
 #mobBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));z-index:60;background:rgba(30,16,22,.95);border:1px solid rgba(255,201,74,.45);border-radius:16px;padding:8px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px);box-shadow:0 6px 24px rgba(0,0,0,.45);color:#fff;font:600 13px Fredoka,sans-serif}
@@ -4264,12 +4268,33 @@ function aptoAcao(ap){const i=aptoInfo(ap),tipo=ap.kind==='kit'?'Kitnet':'Aparta
   const dono=others.get(i.dono);if(!dono||!dono.seen){toast('🔔 Ninguém atendeu: '+(i.nome||'o dono')+' não está na cidade agora.',3000);return}
   emitEv('campainha',{para:i.dono,ap:ap.n});Som.play('clique');toast('🔔 Tocando a campainha do '+ap.num+'… espere '+(i.nome||'o dono')+' abrir.',3500);return}
  if(temCasa()){confirmar('🏢 Apartamento '+ap.num,'Quem tem casa na cidade não pode ter apartamento. O condomínio é para quem está começando. 😉');return}
- const ja=meuApto();
+ confirmar('🔑 '+tipo+' · '+ap.num,nomeAp+' está livre. Para comprar ou alugar, vá à 🏘️ <b>Imobiliária</b> (na cidade, ao lado da Igreja).',null,[['🏘️ Ir para a Imobiliária',()=>irPara((imob.front[0]+.5)*TILE,(imob.front[1]+.5)*TILE)],['OK',()=>{}]])}
+function negociarApto(ap){const ja=meuApto(),tipo=ap.kind==='kit'?'Kitnet':'Apartamento de 2 quartos',nomeAp='apto '+ap.num+' do Bloco '+ap.bloco.nome;
+ if(temCasa()){confirmar('🏢 Apartamento '+ap.num,'Quem tem casa na cidade não pode ter apartamento. O condomínio é para quem está começando. 😉');return}
  confirmar('🔑 '+tipo+' · '+ap.num,nomeAp+' está livre.'+(ja?'<br><small>⚠️ Você já mora no apto '+ja.num+' do Bloco '+ja.bloco.nome+': ele fica vago se pegar este (os móveis de lá são vendidos pela metade).</small>':''),null,[
   ['💰 Comprar por '+money(ap.preco),()=>acao(async()=>{const r=tratar(await api.comprarApto(ap.n));aptoNovo(ap,ja,false,r)})],
   ['📅 Alugar por '+money(ap.aluguel)+'/semana',()=>acao(async()=>{const r=tratar(await api.alugarApto(ap.n));aptoNovo(ap,ja,true,r)})]])}
 function aptoNovo(ap,ja,alugado,r){if(ja)casasInfo.set(ja.n,{dono:null});casasInfo.set(ap.n,{dono:eu.id,nome:eu.nome,alugado});eu.casa_id=ap.n;floatText(eu.x,eu.y-30,'🏢 APÊ NOVO!','#ffc94a');
- toast('🎉 O apto '+ap.num+' do Bloco '+ap.bloco.nome+' agora é seu'+(alugado?' (aluguel de '+money(ap.aluguel)+' por semana, cobrado sozinho)':'')+'!',5000);log(`🏢 ${eu.nome} se mudou para o condomínio!`);emitEv('apto',{n:ap.n,v:1});entrarSala(ap)}
+ toast('🎉 O apto '+ap.num+' do Bloco '+ap.bloco.nome+' agora é seu'+(alugado?' (aluguel de '+money(ap.aluguel)+' por semana, cobrado sozinho)':'')+'!',5000);log(`🏢 ${eu.nome} se mudou para o condomínio!`);emitEv('apto',{n:ap.n,v:1})}
+// ===== Imobiliária: o corretor mostra no mapa as casas e os apartamentos livres =====
+function comprarCasaImob(b){const falta=b.preco-eu.dinheiro;if(b.kind==='mansao'&&eu.nivel<MANSAO_NIVEL){toast('🔒 Mansão: libera no nível '+MANSAO_NIVEL+'.',2500);return}
+ if(falta>0){confirmar('💰 Falta dinheiro','Essa casa custa <b>'+money(b.preco)+'</b>. Você tem <b>'+money(eu.dinheiro)+'</b>. Faltam <b>'+money(falta)+'</b>. Trabalhe mais um pouco! 💼');return}
+ confirmar('🏠 Comprar casa','Comprar a '+(b.kind==='mansao'?'mansão':'casa')+' '+b.n+' por <b>'+money(b.preco)+'</b>?<br><small>Se você já tem uma casa do mesmo tipo, recebe metade do valor dela de volta.</small>',()=>comprarCasa(b))}
+function abrirImobiliaria(){if(!eu)return;confirmar('🏘️ Imobiliária do Tonhão','Olá! Sou o corretor. 😄 Você quer comprar ou alugar?',null,[['🏠 Comprar',()=>mapaImob(false)],['📅 Alugar',()=>mapaImob(true)]])}
+function mapaImob(alugar){const el=document.createElement('div');el.id='mapaG';
+ el.innerHTML='<div class="hd"><h3>'+(alugar?'📅 Para alugar':'🏠 À venda')+'</h3><button class="x">✕</button></div><div class="wrap" style="overflow:auto;max-height:68vh;border-radius:14px"><canvas></canvas></div><div class="lg">'+(alugar?'Só os apartamentos do condomínio são alugados. Toque num <b>bloco</b>.':'🟢 casa livre (toque para ver) · 🏢 condomínio (toque no bloco)')+'</div>';document.body.appendChild(el);
+ const cv3=el.querySelector('canvas'),g=cv3.getContext('2d'),wr=el.querySelector('.wrap');if(!MAPA_ART)MAPA_ART=mapaArte();cv3.width=MAPA_ART.width;cv3.height=MAPA_ART.height;cv3.style.width='200%';
+ const alvos=[];g.drawImage(MAPA_ART,0,0);
+ {const C=CONDO,q=[[C.x0,C.y0],[C.x1+1,C.y0],[C.x1+1,C.y1+1],[C.x0,C.y1+1]].map(([x,y])=>mapaP(T(x),T(y)));g.fillStyle='#c9c2b4';g.strokeStyle='#8a8070';g.lineWidth=2;g.beginPath();q.forEach((p,k)=>k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fill();g.stroke();
+  for(const b of BLOCOS){const r=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]].map(([x,y])=>mapaP(T(x),T(y)));g.fillStyle=b.cor;g.beginPath();r.forEach((p,k)=>k?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fill();g.stroke()}
+  const m=mapaP(T(15),T(-4));g.font='700 11px Fredoka,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#1a1410';g.strokeText('🏢 Condomínio Vila Tonhão',m[0],m[1]+16);g.fillStyle='#ffd23f';g.fillText('🏢 Condomínio Vila Tonhão',m[0],m[1]+16)}
+ const pino=(x,y,txt,cor,fn)=>{const [px,py]=mapaP(x,y);g.fillStyle=cor;g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.arc(px,py,7,0,7);g.fill();g.stroke();g.font='700 9px Fredoka,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='#1a1410';g.strokeText(txt,px,py-11);g.fillStyle='#fff';g.fillText(txt,px,py-11);alvos.push([px,py,fn])};
+ if(!alugar)for(const b of houses){if(b.off||(casasInfo.get(b.n)||{}).dono)continue;pino((b.x+b.w/2)*TILE,(b.y+b.h/2)*TILE,money(b.preco),'#27ae60',()=>{el.remove();confirmar((b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n,'À venda por <b>'+money(b.preco)+'</b>.',null,[['🔑 Comprar',()=>comprarCasaImob(b)],['🚪 Ir visitar',()=>{closePlace();irPara((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE)}],['Voltar',()=>mapaImob(false)]])})}
+ for(const bl of BLOCOS){const livres=APTOS.filter(a=>a.bloco===bl&&!aptoInfo(a).dono);pino((bl.x+bl.w/2)*TILE,(bl.y+bl.h/2)*TILE,'Bloco '+bl.nome+' ('+livres.length+')','#2e86c1',()=>{el.remove();
+  if(!livres.length){confirmar('🏢 Bloco '+bl.nome,'Esse bloco está lotado. Escolha outro!',null,[['Voltar',()=>mapaImob(alugar)]]);return}
+  confirmar('🏢 Bloco '+bl.nome+(bl.i<3?' · kitnets':' · 2 quartos'),(bl.i<3?'Kitnet pequena: comprar '+money(4000)+' ou alugar '+money(250)+'/semana.':'Apartamento médio: comprar '+money(6000)+' ou alugar '+money(350)+'/semana.')+'<br>Apartamentos livres:',null,livres.map(a=>['🔑 '+a.num,()=>negociarApto(a)]).concat([['Voltar',()=>mapaImob(alugar)]]))})}
+ cv3.onclick=ev=>{const r=cv3.getBoundingClientRect(),x=(ev.clientX-r.left)*cv3.width/r.width,y=(ev.clientY-r.top)*cv3.height/r.height;let best=null,bd=18;for(const a of alvos){const d=Math.hypot(a[0]-x,a[1]-y);if(d<bd){bd=d;best=a}}if(best)best[2]()};
+ el.querySelector('.x').onclick=()=>el.remove();requestAnimationFrame(()=>{const q=mapaP(T(30),T(10));wr.scrollLeft=q[0]*wr.scrollWidth/cv3.width-wr.clientWidth/2;wr.scrollTop=q[1]*wr.scrollHeight/cv3.height-wr.clientHeight/2})}
 function cobrarAluguel(){if(!eu||!meuApto())return;api.cobrarAluguel().then(r=>{if(!r)return;tratar(r);
  if(r.pago)toast('🏢 Aluguel do apartamento pago: '+money(r.pago)+'.',3500);
  if(r.atrasado)toast('⚠️ Aluguel atrasado! Junte '+money(r.valor)+' em até 3 dias ou você perde o apartamento.',6000);
@@ -4697,6 +4722,7 @@ function pertoOpcoes(){
  if(casaEm(eu.x,eu.y)===lojaRoupa&&eu.y<T(lojaRoupa.y+lojaRoupa.h-1))o.push(['👕 Ver as roupas',()=>abrirLojaRoupa()]);
  
  {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
+ if(perto((imob.front[0]+.5)*TILE,(imob.front[1]+.5)*TILE,T(1.7)))o.push(['🏘️ Entrar na Imobiliária',()=>entrarSala(IMOB)]);
  for(const bl of BLOCOS)if(perto((bl.front[0]+.5)*TILE,(bl.front[1]+.5)*TILE,T(1.7))){o.push(['🏢 Bloco '+bl.nome+': apartamentos',()=>abrirBloco(bl)]);break}
  for(const b of houses)if(!b.off&&!casaEm(eu.x,eu.y)&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3))){const i=casasInfo.get(b.n)||{};o.push([i.dono&&i.dono===eu.id?'🏠 Minha casa':i.dono?'🏠 Casa de '+(i.nome||'alguém'):'🔑 Casa '+b.n+' à venda',()=>abrirLugar(b)]);break}
  for(const f of FRUTAS)if(perto(f.x,f.y+8,T(1.4))&&!(frutaCD[f.id]>Date.now())){o.push([f.tipo==='manga'?'🥭 Pegar manga':'🍐 Pegar goiaba',()=>comerFruta(f)]);break}
@@ -4929,7 +4955,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261121a';
+const VERSAO_JOGO='v20261121b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
