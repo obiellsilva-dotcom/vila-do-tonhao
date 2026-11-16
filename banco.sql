@@ -1992,3 +1992,7 @@ grant execute on function public.criar_morador(text, text) to authenticated;
 update public.loja set nome = 'Rover' where id = 'esportivo' and tipo = 'carro';
 update public.produtos set nome = 'Lambordini' where id = 'carro_neon';
 update public.loja set nome = 'Jipe Renegado' where id = 'jipe' and tipo = 'carro';
+
+-- ===================== ETAPA 23: Ferrarini na loja do Pix (a Lambordini fica só com o VIP) =====================
+insert into public.produtos(id, tipo, item, dias, nome, preco) values ('carro_gto', 'carro', 'gto', 0, 'Ferrarini', 19.90)
+on conflict (id) do update set nome = excluded.nome, preco = excluded.preco, item = excluded.item;
