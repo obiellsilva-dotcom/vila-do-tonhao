@@ -70,3 +70,6 @@ begin
   return _estado(m.id);
 end $$;
 grant execute on function public.criar_morador(text, text) to authenticated;
+
+-- ===================== ETAPA 22: Esportivo passa a se chamar Rover =====================
+update public.loja set nome = 'Rover' where id = 'esportivo' and tipo = 'carro';
