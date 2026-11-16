@@ -2508,7 +2508,7 @@ const CAR_ESC={moto:1.3,fusca:1.08,sedan:1.2,opala:1.18,esportivo:1.3,kombi_tonh
 const NITIDO=new WeakMap();
 // md = {roda, vidro, pintura}: rodas (0 original, 1 esportiva vermelha, 2 cromada, 3 dourada, 4 preta fosca), vidro (0 normal, 1 fumê, 2 insulfilm, 3 espelhado), pintura (0 fábrica, 1 fosca, 2 metálica, 3 perolada)
 // processa só o quadro (ângulo) que vai aparecer, na hora que precisa: leve e sem travadas
-function quadro(img,md,i){let cc=NITIDO.get(img);if(!cc){cc={};NITIDO.set(img,cc)}const ro=md?md.roda|0:0,vi=md?md.vidro|0:0,pi=md?md.pintura|0:0,key=ro+','+vi+','+pi+','+i;if(cc[key])return cc[key];
+function quadro(img,md,i){let cc=NITIDO.get(img);if(!cc){cc={};NITIDO.set(img,cc)}const ro=0,vi=md?md.vidro|0:0,pi=md?md.pintura|0:0,key=ro+','+vi+','+pi+','+i;if(cc[key])return cc[key];
  const F=320,cv=document.createElement('canvas');cv.width=F;cv.height=F;const g=cv.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(img,(i%8)*160,Math.floor(i/8)*160,160,160,0,0,F,F);
  try{const W=F,H=F,id=g.getImageData(0,0,W,H),d=id.data,n=W*H,bl=new Float32Array(n*3),tmp=new Float32Array(n*3);
   for(let y=0;y<H;y++){const o=y*W;for(let x=0;x<W;x++){const x0=x>0?x-1:x,x1=x<W-1?x+1:x;for(let ch=0;ch<3;ch++)tmp[(o+x)*3+ch]=(d[(o+x0)*4+ch]+d[(o+x)*4+ch]+d[(o+x1)*4+ch])/3}}
@@ -2529,15 +2529,25 @@ function quadro(img,md,i){let cc=NITIDO.get(img);if(!cc){cc={};NITIDO.set(img,cc
     else if(pi===3){const k=Math.max(0,.8-rel)*.45;mix(q,255,232,246,k)}}}
   g.putImageData(id,0,0)}catch(e){}
  cc[key]=cv;return cv}
+const RODAS={fusca:[34.5,-28.3,16.5,7.5,78],sedan:[35,-35,22,8.5,79],opala:[42.5,-28,19.5,8.5,79],esportivo:[33.7,-33,22,9.5,79],kombi_tonhao:[44.5,-37.5,24.5,10.5,79],viatura:[40.5,-36,24.5,10.5,78],duster:[38.7,-39.5,24.5,10.5,73.8]};
+const ARO_COR=[['#c3c7cd','#55595f'],['#d23a3a','#5a1010'],['#eef1f5','#8d949c'],['#e2b33c','#6b4b0c'],['#26272b','#0c0c0e']];
+// rodas que giram: desenha o aro por cima da foto, no lugar certo de cada ângulo
+function drawRodas(c,x0,y0,k,i,R,giro,ro){const EL=.663,se=Math.sin(EL),ce=Math.cos(EL),th=-Math.PI+i*Math.PI/16,yaw=Math.atan2(Math.sin(th)/se,Math.cos(th)),cy=Math.cos(yaw),sy=Math.sin(yaw);
+ if(Math.abs(cy)<.3)return;const [Xf,Xr,b,r,yl]=R,C=yl-b*se+r*ce,cor=ARO_COR[ro]||ARO_COR[0],hx=cy,hy=sy*se,ux=0,uy=-ce,rr0=r*.62*k;
+ for(const X of [Xf,Xr])for(const Z of [b,-b]){if(Z*cy<0)continue;const zp=X*sy+Z*cy;const u=X*cy-Z*sy,v=zp*se-r*ce+C,px=x0+(80+u)*k,py=y0+v*k;
+  const P=(a,rad)=>[px+rad*(Math.cos(a)*hx+Math.sin(a)*ux),py+rad*(Math.cos(a)*hy+Math.sin(a)*uy)];
+  c.beginPath();for(let q=0;q<=16;q++){const t=P(q*Math.PI/8,rr0);q?c.lineTo(t[0],t[1]):c.moveTo(t[0],t[1])}c.fillStyle=cor[0];c.fill();
+  c.strokeStyle=cor[1];c.lineWidth=Math.max(1,rr0*.28);c.beginPath();const sg=Math.sign(cy)||1;for(let q=0;q<5;q++){const a=sg*giro+q*Math.PI*2/5,t=P(a,rr0*.92),m=P(a,rr0*.25);c.moveTo(m[0],m[1]);c.lineTo(t[0],t[1])}c.stroke();
+  c.fillStyle=cor[1];c.beginPath();for(let q=0;q<=8;q++){const t=P(q*Math.PI/4,rr0*.22);q?c.lineTo(t[0],t[1]):c.moveTo(t[0],t[1])}c.fill()}}
 function drawCarSprite(c,x,y,img,ang,o,off=0){const N=32,T=77*CK*(o.esc||1),i=((Math.round((Math.PI+ang)/(Math.PI*2/N))+off)%N+N)%N;
  if(!o.semSombra){c.save();c.translate(x,y);c.scale(CK,SY*CK);c.rotate(ang);c.fillStyle='rgba(0,0,0,.3)';rr(c,-30,-13,62,28,8);c.fill();c.restore()}
- const bob=(o.pitch||0)*6;c.drawImage(quadro(img,CAR_MOD_ATUAL,i),0,0,320,320,x-T/2,o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob,T,T);
+ const bob=(o.pitch||0)*6;const Y0=o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob;c.drawImage(quadro(img,CAR_MOD_ATUAL,i),0,0,320,320,x-T/2,Y0,T,T);if(o.rodas)drawRodas(c,x-T/2,Y0,T/160,i,o.rodas,o.giroRoda||0,CAR_MOD_ATUAL?CAR_MOD_ATUAL.roda|0:0);
  if(o.freio){const cs=Math.cos(ang),sn=Math.sin(ang);c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,40,40,.35)';c.beginPath();c.ellipse(x-cs*30*CK,y-sn*30*SY*CK-8*CK,5,3,0,0,7);c.fill();c.restore()}}
 function drawCarStack(c,x,y,kind,ang,v,o={}){if(kind==='duster'&&!SPR_DUSTER.naturalWidth)kind='viatura';
  if(CAR_SOM_ATUAL){const t=now*2.2;c.save();c.globalCompositeOperation='lighter';for(let k=0;k<3;k++){const f=(t+k/3)%1;c.strokeStyle=`rgba(255,80,200,${(1-f)*.55})`;c.lineWidth=2.2;c.beginPath();c.ellipse(x,y-6,20+f*46,9+f*21,0,0,7);c.stroke()}c.restore();c.font='14px sans-serif';c.textAlign='center';c.fillText(['🎵','🎶','🔊'][Math.floor(now*2)%3],x+Math.sin(now*3)*18,y-48-((now*30)%18))}
  const SP3={fusca:[SPR_FUSCA,SPR_FUSCA_M],sedan:[SPR_SEDAN,SPR_SEDAN_M],moto:[SPR_MOTO,SPR_MOTO_M],opala:[SPR_OPALA,SPR_OPALA_M],esportivo:[SPR_ESP,SPR_ESP_M],kombi_tonhao:[SPR_KT,SPR_KT_M],viatura:[SPR_VIAT,null],duster:[SPR_DUSTER,null]}[kind];
  if(SP3&&SP3[0].complete&&SP3[0].naturalWidth){const sp=SP3[1]?spriteCor(SP3[0],SP3[1],o.cor||CAR_COR_ATUAL||CAR_COLOR[kind]):SP3[0];if(sp){const th=Math.atan2((Math.cos(ang)+Math.sin(ang))*IB,(Math.cos(ang)-Math.sin(ang))*IA);{const cs=Math.cos(ang),sn=Math.sin(ang),E0=CAR_ESC[kind]||1,L=(kind==='moto'?14:21)*CK*E0,Wd=(kind==='moto'?3.5:8.5)*CK*E0,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];c.fillStyle='rgba(10,10,20,.22)';c.beginPath();[[L,Wd],[L,-Wd],[-L,-Wd],[-L,Wd]].forEach(([u,w],k2)=>{const q=P(cs*u-sn*w,sn*u+cs*w);k2?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fill()}
-   drawCarSprite(c,x,y,sp,th,Object.assign({},o,{semSombra:1,chao:1,esc:CAR_ESC[kind]||1}));if(kind==='viatura'&&o.giro)giroflex(c,x,y);if(kind==='moto'&&v)drawPerson(c,x,y-9,v,{s:.62,sit:true,dir:Math.cos(th)>=0?1:-1,back:Math.sin(th)<-.4});return}}
+   drawCarSprite(c,x,y,sp,th,Object.assign({},o,{semSombra:1,chao:1,esc:CAR_ESC[kind]||1,rodas:RODAS[kind]}));if(kind==='viatura'&&o.giro)giroflex(c,x,y);if(kind==='moto'&&v)drawPerson(c,x,y-9,v,{s:.62,sit:true,dir:Math.cos(th)>=0?1:-1,back:Math.sin(th)<-.4});return}}
  ang+=Math.PI/4;
 {const ANT=kind==='caminhonete'?[SPR_PICK,0]:kind==='neon'?[SPR_VIP,16]:null;
  if(ANT&&ANT[0].complete&&ANT[0].naturalWidth){const a0=ang-Math.PI/4,th0=Math.atan2((Math.cos(a0)+Math.sin(a0))*IB,(Math.cos(a0)-Math.sin(a0))*IA),th=Math.atan2(Math.sin(th0)/.78,Math.cos(th0)),cs=Math.cos(a0),sn=Math.sin(a0),L=(kind==='caminhonete'?25:22)*CK*(CAR_ESC[kind]||1)/1.1,Wd=9.5*CK*(CAR_ESC[kind]||1)/1.1,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];
@@ -2634,7 +2644,7 @@ function dirigir0(c,p,car){
  const dt=Math.max(.001,Math.min(.1,now-m.t));m.t=now;
  const ivx=(p.x-m.x)/dt,ivy=(p.y-m.y)/dt;m.x=p.x;m.y=p.y;
  const k=Math.min(1,dt*8);m.vx+=(ivx-m.vx)*k;m.vy+=(ivy-m.vy)*k;
- const vel=Math.hypot(m.vx,m.vy),anda=vel>12;m.ac+=((vel-m.v)/dt-m.ac)*Math.min(1,dt*5);m.v=vel;
+ const vel=Math.hypot(m.vx,m.vy),anda=vel>12;m.ac+=((vel-m.v)/dt-m.ac)*Math.min(1,dt*5);m.v=vel;m.odo=(m.odo||0)+(anda?vel*dt*(p.re?-1:1):0);
  let w=0;if(anda){let d=(p===eu&&eu.hd!=null?eu.hd:p.re?Math.atan2(-m.vy,-m.vx):Math.atan2(m.vy,m.vx))-m.ang;d=Math.atan2(Math.sin(d),Math.cos(d));const giro=d*Math.min(1,dt*16);m.ang+=giro;w=giro/dt}
  m.w+=(w-m.w)*Math.min(1,dt*6);
  const f=carro3d(car);
@@ -2650,7 +2660,7 @@ function dirigir0(c,p,car){
  if(vel>90){c.strokeStyle=`rgba(255,255,255,${Math.min(.3,(vel-90)/400)})`;c.lineWidth=1.2;const ux=cs,uy=sn*SY;
   for(const o of [-f.W*.7,f.W*.7]){const px=p.x-ux*f.L-sn*o,py=p.y-uy*f.L+cs*o*SY;c.beginPath();c.moveTo(px,py);c.lineTo(px-ux*(10+vel*.06),py-uy*(10+vel*.06));c.stroke()}}
  const bob=anda?Math.sin(now*22+p.x*.05)*.35:Math.sin(now*30)*.12;
- drawCarStack(c,p.x,p.y+bob,car,m.ang,p.v,{giro:car==='viatura'&&(p===eu?eu.giro:p.giro),steer:m.st,roll:m.rl,pitch:m.pt,freio:!anda||m.ac<-60});
+ drawCarStack(c,p.x,p.y+bob,car,m.ang,p.v,{giroRoda:-(m.odo||0)/6,giro:car==='viatura'&&(p===eu?eu.giro:p.giro),steer:m.st,roll:m.rl,pitch:m.pt,freio:!anda||m.ac<-60});
 }
 function drawCarShape(c,x,y,kind,dir,s,v){
  if(s>=.7){drawCarStack(c,x,y,kind,dir>0?0:Math.PI,v,{freio:1});return}
