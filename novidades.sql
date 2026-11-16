@@ -1,135 +1,72 @@
--- Novidades: painel do administrador e venda de carros. Rode no Supabase.
+-- Novidades: provador não dá mais roupa paga de graça. Rode no Supabase.
 
--- ===================== ETAPA 11: painel do administrador e venda de carros =====================
-alter table public.moradores add column if not exists admin boolean not null default false;
+-- ===================== ETAPA 21: provador não dá mais roupa paga de graça =====================
+-- lê os números do visual (TH antigo = 1 dígito por campo; TJ = 2 dígitos por campo)
+create or replace function public._vis_nums(v text) returns integer[]
+language sql immutable as $$
+  select case
+    when v ~ '^TH[0-9]+$' then (select array_agg(substr(v, i, 1)::int order by i) from generate_series(3, length(v)) i)
+    when v ~ '^TJ[0-9]+$' then (select array_agg(substr(v, i, 2)::int order by i) from generate_series(3, length(v) - 1, 2) i)
+  end
+$$;
 
-create or replace function public._adm() returns public.moradores
+-- confere se a pessoa pode vestir esse visual: peça grátis, peça que já está usando ou peça comprada na loja
+create or replace function public._confere_roupas(p_id uuid, v text) returns void
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores;
+declare novo integer[] := _vis_nums(v); velho integer[]; ant text; s text; s0 text;
+        k integer; i integer; pc text; campos integer[] := array[8, 5, 9, 6, 7, 15]; nomes text[] := array['roupa','calca','calcado','chapeu','extra','estampa'];
 begin
-  m := _eu();
-  if not m.admin then raise exception 'Só o administrador pode fazer isso.'; end if;
-  return m;
+  select visual into ant from moradores where id = p_id;
+  velho := _vis_nums(coalesce(ant, ''));
+  s := case when coalesce(novo[10], 0) = 1 then 'f' else 'm' end;
+  s0 := case when coalesce(velho[10], 0) = 1 then 'f' else 'm' end;
+  for k in 1..6 loop
+    i := coalesce(novo[campos[k]], 0);
+    if i >= 50 then continue; end if;  -- peça VIP: conferida à parte
+    pc := case when nomes[k] = 'estampa' then 'estampa' else nomes[k] || '_' || s end;
+    if preco_roupa(pc, i) = 0 then continue; end if;
+    if velho is not null and coalesce(velho[campos[k]], 0) = i and (nomes[k] = 'estampa' or s = s0) then continue; end if;
+    if exists (select 1 from guarda_roupa where morador = p_id and guarda_roupa.peca = pc and guarda_roupa.item = i) then continue; end if;
+    raise exception '👕 Essa peça é vendida na Loja de Roupas. Compre lá primeiro.';
+  end loop;
 end $$;
-revoke execute on function public._adm() from public, anon, authenticated;
+revoke execute on function public._confere_roupas(uuid, text) from public, anon, authenticated;
 
-create or replace function public._alvo(p_nome text) returns public.moradores
+-- quem já joga fica com as peças que está usando agora (vão para o guarda-roupa)
+insert into public.guarda_roupa(morador, peca, item)
+select m.id, case when c.n = 'estampa' then 'estampa' else c.n || '_' || case when coalesce(x.a[10], 0) = 1 then 'f' else 'm' end end, x.a[c.p]
+from public.moradores m
+cross join lateral (select public._vis_nums(m.visual) a) x
+cross join (values ('roupa', 8), ('calca', 5), ('calcado', 9), ('chapeu', 6), ('extra', 7), ('estampa', 15)) c(n, p)
+where x.a is not null and x.a[c.p] is not null and x.a[c.p] < 50
+  and public.preco_roupa(case when c.n = 'estampa' then 'estampa' else c.n || '_' || case when coalesce(x.a[10], 0) = 1 then 'f' else 'm' end end, x.a[c.p]) > 0
+on conflict do nothing;
+
+create or replace function public.criar_morador(p_nome text, p_visual text) returns json
 language plpgsql security definer set search_path = public as $$
-declare a public.moradores;
+declare m public.moradores; n text := btrim(regexp_replace(coalesce(p_nome,''), '\s+', ' ', 'g'));
+        v text := upper(coalesce(p_visual,'')); vip boolean;
 begin
-  select * into a from moradores where lower(nome) = lower(btrim(p_nome)) limit 1 for update;
-  if not found then raise exception 'Jogador "%" não encontrado.', p_nome; end if;
-  return a;
+  if auth.uid() is null then raise exception 'Entre no jogo primeiro.'; end if;
+  if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) then raise exception 'Crie sua conta para jogar.'; end if;
+  if char_length(n) < 1 or char_length(n) > 22 then raise exception 'O nome precisa ter de 1 a 22 letras.'; end if;
+  if v !~ '^(TH[0-9]{7,30}|TJ[0-9]{20,60})$' or (v ~ '^TJ' and length(v) % 2 = 1) then raise exception 'Visual inválido.'; end if;
+  if v ~ '^TJ' and exists (select 1 from generate_series(3, length(v) - 1, 2) i where substr(v, i, 2)::int >= 50) then
+    select coalesce(vip_ate > now(), false) into vip from moradores where id = auth.uid();
+    if not coalesce(vip, false) then raise exception '👑 Essa peça é exclusiva para VIP.'; end if;
+  end if;
+  perform _confere_roupas(auth.uid(), v);
+  n := public.limpar_texto(n);
+  if n is distinct from (select nome from moradores where id = auth.uid())
+     and exists (select 1 from moradores where id <> auth.uid() and lower(translate(nome,'áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ','aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC')) = lower(translate(n,'áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ','aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC'))) then
+    raise exception 'Já existe um morador com esse nome. Escolha outro.';
+  end if;
+  insert into moradores(id, nome, visual) values (auth.uid(), n, v)
+  on conflict (id) do update set nome = excluded.nome, visual = excluded.visual, visto_em = now(),
+    fome_em = case when now() - moradores.visto_em > interval '2 minutes' then now() else moradores.fome_em end
+    where not moradores.banido
+  returning * into m;
+  if m.id is null then raise exception 'Você foi banido da cidade.'; end if;
+  return _estado(m.id);
 end $$;
-revoke execute on function public._alvo(text) from public, anon, authenticated;
-
--- uma função só para o painel: p_acao = dinheiro | vip | pet | carro | casa | banir | desbanir | tirar_casa
-create or replace function public.admin_acao(p_nome text, p_acao text, p_valor text) returns json
-language plpgsql security definer set search_path = public as $$
-declare a public.moradores; n integer; c public.casas;
-begin
-  perform _adm();
-  a := _alvo(p_nome);
-  if p_acao = 'dinheiro' then
-    n := p_valor::integer;
-    update moradores set dinheiro = greatest(0, dinheiro + n) where id = a.id;
-  elsif p_acao = 'vip' then
-    n := greatest(1, p_valor::integer);
-    update moradores set vip_ate = greatest(coalesce(vip_ate, now()), now()) + make_interval(days => n) where id = a.id;
-  elsif p_acao = 'pet' then
-    if p_valor not in ('cachorro','gato','galinha','capivara','papagaio') then raise exception 'Pet inválido.'; end if;
-    update moradores set pets = (select array_agg(distinct x) from unnest(array_append(pets, p_valor)) x), pet = p_valor where id = a.id;
-  elsif p_acao = 'carro' then
-    update moradores set carros = (select array_agg(distinct x) from unnest(array_append(carros, p_valor)) x), carro = p_valor where id = a.id;
-  elsif p_acao = 'casa' then
-    select * into c from casas where id = p_valor::integer for update;
-    if not found then raise exception 'Casa não existe.'; end if;
-    update vagas set morador = null, carro = null, desde = null where casa in (select id from casas where dono = a.id);
-    update casas set dono = null, comprada_em = null, aberta = false where dono = a.id;
-    update casas set dono = a.id, comprada_em = now(), aberta = false where id = c.id;
-    update moradores set casa_id = c.id where id = a.id;
-  elsif p_acao = 'tirar_casa' then
-    update casas set dono = null, comprada_em = null, aberta = false where dono = a.id;
-    update moradores set casa_id = null where id = a.id;
-  elsif p_acao = 'banir' then
-    update moradores set banido = true where id = a.id;
-  elsif p_acao = 'desbanir' then
-    update moradores set banido = false where id = a.id;
-  else raise exception 'Ação desconhecida.'; end if;
-  return json_build_object('ok', true, 'id', a.id, 'nome', a.nome);
-end $$;
-grant execute on function public.admin_acao(text, text, text) to authenticated;
-
--- vender o carro para a concessionária (metade do preço)
-create or replace function public.vender_carro_loja(p_carro text) returns json
-language plpgsql security definer set search_path = public as $$
-declare m public.moradores; i public.loja; v integer;
-begin
-  m := _eu();
-  if not (p_carro = any(m.carros)) then raise exception 'Esse carro não é seu.'; end if;
-  select * into i from loja where id = p_carro and tipo = 'carro';
-  if not found then raise exception 'A concessionária não compra esse carro (é da loja VIP). Venda para outro jogador!'; end if;
-  v := i.preco / 2;
-  update vagas set morador = null, carro = null, desde = null where morador = m.id and carro = p_carro;
-  update moradores set carros = array_remove(carros, p_carro), carro = case when carro = p_carro then null else carro end,
-    carro_cores = carro_cores - p_carro, dinheiro = dinheiro + v where id = m.id;
-  return json_build_object('recebido', v, 'eu', _estado(m.id));
-end $$;
-grant execute on function public.vender_carro_loja(text) to authenticated;
-
--- propostas de venda entre jogadores
-create table if not exists public.propostas (
-  id bigserial primary key,
-  vendedor uuid not null references public.moradores(id) on delete cascade,
-  comprador uuid not null references public.moradores(id) on delete cascade,
-  carro text not null,
-  valor integer not null check (valor >= 0),
-  criado_em timestamptz not null default now()
-);
-alter table public.propostas enable row level security;
-revoke insert, update, delete on public.propostas from anon, authenticated;
-
-create or replace function public.propor_venda(p_nome text, p_carro text, p_valor integer) returns json
-language plpgsql security definer set search_path = public as $$
-declare m public.moradores; b public.moradores; pid bigint;
-begin
-  m := _eu();
-  if not (p_carro = any(m.carros)) then raise exception 'Esse carro não é seu.'; end if;
-  if p_valor < 0 or p_valor > 10000000 then raise exception 'Valor inválido.'; end if;
-  select * into b from moradores where lower(nome) = lower(btrim(p_nome)) limit 1;
-  if not found then raise exception 'Jogador "%" não encontrado.', p_nome; end if;
-  if b.id = m.id then raise exception 'Não dá para vender para você mesmo.'; end if;
-  if p_carro = any(b.carros) then raise exception '% já tem esse carro.', b.nome; end if;
-  delete from propostas where vendedor = m.id and carro = p_carro;
-  insert into propostas(vendedor, comprador, carro, valor) values (m.id, b.id, p_carro, p_valor) returning id into pid;
-  return json_build_object('id', pid, 'comprador', b.id, 'nome', b.nome);
-end $$;
-grant execute on function public.propor_venda(text, text, integer) to authenticated;
-
-create or replace function public.responder_proposta(p_id bigint, p_aceitar boolean) returns json
-language plpgsql security definer set search_path = public as $$
-declare m public.moradores; p public.propostas; v public.moradores; cor text;
-begin
-  m := _eu();
-  select * into p from propostas where id = p_id and comprador = m.id for update;
-  if not found then raise exception 'Essa proposta não existe mais.'; end if;
-  delete from propostas where id = p.id;
-  if not p_aceitar then return json_build_object('ok', false); end if;
-  if p.criado_em < now() - interval '30 minutes' then raise exception 'A proposta expirou.'; end if;
-  select * into v from moradores where id = p.vendedor for update;
-  if not (p.carro = any(v.carros)) then raise exception 'O vendedor não tem mais esse carro.'; end if;
-  if p.carro = any(m.carros) then raise exception 'Você já tem esse carro.'; end if;
-  if m.dinheiro < p.valor then raise exception 'Dinheiro insuficiente.'; end if;
-  cor := v.carro_cores->>p.carro;
-  update vagas set morador = null, carro = null, desde = null where morador = v.id and carro = p.carro;
-  update moradores set carros = array_remove(carros, p.carro), carro = case when carro = p.carro then null else carro end,
-    carro_cores = carro_cores - p.carro, dinheiro = dinheiro + p.valor where id = v.id;
-  update moradores set carros = array_append(carros, p.carro), carro = p.carro, dinheiro = dinheiro - p.valor,
-    carro_cores = case when cor is null then carro_cores else carro_cores || jsonb_build_object(p.carro, cor) end where id = m.id;
-  return json_build_object('ok', true, 'carro', p.carro, 'eu', _estado(m.id));
-end $$;
-grant execute on function public.responder_proposta(bigint, boolean) to authenticated;
-
--- TORNE-SE ADMINISTRADOR: troque SEU_EMAIL_AQUI pelo e-mail que você usa para entrar no jogo
-update public.moradores set admin = true where id = (select id from auth.users where email = 'SEU_EMAIL_AQUI');
-select nome as administrador from public.moradores where admin = true;
+grant execute on function public.criar_morador(text, text) to authenticated;
