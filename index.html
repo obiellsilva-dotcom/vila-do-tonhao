@@ -1302,8 +1302,8 @@ for(let y=-7;y<=-5;y++){for(let x=2;x<=8;x++)setTile(x,y,G.GRASS);for(let x=11;x
 const BLOCOS=[{nome:'A',x:2,y:-18},{nome:'B',x:12,y:-18},{nome:'C',x:22,y:-18},{nome:'D',x:1,y:-12}].map((b,i)=>Object.assign(b,{w:7,h:4,i,cor:['#e9d8b4','#cfe0d2','#f0cdb0','#d6d9ea'][i],front:[b.x+3,b.y+4]}));
 for(const b of BLOCOS)for(let y=b.y;y<b.y+b.h;y++)for(let x=b.x;x<b.x+b.w;x++)setTile(x,y,G.BLD);
 setTile(29,-12,G.BLD); // guarita (portaria)
-// 4 blocos × 4 andares × 4 apartamentos = 64. Finais 1 e 2 = kitnet, 3 e 4 = 2 quartos. Número no banco: 1000 + bloco×100 + andar×10 + final
-const APTOS=[];BLOCOS.forEach((b,bi)=>{for(let a=1;a<=4;a++)for(let k=1;k<=4;k++)APTOS.push({n:1000+(bi+1)*100+a*10+k,num:a*100+k,bloco:b,kind:k<=2?'kit':'ap2',apto:true,front:b.front,preco:k<=2?4000:7000,aluguel:k<=2?250:400})});
+// 4 blocos × 4 andares × 4 apartamentos = 64. Blocos A, B e C = kitnet (pequeno); Bloco D = 2 quartos (médio, um pouco mais caro). Número no banco: 1000 + bloco×100 + andar×10 + final
+const APTOS=[];BLOCOS.forEach((b,bi)=>{for(let a=1;a<=4;a++)for(let k=1;k<=4;k++)APTOS.push({n:1000+(bi+1)*100+a*10+k,num:a*100+k,bloco:b,kind:bi<3?'kit':'ap2',apto:true,front:b.front,preco:bi<3?4000:6000,aluguel:bi<3?250:350})});
 const aptoDe=n=>APTOS.find(a=>a.n===+n);
 // zones
 for(let y=15;y<=28;y++)for(let x=37;x<=54;x++)grid[y][x]=G.WALK; // centro de empregos
@@ -2328,8 +2328,8 @@ function piscaArvore(c,t){if(!(t.x>T(15)&&t.x<T(33)&&t.y>T(31)&&t.y<T(37)))retur
 const SALAS={casa:{x0:123,y0:82,x1:132,y1:89,porta:[127,90],parede:'#efe2c8',piso:['#b07a4a','#a56f40']},
  mansao:{x0:121,y0:92,x1:138,y1:98,porta:[129,99],esc:{x0:137,y0:92,x1:138,y1:95},parede:'#f4ead8',piso:['#d8c7a8','#cdb995']},
  mansao2:{x0:-19,y0:92,x1:-2,y1:98,porta:null,esc:{x0:-3,y0:92,x1:-2,y1:95},parede:'#e8eef4',piso:['#c9b08a','#bfa47c'],cima:1},
- kit:{x0:112,y0:-18,x1:119,y1:-13,porta:[115,-12],parede:'#f1ead9',piso:['#cfc6b8','#c4bbab']},
- ap2:{x0:122,y0:-18,x1:135,y1:-13,porta:[128,-12],parede:'#e6eef2',piso:['#b8946a','#ad8a60']}};
+ kit:{x0:112,y0:-17,x1:117,y1:-14,porta:[114,-13],parede:'#f1ead9',piso:['#cfc6b8','#c4bbab']},
+ ap2:{x0:122,y0:-18,x1:129,y1:-14,porta:[125,-13],parede:'#e6eef2',piso:['#b8946a','#ad8a60']}};
 for(const R of Object.values(SALAS)){for(let y=R.y0-1;y<=R.y1+1;y++)for(let x=R.x0-1;x<=R.x1+1;x++)setTile(x,y,(x<R.x0||x>R.x1||y<R.y0||y>R.y1)?G.BLD:G.FLOOR);if(R.porta)setTile(R.porta[0],R.porta[1],G.FLOOR)}
 const movAqui=m=>!m.g&&(m.a|0)===((eu&&eu.rm&&eu.rm.andar)|0);
 const naEsc=(R,tx,ty)=>!!R.esc&&tx>=R.esc.x0&&tx<=R.esc.x1&&ty>=R.esc.y0&&ty<=R.esc.y1;
