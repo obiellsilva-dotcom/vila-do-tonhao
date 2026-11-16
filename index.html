@@ -3467,7 +3467,7 @@ function morreu(){
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
 const NOVID='v20261117';
 const NOV_SLIDES=[
- {t:'🏠 Casas em outra dimensão',x:'Entre em casa e ela vira um cômodo grande, só seu. Toque em <b>🛋️ Decorar</b>: 25 móveis novos, girar, mover, guardar no 📦 inventário e até <b>paredes e portas</b> para fazer quarto, cozinha e banheiro. Deite na cama, sente no sofá, veja TV e guarde comida na geladeira!',d:(g,t)=>{const L=['cama','sofa','tv','aquario','geladeira','homet'],k=Math.floor(t/1.6)%L.length;const o=NOV_OFF||(NOV_OFF=document.createElement('canvas'));previaMovel(o,L[k],Math.floor(t*1.25)%4);g.drawImage(o,160-o.width*.75,100-o.height*.75,o.width*1.5,o.height*1.5)}},
+ {t:'🏠 Interior das casas novo',x:'Sua casa agora tem um interior muito melhor: maior e todo seu para decorar. Toque em <b>🛋️ Decorar</b>: 25 móveis novos, girar, mover, guardar no 📦 inventário e até <b>paredes e portas</b> para fazer quarto, cozinha e banheiro. Deite na cama, sente no sofá, veja TV e guarde comida na geladeira!',d:(g,t)=>{const L=['cama','sofa','tv','aquario','geladeira','homet'],k=Math.floor(t/1.6)%L.length;const o=NOV_OFF||(NOV_OFF=document.createElement('canvas'));previaMovel(o,L[k],Math.floor(t*1.25)%4);g.drawImage(o,160-o.width*.75,100-o.height*.75,o.width*1.5,o.height*1.5)}},
  {t:'🏰 Mansão com 2 andares',x:'A mansão ganhou uma <b>escada de concreto</b>: suba e o andar de baixo some, mostrando só o andar de cima. Cada andar tem seus móveis.',d:(g,t)=>{g.font='70px sans-serif';g.textAlign='center';g.fillText('🏰',160,120+Math.sin(t*2)*6);g.font='30px sans-serif';g.fillText('⬆️',230,80-((t*30)%40))}},
  {t:'🚗 Carros novos',x:'<b>Lamborghini</b> (no lugar do Esportivo Neon), <b>Amarok</b> (no lugar da Caminhonete) e veículos de trabalho: Duster da prefeitura, SW4 do delegado, Frontier do mecânico, caminhão do padeiro e do operário e o caminhão de lixo. E as rodas agora giram!',d:(g,t)=>{const L=['neon','caminhonete','duster','sw4','frontier','caminhao','lixo'],k=Math.floor(t/1.7)%L.length;g.save();g.setTransform(1.25,0,0,1.25,160,128);try{drawCarStack(g,0,0,L[k],t*1.2,null,{giroRoda:t*6,rodaAnda:true})}catch(e){}g.restore()}},
  {t:'💼 Empregos no mapa',x:'Agora as tarefas acontecem na cidade: siga a <b>seta amarela</b>. Frentista, repositor, mecânico, médico, delegado, padeiro (entregas), operário e o emprego novo de <b>🗑️ Lixeiro</b>. Os empregos liberam em níveis mais altos (vai até o 50).',d:(g,t)=>{g.font='54px sans-serif';g.textAlign='center';const E=['⛽','📦','🔧','🩺','🕵️','🥖','🧊','🗑️'];g.fillText(E[Math.floor(t/.9)%E.length],160,120);g.fillStyle='#ffd23f';g.beginPath();const y=150+Math.sin(t*5)*5;g.moveTo(160,y+20);g.lineTo(148,y);g.lineTo(172,y);g.fill()}},
@@ -4616,7 +4616,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261117b';
+const VERSAO_JOGO='v20261117c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
