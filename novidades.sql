@@ -1,135 +1,141 @@
--- Novidades: painel do administrador e venda de carros. Rode no Supabase.
+-- Novidades: só a ETAPA 25 (condomínio, imobiliária, aluguel, casas 50% mais caras). As etapas 21 a 24 já foram rodadas.
 
--- ===================== ETAPA 11: painel do administrador e venda de carros =====================
-alter table public.moradores add column if not exists admin boolean not null default false;
+-- ===================== ETAPA 25: Condomínio Vila Tonhão (apartamentos para comprar ou alugar) e casas 50% mais caras =====================
+-- Os apartamentos ficam na mesma tabela das casas (id 1101 a 1444): assim móveis, geladeira e porta funcionam igual.
+-- Número: 1000 + bloco×100 + andar×10 + final. Blocos A, B e C = kitnet; bloco D = 2 quartos.
+create table if not exists public.migracoes (id text primary key, feita_em timestamptz not null default now());
+alter table public.casas add column if not exists alugada boolean not null default false;
+alter table public.casas add column if not exists aluguel_ate timestamptz;
+alter table public.casas add column if not exists valor_aluguel integer;
 
-create or replace function public._adm() returns public.moradores
+-- o "tipo" passa a considerar apartamento e os preços novos (casas 50% mais caras)
+drop index if exists public.casas_um_por_tipo;
+alter table public.casas drop column if exists tipo;
+alter table public.casas add column tipo text generated always as (case when id > 1000 then 'apto' when preco >= 75000 then 'mansao' when preco >= 15000 then 'media' else 'barata' end) stored;
+create unique index if not exists casas_um_por_tipo on public.casas(dono, tipo) where dono is not null;
+
+-- casas da cidade 50% mais caras (roda uma vez só)
+do $$ begin
+  if not exists (select 1 from public.migracoes where id = 'casas_x15') then
+    update public.casas set preco = round(preco * 1.5) where id < 1000;
+    insert into public.migracoes(id) values ('casas_x15');
+  end if;
+end $$;
+
+-- os 64 apartamentos
+insert into public.casas(id, preco, nivel_min, valor_aluguel)
+select 1000 + b * 100 + a * 10 + f, case when b <= 3 then 4000 else 6000 end, 1, case when b <= 3 then 250 else 350 end
+from generate_series(1, 4) b, generate_series(1, 4) a, generate_series(1, 4) f
+on conflict (id) do update set preco = excluded.preco, valor_aluguel = excluded.valor_aluguel;
+
+-- vende os móveis pela metade e deixa o apartamento vago
+create or replace function public._vagar_apto(p_casa integer) returns integer
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores;
+declare c public.casas; volta integer := 0;
+begin
+  select * into c from casas where id = p_casa and id > 1000 for update;
+  if c.id is null or c.dono is null then return 0; end if;
+  select coalesce(sum(coalesce(preco_movel(e->>'t'), 0) / 2), 0) into volta from jsonb_array_elements(c.moveis) e;
+  update moradores set dinheiro = dinheiro + volta, casa_id = case when casa_id = c.id then null else casa_id end where id = c.dono;
+  update casas set dono = null, comprada_em = null, aberta = false, alugada = false, aluguel_ate = null, moveis = '[]'::jsonb, geladeira = '{}'::jsonb where id = c.id;
+  return volta;
+end $$;
+revoke execute on function public._vagar_apto(integer) from public, anon, authenticated;
+
+-- apartamento alugado e vencido há mais de 3 dias volta a ficar livre
+create or replace function public._limpa_aptos() returns void
+language plpgsql security definer set search_path = public as $$
+declare r record;
+begin
+  for r in select id from casas where id > 1000 and alugada and aluguel_ate < now() - interval '3 days' loop
+    perform _vagar_apto(r.id);
+  end loop;
+end $$;
+revoke execute on function public._limpa_aptos() from public, anon, authenticated;
+
+create or replace function public._pegar_apto(p_casa integer, p_alugar boolean) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; antigo integer; volta integer := 0; custo integer;
 begin
   m := _eu();
-  if not m.admin then raise exception 'Só o administrador pode fazer isso.'; end if;
-  return m;
+  perform _limpa_aptos();
+  select * into c from casas where id = p_casa and id > 1000 for update;
+  if not found then raise exception 'Esse apartamento não existe.'; end if;
+  if c.dono = m.id then raise exception 'Esse apartamento já é seu.'; end if;
+  if c.dono is not null then raise exception 'Esse apartamento já tem morador.'; end if;
+  if exists (select 1 from casas where dono = m.id and id < 1000) then raise exception 'Quem tem casa na cidade não pode ter apartamento.'; end if;
+  custo := case when p_alugar then c.valor_aluguel else c.preco end;
+  select id into antigo from casas where dono = m.id and id > 1000;
+  if m.dinheiro < custo then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', custo; end if;
+  if antigo is not null then volta := _vagar_apto(antigo); end if;
+  update casas set dono = m.id, comprada_em = now(), aberta = false, alugada = p_alugar,
+    aluguel_ate = case when p_alugar then now() + interval '7 days' else null end where id = c.id;
+  update moradores set dinheiro = dinheiro - custo, casa_id = c.id where id = m.id;
+  return json_build_object('casa', c.id, 'devolvido', volta, 'eu', _estado(m.id));
 end $$;
-revoke execute on function public._adm() from public, anon, authenticated;
+revoke execute on function public._pegar_apto(integer, boolean) from public, anon, authenticated;
 
-create or replace function public._alvo(p_nome text) returns public.moradores
-language plpgsql security definer set search_path = public as $$
-declare a public.moradores;
-begin
-  select * into a from moradores where lower(nome) = lower(btrim(p_nome)) limit 1 for update;
-  if not found then raise exception 'Jogador "%" não encontrado.', p_nome; end if;
-  return a;
-end $$;
-revoke execute on function public._alvo(text) from public, anon, authenticated;
+create or replace function public.comprar_apto(p_casa integer) returns json
+language sql security definer set search_path = public as $$ select _pegar_apto(p_casa, false) $$;
+create or replace function public.alugar_apto(p_casa integer) returns json
+language sql security definer set search_path = public as $$ select _pegar_apto(p_casa, true) $$;
+grant execute on function public.comprar_apto(integer) to authenticated;
+grant execute on function public.alugar_apto(integer) to authenticated;
 
--- uma função só para o painel: p_acao = dinheiro | vip | pet | carro | casa | banir | desbanir | tirar_casa
-create or replace function public.admin_acao(p_nome text, p_acao text, p_valor text) returns json
+create or replace function public.sair_apto() returns json
 language plpgsql security definer set search_path = public as $$
-declare a public.moradores; n integer; c public.casas;
-begin
-  perform _adm();
-  a := _alvo(p_nome);
-  if p_acao = 'dinheiro' then
-    n := p_valor::integer;
-    update moradores set dinheiro = greatest(0, dinheiro + n) where id = a.id;
-  elsif p_acao = 'vip' then
-    n := greatest(1, p_valor::integer);
-    update moradores set vip_ate = greatest(coalesce(vip_ate, now()), now()) + make_interval(days => n) where id = a.id;
-  elsif p_acao = 'pet' then
-    if p_valor not in ('cachorro','gato','galinha','capivara','papagaio') then raise exception 'Pet inválido.'; end if;
-    update moradores set pets = (select array_agg(distinct x) from unnest(array_append(pets, p_valor)) x), pet = p_valor where id = a.id;
-  elsif p_acao = 'carro' then
-    update moradores set carros = (select array_agg(distinct x) from unnest(array_append(carros, p_valor)) x), carro = p_valor where id = a.id;
-  elsif p_acao = 'casa' then
-    select * into c from casas where id = p_valor::integer for update;
-    if not found then raise exception 'Casa não existe.'; end if;
-    update vagas set morador = null, carro = null, desde = null where casa in (select id from casas where dono = a.id);
-    update casas set dono = null, comprada_em = null, aberta = false where dono = a.id;
-    update casas set dono = a.id, comprada_em = now(), aberta = false where id = c.id;
-    update moradores set casa_id = c.id where id = a.id;
-  elsif p_acao = 'tirar_casa' then
-    update casas set dono = null, comprada_em = null, aberta = false where dono = a.id;
-    update moradores set casa_id = null where id = a.id;
-  elsif p_acao = 'banir' then
-    update moradores set banido = true where id = a.id;
-  elsif p_acao = 'desbanir' then
-    update moradores set banido = false where id = a.id;
-  else raise exception 'Ação desconhecida.'; end if;
-  return json_build_object('ok', true, 'id', a.id, 'nome', a.nome);
-end $$;
-grant execute on function public.admin_acao(text, text, text) to authenticated;
-
--- vender o carro para a concessionária (metade do preço)
-create or replace function public.vender_carro_loja(p_carro text) returns json
-language plpgsql security definer set search_path = public as $$
-declare m public.moradores; i public.loja; v integer;
+declare m public.moradores; c integer; volta integer := 0;
 begin
   m := _eu();
-  if not (p_carro = any(m.carros)) then raise exception 'Esse carro não é seu.'; end if;
-  select * into i from loja where id = p_carro and tipo = 'carro';
-  if not found then raise exception 'A concessionária não compra esse carro (é da loja VIP). Venda para outro jogador!'; end if;
-  v := i.preco / 2;
-  update vagas set morador = null, carro = null, desde = null where morador = m.id and carro = p_carro;
-  update moradores set carros = array_remove(carros, p_carro), carro = case when carro = p_carro then null else carro end,
-    carro_cores = carro_cores - p_carro, dinheiro = dinheiro + v where id = m.id;
-  return json_build_object('recebido', v, 'eu', _estado(m.id));
+  select id into c from casas where dono = m.id and id > 1000;
+  if c is null then raise exception 'Você não mora no condomínio.'; end if;
+  volta := _vagar_apto(c);
+  return json_build_object('devolvido', volta, 'eu', _estado(m.id));
 end $$;
-grant execute on function public.vender_carro_loja(text) to authenticated;
+grant execute on function public.sair_apto() to authenticated;
 
--- propostas de venda entre jogadores
-create table if not exists public.propostas (
-  id bigserial primary key,
-  vendedor uuid not null references public.moradores(id) on delete cascade,
-  comprador uuid not null references public.moradores(id) on delete cascade,
-  carro text not null,
-  valor integer not null check (valor >= 0),
-  criado_em timestamptz not null default now()
-);
-alter table public.propostas enable row level security;
-revoke insert, update, delete on public.propostas from anon, authenticated;
-
-create or replace function public.propor_venda(p_nome text, p_carro text, p_valor integer) returns json
+-- cobra o aluguel vencido (o jogo chama ao entrar e a cada 10 minutos)
+create or replace function public.cobrar_aluguel() returns json
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores; b public.moradores; pid bigint;
+declare m public.moradores; c public.casas; pago integer := 0;
 begin
   m := _eu();
-  if not (p_carro = any(m.carros)) then raise exception 'Esse carro não é seu.'; end if;
-  if p_valor < 0 or p_valor > 10000000 then raise exception 'Valor inválido.'; end if;
-  select * into b from moradores where lower(nome) = lower(btrim(p_nome)) limit 1;
-  if not found then raise exception 'Jogador "%" não encontrado.', p_nome; end if;
-  if b.id = m.id then raise exception 'Não dá para vender para você mesmo.'; end if;
-  if p_carro = any(b.carros) then raise exception '% já tem esse carro.', b.nome; end if;
-  delete from propostas where vendedor = m.id and carro = p_carro;
-  insert into propostas(vendedor, comprador, carro, valor) values (m.id, b.id, p_carro, p_valor) returning id into pid;
-  return json_build_object('id', pid, 'comprador', b.id, 'nome', b.nome);
+  select * into c from casas where dono = m.id and id > 1000 and alugada for update;
+  if c.id is null then return json_build_object('ok', true); end if;
+  while c.aluguel_ate <= now() and m.dinheiro >= c.valor_aluguel loop
+    m.dinheiro := m.dinheiro - c.valor_aluguel; pago := pago + c.valor_aluguel; c.aluguel_ate := c.aluguel_ate + interval '7 days';
+  end loop;
+  update moradores set dinheiro = m.dinheiro where id = m.id;
+  update casas set aluguel_ate = c.aluguel_ate where id = c.id;
+  if c.aluguel_ate < now() - interval '3 days' then
+    perform _vagar_apto(c.id);
+    return json_build_object('despejado', true, 'pago', pago, 'eu', _estado(m.id));
+  end if;
+  return json_build_object('pago', pago, 'atrasado', c.aluguel_ate < now(), 'valor', c.valor_aluguel, 'eu', _estado(m.id));
 end $$;
-grant execute on function public.propor_venda(text, text, integer) to authenticated;
+grant execute on function public.cobrar_aluguel() to authenticated;
 
-create or replace function public.responder_proposta(p_id bigint, p_aceitar boolean) returns json
+-- comprar casa na cidade deixa o apartamento vago (o jogo avisa antes)
+create or replace function public.comprar_casa(p_casa integer) returns json
 language plpgsql security definer set search_path = public as $$
-declare m public.moradores; p public.propostas; v public.moradores; cor text;
+declare m public.moradores; c public.casas; antiga public.casas; volta integer := 0; apto integer;
 begin
   m := _eu();
-  select * into p from propostas where id = p_id and comprador = m.id for update;
-  if not found then raise exception 'Essa proposta não existe mais.'; end if;
-  delete from propostas where id = p.id;
-  if not p_aceitar then return json_build_object('ok', false); end if;
-  if p.criado_em < now() - interval '30 minutes' then raise exception 'A proposta expirou.'; end if;
-  select * into v from moradores where id = p.vendedor for update;
-  if not (p.carro = any(v.carros)) then raise exception 'O vendedor não tem mais esse carro.'; end if;
-  if p.carro = any(m.carros) then raise exception 'Você já tem esse carro.'; end if;
-  if m.dinheiro < p.valor then raise exception 'Dinheiro insuficiente.'; end if;
-  cor := v.carro_cores->>p.carro;
-  update vagas set morador = null, carro = null, desde = null where morador = v.id and carro = p.carro;
-  update moradores set carros = array_remove(carros, p.carro), carro = case when carro = p.carro then null else carro end,
-    carro_cores = carro_cores - p.carro, dinheiro = dinheiro + p.valor where id = v.id;
-  update moradores set carros = array_append(carros, p.carro), carro = p.carro, dinheiro = dinheiro - p.valor,
-    carro_cores = case when cor is null then carro_cores else carro_cores || jsonb_build_object(p.carro, cor) end where id = m.id;
-  return json_build_object('ok', true, 'carro', p.carro, 'eu', _estado(m.id));
+  select * into c from casas where id = p_casa and id < 1000 for update;
+  if not found then raise exception 'Essa casa não existe.'; end if;
+  if c.dono = m.id then raise exception 'Essa casa já é sua.'; end if;
+  if c.dono is not null then raise exception 'Essa casa já tem dono.'; end if;
+  if m.nivel < c.nivel_min then raise exception 'Essa casa libera no nível %.', c.nivel_min; end if;
+  select * into antiga from casas where dono = m.id and tipo = c.tipo for update;
+  if found then volta := antiga.preco / 2; end if;
+  if m.dinheiro + volta < c.preco then raise exception 'Dinheiro insuficiente para essa casa.'; end if;
+  if antiga.id is not null then
+    update casas set dono = null, comprada_em = null, aberta = false where id = antiga.id;
+    update vagas set morador = null, carro = null, desde = null where casa = antiga.id;
+  end if;
+  select id into apto from casas where dono = m.id and id > 1000;
+  if apto is not null then volta := volta + _vagar_apto(apto); end if;
+  update casas set dono = m.id, comprada_em = now(), aberta = false where id = c.id;
+  update moradores set dinheiro = dinheiro + volta - c.preco, casa_id = c.id where id = m.id;
+  return json_build_object('casa', c.id, 'devolvido', volta, 'eu', _estado(m.id));
 end $$;
-grant execute on function public.responder_proposta(bigint, boolean) to authenticated;
-
--- TORNE-SE ADMINISTRADOR: troque SEU_EMAIL_AQUI pelo e-mail que você usa para entrar no jogo
-update public.moradores set admin = true where id = (select id from auth.users where email = 'SEU_EMAIL_AQUI');
-select nome as administrador from public.moradores where admin = true;
