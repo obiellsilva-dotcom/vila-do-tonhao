@@ -241,8 +241,8 @@ input,select,textarea{font-size:16px!important}button{touch-action:manipulation}
 
 /* layout novo: topo numa linha, menu embaixo abrindo para cima */
 body.jogando #top{right:131px}body.jogando #top .row:first-child{flex-wrap:nowrap}
-#irBtn{font:600 12.5px Fredoka,sans-serif;color:#9fffb0;cursor:pointer;padding:5px 9px}#fomeP.ok,#sedeP.ok{display:none}
-body.jogando #top .row:first-child{gap:5px}body.jogando #top .row:first-child .pill{padding:5px 7px;font-size:12.5px}body.jogando .lvl i{width:26px}body.jogando #top{right:127px}
+#rankTop{padding:4px 8px;font-size:15px;line-height:1}#irBtn{font:600 12.5px Fredoka,sans-serif;color:#9fffb0;cursor:pointer;padding:5px 9px}#fomeP.ok,#sedeP.ok{display:none}
+body.jogando #top .row:first-child{gap:4px}body.jogando #top .row:first-child .pill{padding:5px 6px;font-size:12px}body.jogando .lvl{gap:4px}body.jogando .lvl i{width:18px}body.jogando #rankTop{padding:4px 6px}body.jogando #top{right:127px}
 .irLista{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:46vh;overflow-y:auto}
 .irLista button{text-align:left;font-size:13.5px;padding:8px 9px}
 #zoom{top:auto!important;transform:none!important;right:max(10px,env(safe-area-inset-right,0px));left:auto;bottom:calc(186px + env(safe-area-inset-bottom,0px));flex-direction:column-reverse}
@@ -261,9 +261,9 @@ body.joyEsq #painelEsq{top:150px}
 <div id="top">
   <div class="row">
     <div class="brand">🍺 Cidade do Tonhão</div>
-    <div class="pill lvl hidden" id="lvl"><span id="lvlTxt">⭐ Nv 1</span><i><b id="lvlBar"></b></i></div><div class="pill money hidden" id="money">💰 R$ 0</div><div class="pill clock" id="clock">--:--</div>
+    <div class="pill lvl hidden" id="lvl"><span id="lvlTxt">⭐ Nv 1</span><i><b id="lvlBar"></b></i></div><div class="pill money hidden" id="money">💰 R$ 0</div><div class="pill clock" id="clock">--:--</div><button id="rankTop" class="btn ghost hidden" aria-label="ranking">🏆</button>
   </div>
-  <div class="row"><button id="irBtn" class="pill hidden" aria-label="pessoas online">🟢 1 online</button><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill hidden" id="sedeP">💧 100%</div><div class="pill hidden" id="gasP">⛽ 100%</div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
+  <div class="row"><button id="irBtn" class="pill hidden" aria-label="pessoas online">🟢 1 online</button><div class="pill hidden" id="peixeP">🐟 0</div><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill hidden" id="sedeP">💧 100%</div><div class="pill hidden" id="gasP">⛽ 100%</div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
 </div>
 
 <div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" style="display:none" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Perfil e fotos" aria-label="meu perfil">👤</button><button id="zin" style="display:none" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" style="display:none" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b;display:none">🛡️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
@@ -3707,7 +3707,7 @@ async function aplicarPerfil(m,anunciar){
  if(!novo){refreshHud();return}
  {const h=m.casa_id>1000?{front:[27,-10]}:m.casa_id?houses[m.casa_id-1]:null;if(h){eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE}else{eu.x=T(rand(19,29));eu.y=T(29.5)}}
  follow=eu;cam.x=eu.x;cam.y=eu.y;cam.z=Math.max(cam.z,1.5);
- ['irBtn','chatbar','money','salaPill','zme','zperfil','lvl','fomeP','sedeP','zloja','zjobs','zdanca','zfotos','zcarro','zmochila'].forEach(id=>$(id).classList.remove('hidden'));if(matchMedia('(pointer: coarse)').matches)$('joy').classList.remove('hidden');$('join').classList.add('hidden');$('barstat').classList.add('hidden');document.body.classList.add('jogando');
+ ['rankTop','irBtn','chatbar','money','salaPill','zme','zperfil','lvl','fomeP','sedeP','zloja','zjobs','zdanca','zfotos','zcarro','zmochila'].forEach(id=>$(id).classList.remove('hidden'));if(matchMedia('(pointer: coarse)').matches)$('joy').classList.remove('hidden');$('join').classList.add('hidden');$('barstat').classList.add('hidden');document.body.classList.add('jogando');
  await carregarVagas();for(const [id,i] of vagasInfo)if(i.morador===eu.id)eu.parked=id;
  if(m.trabalho&&JOBS[m.trabalho]){const J=JOBS[m.trabalho];iniciarTurno(m.trabalho,Date.parse(m.trabalho_inicio),J.duracao)}
  conectar();if(souVip())later(5,()=>emitEv('chegou',{}));setTimeout(cobrarAluguel,6000);
@@ -3717,7 +3717,7 @@ async function aplicarPerfil(m,anunciar){
 }
 function refreshHud(){
  if(!eu)return;
- $('money').textContent='💰 '+money(eu.dinheiro)+(eu.peixes?` · 🐟 ${eu.peixes}`:'');
+ {const v=eu.dinheiro||0,cur=(x,d)=>x.toFixed(d).replace('.',',').replace(/,?0+$/,'');$('money').textContent='💰 '+(v>=1e6?'R$ '+cur(v/1e6,2)+' mi':v>=1e4?'R$ '+cur(Math.floor(v/100)/10,1)+' mil':money(v));$('money').title=money(v);const pp=$('peixeP');if(pp){pp.textContent='🐟 '+(eu.peixes||0);pp.classList.toggle('hidden',!eu.peixes)}}
  const b=LV.base(eu.nivel),nx=LV.base(Math.min(eu.nivel+1,NIVEL_MAX));
  $('lvlTxt').textContent=`⭐ Nv ${eu.nivel}`;$('lvlBar').style.width=(eu.nivel>=NIVEL_MAX?100:Math.max(4,Math.min(100,(eu.xp-b)/(nx-b)*100)))+'%';$('lvl').title=`${eu.xp-b} / ${nx-b} XP para o nível ${eu.nivel+1}`;
  const f=Math.max(0,Math.round(eu.fome));$('fomeP').textContent='🍗 '+f+'%';$('fomeP').classList.toggle('baixa',f<30);$('fomeP').classList.toggle('ok',f>=50);const sd=Math.max(0,Math.round(eu.sede??100));$('sedeP').textContent='💧 '+sd+'%';$('sedeP').classList.toggle('baixa',sd<30);$('sedeP').classList.toggle('ok',sd>=50);{const gp=$('gasP'),gc=carOf(eu),gv=Math.round(eu.gas??100);gp.classList.toggle('hidden',!gc||SERVICO(gc));gp.textContent='⛽ '+gv+'%';gp.classList.toggle('baixa',gv<20)}
@@ -4466,6 +4466,7 @@ $('chatPainel').addEventListener('pointerdown',e=>e.preventDefault());
 $('zme').onclick=()=>{if(!eu)return;follow=eu;cam.z=Math.max(cam.z,1.3)};
 
 /* ----- ranking ----- */
+$('rankTop').onclick=()=>$('rankBtn').click();
 $('rankBtn').onclick=async()=>{
  const box=$('rankList');box.textContent='Carregando…';$('mRank').classList.remove('hidden');
  try{const rows=await api.ranking();box.innerHTML='';
@@ -5001,7 +5002,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122k';
+const VERSAO_JOGO='v20261122l';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
