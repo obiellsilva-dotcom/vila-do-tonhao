@@ -64,8 +64,27 @@ Comprar móveis para a casa (precisa de tabela nova), interiores das lojas, giro
 ## Últimas mudanças (já no ar)
 Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡️ ADM e chat vermelho do admin, aviso para a cidade, vitrine de carros com setas, venda de carros (para a loja e entre jogadores), cargo de prefeito (🏛️ com brilho, banner ao entrar, chat dourado, vistorias), mochila, 🚗 Meu carro no menu, 10 NPCs, geladeira 3D, sem banheiro, sinuca com 4 lugares, reconexão automática da sala.
 
-## ATUALIZAÇÃO COMPLETA (17/11/2026) — LEIA PRIMEIRO
-A proposta virou o `index.html` oficial (VERSAO_JOGO v20261117a). `novidades.sql` = atualização completa (etapas 13 a 20: sede, prefeito nível 20, gasolina, missão, estampas/loja de roupas/joias, nível 50, carros +20%, oficina), testado num PostgreSQL local em cima do banco antigo. `banco.sql` agora é o completo de verdade (veio do ramo claude/new-session-cwzmp3 + etapas novas). `extras/proposta-index.html` continua igual ao index para seguir trabalhando.
+## SITUAÇÃO EM 16/11/2026 (terceira sessão) — LEIA PRIMEIRO
+**Arquivos para anexar no chat novo:** `CONTEXTO.md`, `index.html`, `banco.sql`, `novidades.sql` (ou as 4 partes em `sql-celular/`) e `pix-funcao.ts`.
+- `index.html` é a versão única e atual (VERSAO_JOGO v20261117b). A antiga "proposta" foi incorporada nele; NÃO use mais `extras/proposta-index.html`.
+- `banco.sql` é o banco COMPLETO e atualizado (pode rodar de novo sem perder dados). Testado num PostgreSQL local.
+- `novidades.sql` = atualização completa (etapas 13 a 20). Pelo celular, rodar em ordem `sql-celular/parte1.sql` … `parte4.sql`.
+- **Confirmar com o usuário** se ele já rodou as 4 partes do SQL e subiu o `site.zip` (até o fim da sessão ele ainda estava testando).
+- Teste sem servidor: `teste/index-teste.html` (ONLINE=false). Pelo celular o arquivo é grande demais: publicar como Artifact privado e mandar o link.
+
+### O que entrou nesta sessão
+- Estampas (13), Loja de Roupas com interior no Centro de Empregos (x52 y23, 4x5; o usuário NÃO quer maior), vitrine com boneco de frente, carrinho (paga ao sair), joias (relógios, colares, brincos; coroa 50 mil), chapéus com volume.
+- Nível máximo 50 (quem estava no 20 sobe pelo XP).
+- Carros 20% mais caros (moto 2.200 … esportivo 144.000), mais nítidos (função `quadro()`: processa só o ângulo visível).
+- Oficina com interior (`interiorLoja(ofic,…)`): "🔧 Personalizar meu carro" com cor 1.000, rodas, vidros, pintura e som 5 mil (`carro_mods`, `personalizar_carro`). Com som, botão 🔊 ao dirigir (anéis e notas, evento `som`).
+- Desempenho: luz da noite em meia resolução. **O usuário NÃO quer qualidade gráfica automática.**
+- Do ramo da sessão anterior (`claude/new-session-cwzmp3`) vieram no SQL: sede, gasolina/posto, primeira missão e prefeito automático no nível 20.
+
+### Pendências
+1. **Brecha:** o provador ainda deixa escolher roupas pagas de graça. Falta o passo "criação de personagem com 4 peças grátis" + `criar_morador` conferir o `guarda_roupa` (joias 40–49 também).
+2. Joia: só uma por vez (relógio OU colar OU brinco). Se quiser junto, criar campo separado.
+3. Kombi e Jipe só mudam a cor na oficina (não têm foto 3D). Carros nítidos de verdade exigiriam refazer as fotos em tamanho maior.
+4. Próximos combinados: mapinha no canto, acessórios, poupança, loja de móveis, músicas no Storage.
 
 ## ATUALIZAÇÃO (15/11/2026, segunda sessão)
 Tudo abaixo está SÓ em `extras/proposta-index.html` (ramo `ccr-e150a3c5-3uuba3` no GitHub). O `index.html` oficial NÃO foi mexido. Aplicar no oficial só quando o usuário aprovar.
