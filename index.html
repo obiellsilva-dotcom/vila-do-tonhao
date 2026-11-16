@@ -1815,7 +1815,7 @@ const chopp={x:T(26.1),y:T(27.55),home:[T(26.1),T(27.55)],tx:null,ty:null,sleep:
 const ball={x:T(69),y:T(22),tx:T(69),ty:T(22),z:0};
 
 /* ================= TIME / ECONOMY ================= */
-const SPEED=2.4;let now=0,gmOff=0;const gmNow=()=>Date.now()/1000*SPEED+gmOff;let gm=gmNow();
+const SPEED=1;let now=0,gmOff=0;const gmNow=()=>Date.now()/1000*SPEED+gmOff;let gm=gmNow();
 const hour=()=>(gm/60)%24;
 const clockStr=()=>{const m=Math.floor(gm)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
 let caixa=0,fiadoDia=0,lastDay=Math.floor((gm-360)/1440);
@@ -5002,7 +5002,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122m';
+const VERSAO_JOGO='v20261122n';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

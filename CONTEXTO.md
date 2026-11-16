@@ -80,7 +80,7 @@ Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡
 - Desempenho: luz da noite em meia resolução. **O usuário NÃO quer qualidade gráfica automática.**
 - Do ramo da sessão anterior (`claude/new-session-cwzmp3`) vieram no SQL: sede, gasolina/posto, primeira missão e prefeito automático no nível 20.
 
-- **Relógio do jogo:** `SPEED=2.4` → 1 dia do jogo = 10 minutos reais (antes 8).
+- **Relógio do jogo:** `SPEED=1` → 1 hora do jogo = 1 minuto real, 1 dia = 24 minutos (antes 8).
 ### Pendências
 1. **Brecha:** o provador ainda deixa escolher roupas pagas de graça. Falta o passo "criação de personagem com 4 peças grátis" + `criar_morador` conferir o `guarda_roupa` (joias 40–49 também).
 2. Joia: só uma por vez (relógio OU colar OU brinco). Se quiser junto, criar campo separado.
@@ -165,7 +165,7 @@ Versão VERSAO_JOGO v20261118b. Ramo `claude/new-session-zudz0a`. Subir: `site.z
 - Mercadinho: entrega na frente das barracas (personagem ficava escondido). Policial e prefeito descem da viatura/Duster (`trabalho.ape`). Painel de tarefas e missão no canto esquerdo e minimizáveis (`#painelEsq`).
 - Chat do prefeito só levemente amarelo (só emoji 🏛️, sem a palavra prefeito). Tiradas as músicas Forró do Dragão e Festa Boa.
 - Scripts do estúdio de fotos (render2.py, auto.py, folha.py, integra.py) ficaram no scratchpad e se perdem; o código de faróis acesos (`LUZ_IMG`, `LUZES_FRAME`) já está no jogo mas sem as fotos de luz.
-- **Relógio do jogo:** `SPEED=2.4` → 1 dia do jogo = 10 minutos reais (antes 8).
+- **Relógio do jogo:** `SPEED=1` → 1 hora do jogo = 1 minuto real, 1 dia = 24 minutos (antes 8).
 ### Pendências
 1. Faróis acendendo ao dirigir (falta tirar as fotos de luz de cada carro).
 2. Kombi e Fusca Dourado: o usuário vai mandar os modelos.
@@ -197,7 +197,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122m** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122n** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -205,7 +205,7 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Faróis:** `FAROL_FORMA` dos 6 carros marcados (sw4, viatura, kombi_tonhao, duster, neon, caminhonete) refeito pelas marcações amarelas do usuário: frente em '3p' branco (círculos, setas, LED, milha) e traseira '3p' vermelho (copiado idêntico). Jeep (jipe), Ferrari (gto) e Rover (esportivo) ficaram com o LED dos riscos vermelhos anteriores. Farol do outro lado aparece na diagonal (`longe` com 1.2×|cy|). O usuário aprovou.
 - **Novidades:** `NOVID='v20261122'` (XP em dobro, imobiliária, condomínio, jogo mais leve/tela nova). Trava contra abrir duplicada.
 - **Sons reais de motor** (`sons/*.mp3`, trechos de 4 s em loop, `GRAV`/`GRAV_RPM`/`gravacao()` dentro de `Som.motor`): fusca (e fusca_ouro), sedan (e jipe), opala, esportivo, neon, gto, moto, diesel (sw4, kombi_tonhao, caminhonete, viatura). Volume .2 e tom suave (aprovado). Frontier, Duster da prefeitura e caminhões continuam sintetizados.
-- **Relógio do jogo:** `SPEED=2.4` → 1 dia do jogo = 10 minutos reais (antes 8).
+- **Relógio do jogo:** `SPEED=1` → 1 hora do jogo = 1 minuto real, 1 dia = 24 minutos (antes 8).
 ### Pendências
 1. Desempenho itens 2 e 3 (o usuário reclamou que o jogo trava).
 2. Interiores das lojas em outra dimensão. 3. Curva de XP para a Play Store.
