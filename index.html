@@ -2678,9 +2678,9 @@ function giroflexV(c,x0,y0,k,i,md){const EL=.663,se=Math.sin(EL),ce=Math.cos(EL)
  c.globalCompositeOperation='lighter';
  if(md===2){const w=now*Math.PI*2*1.6;
   for(const [Z,ph] of [[-11,0],[11,Math.PI]]){const a=w+ph,int=Math.pow(Math.max(0,Math.cos(a)),3)*.8+.2,[px,py]=P(-3,Z,53);
-   // facho girando: ponto de luz que corre pelo chão em volta da viatura
-   const dX=Math.cos(a)*70,dZ=Math.sin(a)*70+Z,[fx,fy]=P(dX,dZ,0),R=30*k;let g=c.createRadialGradient(fx,fy,0,fx,fy,R);g.addColorStop(0,'rgba(255,30,30,.35)');g.addColorStop(1,'rgba(255,30,30,0)');c.fillStyle=g;c.beginPath();c.ellipse(fx,fy,R,R*.5,0,0,7);c.fill();
-   const R2=24*k*(.6+int);g=c.createRadialGradient(px,py,0,px,py,R2);g.addColorStop(0,`rgba(255,40,30,${.95*int})`);g.addColorStop(.3,`rgba(255,30,30,${.4*int})`);g.addColorStop(1,'rgba(255,30,30,0)');c.fillStyle=g;c.fillRect(px-R2,py-R2,R2*2,R2*2);
+   // quando o facho aponta para a câmera: risco de brilho horizontal (como um giroflex de verdade)
+   if(int>.6){const L=18*k*(int-.6)/.4*2.5;c.strokeStyle=`rgba(255,90,80,${(int-.6)*1.6})`;c.lineWidth=1.6*k;c.lineCap='round';c.beginPath();c.moveTo(px-L,py);c.lineTo(px+L,py);c.stroke()}
+   const R2=24*k*(.6+int),g=c.createRadialGradient(px,py,0,px,py,R2);g.addColorStop(0,`rgba(255,40,30,${.95*int})`);g.addColorStop(.3,`rgba(255,30,30,${.4*int})`);g.addColorStop(1,'rgba(255,30,30,0)');c.fillStyle=g;c.fillRect(px-R2,py-R2,R2*2,R2*2);
    c.fillStyle=`rgba(255,${120+120*int},${120+120*int},${.5+.5*int})`;c.beginPath();c.ellipse(px,py,2.6*k,1.3*k,0,0,7);c.fill()}
   // grade e traseira acompanham o giro, devagar
   for(const [X,Z,h,cr,fs,R0,lado] of GIRO_PTS){if(!lado)continue;const vis=lado*sy;if(vis<-.05)continue;const int=Math.pow(Math.max(0,Math.cos(w+(Z<0?0:Math.PI))),3);if(int<.15)continue;const [px,py]=P(X,Z,h),R=R0*k*.55*Math.max(.4,vis);
@@ -2689,8 +2689,7 @@ function giroflexV(c,x0,y0,k,i,md){const EL=.663,se=Math.sin(EL),ce=Math.cos(EL)
  for(const [X,Z,h,cr,fs,R0,lado] of GIRO_PTS){if(!F[fs])continue;const vis=lado?lado*sy:1;if(vis<-.05)continue;const [px,py]=P(X,Z,h),R=R0*k*.55*(lado?Math.max(.4,vis):1);
   const g=c.createRadialGradient(px,py,0,px,py,R);g.addColorStop(0,`rgba(${cr},.95)`);g.addColorStop(.22,`rgba(${cr},.4)`);g.addColorStop(1,`rgba(${cr},0)`);c.fillStyle=g;c.fillRect(px-R,py-R,R*2,R*2);
   c.fillStyle='#fff';c.beginPath();c.ellipse(px,py,(lado?1.3:2.4)*k,(lado?.8:1.1)*k,0,0,7);c.fill()}
- // reflexo no chão
- for(const fs of ['L','R']){if(!F[fs])continue;const [px,py]=P(0,fs==='L'?-14:14,0),R=34*k,g=c.createRadialGradient(px,py,0,px,py,R);g.addColorStop(0,'rgba(255,30,30,.14)');g.addColorStop(1,'rgba(255,30,30,0)');c.fillStyle=g;c.beginPath();c.ellipse(px,py,R,R*.45,0,0,7);c.fill()}
+
  c.restore()}
 const CAR_ESC={moto:1.3,fusca:1.08,sedan:1.2,opala:1.18,esportivo:1.439,kombi_tonhao:1.28,viatura:1.229,duster:1.2,sw4:1.233,frontier:1.2,caminhao:1.7,lixo:1.65,caminhonete:1.27,neon:1.338,jipe:1.2,gto:1.338};
 // carros mais nítidos: amplia a foto 2x com qualidade, realça as bordas e clareia o preto chapado (vidro e pneu)
@@ -4839,7 +4838,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119h';
+const VERSAO_JOGO='v20261119i';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
