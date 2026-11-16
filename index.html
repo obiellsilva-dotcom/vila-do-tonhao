@@ -3482,7 +3482,7 @@ const api=ONLINE?(()=>{
    const morreu=lfome(m,J.fome);lsave();return{pago,xp_ganho:J.xp,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,eu:lest()}},
   async largar(){lme().trabalho=null;lsave()},
   async tarefa(){const m=lme();if(!m.trabalho)fail('Você não está trabalhando.');const J=JOBS[m.trabalho],ex=Math.max(0,m.nivel-J.nivel_min);
-   let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(1,Math.round(J.xp/20*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
+   let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(1,Math.round(J.xp/10*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
   async cidade(){return null},
@@ -3832,7 +3832,7 @@ function abrirLugar(b){
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
   if(eu.nivel<J.nivel_min)botao(boxJob,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
-  else{const sal=Math.round(J.salario*(1+.02*(eu.nivel-1))),ex=Math.max(0,eu.nivel-J.nivel_min),pt=Math.round(J.salario/6*(1+.06*ex)),xt=Math.max(1,Math.round(J.xp/20*(1+.04*ex)));botao(boxJob,j==='pescador'?`🎣 Pescar: 60% de chance de peixe por fisgada · +${xt} XP cada`:j==='policia'?`🚓 Fazer ronda de viatura: ${money(sal)} · +${J.xp} XP`:`💼 Trabalhar de ${J.nome}: ${money(pt)} + ${xt} XP por tarefa`,()=>comecarTrabalho(j),{ghost:k==='concessionaria'})}
+  else{const sal=Math.round(J.salario*(1+.02*(eu.nivel-1))),ex=Math.max(0,eu.nivel-J.nivel_min),pt=Math.round(J.salario/6*(1+.06*ex)),xt=Math.max(1,Math.round(J.xp/10*(1+.04*ex)));botao(boxJob,j==='pescador'?`🎣 Pescar: 60% de chance de peixe por fisgada · +${xt} XP cada`:j==='policia'?`🚓 Fazer ronda de viatura: ${money(sal)} · +${J.xp} XP`:`💼 Trabalhar de ${J.nome}: ${money(pt)} + ${xt} XP por tarefa`,()=>comecarTrabalho(j),{ghost:k==='concessionaria'})}
  });
  if(k==='igreja')sub='Silêncio, por favor. 🙏 Acenda uma vela e siga em paz.';
  if(k==='hospital')sub='Quem desmaia de fome acorda aqui. A conta é R$ 30. Coma direitinho! 🍗';
@@ -4785,7 +4785,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261119a';
+const VERSAO_JOGO='v20261119b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
