@@ -154,3 +154,18 @@ Braço do sofá por cima das pernas e lugares fixos no sofá; aumentar cadeira/p
 - Combinado novo de trabalho: primeiro mandar FOTO + link do arquivo de teste (Artifact). Só mandar `site.zip` e `index.html` quando o usuário aprovar. Respostas curtas.
 - Arquivo de teste: cópia do index com ONLINE=false e um setInterval que libera nível 30, R$ 300 mil, todos os carros, VIP, Top 1 e põe o personagem na frente de uma mansão.
 - Pendências: veículo para o repositor (oferecido), boneco maior no mapa (oferecido), ambulância (.max), braço do sofá por cima das pernas, interiores das lojas.
+
+## SITUAÇÃO EM 18/11/2026 (quinta sessão) — LEIA PRIMEIRO
+Versão VERSAO_JOGO v20261118b. Ramo `claude/new-session-zudz0a`. Subir: `site.zip` (index + 3 músicas) e rodar `novidades.sql` (etapas 21 a 23).
+### O que entrou
+- Provador fechado: só peças grátis/compradas/em uso (cliente) + `criar_morador` confere `guarda_roupa` (`_confere_roupas`, `_vis_nums`). Quem já jogava ganhou as peças que usava.
+- Todos os carros refeitos no Blender (fotos 320 px, 32 ângulos) com **rodas girando** (4 fotos só das rodas por carro, `RODA_IMG`, trocadas pela distância andada). Pintura sem pegar faróis. Opala e Jipe Renegado com modelos novos. Ferrarini (`gto`, Ferrari) na loja do Pix no lugar da Lambordini (`neon`, agora só com VIP). Nomes: Rover (`esportivo`), Lambordini (`neon`), Jipe Renegado (`jipe`).
+- Tamanhos com a Hilux como base (viatura -12%, Rover -11%, Lambordini -10%, SW4 -9%) em `CAR_ESC`.
+- Mercadinho: entrega na frente das barracas (personagem ficava escondido). Policial e prefeito descem da viatura/Duster (`trabalho.ape`). Painel de tarefas e missão no canto esquerdo e minimizáveis (`#painelEsq`).
+- Chat do prefeito só levemente amarelo (só emoji 🏛️, sem a palavra prefeito). Tiradas as músicas Forró do Dragão e Festa Boa.
+- Scripts do estúdio de fotos (render2.py, auto.py, folha.py, integra.py) ficaram no scratchpad e se perdem; o código de faróis acesos (`LUZ_IMG`, `LUZES_FRAME`) já está no jogo mas sem as fotos de luz.
+### Pendências
+1. Faróis acendendo ao dirigir (falta tirar as fotos de luz de cada carro).
+2. Kombi e Fusca Dourado: o usuário vai mandar os modelos.
+3. **Curva de XP (fazer quando for para a Play Store):** níveis 1–9 custam 70% de hoje, 10–19 ×0,91, 20–34 ×1,18, 35–50 ×1,54 (passo de hoje = 50×n). Converter o XP de cada jogador para não cair de nível.
+4. Fechar compra da Lambordini direto pelo Pix (o produto `carro_neon` ainda existe no banco).
