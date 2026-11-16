@@ -172,7 +172,8 @@ Versão VERSAO_JOGO v20261118b. Ramo `claude/new-session-zudz0a`. Subir: `site.z
 
 ## SITUAÇÃO EM 21/11/2026 (sexta sessão) — LEIA PRIMEIRO
 Versão VERSAO_JOGO **v20261121e** (ramo `ccr-ecf86c6e-oy7n3d`). Anexar no chat novo: `CONTEXTO.md`, `index.html`, `banco.sql`, `novidades.sql`, `pix-funcao.ts`.
-**O usuário AINDA NÃO SUBIU esta versão nem rodou o SQL desta sessão.** Para subir: 1) rodar `novidades.sql` (etapas 21 a 25) no Supabase; 2) subir `site.zip` (index + charrete.mp3, futilidades-entre-nos.mp3, o-campeao.mp3) no Cloudflare. A última versão que ele recebeu para subir foi a v20261119g.
+**NO SERVIDOR HOJE:** o usuário subiu a versão v20261119g com o XP 2x e rodou as **etapas 21 a 24** (provador, Rover/Jipe Renegado, Ferrarini no Pix, XP 2x). Ou seja: no ar estão a correção da tela preta (incluindo preso dentro de casa), sirene e giroflex Dupla/Rápida e os faróis da época (com LED em vários carros).
+**AINDA NÃO SUBIDO:** tudo depois disso (v20261120a até v20261121e): faróis novos (só Hilux com LED), condomínio, imobiliária, casas 50% mais caras. Para subir: 1) rodar `novidades.sql` (agora só a **etapa 25**) no Supabase; 2) subir `site.zip` (index + charrete.mp3, futilidades-entre-nos.mp3, o-campeao.mp3) no Cloudflare.
 Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://claude.ai/artifact/PVH5qqowD4CYbPN7k8qLV7, cópia com ONLINE=false); só mandar site.zip/index.html quando ele aprovar. Respostas curtas, em português simples. Pesquisar na internet antes de fazer as coisas (ele pede sempre).
 
 ### O que entrou nesta sessão
