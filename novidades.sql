@@ -82,7 +82,7 @@ update public.loja set nome = 'Jipe Renegado' where id = 'jipe' and tipo = 'carr
 insert into public.produtos(id, tipo, item, dias, nome, preco) values ('carro_gto', 'carro', 'gto', 0, 'Ferrarini', 19.90)
 on conflict (id) do update set nome = excluded.nome, preco = excluded.preco, item = excluded.item;
 
--- ===================== ETAPA 24: XP por tarefa 2,5x maior (t.xp/4) =====================
+-- ===================== ETAPA 24: XP por tarefa 2x maior (t.xp/5) =====================
 create or replace function public.tarefa_feita() returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; t public.trabalhos; extra integer; pago integer; ganho integer; novo_xp integer;
@@ -96,7 +96,7 @@ begin
   select * into t from trabalhos where id = m.trabalho;
   extra := greatest(0, m.nivel - t.nivel_min);
   pago  := round(t.salario / 6.0 * (1 + 0.06 * extra));
-  ganho := greatest(1, round(t.xp / 4.0 * (1 + 0.04 * extra)));  -- XP por tarefa (era /6, /20, /10)
+  ganho := greatest(1, round(t.xp / 5.0 * (1 + 0.04 * extra)));  -- XP por tarefa (era /6, /20, /10, /4)
   if t.id = 'pescador' then pago := 0; peixes_ganhos := (random() < 0.6)::integer; end if;
   novo_xp := m.xp + ganho;
   novo_nivel := nivel_de(novo_xp);
