@@ -1704,6 +1704,7 @@ drop function if exists public.mexer_movel(integer, integer, integer, boolean);
 create or replace function public.preco_movel(p_tipo text) returns integer
 language sql immutable as $$
   select case p_tipo
+    when 'parede' then 200 when 'porta' then 600
     when 'caixote' then 80 when 'cadeira' then 150 when 'planta' then 250 when 'colchao' then 300
     when 'tapete' then 400 when 'abajur' then 350 when 'criado' then 450 when 'mesinha' then 500
     when 'mesa' then 900 when 'pia' then 1100 when 'estante' then 1200 when 'fogao' then 1300
