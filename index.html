@@ -3464,6 +3464,31 @@ function morreu(){
  log(`💀 ${eu.nome} morreu de fome`);emitEv('morte',{});sendPos(true);
 }
 
+/* ----- minimapa (canto de cima) e mapa grande ----- */
+const MINI_COR={[G.ROAD]:'#4a4950',[G.WALK]:'#cbbd9e',[G.PLAZA]:'#e8d39a',[G.PBLK]:'#e8d39a',[G.WATER]:'#3d8cc4',[G.SAND]:'#e6d39a',[G.FOREST]:'#2e6b2e',[G.TRAIL]:'#a07a50',[G.PATH]:'#a07a50',[G.BRIDGE]:'#8a5a33',[G.FIELD]:'#7cc04f',[G.ROCK]:'#8a8f96',[G.HILL]:'#5f9a45',[G.HORTA]:'#6b4a2a',[G.TERR]:'#c9a26a',[G.FLOOR]:'#b9876a',[G.CASA]:'#b9876a',[G.BLD]:'#b9876a',[G.BEHIND]:'#b9876a'};
+let MINI_BASE=null;const MS=1.1,MX0=4,MOX=(H+4)*IA*MS;
+const miniP=(x,y)=>[MOX+(x-y)*IA*MS,MX0+(x+y)*IB*MS];
+function miniBase(){const c=document.createElement('canvas');c.width=Math.ceil((W+H+8)*IA*MS);c.height=Math.ceil((W+H+8)*IB*MS+MX0*2);const g=c.getContext('2d');
+ for(let y=-2;y<H+2;y++)for(let x=-2;x<W+2;x++){const t=tileAt(x,y);g.fillStyle=MINI_COR[t]||'#6fb04a';const a=miniP(x,y),b=miniP(x+1,y),d=miniP(x+1,y+1),e=miniP(x,y+1);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.lineTo(d[0],d[1]);g.lineTo(e[0],e[1]);g.closePath();g.fill()}
+ for(const b of B){const col=(typeof ROOF_KIND!=='undefined'&&ROOF_KIND[b.kind])||b.roof||'#8e5a3c';g.fillStyle=col;const a=miniP(b.x,b.y),q=miniP(b.x+b.w,b.y),d=miniP(b.x+b.w,b.y+b.h),e=miniP(b.x,b.y+b.h);g.beginPath();g.moveTo(a[0],a[1]-1);g.lineTo(q[0],q[1]-1);g.lineTo(d[0],d[1]-1);g.lineTo(e[0],e[1]-1);g.closePath();g.fill()}
+ return c}
+function miniDesenha(g,esc,ox,oy,grande){if(!MINI_BASE)MINI_BASE=miniBase();g.drawImage(MINI_BASE,ox,oy,MINI_BASE.width*esc,MINI_BASE.height*esc);
+ const pt=(wx,wy)=>{const q=miniP(wx/TILE,wy/TILE);return[ox+q[0]*esc,oy+q[1]*esc]};
+ for(const o of others.values()){if(!o.seen||o.hidden||o.rm)continue;const q=pt(o.x,o.y);g.fillStyle=vipP(o)?'#5fd0ff':'#ffffff';g.beginPath();g.arc(q[0],q[1],grande?3:1.6,0,7);g.fill()}
+ const e=trabalho&&trabalho.entrega;if(e&&!e.insp||e){const q=pt(e.x,e.y),k=(Math.sin(now*6)+1)/2;g.fillStyle='#ffd23f';g.beginPath();g.arc(q[0],q[1],(grande?4:2.2)+k*1.5,0,7);g.fill()}
+ if(eu&&!eu.rm){const q=pt(eu.x,eu.y),k=(Math.sin(now*5)+1)/2;g.fillStyle=`rgba(255,80,60,${.35*(1-k)})`;g.beginPath();g.arc(q[0],q[1],(grande?6:3.5)+k*(grande?7:4),0,7);g.fill();g.fillStyle='#ff3b30';g.strokeStyle='#fff';g.lineWidth=1;g.beginPath();g.arc(q[0],q[1],grande?4.5:2.6,0,7);g.fill();g.stroke()}}
+(function(){const el=document.createElement('canvas');el.id='mini';el.width=230;el.height=130;el.title='Mapa';
+ const st=document.createElement('style');st.textContent='#mini{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:8px;width:115px;height:65px;z-index:5;border-radius:12px;border:2px solid rgba(255,201,74,.7);background:rgba(20,12,16,.75);box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:pointer}#mini.hidden{display:none}#mapaG{position:fixed;inset:0;z-index:70;background:rgba(10,5,8,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;font-family:Fredoka,sans-serif;color:#fff}#mapaG .hd{width:min(720px,100%);display:flex;align-items:center;margin-bottom:8px}#mapaG h3{flex:1;margin:0;color:#ffd23f}#mapaG button.x{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:10px;padding:6px 12px;font:700 15px Fredoka,sans-serif}#mapaG .wrap{position:relative;width:min(720px,100%)}#mapaG canvas{width:100%;height:auto;border-radius:14px;border:2px solid rgba(255,201,74,.6);background:#1b2a1b}#mapaG .lg{font-size:12px;opacity:.8;margin-top:6px;text-align:center}';
+ document.head.appendChild(st);document.body.appendChild(el);const g=el.getContext('2d');
+ setInterval(()=>{const sala=eu&&eu.rm;el.classList.toggle('hidden',!eu||!!sala);if(!eu||sala)return;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,230,130);if(!MINI_BASE)MINI_BASE=miniBase();const esc=Math.min(226/MINI_BASE.width,126/MINI_BASE.height);miniDesenha(g,esc,(230-MINI_BASE.width*esc)/2,(130-MINI_BASE.height*esc)/2,false)},250);
+ el.onclick=()=>abrirMapa()})();
+function abrirMapa(){if(!eu)return;const el=document.createElement('div');el.id='mapaG';el.innerHTML='<div class="hd"><h3>🗺️ Mapa da cidade</h3><button class="x">✕</button></div><div class="wrap"><canvas></canvas></div><div class="lg">🔴 você · ⚪ jogadores · 🔵 VIP · 🟡 seu objetivo<br>Toque num lugar para ir até lá</div>';document.body.appendChild(el);
+ const cv3=el.querySelector('canvas'),g=cv3.getContext('2d');if(!MINI_BASE)MINI_BASE=miniBase();const esc=3;cv3.width=MINI_BASE.width*esc;cv3.height=MINI_BASE.height*esc;
+ const vaiB=b=>()=>irPara((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE-2);const LUG=Object.entries(SHOPS).map(([k,b])=>[k,PLACE_NAMES[k]||k,b.x+b.w/2,b.y+b.h/2,vaiB(b)]).concat([['bar','Bar do Tonhão',24,22,()=>irPara(T(22.5),T(20.9))],['roupas','Loja de roupas',54,25,vaiB(lojaRoupa)]]).concat(Object.entries(FOCUS).filter(([k])=>!SHOPS[k]&&k!=='roupas'&&k!=='leste').map(([k,f])=>[k,PLACE_NAMES[k]||cap(k),f[0],f[1],()=>irPara(T(f[0]),T(f[1]))]));
+ let vivo=true;const loop=()=>{if(!vivo)return;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv3.width,cv3.height);miniDesenha(g,esc,0,0,true);g.font='700 13px Fredoka,sans-serif';g.textAlign='center';for(const [k,n,x,y] of LUG){const q=miniP(x,y);g.lineWidth=3;g.strokeStyle='rgba(20,10,14,.9)';g.strokeText(n,q[0]*esc,q[1]*esc-4);g.fillStyle='#fff';g.fillText(n,q[0]*esc,q[1]*esc-4)}requestAnimationFrame(loop)};loop();
+ const fecha=()=>{vivo=false;el.remove()};el.querySelector('.x').onclick=fecha;
+ cv3.onclick=ev=>{const r=cv3.getBoundingClientRect(),mx=(ev.clientX-r.left)*cv3.width/r.width,my=(ev.clientY-r.top)*cv3.height/r.height;let best=null,bd=40*esc;for(const L of LUG){const q=miniP(L[2],L[3]),d=Math.hypot(q[0]*esc-mx,q[1]*esc-my);if(d<bd){bd=d;best=L}}if(best){fecha();follow=eu;toast('📍 Indo até: '+best[1],2200);best[4]()}}}
+
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
 const NOVID='v20261117';
 const NOV_SLIDES=[
@@ -4616,7 +4641,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261117c';
+const VERSAO_JOGO='v20261117d';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

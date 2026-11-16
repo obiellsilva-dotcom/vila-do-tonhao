@@ -66,7 +66,7 @@ Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡
 
 ## SITUAÇÃO EM 16/11/2026 (terceira sessão) — LEIA PRIMEIRO
 **Arquivos para anexar no chat novo:** `CONTEXTO.md`, `index.html`, `banco.sql`, `novidades.sql` (ou as 4 partes em `sql-celular/`) e `pix-funcao.ts`.
-- `index.html` é a versão única e atual (VERSAO_JOGO v20261117c). A antiga "proposta" foi incorporada nele; NÃO use mais `extras/proposta-index.html`.
+- `index.html` é a versão única e atual (VERSAO_JOGO v20261117d (com minimapa)). A antiga "proposta" foi incorporada nele; NÃO use mais `extras/proposta-index.html`.
 - `banco.sql` é o banco COMPLETO e atualizado (pode rodar de novo sem perder dados). Testado num PostgreSQL local.
 - `novidades.sql` = atualização completa (etapas 13 a 20). Pelo celular, rodar em ordem `sql-celular/parte1.sql` … `parte4.sql`.
 - **Confirmar com o usuário** se ele já rodou as 4 partes do SQL e subiu o `site.zip` (até o fim da sessão ele ainda estava testando).
@@ -131,7 +131,7 @@ Tudo abaixo está SÓ em `extras/proposta-index.html` (ramo `ccr-e150a3c5-3uuba3
 6. SQL continua acumulando em `novidades.sql`; só mandar quando ele disser "vamos subir a nova versão".
 
 ## SITUAÇÃO EM 17/11/2026 (quarta sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO v20261117c. Ramo `ccr-c5db5bd8-0bdems`. Para subir: `index.html` + `musicas/` (site.zip) e rodar `novidades.sql` (pequeno) no Supabase.
+Versão VERSAO_JOGO v20261117d (com minimapa). Ramo `ccr-c5db5bd8-0bdems`. Para subir: `index.html` + `musicas/` (site.zip) e rodar `novidades.sql` (pequeno) no Supabase.
 Se a pessoa NÃO tiver rodado o SQL da sessão anterior, rodar o banco completo pelo celular: `sql-celular/banco-parte1..4.sql` em ordem.
 ### O que entrou
 - Duster branca da prefeitura (vistoria). Veículos de trabalho com botão "🚚 Usar veículo do trabalho": SW4 (delegado), Frontier (mecânico), caminhão baú (padeiro e operário), caminhão de lixo (lixeiro, emprego novo nível 6). Ambulância pendente: o arquivo veio em .max (pedir .glb/.fbx/.obj/.blend).
