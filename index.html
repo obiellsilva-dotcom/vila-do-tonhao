@@ -3825,7 +3825,7 @@ function iniciarTurno(k,ini,dur){
  else if(k==='policia'){const t=nearestCarTile((deleg.front[0]+.5)*TILE,(deleg.front[1]+.5)*TILE,8);eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9;
   const pts=[...CRUZ].sort(()=>Math.random()-.5).slice(0,4);trabalho.ronda={i:0,pts};$('workGiro').classList.remove('hidden');Som.play('sirene');toast('🚓 Passe com a viatura pelos 4 pontos azuis. A seta mostra o caminho.',5000)}
  else if(k==='pescador'){eu.x=LAGOA.x+rand(-T(3),T(3));eu.y=LAGOA.y;eu.fish=true;eu.dir=1}
- else{const b=SHOPS[lugarDoJob(k)]||SHOPS.prefeitura;eu.hidden=true;eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE}
+ else{const b=SHOPS[lugarDoJob(k)]||SHOPS.prefeitura;eu.hidden=!RUA[k];eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE}
  if(TAREFAS[k]){trabalho.feitas=0;trabalho.porTarefa=true;trabalho.ganhou=0;trabalho.xp=0;trabalho.peixes=0;if(RUA[k])proxRua();else abrirTarefa()}
  $('workVeic').classList.toggle('hidden',!VEIC_JOB[k]);trabalho.veic=false;$('workVeic').textContent='🚚 Usar veículo do trabalho';follow=eu;$('workStop').textContent=trabalho.porTarefa?'✅ Encerrar turno':'Largar o turno';$('work').classList.remove('hidden');renderWork();sendPos(true);
 }
@@ -4681,7 +4681,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261117f';
+const VERSAO_JOGO='v20261117g';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
