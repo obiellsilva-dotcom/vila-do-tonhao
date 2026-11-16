@@ -147,3 +147,10 @@ Se a pessoa NÃO tiver rodado o SQL da sessão anterior, rodar o banco completo 
 - Tela de novidades (`mostrarNovidades`, `NOVID`) aparece 1 vez por pessoa (localStorage + coluna `moradores.novidades`).
 ### Ideias pendentes
 Braço do sofá por cima das pernas e lugares fixos no sofá; aumentar cadeira/poltrona; interiores das lojas em outra dimensão; ambulância.
+
+### Para o próximo chat (17/11/2026, fim da quarta sessão)
+- Anexar: `CONTEXTO.md`, `index.html` (v20261117g), `banco.sql`, `novidades.sql` e `pix-funcao.ts`.
+- SQL desta atualização em partes pequenas para o celular: `sql-celular/novidades-01..05.sql`. Banco completo em partes: `sql-celular/banco-01..16.sql`.
+- Combinado novo de trabalho: primeiro mandar FOTO + link do arquivo de teste (Artifact). Só mandar `site.zip` e `index.html` quando o usuário aprovar. Respostas curtas.
+- Arquivo de teste: cópia do index com ONLINE=false e um setInterval que libera nível 30, R$ 300 mil, todos os carros, VIP, Top 1 e põe o personagem na frente de uma mansão.
+- Pendências: veículo para o repositor (oferecido), boneco maior no mapa (oferecido), ambulância (.max), braço do sofá por cima das pernas, interiores das lojas.
