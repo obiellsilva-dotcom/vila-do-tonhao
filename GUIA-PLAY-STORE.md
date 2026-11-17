@@ -17,7 +17,7 @@ O app abre o site viladotonhao.com.br em tela cheia (TWA). Atualizou o site, atu
 3. Conferir no navegador que estes endereços abrem:
    - https://viladotonhao.com.br/privacidade.html
    - https://viladotonhao.com.br/excluir-conta.html
-   - https://viladotonhao.com.br/.well-known/assetlinks.json  ← se não abrir, o app mostra uma barra de endereço em cima (funciona, mas fica feio). Me avise.
+   - https://viladotonhao.com.br/.well-known/assetlinks.json  ← se não abrir (o Cloudflare às vezes ignora pastas que começam com ponto), o app mostra uma barra de endereço em cima: funciona, mas fica feio. Me avise que eu faço o Worker do Cloudflare entregar esse arquivo.
 
 ## Passo a passo no Google Play Console
 1. **Conta de desenvolvedor**: play.google.com/console → criar conta pessoal (taxa única de US$ 25, pede documento).
@@ -41,10 +41,10 @@ O app abre o site viladotonhao.com.br em tela cheia (TWA). Atualizou o site, atu
      > 👕 Monte seu visual com roupas, chapéus e joias.
      > 🏛️ Chegue ao nível 30 e vire prefeito da cidade!
    - Ícone: `loja/icone-512.png` · Recurso gráfico: `loja/destaque-1024x500.png` · Capturas de tela: `loja/print1..4.png`
-5. **Teste fechado (obrigatório para conta pessoal nova)**: Testes → Teste fechado → criar faixa → enviar o `cidade-do-tonhao.aab` → adicionar **pelo menos 12 testadores** (e-mails do Gmail deles) → eles precisam aceitar o convite pelo link e manter o app instalado por **14 dias seguidos**.
+5. **Teste fechado (obrigatório para conta pessoal criada depois de nov/2023; conta de empresa não precisa, mas exige número D-U-N-S)**: Testes → Teste fechado → criar faixa → enviar o `cidade-do-tonhao.aab` → adicionar **pelo menos 12 testadores** (e-mails do Gmail deles) → eles precisam aceitar o convite pelo link e manter o app instalado por **14 dias seguidos**.
 6. **Assinatura do Google (importante)**: ao enviar o .aab, o Google assina o app com a chave dele. Depois vá em **Configuração → Integridade do app → Assinatura do app** e copie o **SHA-256 da chave de assinatura do app**. Me mande esse código: eu coloco no `assetlinks.json` do site (senão aparece a barra de endereço no app baixado da loja).
 7. Passados os 14 dias: **Produção → Solicitar acesso à produção** → responder o questionário → enviar para revisão (alguns dias).
 
 ## Pagamento (já resolvido do jeito mais seguro)
 O Google exige que VIP, carros e pets comprados **dentro do app** usem o pagamento do Google (taxa de 15%). Por isso, **quando o jogo é aberto pelo app, a loja de Pix (💎) fica escondida**. No site tudo continua igual, e quem compra pelo site recebe no app também (é a mesma conta). Não coloque na descrição da loja nada mandando comprar pelo site (o Google não deixa).
-Se no futuro quiser vender dentro do app, dá para integrar o pagamento do Google Play (mais trabalho).
+Pesquisado em 17/11/2026: no Brasil o Google só deixa "sistema alternativo de faturamento" para apps que **não são jogos**; jogos têm que usar o faturamento do Google Play. Por isso o Pix fica só no site. Se no futuro quiser vender dentro do app, dá para integrar o pagamento do Google Play (que também aceita Pix para compras únicas).
