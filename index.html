@@ -1470,6 +1470,7 @@ const ROOFS=['#c0392b','#8e5a3c','#2e6f95','#7a4ea0','#3f7d4f','#b5651d','#a33b5
 const HOUSE_DEFS=[[1,3,4,3,12000],[1,8,4,3,12000],[6,3,4,3,12000],[6,8,4,3,12000],[15,3,4,3,12000],[15,8,4,3,12000],[20,3,4,3,12000],[20,8,4,3,12000],[24,3,4,3,12000],[24,8,4,3,12000],[29,3,4,3,12000],[29,8,4,3,12000],[37,3,4,3,12000],[37,8,4,3,12000],[42,3,4,3,12000],[42,8,4,3,12000],[46,3,4,3,12000],[46,8,4,3,12000],[51,3,4,3,12000],[51,8,4,3,12000],[59,3,4,3,12000],[59,8,4,3,12000],[64,3,4,3,12000],[64,8,4,3,12000],[69,3,4,3,12000],[69,8,4,3,12000],[74,3,4,3,12000],[74,8,4,3,12000],[1,17,4,3,12000],[1,26,4,3,12000],[1,36,4,3,12000],[1,45,4,3,12000],[6,17,4,3,12000],[6,26,4,3,12000],[6,36,4,3,12000],[6,45,4,3,12000],[15,36,4,3,12000],[20,36,4,3,12000],[24,36,4,3,12000],[29,36,4,3,12000],[37,36,4,3,12000],[42,36,4,3,12000],[46,36,4,3,12000],[51,36,4,3,12000],[59,36,4,3,12000],[59,45,4,3,12000],[64,36,4,3,12000],[64,45,4,3,12000],[69,36,4,3,12000],[69,45,4,3,12000],[74,36,4,3,12000],[74,45,4,3,12000],[85,3,4,3,20000],[90,3,4,3,20000],[95,3,4,3,20000],[85,8,4,3,20000],[90,8,4,3,20000],[95,8,4,3,20000],[85,17,4,3,20000],[90,17,4,3,20000],[95,17,4,3,20000],[85,36,4,3,20000],[90,36,4,3,20000],[95,36,4,3,20000],[85,45,4,3,20000],[90,45,4,3,20000],[95,45,4,3,20000],[105,2,6,4,90000],[112,2,6,4,90000],[105,7,6,4,90000],[112,7,6,4,90000],[105,16,6,4,90000],[112,16,6,4,90000],[105,35,6,4,90000],[112,35,6,4,90000],[105,44,6,4,90000],[112,44,6,4,90000],[1,58,4,3,8000],[6,58,4,3,8000],[15,58,4,3,8000],[20,58,4,3,8000],[25,58,4,3,8000],[29,58,4,3,8000],[39,58,4,3,8000],[44,58,4,3,8000],[49,58,4,3,8000],[54,58,4,3,8000],[60,58,4,3,8000],[65,58,4,3,8000],[70,58,4,3,8000],[75,58,4,3,8000],[87,58,4,3,8000],[92,58,4,3,8000],[97,58,4,3,8000],[106,58,4,3,8000],[111,58,4,3,8000],[1,72,4,3,8000],[6,72,4,3,8000],[28,72,4,3,8000],[50,72,4,3,8000],[59,72,4,3,8000],[64,72,4,3,8000],[69,72,4,3,8000],[74,72,4,3,8000],[86,72,4,3,8000],[91,72,4,3,8000],[96,72,4,3,8000],[106,72,4,3,8000],[111,72,4,3,8000]];
 HOUSE_DEFS.forEach(p=>p[4]=Math.round(p[4]*1.5)); // casas da cidade 50% mais caras (o condomínio é a opção barata)
 const HOUSE_OFF=new Set();{const rows={};HOUSE_DEFS.forEach((p,i)=>{(rows[p[1]]=rows[p[1]]||[]).push(i)});for(const r of Object.values(rows)){r.sort((a,b)=>HOUSE_DEFS[a][0]-HOUSE_DEFS[b][0]);r.forEach((i,k)=>{if(k%2===1&&r.length>2)HOUSE_OFF.add(i)})}}
+HOUSE_OFF.add(58); // casa 59 saiu: o terreno virou parte da concessionária
 const houses=HOUSE_DEFS.map((p,i)=>(HOUSE_OFF.has(i)?(o=>(o.front=[o.x+Math.floor(o.w/2),o.y+o.h],o.off=true,o)):addB)({kind:p[2]>4?'mansao':'casa',x:p[0],y:p[1],w:p[2],h:p[3],preco:p[4],n:i+1,wall:WALLS[Math.floor(hsh(i,3,1)*WALLS.length)],roof:ROOFS[Math.floor(hsh(i,5,2)*ROOFS.length)]}));
 // loja de roupas no Centro de Empregos, com interior (usa o mesmo sistema das casas)
 // imobiliária ao lado da igreja: por fora é um prédio; por dentro é uma sala em outra dimensão (como as casas)
@@ -1516,7 +1517,14 @@ const pad=addB({kind:'padaria',x:46,y:16,w:5,h:5});
 const barb=addB({kind:'barbearia',x:51,y:17,w:4,h:4});
 const bank=addB({kind:'banco',x:37,y:15,w:8,h:6});
 const igreja=addB({kind:'igreja',x:48,y:40,w:7,h:8});
-const conc=addB({kind:'concessionaria',x:86,y:23,w:10,h:6});
+// concessionária nova (12x8): showroom de vidro com escritório no fundo (x85-95, y21-23) e pátio murado com os carros na frente (y24-28)
+const conc=addB({kind:'concessionaria',x:85,y:15,w:10,h:5,front:[90,20]});
+const CONC={X0:85,X1:95,Y0:15,Y1:20,P1:29,dentro:[['kombi_tonhao',87.1,17.7,.55],['gto',90.0,17.6,.55],['neon',92.9,17.7,.55]],
+ fora:[['caminhonete',86.3,22.1,1.57],['jipe',87.8,22.1,1.57],['esportivo',92.2,22.1,1.57],['sedan',93.7,22.1,1.57],['opala',86.3,25.5,1.57],['fusca',87.8,25.5,1.57],['moto',92.7,25.6,1.57]]};
+for(let y=20;y<=28;y++)for(let x=85;x<=94;x++)grid[y][x]=G.ROAD; // pátio de asfalto (dá para entrar de carro)
+for(let y=20;y<=28;y++){grid[y][85]=G.BLD;grid[y][94]=G.BLD} // muros laterais
+for(let x=85;x<=94;x++)if(x<89||x>90)grid[28][x]=G.BLD; // muro da frente com portão no meio
+for(const [,cx,cy] of CONC.fora)grid[Math.floor(cy)][Math.floor(cx)]=G.BLD; // carros em exposição bloqueiam
 const ofic=addB({kind:'oficina',x:105,y:23,w:6,h:6});
 const posto=addB({kind:'posto',x:96,y:21,w:4,h:2});
 for(let y=23;y<=29;y++)for(let x=96;x<=100;x++)grid[y][x]=G.ROAD; // pátio do posto
@@ -2283,6 +2291,45 @@ function drawFeira(c,b){const X0=T(b.x),Y0=T(b.y),Y1=T(b.y+b.h),n=4,w=(T(b.w)-12
    c.fillStyle=s2%2?cb:ca;c.beginPath();c.moveTo(a0[0],a0[1]-zf);c.lineTo(a1[0],a1[1]-zf);c.lineTo(b1[0],b1[1]-zb);c.lineTo(b0[0],b0[1]-zb);c.closePath();c.fill();
    c.beginPath();c.moveTo(a0[0],a0[1]-zf);c.lineTo(a1[0],a1[1]-zf);c.lineTo(a1[0],a1[1]-zf+5);c.lineTo(a0[0],a0[1]-zf+5);c.fill()}}
  const pl=isoP(X0+T(b.w)/2,Y1+4);c.fillStyle='#6d4426';c.fillRect(pl[0]-1.5,pl[1]-22,3,22);c.fillStyle='#f3e3bd';rr(c,pl[0]-34,pl[1]-34,68,14,4);c.fill();c.fillStyle='#5a3a22';c.font='700 9px Fredoka, sans-serif';c.textAlign='center';c.fillText('🍎 FEIRINHA 🥬',pl[0],pl[1]-24);c.textAlign='left'}
+// concessionária desenhada à mão (showroom de vidro, escritório no fundo, pátio murado com carros e plaquinhas de preço)
+function concIso(list){const C=CONC,X0=T(C.X0),X1=T(C.X1),Y0=T(C.Y0),Y1=T(C.Y1),P1=T(C.P1),H=50,vid=darkness()>.3?'rgba(255,214,120,.22)':'rgba(170,215,240,.28)';
+ // piso do showroom (porcelanato) e faixas do pátio
+ list.push({x:X0,y:Y0,k:X0+Y0-30,g:1,f:()=>{setWorld(ctx);for(let y=Y0;y<Y1;y+=16)for(let x=X0;x<X1;x+=16){ctx.fillStyle=((x+y)/16)%2?'#e9edf1':'#dfe4ea';ctx.fillRect(x,y,16,16)}
+  ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.4;for(const vx of [85.55,87.05,88.55,91.45,92.95,94.45])for(const [a,b] of [[20.8,23.6],[24.2,27]]){ctx.beginPath();ctx.moveTo(T(vx),T(a));ctx.lineTo(T(vx),T(b));ctx.stroke()}
+  ctx.fillStyle='rgba(255,201,74,.85)';ctx.fillRect(T(89),T(20),T(2),3);ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(T(89.1),T(20.2),T(1.8),T(7.8));for(const [,cx,cy] of C.dentro){ctx.fillStyle='rgba(30,30,40,.16)';ctx.beginPath();ctx.ellipse(T(cx),T(cy)+3,40,14,0,0,7);ctx.fill();ctx.strokeStyle='#c9ced6';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(T(cx),T(cy)+3,40,14,0,0,7);ctx.stroke()}}});
+ // parede do fundo com o escritório
+ list.push({x:(X0+X1)/2,y:Y0,k:X0+Y0+4,cam:1,f:()=>{isoBox(ctx,X0,Y0,X1,Y0+5,0,H,'#f2f4f7');isoBox(ctx,X0,Y0,X0+5,Y1,0,H,'#e4e8ee');
+  wallSet(ctx,Y0+5);const z=v=>Y0+5-v/WK;ctx.fillStyle='#1f5a8a';ctx.fillRect(X0+8,z(H-4),X1-X0-16,10/WK);ctx.fillStyle='#ffc94a';ctx.font='700 7px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('CARROS DO ZÉ  ·  SHOWROOM',(X0+X1)/2,z(H-11));
+  const ox=X1-T(3.2);ctx.fillStyle='#8a5a2b';ctx.fillRect(ox,z(40),T(2.6),40/WK);ctx.fillStyle='#cfe6f5';ctx.fillRect(ox+3,z(37),T(1.2)-4,22/WK);ctx.fillStyle='#6b4423';ctx.fillRect(ox+T(1.4),z(36),T(1)-2,36/WK);ctx.fillStyle='#ffd23f';ctx.fillRect(ox+T(2.2),z(18),2,2/WK);
+  ctx.fillStyle='#2b2b30';ctx.font='600 5px Fredoka, sans-serif';ctx.fillText('ESCRITÓRIO',ox+T(1.3),z(44));
+  ctx.fillStyle='#d9dde3';ctx.fillRect(X0+T(1.2),z(44),T(2.4),18/WK);ctx.fillStyle='#2e6fd8';ctx.fillRect(X0+T(1.3),z(42),T(2.2),14/WK);ctx.fillStyle='#fff';ctx.font='600 4.5px Fredoka, sans-serif';ctx.fillText('FINANCIAMOS!',X0+T(2.4),z(33));ctx.textAlign='left';setCam(ctx)}});
+ // mesa do vendedor (escritório) e plantas
+ list.push({x:X1-T(2),y:Y0+T(1),cam:1,f:()=>{const x=X1-T(2.9),y=Y0+T(.9);sombraChao(ctx,x,y,x+T(1.8),y+T(.8));isoBox(ctx,x,y,x+T(1.8),y+T(.8),12,15,'#6b4423');isoBox(ctx,x+3,y+3,x+6,y+T(.8)-3,0,12,'#4a2e17');isoBox(ctx,x+T(1.8)-6,y+3,x+T(1.8)-3,y+T(.8)-3,0,12,'#4a2e17');
+  isoBox(ctx,x+T(.6),y+4,x+T(1.1),y+9,15,24,'#1d1d22');isoBox(ctx,x+T(.6)+1,y+4,x+T(1.1)-1,y+5,16,23,'#5fa8e8');isoBox(ctx,x+T(.7),y+T(1.1),x+T(1.1),y+T(1.5),0,10,'#2b2b30');isoBox(ctx,x+T(.7),y+T(1.4),x+T(1.1),y+T(1.5),10,20,'#2b2b30')}});
+ for(const px of [X0+10,X1-12])list.push({x:px,y:Y1-10,cam:1,f:()=>{isoBox(ctx,px-4,Y1-14,px+4,Y1-6,0,8,'#b5651d');ctx.fillStyle='#2e8b57';const q=isoP(px,Y1-10);for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(q[0]+Math.cos(i*1.3)*4,q[1]-16-Math.sin(i*2)*4,4,7,i,0,7);ctx.fill()}}});
+ // carros do Pix em exposição dentro (giram devagar)
+ for(const [k,cx,cy,a0] of C.dentro)list.push({x:T(cx),y:T(cy),f:()=>{const a=a0;try{drawCarStack(ctx,T(cx),T(cy),k,a,null,{})}catch(e){}placaCarro(T(cx),T(cy),k,true)}});
+ // vidro da frente com colunas e a faixa do letreiro (por cima dos carros de dentro)
+ list.push({x:(X0+X1)/2,y:Y1,k:X1+Y1+2,cam:1,f:()=>{const A=isoP(X0,Y1),B2=isoP(X1,Y1),Cc=isoP(X1,Y0),porta=[T(89.1),T(90.9)];
+  ctx.fillStyle=vid;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B2[0],B2[1]);ctx.lineTo(B2[0],B2[1]-H+8);ctx.lineTo(A[0],A[1]-H+8);ctx.closePath();ctx.fill();
+  ctx.fillStyle=vid;ctx.beginPath();ctx.moveTo(B2[0],B2[1]);ctx.lineTo(Cc[0],Cc[1]);ctx.lineTo(Cc[0],Cc[1]-H+8);ctx.lineTo(B2[0],B2[1]-H+8);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.35)';for(let i=0;i<5;i++){const t=i/5+.05,p=[A[0]+(B2[0]-A[0])*t,A[1]+(B2[1]-A[1])*t];ctx.beginPath();ctx.moveTo(p[0]+4,p[1]-6);ctx.lineTo(p[0]+14,p[1]-6);ctx.lineTo(p[0]+24,p[1]-H+14);ctx.lineTo(p[0]+14,p[1]-H+14);ctx.fill()}
+  for(let x=X0;x<=X1+1;x+=T(2.2))isoBox(ctx,Math.min(x,X1)-2,Y1-2,Math.min(x,X1)+2,Y1+2,0,H-6,'#9aa3ad');isoBox(ctx,X1-3,Y0,X1+1,Y0+4,0,H-6,'#9aa3ad');
+  isoBox(ctx,porta[0],Y1-1,porta[1],Y1+1,0,40,'rgba(120,170,200,.35)');isoBox(ctx,porta[0]-1,Y1-2,porta[0]+1,Y1+2,0,40,'#7d8790');isoBox(ctx,porta[1]-1,Y1-2,porta[1]+1,Y1+2,0,40,'#7d8790');
+  isoBox(ctx,X0-3,Y1-6,X1+3,Y1+3,H-8,H+4,'#1f5a8a');isoBox(ctx,X1-1,Y0-2,X1+3,Y1+3,H-8,H+4,'#174a73');
+  wallSet(ctx,Y1+3);ctx.fillStyle='#ffc94a';ctx.font='700 9px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('🚗 CARROS DO ZÉ',(X0+X1)/2,Y1+3-(H-5)/WK);ctx.textAlign='left';setCam(ctx)}});
+ // carros do pátio
+ for(const [k,cx,cy,a] of C.fora)list.push({x:T(cx),y:T(cy),f:()=>{try{drawCarStack(ctx,T(cx),T(cy),k,a,null,{})}catch(e){}placaCarro(T(cx),T(cy),k,false)}});
+ // muros (laterais e frente, com portão) e totem
+ const muro=(x0,y0,x1,y1)=>list.push({x:(x0+x1)/2,y:(y0+y1)/2,k:(x0+x1)/2+(y0+y1)/2+2,cam:1,f:()=>{isoBox(ctx,x0,y0,x1,y1,0,13,'#d9d1c3');isoBox(ctx,x0-1,y0-1,x1+1,y1+1,13,15,'#b8ad99')}});
+ for(let y=20;y<29;y++){muro(X0,T(y),X0+6,T(y+1));muro(X1-6,T(y),X1,T(y+1))}
+ for(let x=85;x<95;x++)if(x<89||x>90)muro(T(x),P1-6,T(x+1),P1);
+ for(const gx of [T(89),T(91)])list.push({x:gx,y:P1-3,k:gx+P1,cam:1,f:()=>{isoBox(ctx,gx-4,P1-7,gx+4,P1+1,0,22,'#9a8f7d');isoBox(ctx,gx-5,P1-8,gx+5,P1+2,22,25,'#ffc94a')}});
+ list.push({x:X0+8,y:P1+8,k:X0+P1+20,cam:1,f:()=>{const x=X0+4,y=P1+4;isoBox(ctx,x,y,x+5,y+5,0,70,'#3a3f47');isoBox(ctx,x-10,y-1,x+15,y+6,58,90,'#1f5a8a');const q=isoP(x+2,y+6);ctx.fillStyle='#ffc94a';ctx.font='700 7px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('CARROS',q[0],q[1]-80);ctx.fillText('DO ZÉ',q[0],q[1]-70);ctx.font='9px sans-serif';ctx.fillText('🚗',q[0],q[1]-61);ctx.textAlign='left'}});
+}
+function placaCarro(x,y,k,pix){const c=CARS[k]||CARS_PREMIUM[k];if(!c||!vis2(x,y))return;const nm=c.nome,pr=k==='neon'?'👑 VIP':pix?'💎 Pix':money(c.preco);ctx.save();setWorld(ctx);bbSet(ctx,x,y);const w=Math.max(ctx.measureText?34:34,nm.length*3.4+10);
+ ctx.font='600 5px Fredoka, sans-serif';const tw=Math.max(ctx.measureText(nm).width,ctx.measureText(pr).width)+8;ctx.fillStyle='rgba(20,12,16,.82)';rr(ctx,x-tw/2,y-46,tw,15,4);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(nm,x,y-39.5);ctx.fillStyle=k==='neon'?'#6fb8ff':pix?'#c9a8ff':'#7dff9a';ctx.fillText(pr,x,y-33.5);ctx.textAlign='left';ctx.restore()}
+const vis2=(x,y)=>{const q=toScreen(x,y);return q[0]>-80&&q[0]<cw+80&&q[1]>-80&&q[1]<ch+120};
 function predioFatias(list,b,dentro){
  const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h),Hf=b.h*TILE*WK,casa=b.kind==='casa'||b.kind==='mansao',Hw=Hf*(casa?.52:.62),rf=b.roof||ROOF_KIND[b.kind]||'#8e5a3c',wl=b.wall||'#e8e3d3';
  if(dentro){ // corte: só as paredes do fundo e da esquerda, baixas
@@ -3218,7 +3265,7 @@ function drawCena(){
  for(let i=0;i<95;i++){const x=WX0+((i*173+now*14)%(MW+60))-30,y=T(53.3)+((i*47)%112);if(!vis(x,y))continue;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+10,y);ctx.stroke()}
  const list=[];
  for(const p of plist)if(p.pet&&vis(p.x,p.y))list.push({x:p.petX||p.x,y:(p.petY||p.y)-1,f:()=>desenhaPet(ctx,p)});
- for(const b of B){if(b.kind==='bar')continue;const q=toScreen(T(b.x+b.w/2),T(b.y+b.h/2)),m=(b.w+b.h)*TILE*cam.z;if(q[0]<-m||q[0]>cw+m||q[1]<-m||q[1]>ch+m*1.6)continue;predioFatias(list,b,b===minhaC)}
+ for(const b of B){if(b.kind==='bar')continue;if(b.kind==='concessionaria'){const q=toScreen(T(90),T(22));if(q[0]>-500&&q[0]<cw+500&&q[1]>-400&&q[1]<ch+500)concIso(list);continue}const q=toScreen(T(b.x+b.w/2),T(b.y+b.h/2)),m=(b.w+b.h)*TILE*cam.z;if(q[0]<-m||q[0]>cw+m||q[1]<-m||q[1]>ch+m*1.6)continue;predioFatias(list,b,b===minhaC)}
  if(BARA)for(let i=16;i<33;i++)list.push({x:T(i+.5),y:T(18),k:T(i+.5)+T(18)-2,w:T(18),f:()=>artFatia(ctx,BARA,T(i),T(i+1),T(15)-12,T(18))});
  for(const [bx,by] of PRACA_BANCOS)if(vis(T(bx),T(by)))list.push({x:T(bx),y:T(by),k:T(bx)+T(by)+8,cam:1,f:()=>bancoIso(ctx,T(bx),T(by))});
  if(BARA){for(const st of seats){if(st.kind!=='mesa'&&st.kind!=='fora')continue;const cx=T(st.x),cy=T(st.y)-3,dx=st.x-st.t[0],dy=st.y-st.t[1],col=st.kind==='fora'?'#d63c3c':'#8b5a2b',perto=Math.abs(dx)>Math.abs(dy)?dx>0:dy>0;
@@ -3404,7 +3451,7 @@ function uiTick(){
  refreshCard();
 }
 setInterval(uiTick,300);
-const FOCUS={roupas:[54,25,1.3],delegacia:[65,69,1.3],hospital:[91,69,1.3],parque:[111,67.5,1.3],lagoa:[46,-9,1.1],mirante:[131,34,1.2],acampamento:[-10,39.5,1.3],pomar:[57,89,1.2],concessionaria:[91,27,1.3],oficina:[108,27,1.3],posto:[98,25,1.4],fabrica:[21,71,1.1],prefeitura:[44,71,1.2],leste:[100,24,.75],sul:[60,68,.65],bar:[24,22,1.4],praca:[23.8,33.8,1.5],campo:[69,22,.85],banco:[41,19,1.3],igreja:[51.5,44,1.3],mercadinho:[45,26,1.3],padaria:[48.5,19.5,1.3],barbearia:[53,20,1.5],rio:[40,52.5,1]};
+const FOCUS={roupas:[54,25,1.3],delegacia:[65,69,1.3],hospital:[91,69,1.3],parque:[111,67.5,1.3],lagoa:[46,-9,1.1],mirante:[131,34,1.2],acampamento:[-10,39.5,1.3],pomar:[57,89,1.2],concessionaria:[90,22,1.25],oficina:[108,27,1.3],posto:[98,25,1.4],fabrica:[21,71,1.1],prefeitura:[44,71,1.2],leste:[100,24,.75],sul:[60,68,.65],bar:[24,22,1.4],praca:[23.8,33.8,1.5],campo:[69,22,.85],banco:[41,19,1.3],igreja:[51.5,44,1.3],mercadinho:[45,26,1.3],padaria:[48.5,19.5,1.3],barbearia:[53,20,1.5],rio:[40,52.5,1]};
 $('places').onchange=e=>{const v=e.target.value;e.target.value='';if(!v)return;follow=null;
  if(v==='cidade'){cam.x=(WX0+WX1)/2;cam.y=(WY0+WY1)/2;cam.z=Math.min(cw/MW,ch/MH)*1.02;return}
  const f=FOCUS[v];cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.min(f[2]*Math.max(.8,cw/700),2.2)};
@@ -5238,7 +5285,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261123b';
+const VERSAO_JOGO='v20261124a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5527,7 +5574,7 @@ function tutoMostra(){const st=TUTO[tutoI];$('tutoTxt').innerHTML=st[1];$('tutoI
  if(st[0]&&FOCUS[st[0]]){follow=null;const f=FOCUS[st[0]];cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.min(f[2]*Math.max(.8,cw/700),2.2)}else if(eu){follow=eu}}
 function tutoFim(){$('tuto').classList.add('hidden');if(eu&&eu.tutoPend){eu.tutoPend=false;if(msAtiva())later(.6,()=>{bannerGrande('🎯 SUA PRIMEIRA MISSÃO!','Siga o cartão dourado e a seta. Bônus de R$ 100!');Som.play('clique')})}if(eu)follow=eu;try{localStorage.setItem('cidadeTonhao.tuto','1')}catch(e){}}
 function tutorial(){tutoI=0;$('tuto').classList.remove('hidden');tutoMostra()}
-$('tutoProx').onclick=()=>{if(++tutoI>=TUTO.length)tutoFim();else tutoMostra()};$('tutoPular').onclick=tutoFim;
+$('tutoProx').onclick=()=>{if(++tutoI>=TUTO.length)tutoFim();else tutoMostra()};$('tutoPular').onclick=()=>{tutoFim();setTimeout(()=>tourCidade(),900)};
 /* ----- primeira missão: guia quem acabou de chegar até o primeiro dinheiro ----- */
 const MS_META=3;let msTar=0,msBusy=false;try{msTar=+localStorage.getItem('cidadeTonhao.msTar')||0}catch(e){}
 function msAtiva(){return !!eu&&(eu.missao===0||eu.missao===1)}
@@ -5549,15 +5596,39 @@ function msRender(){const el=$('missao'),on=msAtiva()&&!eu.tutoPend&&$('tuto').c
  if($('msTit').textContent!==tit)$('msTit').textContent=tit;if(msRender.t!==txt){msRender.t=txt;$('msTxt').innerHTML=txt}
  $('msBar').style.display=eu.missao===0?'':'none';$('msBar').firstChild.style.width=(pct*100)+'%';$('msIr').style.display=ir&&livre()?'':'none';$('perto').style.top=Math.round(el.getBoundingClientRect().bottom+8)+'px'}
 setInterval(msRender,400);
+/* ----- tour obrigatório pela cidade (depois da 1ª missão ou ao pular o tutorial; 1 vez por pessoa) ----- */
+const TOUR=[[24,22.5,1.35,'🍺 Bar do Tonhão','O coração da cidade: bebida, comida, sinuca e conversa. O <b>garçom</b> é o primeiro emprego.'],
+ [44,21,1.05,'💼 Centro de Empregos','Mercadinho, Padaria, Barbearia e Banco. Toque em <b>☰ → 💼 Empregos</b> para trabalhar e ganhar dinheiro e XP.'],
+ [54,25.5,1.35,'👕 Loja de Roupas','Roupas, calçados, chapéus e joias. Depois troque tudo no <b>👕 Guarda-roupa</b>.'],
+ [90,22,1.2,'🚗 Concessionária Carros do Zé','Carros de verdade no pátio e os especiais 💎 no showroom. Comprou, saiu dirigindo!'],
+ [101,25,1.2,'⛽ Posto e 🔧 Oficina','Abasteça o carro no posto e troque a cor na oficina.'],
+ [92,40,.95,'🏠 Casas à venda','Placa <b>VENDE-SE</b> = casa livre. Dá para entrar, decorar e convidar amigos.'],
+ [41.5,44,1.3,'🏢 Imobiliária','Fale com o corretor para <b>comprar ou alugar</b> casas e apartamentos.'],
+ [15,-11,.9,'🏘️ Condomínio Vila Tonhão','64 apartamentos para comprar ou alugar por semana, com portaria e quadra.'],
+ [65,69,1.2,'🚓 Delegacia','Seja <b>policial</b> ou delegado: patrulhe a cidade com a viatura.'],
+ [91,69,1.2,'🏥 Hospital','Enfermeiro e médico. Se a fome zerar, você acorda aqui!'],
+ [44,71,1.1,'🏛️ Prefeitura','No <b>nível 30</b> você pode virar <b>prefeito</b> da cidade!']];
+let tourOn=false;
+function tourCidade(forcar){if(!eu||tourOn)return;const kk='cidadeTonhao.tour.'+eu.id;if(!forcar){try{if(localStorage.getItem(kk))return}catch(e){}}
+ tourOn=true;try{localStorage.setItem(kk,'1')}catch(e){}closePlace();$('tuto').classList.add('hidden');eu.path=[];const volta={x:cam.x,y:cam.y,z:cam.z};follow=null;
+ const el=document.createElement('div');el.id='tour';el.innerHTML=`<style>#tour{position:fixed;inset:0;z-index:70;pointer-events:all;background:linear-gradient(rgba(0,0,0,.35),transparent 18%,transparent 70%,rgba(0,0,0,.55))}#tour .tp{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(43,26,32,.92);border:2px solid #ffc94a;border-radius:14px;padding:6px 14px;color:#ffc94a;font:700 15px Fredoka,sans-serif;white-space:nowrap}#tour .cx{position:absolute;left:12px;right:12px;bottom:calc(22px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto;background:rgba(43,26,32,.94);border:2px solid #ffc94a;border-radius:16px;padding:12px 14px;color:#fff;font:15px/1.4 Fredoka,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.5)}#tour h3{margin:0 0 4px;color:#ffc94a;font-size:19px}#tour .ds{display:flex;gap:4px;justify-content:center;margin-top:8px}#tour .ds i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}#tour .ds i.on{background:#ffc94a}</style><div class="tp">🗺️ Conheça a Cidade do Tonhão</div><div class="cx"><h3></h3><div class="tx"></div><div class="ds"></div></div>`;
+ document.body.appendChild(el);let i=-1,t0=0,de=null,ate=null;const MOV=1.6,PARA=3.4;
+ const pr=()=>{i++;if(i>=TOUR.length){fim();return}const [x,y,z,ti,tx]=TOUR[i];de={x:cam.x,y:cam.y,z:cam.z};ate={x:T(x),y:T(y),z};t0=performance.now();
+  el.querySelector('h3').textContent=ti;el.querySelector('.tx').innerHTML=tx;el.querySelector('.ds').innerHTML=TOUR.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');Som.play('clique')};
+ const ease=u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+ const passo=()=>{if(!tourOn)return;const u=Math.min(1,(performance.now()-t0)/1000/MOV),e=ease(u);if(de&&ate){cam.x=de.x+(ate.x-de.x)*e;cam.y=de.y+(ate.y-de.y)*e;cam.z=de.z+(ate.z-de.z)*e;follow=null}
+  if((performance.now()-t0)/1000>MOV+PARA)pr();if(tourOn)requestAnimationFrame(passo)};
+ const fim=()=>{tourOn=false;el.remove();cam.z=Math.max(1.3,volta.z);follow=eu;bannerGrande('✅ PRONTO!','Agora é com você. Os lugares também estão no 🗺️ mapa e no 🟢 online → Ir para.')};
+ pr();requestAnimationFrame(passo)}
 function msTarefa(){if(!eu||eu.missao!==0)return;msTar++;try{localStorage.setItem('cidadeTonhao.msTar',msTar)}catch(e){}msRender()}
 function msComprou(it){if(eu&&eu.missao===1&&it&&it.fome>0&&!msBusy)msPasso(2)}
 function msPasso(p,pulou){msBusy=true;api.missao(p).then(r=>{if(r&&r.eu)aplicarEstado(r.eu);eu.missao=r&&r.missao!=null?+r.missao:2;
-  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('compra');floatText(eu.x,eu.y-44,'+'+money(r.bonus||100),'#9dff7a');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||100)+'. Agora vá comer alguma coisa!')}
+  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('compra');floatText(eu.x,eu.y-44,'+'+money(r.bonus||100),'#9dff7a');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||100)+'. Agora vá comer alguma coisa!');setTimeout(()=>tourCidade(),3200)}
   else if(!pulou){closePlace();bannerGrande('🎉 MISSÃO COMPLETA!','Agora é com você! Mais empregos em ☰ → 💼 Empregos')}
   if(eu.missao>=2)try{localStorage.removeItem('cidadeTonhao.msTar')}catch(e){}})
  .catch(()=>{eu.missao=2}).finally(()=>{msBusy=false;msRender()})}
 $('msIr').onclick=()=>{const a=msAlvo();if(!a||!livre())return;Som.play('clique');irPara(a.x,a.y,()=>abrirLugar(a.b))};
-$('msX').onclick=()=>confirmar('Pular a missão?',eu.missao===0?'Você fica <b>sem o bônus de R$ 100</b>.':'A missão some da tela.',()=>msPasso(2,true));
+$('msX').onclick=()=>confirmar('Pular a missão?',eu.missao===0?'Você fica <b>sem o bônus de R$ 100</b>.':'A missão some da tela.',()=>{msPasso(2,true);setTimeout(()=>tourCidade(),900)});
 $('shuffle').onclick=()=>{prov=randomVis();renderProv()};
 $('copyCode').onclick=()=>copy(encode(prov),'Código do visual copiado!');
 $('enter').onclick=()=>{
