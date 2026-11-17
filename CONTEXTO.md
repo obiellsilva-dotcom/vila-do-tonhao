@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122p** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122r** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -212,7 +212,13 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Entregas pela cidade:** `pontosCidade()`/`pontoCidade()` (calçada G.WALK colada em rua) para padeiro, operário (fábrica) e lixeiro.
 - **Arquivo de teste:** o "trapaça" também atualiza o banco local (`L.me`), então os trabalhos de nível alto abrem.
 - **Medidor de desempenho** (⚙️ → 📊 Mostrar desempenho, `CFG.perf`, `perfTick`): quadros por segundo e travadas (quadro > 0,1 s) nos últimos 10 s. O computador de teste desenha sem placa de vídeo e não serve para medir; trocar degradês da luz por imagem pronta PIOROU aqui e foi desfeito.
+- **Play Store (preparado):** app TWA em `app-android/` (Bubblewrap; pacote `br.com.viladotonhao.app`, targetSdk 35), `.aab` e `.apk` assinados em `entrega/app/` com a chave `cidade-do-tonhao.keystore` (NÃO vai pro git; o usuário guarda). `.well-known/assetlinks.json` tem o SHA-256 da chave de upload; falta acrescentar o SHA-256 da chave de assinatura do Google (Play Console → Integridade do app). Guia completo: `GUIA-PLAY-STORE.md`. Imagens da loja em `entrega/loja/`. Para compilar de novo: Android SDK em /opt/android-sdk, `./gradlew bundleRelease` (usar o espelho maven-central.storage-download.googleapis.com; Maven Central dá 429) e assinar com jarsigner.
+- **App sem loja Pix:** com `?app=1` (start_url do app) ou referrer android-app, `NO_APP` esconde o 💎 e bloqueia `abrirLoja`/`comprarPix` (regra de pagamentos do Google). Site normal.
+- **Excluir conta (ETAPA 27):** função `excluir_conta()`, botão em ⚙️ e página `excluir-conta.html`. **Privacidade:** `privacidade.html` (contato: chat do jogo ou e-mail da página na Google Play).
+- **Bloquear jogador:** botão 🔇 no cartão; lista `BLOQ` no aparelho (some chat, balões, convites, propostas, sinuca).
+- **Menos travadas:** chão em blocos de 256 (antes 512) e 1 bloco novo por quadro; camada de faróis 320 px (antes 640); brilho do farol do outro lado só quando visível.
+- **Manifest/ícones:** `manifest.webmanifest`, `icones/` (emoji 🍺 da fonte Noto).
 ### Pendências
-0. Confirmar se o usuário rodou a ETAPA 26.
+0. Confirmar se o usuário rodou as ETAPAS 26 e 27 e se `/.well-known/assetlinks.json` abriu no site depois de subir (o Cloudflare pode ignorar pasta com ponto).
 1. Desempenho itens 2 e 3 (o usuário reclamou que o jogo trava).
 2. Interiores das lojas em outra dimensão. 3. Curva de XP para a Play Store.

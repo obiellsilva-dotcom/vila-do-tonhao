@@ -1,0 +1,43 @@
+{
+  "packageId": "br.com.viladotonhao.app",
+  "host": "viladotonhao.com.br",
+  "name": "Cidade do Tonhão",
+  "launcherName": "Cidade do Tonhão",
+  "display": "fullscreen",
+  "themeColor": "#2B1A20",
+  "themeColorDark": "#2B1A20",
+  "navigationColor": "#2B1A20",
+  "navigationColorDark": "#2B1A20",
+  "navigationDividerColor": "#2B1A20",
+  "navigationDividerColorDark": "#2B1A20",
+  "backgroundColor": "#2B1A20",
+  "enableNotifications": false,
+  "startUrl": "/?app=1",
+  "iconUrl": "http://localhost:8790/icones/icone-512.png",
+  "maskableIconUrl": "http://localhost:8790/icones/icone-mascara-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "../cidade-do-tonhao.keystore",
+    "alias": "tonhao"
+  },
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": false,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://viladotonhao.com.br/",
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "displayOverride": []
+}
