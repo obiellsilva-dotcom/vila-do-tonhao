@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122s** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122t** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -220,7 +220,12 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Manifest/ícones:** `manifest.webmanifest`, `icones/` (emoji 🍺 da fonte Noto).
 - **Passe da Temporada (ETAPA 28):** tabelas `passe_temporadas`, `passe_premios`, `passe_jogador`; temporada T1 "Natal na Vila" até 01/01/2027; 20 níveis × 100 pontos; tarefa = 10, patrulha = 15, VIP +50% (`_passe_pontos`, chamado em `tarefa_feita` e `ronda_policia`); `meu_passe()`, `resgatar_passe(nivel,trilha)`; prêmios por `_dar_premio` (dinheiro, estampa, roupa/calca/calcado/chapeu/extra para os dois sexos no `guarda_roupa`). Premium = produto Pix `passe_T1` (R$ 9,90, tipo 'passe' no `_entregar`). Cliente: `PASSE_T1` (cópia dos prêmios para o modo offline), `abrirPasse`/`pintaPasse`, botão 🎟️ no menu. Nova temporada = inserir em `passe_temporadas` + `passe_premios` + produto `passe_T2` e atualizar o cliente.
 - **VIP turbinado:** `vip_mensal` (presente por mês até 2027-04) + `presente_vip()`/`vip_info()`; botões 🎁 Presente do mês e 🏠 Ir para casa (`irParaCasa`) em ⚙️; produto `vip90` (R$ 39,90). Novidades `NOVID='v20261125'` com 2 páginas novas.
+- **Itens exclusivos (índices 30-39, `OPC.chapeu.exc`, `excOf`)**: gorro de Papai Noel (30, grátis nível 5) e gorro brilhante (31, premium nível 1; todos veem brilhando). Não vendem (`preco_roupa` 999999, `comprar_roupa` recusa).
+- **Prêmio final do passe:** `{"carro":"natal"}` (premium nível 20). Bloqueado até `passe_temporadas.carro_pronto = true` e até existir `CARS_PREMIUM.natal` no cliente. Quando o usuário mandar o carro: adicionar o sprite com id `natal`, `CARS_PREMIUM.natal` e rodar `update passe_temporadas set carro_pronto = true where id = 'T1'`.
+- **Tela do passe nova** (estilo Fortnite/Clash): vitrine com carro (silhueta "?") e gorro, aviso "nunca mais voltam", trilha horizontal grátis/premium com miniaturas do próprio boneco (`thumbPremio`). Loja VIP com quadro de benefícios e a Lambordini desenhada.
+- **Roupas VIP novas** (no fim de `vipm`/`vipf`, 53-56): bomber dourada, moletom neon, jaqueta de veludo, smoking (m) / vestido de lantejoulas (f); tênis neon (calçado 51) e boné neon (chapéu 52). **Estampas redesenhadas** (mesmos índices).
 ### Pendências
+000. Carro exclusivo do passe (o usuário vai mandar).
 00. Confirmar se o usuário rodou a ETAPA 28 (`novidades.sql`). Antes: ETAPAS 26 e 27 já rodadas.
 0. Confirmar se o usuário rodou as ETAPAS 26 e 27 e se `/.well-known/assetlinks.json` abriu no site depois de subir (o Cloudflare pode ignorar pasta com ponto).
 1. Desempenho itens 2 e 3 (o usuário reclamou que o jogo trava).

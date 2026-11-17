@@ -2195,6 +2195,7 @@ on conflict (id) do update set tipo = excluded.tipo, item = excluded.item, dias 
 create table if not exists public.passe_temporadas (
   id text primary key, nome text not null, inicio timestamptz not null, fim timestamptz not null
 );
+alter table public.passe_temporadas add column if not exists carro_pronto boolean not null default false; -- o carro exclusivo só pode ser resgatado quando estiver no jogo
 insert into public.passe_temporadas(id, nome, inicio, fim) values ('T1', 'Natal na Vila', '2026-11-17 00:00-03', '2027-01-01 00:00-03')
 on conflict (id) do update set nome = excluded.nome, inicio = excluded.inicio, fim = excluded.fim;
 
@@ -2207,14 +2208,14 @@ create table if not exists public.passe_premios (
 );
 insert into public.passe_premios(temporada, nivel, trilha, premio) values
   ('T1',1,'gratis','{"dinheiro": 300}'),
-  ('T1',1,'premium','{"estampa": 12}'),
+  ('T1',1,'premium','{"chapeu": [31, 31]}'),
   ('T1',2,'gratis','{"dinheiro": 300}'),
   ('T1',2,'premium','{"roupa": [22, 17]}'),
   ('T1',3,'gratis','{"dinheiro": 400}'),
   ('T1',3,'premium','{"chapeu": [6, 8]}'),
   ('T1',4,'gratis','{"estampa": 5}'),
   ('T1',4,'premium','{"dinheiro": 1500}'),
-  ('T1',5,'gratis','{"dinheiro": 500}'),
+  ('T1',5,'gratis','{"chapeu": [30, 30]}'),
   ('T1',5,'premium','{"calca": [15, 22]}'),
   ('T1',6,'gratis','{"dinheiro": 500}'),
   ('T1',6,'premium','{"roupa": [20, 16]}'),
@@ -2245,7 +2246,7 @@ insert into public.passe_premios(temporada, nivel, trilha, premio) values
   ('T1',19,'gratis','{"dinheiro": 1500}'),
   ('T1',19,'premium','{"estampa": 9}'),
   ('T1',20,'gratis','{"dinheiro": 2000}'),
-  ('T1',20,'premium','{"roupa": [9, 3]}')
+  ('T1',20,'premium','{"carro": "natal"}')
 on conflict (temporada, nivel, trilha) do update set premio = excluded.premio;
 
 create table if not exists public.passe_jogador (
@@ -2302,6 +2303,7 @@ language plpgsql security definer set search_path = public as $$
 declare k text;
 begin
   if p ? 'dinheiro' then update moradores set dinheiro = dinheiro + (p->>'dinheiro')::int where id = p_morador; end if;
+  if p ? 'carro' then update moradores set carros = case when (p->>'carro') = any(carros) then carros else array_append(carros, p->>'carro') end where id = p_morador; end if;
   if p ? 'estampa' then insert into guarda_roupa(morador, peca, item) values (p_morador, 'estampa', (p->>'estampa')::int) on conflict do nothing; end if;
   foreach k in array array['roupa','calca','calcado','chapeu','extra'] loop
     if p ? k then
@@ -2324,6 +2326,7 @@ begin
   if cod = any(j.resgatados) then raise exception 'Você já pegou esse prêmio.'; end if;
   select premio into pr from passe_premios where temporada = t and nivel = p_nivel and trilha = p_trilha;
   if pr is null then raise exception 'Prêmio não encontrado.'; end if;
+  if pr ? 'carro' and not (select carro_pronto from passe_temporadas where id = t) then raise exception 'O carro exclusivo chega em breve!'; end if;
   perform _dar_premio(m.id, pr);
   update passe_jogador set resgatados = array_append(resgatados, cod) where morador = m.id and temporada = t;
   return json_build_object('premio', pr, 'eu', _estado(m.id));
@@ -2455,3 +2458,31 @@ begin
   return json_build_object('pago', 50, 'xp_ganho', 20, 'subiu', novo_nivel - m.nivel, 'premio', premio,
     'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
 end $$;
+
+-- itens exclusivos (30-39) não são vendidos na loja de roupas: só quem ganhou no passe
+create or replace function public.preco_roupa(p_peca text, p_item integer) returns integer
+language sql immutable as $$
+  select case
+    when p_item >= 40 then coalesce((case p_peca
+      when 'chapeu_m' then array[50000] when 'chapeu_f' then array[50000]
+      when 'extra_m' then array[3000,10000,8000,6000] when 'extra_f' then array[3000,10000,8000,4000,15000,20000,7000] end)[p_item - 39], 999999)
+    when p_item >= 30 then 999999
+    when p_item < (case when p_peca = 'estampa' then 2 else 4 end) then 0
+    else (round(30 * power(1.15, p_item - (case when p_peca = 'estampa' then 2 else 4 end)) / 10) * 10)::integer end
+$$;
+create or replace function public.comprar_roupa(p_peca text, p_item integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; pr integer;
+begin
+  m := _eu();
+  if p_peca not in ('roupa_m','roupa_f','calca_m','calca_f','calcado_m','calcado_f','chapeu_m','chapeu_f','extra_m','extra_f','estampa') then raise exception 'Peça inválida.'; end if;
+  if p_item < 0 or p_item >= 50 then raise exception 'Peça inválida.'; end if;
+  if p_item >= 30 and p_item < 40 then raise exception 'Esse item é exclusivo do Passe da Temporada.'; end if;
+  if exists (select 1 from guarda_roupa where morador = m.id and peca = p_peca and item = p_item) then return json_build_object('ok', true, 'eu', _estado(m.id)); end if;
+  pr := preco_roupa(p_peca, p_item);
+  if m.dinheiro < pr then raise exception 'Dinheiro insuficiente.'; end if;
+  insert into guarda_roupa(morador, peca, item) values (m.id, p_peca, p_item);
+  update moradores set dinheiro = dinheiro - pr where id = m.id;
+  return json_build_object('ok', true, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.comprar_roupa(text, integer) to authenticated;
