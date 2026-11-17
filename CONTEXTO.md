@@ -197,7 +197,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122n** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122o** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -206,6 +206,10 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Novidades:** `NOVID='v20261122'` (XP em dobro, imobiliária, condomínio, jogo mais leve/tela nova). Trava contra abrir duplicada.
 - **Sons reais de motor** (`sons/*.mp3`, trechos de 4 s em loop, `GRAV`/`GRAV_RPM`/`gravacao()` dentro de `Som.motor`): fusca (e fusca_ouro), sedan (e jipe), opala, esportivo, neon, gto, moto, diesel (sw4, kombi_tonhao, caminhonete, viatura). Volume .2 e tom suave (aprovado). Frontier, Duster da prefeitura e caminhões continuam sintetizados.
 - **Relógio do jogo:** `SPEED=1` → 1 hora do jogo = 1 minuto real, 1 dia = 24 minutos (antes 8).
+- **Polícia:** patrulha sem limite (`trabalho.ronda`: um ponto azul atrás do outro, opcional); a cada 90 s paga R$ 50 + 20 XP pela função nova `ronda_policia` (**ETAPA 26**, `novidades.sql`; limite de 85 s no servidor). A viatura não some mais.
+- **Entregas pela cidade:** `pontosCidade()`/`pontoCidade()` (calçada G.WALK colada em rua) para padeiro, operário (fábrica) e lixeiro.
+- **Arquivo de teste:** o "trapaça" também atualiza o banco local (`L.me`), então os trabalhos de nível alto abrem.
 ### Pendências
+0. Confirmar se o usuário rodou a ETAPA 26.
 1. Desempenho itens 2 e 3 (o usuário reclamou que o jogo trava).
 2. Interiores das lojas em outra dimensão. 3. Curva de XP para a Play Store.

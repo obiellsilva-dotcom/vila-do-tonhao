@@ -3488,6 +3488,7 @@ const api=ONLINE?(()=>{
   comecar:j=>rpc('comecar_trabalho',{p_trabalho:j}),
   terminar:()=>rpc('terminar_trabalho'),
   tarefa:()=>rpc('tarefa_feita'),
+  rondaPolicia:()=>rpc('ronda_policia'),
   missao:p=>rpc('missao_passo',{p_passo:p}),
   abastecer:g=>rpc('abastecer',{p_nivel:g}),
   salvarGas:g=>rpc('salvar_gasolina',{p_nivel:g}),
@@ -3546,6 +3547,8 @@ const api=ONLINE?(()=>{
    let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(1,Math.round(J.xp/5*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
+  async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=50+premio;
+   const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:50,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
   async cidade(){return null},
   async admin(){fail('Painel só funciona online.')},async roupas(){return(lme().roupas||[]).slice()},async comprarRoupa(p,i){const m=lme(),pr=precoRoupa(p.split('_')[0],i);if(m.dinheiro<pr)fail('Dinheiro insuficiente.');m.roupas=m.roupas||[];if(!m.roupas.includes(p+':'+i)){m.roupas.push(p+':'+i);m.dinheiro-=pr}lsave();return{eu:lest()}},async venderLoja(c){const m=lme();if(!CARS[c]||CARS[c].premium)fail('A concessionária não compra esse carro.');m.carros=m.carros.filter(x=>x!==c);if(m.carro===c)m.carro=null;const v=Math.floor(CARS[c].preco/2);m.dinheiro+=v;lsave();return{recebido:v,eu:lest()}},async propor(){fail('Venda entre jogadores só funciona online.')},async responder(){fail('Só online.')},
   async missao(p){const m=lme();m.missao=m.missao||0;let bonus=0;if(p===1){if(m.missao!==0)fail('Essa missão já foi feita.');m.dinheiro+=100;bonus=100;m.missao=1}else m.missao=2;lsave();return{missao:m.missao,bonus,eu:lest()}},
@@ -3759,7 +3762,7 @@ function euUpdate(dt){
   if(now>(eu.hicT||0)){eu.hicT=now+rand(5,10);say(eu,pick(['hic! 🥴','*hic*','Eu te amo, Tonhão! hic!','Mais uma… hic!','Tô ótimo! hic']),2.5,true);Som.play('soluco')}
   if(carOf(eu)&&!SERVICO(carOf(eu))&&now>(eu.avisoDirigir||0)){eu.avisoDirigir=now+40;toast('🚫🚗 Se beber, não dirija! Estacione e vá a pé.',3500)}}
  if(trabalho&&trabalho.job==='bar'&&!eu.path.length&&Math.random()<dt*.35)0;
- if(trabalho&&trabalho.ronda){const r=trabalho.ronda,p=r.pts[r.i];if(p&&Math.hypot(eu.x-p.x,eu.y-p.y)<56){r.i++;floatText(p.x,p.y-20,'✔ '+r.i+'/4','#9fe3ff');toast(r.i<4?`🚓 Ponto ${r.i} de 4 conferido!`:'🚓 Ronda completa!',1800);renderWork()}}
+ if(trabalho&&trabalho.ronda){const r=trabalho.ronda,p=r.pts[0];if(p&&Math.hypot(eu.x-p.x,eu.y-p.y)<56){r.n++;floatText(p.x,p.y-20,'✔ Área vigiada','#9fe3ff');const L=CRUZ.filter(q=>q!==p);r.pts=[pk(L.length?L:CRUZ)];renderWork()}}
  if(eu.beer&&Math.random()<dt*.004)eu.beer=false;
  eu.fome=Math.max(0,eu.fome-dt/120);eu.sede=Math.max(0,(eu.sede??100)-dt/90);
  if(eu.sede<30&&now>(eu.sedeAviso||0)){eu.sedeAviso=now+25;say(eu,eu.sede<15?'🥵 Tô morrendo de sede...':'💧 Tô com sede... uma cervejinha ou uma água?',3,true)}
@@ -3889,7 +3892,7 @@ function abrirLugar(b){
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
   if(eu.nivel<J.nivel_min)botao(boxJob,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
-  else{const sal=Math.round(J.salario*(1+.02*(eu.nivel-1))),ex=Math.max(0,eu.nivel-J.nivel_min),pt=Math.round(J.salario/6*(1+.06*ex)),xt=Math.max(1,Math.round(J.xp/5*(1+.04*ex)));botao(boxJob,j==='pescador'?`🎣 Pescar: 60% de chance de peixe por fisgada · +${xt} XP cada`:j==='policia'?`🚓 Fazer ronda de viatura: ${money(sal)} · +${J.xp} XP`:`💼 Trabalhar de ${J.nome}: ${money(pt)} + ${xt} XP por tarefa`,()=>comecarTrabalho(j),{ghost:k==='concessionaria'})}
+  else{const sal=Math.round(J.salario*(1+.02*(eu.nivel-1))),ex=Math.max(0,eu.nivel-J.nivel_min),pt=Math.round(J.salario/6*(1+.06*ex)),xt=Math.max(1,Math.round(J.xp/5*(1+.04*ex)));botao(boxJob,j==='pescador'?`🎣 Pescar: 60% de chance de peixe por fisgada · +${xt} XP cada`:j==='policia'?`🚓 Patrulhar de viatura: R$ 50 + 20 XP a cada 1 min e meio`:`💼 Trabalhar de ${J.nome}: ${money(pt)} + ${xt} XP por tarefa`,()=>comecarTrabalho(j),{ghost:k==='concessionaria'})}
  });
  if(k==='igreja')sub='Silêncio, por favor. 🙏 Acenda uma vela e siga em paz.';
  if(k==='hospital')sub='Quem desmaia de fome acorda aqui. A conta é R$ 30. Coma direitinho! 🍗';
@@ -3971,7 +3974,7 @@ function iniciarTurno(k,ini,dur){
  closePlace();trabalho={job:k,ini,fim:ini+dur*1000,dur};eu.path=[];eu.onArrive=null;eu.driving=false;eu.hidden=false;
  if(k==='bar'){eu.x=T(22.5);eu.y=T(20.9);eu.apron=true;say(tonhao,'Pega a bandeja aí!',3)}
  else if(k==='policia'){const t=nearestCarTile((deleg.front[0]+.5)*TILE,(deleg.front[1]+.5)*TILE,8);eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9;
-  const pts=[...CRUZ].sort(()=>Math.random()-.5).slice(0,4);trabalho.ronda={i:0,pts};$('workGiro').classList.remove('hidden');Som.play('sirene');toast('🚓 Passe com a viatura pelos 4 pontos azuis. A seta mostra o caminho.',5000)}
+  trabalho.ronda={i:0,pts:[pk(CRUZ)],n:0,pago:0,xp:0,prox:Date.now()+90000};$('workGiro').classList.remove('hidden');Som.play('sirene');toast('🚓 Patrulha: rode a cidade com a viatura (ou fique de plantão parado). A cada 1 min e meio você ganha R$ 50 e 20 XP.',6000)}
  else if(k==='pescador'){eu.x=LAGOA.x+rand(-T(3),T(3));eu.y=LAGOA.y;eu.fish=true;eu.dir=1}
  else{const b=SHOPS[lugarDoJob(k)]||SHOPS.prefeitura;eu.hidden=!RUA[k];eu.x=(b.front[0]+.5)*TILE;eu.y=(b.front[1]+.5)*TILE}
  if(TAREFAS[k]){trabalho.feitas=0;trabalho.porTarefa=true;trabalho.ganhou=0;trabalho.xp=0;trabalho.peixes=0;if(RUA[k])proxRua();else abrirTarefa()}
@@ -4036,6 +4039,11 @@ function comecarInspecao(carro){const g=geraInspecao(),[x,y]=lugarInspecao(g.k);
 const frente=k=>{const b=SHOPS[k];return b?[(b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE]:[T(23.9),T(34.6)]};
 const pertoDe=(L,x,y,n)=>pk(L.slice().sort((a,b)=>Math.hypot(a[0]-x,a[1]-y)-Math.hypot(b[0]-x,b[1]-y)).slice(0,n));
 const LUGS=()=>Object.keys(INSP).map(k=>lugarInspecao(k));
+// pontos de entrega pela cidade inteira: calçada colada numa rua (o carro/caminhão chega)
+let PTS_CID=null;
+function pontosCidade(){if(PTS_CID)return PTS_CID;PTS_CID=[];for(let ty=-MY;ty<H+MY;ty+=2)for(let tx=-MX;tx<W+MX;tx+=2){if(tileAt(tx,ty)!==G.WALK||!walkP(tx,ty))continue;
+ if(!(carOk(tx+1,ty)||carOk(tx-1,ty)||carOk(tx,ty+1)||carOk(tx,ty-1)))continue;PTS_CID.push([(tx+.5)*TILE,(ty+.5)*TILE])}return PTS_CID}
+function pontoCidade(x,y,min,max){const L=pontosCidade().filter(q=>{const d=Math.hypot(q[0]-x,q[1]-y);return d>=min&&d<=(max||1e9)});return L.length?pk(L):calcadaPerto(x,y)}
 const RUA={
  posto:()=>{const b=pk(BOMBAS);return[{x:b.x,y:b.y+T(.9),r:'⛽ Cliente na bomba',f:'Bom dia! Vai abastecer?'}]},
  mercadinho:()=>{const bc=pk(BANCAS.filter(q=>!q.fundo));return[{p:calcadaPerto(T(37.2),T(27.5)),r:'📦 Pegar a caixa',f:'Peguei a caixa! 📦'},{x:T((bc.x0+bc.x1)/2),y:T(bc.y+1.45),r:'🍎 Levar à barraca',f:'Chegou mercadoria!'}]},
@@ -4046,9 +4054,9 @@ const RUA={
  banco:()=>{const b=SHOPS.banco;return[{p:calcadaPerto(T(b.x-.5),T(b.y+b.h-1)),r:'💰 Buscar malote no cofre',f:'Malote na mão! 💰'},{p:frente('banco'),r:'🏦 Atender no caixa',f:'Próximo! 🙋'}]},
  gerente:()=>{const [x,y]=frente('banco');return[{p:pertoDe(LUGS(),x,y,5),r:'💼 Visitar cliente',f:'Vamos falar de empréstimo? 💼'}]},
  prefeitura:()=>{const k=pk(Object.keys(INSP));return[{p:lugarInspecao(k),r:'📄 Entregar ofício: '+INSP[k].ic+' '+INSP[k].n,f:'Ofício da prefeitura! 📄'},{p:frente('prefeitura'),r:'🏛️ Voltar pra mesa',f:'De volta à papelada.'}]},
- padaria:()=>{const k=pk(['bar','posto','feirinha','barbearia','banco','praca']);return[{p:lugarInspecao(k==='bar'?'praca':k),r:'🥖 Entregar pães'+(k==='bar'?' no Bar':''),f:'Pão quentinho chegando! 🥖'},{p:frente('padaria'),r:'🔥 Voltar ao forno',f:'Bora assar mais!'}]},
- fabrica:()=>{const k=pk(['posto','feirinha','praca','padaria']);return[{p:lugarInspecao(k),r:'🧊 Entregar gelo',f:'Gelo entregue! 🧊'},{p:frente('fabrica'),r:'🏭 Voltar à fábrica',f:'Próximo bloco!'}]},
- lixeiro:()=>{const [x,y]=frente('prefeitura'),L=LUGS(),a=pertoDe(L,x,y,8),b2=pertoDe(L,a[0],a[1],4);return[{p:calcadaPerto(a[0]+T(1),a[1]),r:'🗑️ Recolher o lixo',f:'Lixo recolhido! 🗑️'},{p:calcadaPerto(b2[0]-T(1),b2[1]),r:'🗑️ Recolher o lixo',f:'Mais um saco! ♻️'}]},
+ padaria:()=>{const [x,y]=frente('padaria');return[{p:pontoCidade(x,y,T(12)),r:'🥖 Entregar pães',f:'Pão quentinho chegando! 🥖'},{p:frente('padaria'),r:'🔥 Voltar ao forno',f:'Bora assar mais!'}]},
+ fabrica:()=>{const [x,y]=frente('fabrica');return[{p:pontoCidade(x,y,T(12)),r:'🧊 Entregar gelo',f:'Gelo entregue! 🧊'},{p:frente('fabrica'),r:'🏭 Voltar à fábrica',f:'Próximo bloco!'}]},
+ lixeiro:()=>{const [x,y]=eu?[eu.x,eu.y]:frente('prefeitura'),a=pontoCidade(x,y,T(10)),b2=pontoCidade(a[0],a[1],T(6),T(18));return[{p:a,r:'🗑️ Recolher o lixo',f:'Lixo recolhido! 🗑️'},{p:b2,r:'🗑️ Recolher o lixo',f:'Mais um saco! ♻️'}]},
  delegado:()=>{const [x,y]=frente('delegacia'),c=pertoDe(CRUZ.map(q=>[q.x,q.y]),x,y,6);return[{p:calcadaPerto(c[0],c[1]),r:'🔍 Local do crime',f:'Hmm… pistas por aqui. 🕵️'},{p:frente('delegacia'),r:'🚓 Voltar à delegacia',f:'Vamos ver os suspeitos.'}]}};
 $('workVeic').onclick=()=>{if(!trabalho)return;
  // policial e prefeito: descer e voltar para a viatura/Duster sem largar o turno (bom para abordagens)
@@ -4101,10 +4109,13 @@ function proxTarefa(){cancelAnimationFrame(tarAnim);const T0=TAREFAS[trabalho.jo
 }
 function renderWork(){
  if(!trabalho)return;const J=JOBS[trabalho.job],left=Math.max(0,Math.ceil((trabalho.fim-Date.now())/1000)),r=trabalho.ronda;
- if(r){$('workTxt').textContent=`🚓 Ronda: ${r.i}/4 pontos`+(r.i>=4?(left?` · aguarde ${left}s`:' · recebendo…'):'');$('workBar').style.width=(r.i/4*100)+'%'}
+ if(r){const fal=Math.max(0,Math.ceil((r.prox-Date.now())/1000));$('workTxt').innerHTML=`🚓 Patrulha · próximo pagamento em <b>${fal}s</b> · 💰 ${money(r.pago)} · ⭐ ${r.xp} XP`;$('workBar').style.width=Math.min(100,(1-fal/90)*100)+'%';
+  if(fal<=0&&!r.pagando){r.pagando=true;api.rondaPolicia().then(x=>{if(!trabalho||trabalho.ronda!==r)return;tratar(x);r.pago+=x.pago||0;r.xp+=x.xp_ganho||0;floatText(eu.x,eu.y-40,'+'+money(x.pago||0)+' · +'+(x.xp_ganho||0)+' XP','#7dff9a');Som.play('moeda');
+   if(x.cansado){fimTurno();toast('😵 Você está com muita fome. Coma algo antes de voltar à patrulha.',4000)}}).catch(e=>toast(e.message||'Erro ao receber',2500)).finally(()=>{r.pagando=false;r.prox=Date.now()+90000});}
+  return}
  else if(trabalho.porTarefa){const w=trabalho;$('workTxt').innerHTML=(w.job==='pescador'?'🎣 Pescando':'💼 '+J.nome)+` · <b>${w.feitas}</b> tarefas · `+(w.job==='pescador'?`🐟 ${w.peixes}`:`💰 ${money(w.ganhou)}`)+` · ⭐ ${w.xp} XP`;$('workBar').style.width=((w.feitas%10)*10)+'%';return}
  else{$('workTxt').textContent=(trabalho.job==='pescador'?'🎣 Pescando':'💼 '+J.nome)+' · '+(left?left+'s':'recebendo…');$('workBar').style.width=Math.min(100,(1-left/trabalho.dur)*100)+'%'}
- if(left<=0&&(!r||r.i>=4)&&(!trabalho.meta||trabalho.feitas>=trabalho.meta)&&!trabalho.pagando)receber(0);
+ if(left<=0&&(!trabalho.meta||trabalho.feitas>=trabalho.meta)&&!trabalho.pagando)receber(0);
 }
 setInterval(renderWork,250);
 async function receber(tent){
@@ -4334,7 +4345,7 @@ function cobrarAluguel(){if(!eu||!meuApto())return;api.cobrarAluguel().then(r=>{
 setInterval(cobrarAluguel,10*60*1000);
 function trocarPorta(b,a){acao(async()=>{await api.porta(b.n,a);portas.set(b.n,a);Som.play('porta');toast(a?'🔓 Porta aberta: qualquer um pode entrar.':'🔒 Porta trancada: só você entra.',2500)})}
 function sairCasa(){emCasa=false;eu.hidden=false;$('work').classList.add('hidden');sendPos(true)}
-$('workStop').onclick=()=>{if(emCasa){sairCasa();return}if(!trabalho)return;const w=trabalho;api.largar().catch(()=>{});fimTurno();toast(w.porTarefa?`✅ Turno encerrado: ${w.feitas} tarefas, `+(w.job==='pescador'?`${w.peixes} peixe(s)`:money(w.ganhou))+` e ${w.xp} XP.`:'Largou o turno. Sem pagamento dessa vez.',4000)};
+$('workStop').onclick=()=>{if(emCasa){sairCasa();return}if(!trabalho)return;const w=trabalho;api.largar().catch(()=>{});fimTurno();if(w.ronda){toast(`✅ Patrulha encerrada: ${money(w.ronda.pago)} e ${w.ronda.xp} XP.`,3500);return}toast(w.porTarefa?`✅ Turno encerrado: ${w.feitas} tarefas, `+(w.job==='pescador'?`${w.peixes} peixe(s)`:money(w.ganhou))+` e ${w.xp} XP.`:'Largou o turno. Sem pagamento dessa vez.',4000)};
 
 /* ----- salas online (Supabase Realtime) ----- */
 async function conectar(){
@@ -5002,7 +5013,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122n';
+const VERSAO_JOGO='v20261122o';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5251,7 +5262,7 @@ function msRender(){const el=$('missao'),on=msAtiva()&&!eu.tutoPend&&$('tuto').c
  let tit,txt,ir=false,pct;
  if(eu.missao===0){tit='🎯 MISSÃO 1: ganhe seu primeiro dinheiro';pct=Math.min(1,msTar/MS_META);
   if(msTar>=MS_META)txt='Recebendo seu bônus…';
-  else if(trabalho)txt=trabalho.job==='policia'?'Termine a ronda para ganhar.':`Acerte <b>${MS_META} tarefas</b>: <b>${msTar}/${MS_META}</b> · 🎁 bônus de R$ 100`;
+  else if(trabalho)txt=trabalho.job==='policia'?'Patrulhe: a cada 1 min e meio você ganha R$ 50 e 20 XP.':`Acerte <b>${MS_META} tarefas</b>: <b>${msTar}/${MS_META}</b> · 🎁 bônus de R$ 100`;
   else if(a.perto)txt='Chegou! Toque no <b>🛒 Mercadinho</b> e depois em <b>💼 Trabalhar de Repositor</b>.';
   else{txt='Vá até o <b>🛒 Mercadinho</b> e pegue o emprego de <b>Repositor</b>. Siga a seta amarela.';ir=true}
   if(msTar>=MS_META&&!msBusy)msPasso(1)}
