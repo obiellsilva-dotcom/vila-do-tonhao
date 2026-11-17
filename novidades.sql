@@ -413,3 +413,26 @@ begin
 end $$;
 revoke execute on function public.sinuca_dupla(boolean) from public, anon;
 grant execute on function public.sinuca_dupla(boolean) to authenticated;
+
+-- aluguel: só grava quando cobrou de verdade (cada gravação em "casas" é avisada a todos os jogadores pelo Realtime)
+create or replace function public.cobrar_aluguel() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; pago integer := 0;
+begin
+  m := _eu();
+  select * into c from casas where dono = m.id and id > 1000 and alugada for update;
+  if c.id is null then return json_build_object('ok', true); end if;
+  while c.aluguel_ate <= now() and m.dinheiro >= c.valor_aluguel loop
+    m.dinheiro := m.dinheiro - c.valor_aluguel; pago := pago + c.valor_aluguel; c.aluguel_ate := c.aluguel_ate + interval '7 days';
+  end loop;
+  if pago > 0 then
+    update moradores set dinheiro = m.dinheiro where id = m.id;
+    update casas set aluguel_ate = c.aluguel_ate where id = c.id;
+  end if;
+  if c.aluguel_ate < now() - interval '3 days' then
+    perform _vagar_apto(c.id);
+    return json_build_object('despejado', true, 'pago', pago, 'eu', _estado(m.id));
+  end if;
+  return json_build_object('pago', pago, 'atrasado', c.aluguel_ate < now(), 'valor', c.valor_aluguel, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.cobrar_aluguel() to authenticated;

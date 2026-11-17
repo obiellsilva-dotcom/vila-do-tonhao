@@ -4541,9 +4541,9 @@ function aplicarRemoto(p){
 }
 let lastSent=0,lastKey='';
 function sendPos(force){
- if(!canal||!eu)return;const t=performance.now();if(!force&&t-lastSent<220)return;
+ if(!canal||!eu)return;if(document.hidden&&!force)return;const t=performance.now();if(!force&&t-lastSent<(eu.driving?400:480))return; // menos mensagens do Realtime (o plano grátis conta cada entrega)
  const p={re:eu.re&&eu.driving&&eu.moving?1:0,cr:eu.carona&&eu.driving?1:0,gf:(eu.gM|0)+10*(eu.sirM|0),i:eu.id,x:Math.round(eu.x),y:Math.round(eu.y),d:eu.dir,m:eu.moving?1:0,h:eu.hidden?1:0,c:carOf(eu)||0,b:eu.beer?1:0,w:trabalho?trabalho.job:sinucaAberta?'sinuca':0,st:eu.sit?(eu.back?2:eu.frente?3:1):0,bb:eu.bebK?Math.round(eu.bebK*10)/10:0,rm:eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0,dt:eu.deitado|0,mz:eu.mz|0,sv:eu.sv|0};
- const key=JSON.stringify(p);if(!force&&key===lastKey&&t-lastSent<4000)return;
+ const key=JSON.stringify(p);if(!force&&key===lastKey&&t-lastSent<15000)return;
  lastKey=key;lastSent=t;canal.send({type:'broadcast',event:'pos',payload:p}).catch(()=>{});
 }
 function onPos(p){
@@ -5238,7 +5238,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261123a';
+const VERSAO_JOGO='v20261123b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

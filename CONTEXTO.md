@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261123a** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261123b** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -230,6 +230,7 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Bônus e multa nas tarefas:** `moradores.tarefas_seq`; a cada 10 tarefas +R$ 50 (em `tarefa_feita`, devolve `bonus10`/`seq`); erro no minijogo chama `erro_tarefa()` = −R$ 25 (não abaixo de 0; pescador isento), ligado em `tarFeedback(false)`.
 - **Sinuca nova:** 15 bolas (1-7 lisas, 8 preta, 9-15 listradas), 10 tacadas sozinho (qualquer bola, 3 XP cada, `sinuca(p_bolas<=15)`). Dupla com regra de 8-ball: primeira bola define grupos (`dupla.grupo`), continua se derrubar a sua, branca = passa a vez, 8 antes da hora perde; fim chama `sinuca_dupla(venceu)` (30/10 XP, 90 s entre partidas). Lógica em `sinVez` com `sin.cai`.
 - **Segurança (auditoria 18/11):** nenhuma tabela aceita escrita direta; Pix conferido no Mercado Pago; funções internas fechadas. Risco conhecido: script chamando `tarefa_feita` a cada 2,5 s (robô). O usuário NÃO quer limite de ganho por hora.
+- **Realtime estourou o plano grátis** (2,33 mi de 2 mi mensagens em nov/2026; restrição a partir de 16/12 se continuar). Cortes: `sendPos` andando a cada 480 ms (carro 400; antes 220), parado a cada 15 s (antes 4 s), nada com a aba escondida; `cobrar_aluguel` só grava em `casas` quando cobra. Se ainda estourar: plano Pro (US$ 25/mês) ou tirar `postgres_changes` de casas/vagas.
 ### Pendências
 000. Carro exclusivo do passe (o usuário vai mandar).
 00. Confirmar se o usuário rodou a ETAPA 28 (`novidades.sql`). Antes: ETAPAS 26 e 27 já rodadas.
