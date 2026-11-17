@@ -1,7 +1,7 @@
 -- Novidades: só a ETAPA 28 (Passe da Temporada e VIP turbinado). As etapas 21 a 27 já foram rodadas.
 
 -- ===================== ETAPA 28: Passe da Temporada e VIP turbinado =====================
--- Passe: 20 níveis (500 pontos cada, ~11 h de trabalho). Tarefa de emprego = 2 a 15 pontos conforme o tempo (_pontos_tarefa), pagamento da patrulha = 15, VIP ganha +50%.
+-- Passe: 20 níveis (300 pontos cada, ~7 h de trabalho = ~2 semanas). Tarefa de emprego = 2 a 15 pontos conforme o tempo (_pontos_tarefa), pagamento da patrulha = 15, VIP ganha +50%.
 -- Trilha grátis para todos; trilha premium comprada no Pix (produto passe_T1). Prêmios só visuais ou dinheiro do jogo.
 alter table public.produtos drop constraint if exists produtos_tipo_check;
 alter table public.produtos add constraint produtos_tipo_check check (tipo in ('vip','pet','carro','passe'));
@@ -48,7 +48,7 @@ insert into public.passe_premios(temporada, nivel, trilha, premio) values
   ('T1',11,'gratis','{"dinheiro": 800}'),
   ('T1',11,'premium','{"extra": [6, 5]}'),
   ('T1',12,'gratis','{"estampa": 7}'),
-  ('T1',12,'premium','{"calca": [13, 23]}'),
+  ('T1',12,'premium','{"rastro": 1}'),
   ('T1',13,'gratis','{"dinheiro": 900}'),
   ('T1',13,'premium','{"roupa": [21, 13]}'),
   ('T1',14,'gratis','{"dinheiro": 1000}'),
@@ -120,8 +120,8 @@ declare t text := _temporada_atual(); vip boolean;
 begin
   if t is null then return; end if;
   select coalesce(vip_ate > now(), false) into vip from moradores where id = p_morador;
-  insert into passe_jogador(morador, temporada, pontos) values (p_morador, t, least(10000, case when vip then round(p_pontos * 1.5) else p_pontos end))
-  on conflict (morador, temporada) do update set pontos = least(10000, passe_jogador.pontos + case when vip then round(p_pontos * 1.5) else p_pontos end);
+  insert into passe_jogador(morador, temporada, pontos) values (p_morador, t, least(6000, case when vip then round(p_pontos * 1.5) else p_pontos end))
+  on conflict (morador, temporada) do update set pontos = least(6000, passe_jogador.pontos + case when vip then round(p_pontos * 1.5) else p_pontos end);
 end $$;
 revoke execute on function public._passe_pontos(uuid, integer) from public, anon, authenticated;
 revoke execute on function public._temporada_atual() from public, anon;
@@ -148,6 +148,7 @@ begin
   if p ? 'dinheiro' then update moradores set dinheiro = dinheiro + (p->>'dinheiro')::int where id = p_morador; end if;
   if p ? 'carro' then update moradores set carros = case when (p->>'carro') = any(carros) then carros else array_append(carros, p->>'carro') end where id = p_morador; end if;
   if p ? 'estampa' then insert into guarda_roupa(morador, peca, item) values (p_morador, 'estampa', (p->>'estampa')::int) on conflict do nothing; end if;
+  if p ? 'rastro' then insert into guarda_roupa(morador, peca, item) values (p_morador, 'rastro', (p->>'rastro')::int) on conflict do nothing; end if;
   foreach k in array array['roupa','calca','calcado','chapeu','extra'] loop
     if p ? k then
       insert into guarda_roupa(morador, peca, item) values (p_morador, k || '_m', (p->k->>0)::int), (p_morador, k || '_f', (p->k->>1)::int) on conflict do nothing;
@@ -163,7 +164,7 @@ begin
   m := _eu();
   if t is null then raise exception 'Nenhuma temporada ativa agora.'; end if;
   select * into j from passe_jogador where morador = m.id and temporada = t for update;
-  if j.morador is null or j.pontos < p_nivel * 500 then raise exception 'Você ainda não chegou nesse nível do passe.'; end if;
+  if j.morador is null or j.pontos < p_nivel * 300 then raise exception 'Você ainda não chegou nesse nível do passe.'; end if;
   if p_trilha = 'premium' and not j.premium then raise exception 'Esse prêmio é do Passe Premium.'; end if;
   cod := p_nivel || case when p_trilha = 'premium' then 'p' else 'g' end;
   if cod = any(j.resgatados) then raise exception 'Você já pegou esse prêmio.'; end if;
@@ -329,3 +330,27 @@ begin
   return json_build_object('ok', true, 'eu', _estado(m.id));
 end $$;
 grant execute on function public.comprar_roupa(text, integer) to authenticated;
+
+-- brilho no chão (rastro): 'ouro' = do VIP, 'natal' = vermelho e verde do Passe Natal na Vila, 'nenhum' = desligado; null = padrão (ouro para VIP)
+alter table public.moradores add column if not exists rastro text;
+create or replace function public.usar_rastro(p_rastro text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores;
+begin
+  m := _eu();
+  if p_rastro is not null and p_rastro not in ('ouro','natal','nenhum') then raise exception 'Brilho inválido.'; end if;
+  if p_rastro = 'ouro' and not coalesce(m.vip_ate > now(), false) then raise exception 'O brilho dourado é do VIP.'; end if;
+  if p_rastro = 'natal' and not exists (select 1 from guarda_roupa where morador = m.id and peca = 'rastro' and item = 1) then raise exception 'O brilho de Natal é do Passe Natal na Vila.'; end if;
+  update moradores set rastro = p_rastro where id = m.id;
+  return json_build_object('rastro', p_rastro);
+end $$;
+grant execute on function public.usar_rastro(text) to authenticated;
+create or replace function public._estado(p_id uuid) returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object('id', id, 'nome', nome, 'visual', visual, 'dinheiro', dinheiro, 'xp', xp, 'nivel', nivel,
+    'fome', round(fome, 1), 'sede', round(sede, 1), 'gasolina', round(gasolina, 1), 'peixes', peixes, 'carros', carros, 'carro', carro, 'casa_id', casa_id, 'mortes', mortes,
+    'trabalho', trabalho, 'trabalho_inicio', trabalho_inicio, 'foto', foto, 'frase', frase,
+    'relacionamento', relacionamento, 'time_coracao', time_coracao, 'insta', insta, 'turnos', turnos, 'vip_ate', vip_ate, 'pets', pets, 'pet', pet, 'rastro', rastro)
+  from moradores where id = p_id
+$$;
+revoke execute on function public._estado(uuid) from authenticated;

@@ -272,6 +272,12 @@ html.noApp #zloja{display:none!important}
 .psCard{height:118px;border-radius:12px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4px;position:relative;overflow:hidden}.psCard.prem{background:linear-gradient(#3b2a6b,#26193f);border-color:rgba(170,140,255,.55)}.psCard.fin{background:linear-gradient(#7a1020,#3a0f18);border-color:#ffc94a}
 .psCard canvas{width:70px;height:70px}.psCard .nm{font:600 10.5px Fredoka,sans-serif;color:#fff;text-align:center;line-height:1.1;height:23px;overflow:hidden}.psCard button{width:100%;border:0;border-radius:7px;padding:3px;font:700 11px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}.psCard button:disabled{background:rgba(0,0,0,.35);color:#c9b4aa}
 .psCard.trav canvas{filter:saturate(.7) brightness(.8)}.psCard .cad{position:absolute;top:4px;right:5px;font-size:13px}.psCard.pego{opacity:.6}
+.grBox,.mcBox{width:min(480px,100%);max-height:calc(100dvh - 24px);overflow-y:auto}.grTopo{display:flex;gap:10px;align-items:stretch}.grTopo canvas{width:120px;height:150px;flex:none;border-radius:14px;background:radial-gradient(circle at 50% 35%,#4a3040,#1c1016)}
+.grLooks{flex:1;display:flex;flex-direction:column;gap:4px}#grLooks{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}#grLooks button{border:1px dashed rgba(255,201,74,.5);background:rgba(255,255,255,.05);color:#fff;border-radius:10px;padding:6px 2px;font:600 11px Fredoka,sans-serif;line-height:1.2}#grLooks button.tem{border-style:solid;background:rgba(255,201,74,.15)}
+.grTabs{display:flex;gap:5px;overflow-x:auto;margin:10px 0 8px;scrollbar-width:none}.grTabs button{flex:none;border:1px solid rgba(255,201,74,.35);background:rgba(255,255,255,.06);color:#fff;border-radius:10px;padding:6px 10px;font:600 13px Fredoka,sans-serif}.grTabs button.on{background:#ffc94a;color:#2a1a14}
+.grGrade{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}.grItem{position:relative;border-radius:12px;background:rgba(255,255,255,.06);border:2px solid transparent;padding:3px;display:flex;flex-direction:column;align-items:center;cursor:pointer}.grItem canvas{width:64px;height:64px}.grItem span{font:600 10.5px Fredoka,sans-serif;color:#fff;text-align:center;line-height:1.1;height:24px;overflow:hidden}.grItem.on{border-color:#ffc94a;background:rgba(255,201,74,.16)}.grItem .tg{position:absolute;top:2px;right:4px;font-size:11px}
+.mcGrade{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.mcSlot{aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.28);border:1.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:28px;position:relative;cursor:pointer}.mcSlot b{position:absolute;right:4px;bottom:2px;font:700 12px Fredoka,sans-serif;color:#fff;text-shadow:0 1px 2px #000}.mcSlot.on{border-color:#ffc94a;background:rgba(255,201,74,.18)}
+.mcInfo{margin-top:10px;background:rgba(255,255,255,.06);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}.mcInfo .ic{font-size:34px}.mcLista{display:flex;flex-direction:column;gap:6px}.mcLin{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:12px;padding:8px}.mcLin canvas{width:72px;height:48px;flex:none}.mcLin .tx{flex:1;font-size:13px}
 </style>
 </head>
 <body>
@@ -351,6 +357,20 @@ html.noApp #zloja{display:none!important}
   <div id="psComprar"></div>
   <div class="psTrilha"><div class="psLab"><span>🆓<br>Grátis</span><span class="pr">👑<br>Premium</span></div><div id="psLista" class="psLista"></div></div>
   <p class="psSub" id="psSub" style="margin-top:8px"></p>
+</div></div>
+<div id="mGuarda" class="modal hidden"><div class="box grBox">
+  <button class="x" data-close="mGuarda">×</button>
+  <h2>👕 Guarda-roupa</h2>
+  <div class="grTopo"><canvas id="grBoneco" width="240" height="300"></canvas><div class="grLooks"><div class="psSub">Looks salvos</div><div id="grLooks"></div><button class="btn ghost" id="grCores" style="margin-top:6px;font-size:12px">🎨 Cores e cabelo</button></div></div>
+  <div id="grTabs" class="grTabs"></div>
+  <div id="grGrade" class="grGrade"></div>
+  <div style="display:flex;gap:6px;margin-top:8px"><button class="btn ghost" id="grLoja" style="flex:1">🛍️ Loja de roupas</button><button class="btn" id="grSalvar" style="flex:1.4">✅ Vestir</button></div>
+</div></div>
+<div id="mMochila" class="modal hidden"><div class="box mcBox">
+  <button class="x" data-close="mMochila">×</button>
+  <h2>🎒 Mochila</h2>
+  <div id="mcTabs" class="grTabs"></div>
+  <div id="mcCorpo"></div>
 </div></div>
 <div id="mLoja" class="modal hidden"><div class="box" style="width:min(440px,100%)">
   <button class="x" data-close="mLoja">×</button>
@@ -475,7 +495,7 @@ html.noApp #zloja{display:none!important}
       <button class="btn" id="cardSocial">👤 Ver perfil e fotos</button>
       <button class="btn hidden" id="cardDrive">🚗 Dirigir</button>
       <button class="btn ghost hidden" id="cardCar">🔁 Trocar de carro</button>
-      <button class="btn ghost hidden" id="cardLook">👕 Mudar visual</button>
+      <button class="btn ghost hidden" id="cardLook">👕 Guarda-roupa</button>
       <button class="btn ghost hidden" id="cardReport">🚩 Denunciar</button>
       <button class="btn ghost hidden" id="cardBloq">🔇 Bloquear</button>
     </div>
@@ -3315,7 +3335,7 @@ function drawCena(){
  if(cam.z>=.9)for(const b of houses){if(b.off)continue;const hx=T(b.x+b.w/2);if(!vis(hx,T(b.y+b.h)))continue;const info=casasInfo.get(b.n);
   bbSet(ctx,hx,T(b.y+b.h));if(info&&info.dono){if(info.nome)nameTag(ctx,hx,T(b.y+b.h)-b.h*TILE*WK-4,'🏠 '+info.nome,eu&&info.dono===eu.id,true)}
   else if(eu){const px=T(b.front[0])+22,py=T(b.y+b.h)-18;ctx.fillStyle='#6d4426';ctx.fillRect(px+13,py+8,2,9);ctx.fillStyle='#c0392b';rr(ctx,px,py,28,9,2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 5.5px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('VENDE-SE',px+14,py+6.4);ctx.textAlign='left'}}
- for(const p of plist){if(!vis(p.x,p.y))continue;bbSet(ctx,p.x,p.y);const top=p.y-(carOf(p)?(p.sit?0:26):(p.sit?39:46)*PS*(SALA_ON?SALA_ESC:1))-3-((p===eu?eu.deitado:p.deitado)?-10:0);const vp=p.vip_ate&&Date.parse(p.vip_ate)>Date.now(),lb='⭐'+(p.nivel||1)+' '+p.nome;if(p.foto){ctx.font='600 7px Fredoka, sans-serif';fotoMini(ctx,p.foto,p.x-ctx.measureText(lb).width/2-7,top-2.4,5.2,vp)}nameTag(ctx,p.x,top,lb,p===eu,true,vp);const ehP=PREF_ID&&p.id===PREF_ID,ehA=ehAdm(p.id);{let yy=top-(ehA?24:12)-(ehP?13:0);if(vp){coroaVip(ctx,p.x,yy+2);yy-=12}if(!ehP&&TOP_ID&&p.id===TOP_ID)trofeuTop(ctx,p.x,yy+1)}if(ehA)tagAdm(ctx,p.x,top-12);if(ehP)trofeu(ctx,p.x,top-(ehA?24:13));if(vp&&(p.moving||p.driving)&&Math.random()<.5)brilhos.push({x:p.x+rand(-5,5),y:p.y-rand(0,8),t:now});if(p.bub&&p.bub.until>now)bubble(ctx,p.x,top-(ehP||ehA?(ehP&&ehA?36:24):8),p.bub.t)}
+ for(const p of plist){if(!vis(p.x,p.y))continue;bbSet(ctx,p.x,p.y);const top=p.y-(carOf(p)?(p.sit?0:26):(p.sit?39:46)*PS*(SALA_ON?SALA_ESC:1))-3-((p===eu?eu.deitado:p.deitado)?-10:0);const vp=p.vip_ate&&Date.parse(p.vip_ate)>Date.now(),lb='⭐'+(p.nivel||1)+' '+p.nome;if(p.foto){ctx.font='600 7px Fredoka, sans-serif';fotoMini(ctx,p.foto,p.x-ctx.measureText(lb).width/2-7,top-2.4,5.2,vp)}nameTag(ctx,p.x,top,lb,p===eu,true,vp);const ehP=PREF_ID&&p.id===PREF_ID,ehA=ehAdm(p.id);{let yy=top-(ehA?24:12)-(ehP?13:0);if(vp){coroaVip(ctx,p.x,yy+2);yy-=12}if(!ehP&&TOP_ID&&p.id===TOP_ID)trofeuTop(ctx,p.x,yy+1)}if(ehA)tagAdm(ctx,p.x,top-12);if(ehP)trofeu(ctx,p.x,top-(ehA?24:13));{const rs=p.rastro==='natal'?'natal':(vp&&p.rastro!=='nenhum')?'ouro':null;if(rs&&(p.moving||p.driving)&&Math.random()<.5)brilhos.push({x:p.x+rand(-5,5),y:p.y-rand(0,8),t:now,k:rs})}if(p.bub&&p.bub.until>now)bubble(ctx,p.x,top-(ehP||ehA?(ehP&&ehA?36:24):8),p.bub.t)}
  if(cam.z>=1.3)for(const v of VAGAS){const i=vagasInfo.get(v.id);if(i&&i.ativo&&i.nome&&vis(v.x,v.y)&&!(eu&&i.morador===eu.id&&eu.driving)){bbSet(ctx,v.x,v.y);nameTag(ctx,v.x,v.y-26,'🅿️ '+i.nome,eu&&i.morador===eu.id,true)}}
  setWorld(ctx);
  if(trabalho&&trabalho.ronda&&trabalho.ronda.i<4){const p=trabalho.ronda.pts[trabalho.ronda.i],k=(now*1.5)%1;
@@ -3366,7 +3386,8 @@ function refreshCard(){if(!selected)return;$('cardStatus').textContent=statusOf(
  if(tem)$('cardDrive').textContent=eu.driving?'🅿️ Descer do carro':'🚗 Dirigir '+art(eu.carro||eu.carros[0])+' '+CARS[eu.carro||eu.carros[0]].nome}
 $('cardDrive').onclick=()=>{if(!livre()||(trabalho))return;if(eu.driving)descerDoCarro();else pegarCarro();refreshCard()};
 $('cardCar').onclick=()=>{const i=eu.carros.indexOf(eu.carro),n=eu.carros[(i+1)%eu.carros.length];eu.carro=n;api.usarCarro(n).catch(e=>toast(e.message));const vi=eu.parked&&vagasInfo.get(eu.parked);if(vi)vi.carro=n;toast('Agora com '+art(n)+' '+CARS[n].nome,1800);sendPos(true);refreshCard()};
-$('cardLook').onclick=()=>{provCarregaRoupas();prov=Object.assign({},eu.v);$('provName').value=eu.nome;$('enter').textContent='Salvar visual';renderProv();$('mProv').classList.remove('hidden')};
+function abrirProvadorVisual(){provCarregaRoupas();prov=Object.assign({},eu.v);$('provName').value=eu.nome;$('enter').textContent='Salvar visual';renderProv();$('mProv').classList.remove('hidden')};
+$('cardLook').onclick=()=>abrirGuarda();
 $('cardBloq').onclick=()=>{const o=selected;if(!o||!o.remote)return;if(BLOQ.has(o.id)){BLOQ.delete(o.id);salvaBloq();toast(`🔈 ${o.nome} desbloqueado(a).`,2500);refreshCard();return}
  confirmar('🔇 Bloquear '+esc(o.nome)+'?','Você não vai mais ver as mensagens, balões, convites e propostas dessa pessoa. Dá para desbloquear depois tocando no nome dela.',()=>{BLOQ.add(o.id);salvaBloq();chatMsgs.splice(0,chatMsgs.length,...chatMsgs.filter(m=>m.morador!==o.id));o.bub=null;pintaPainel();toast(`🔇 ${o.nome} bloqueado(a).`,2500);refreshCard()})};
 $('cardReport').onclick=()=>{const o=selected;if(!o||!o.remote)return;const b=$('cardReport');if(!b.dataset.armado){b.dataset.armado=1;b.textContent='Denunciar '+o.nome+'? Toque de novo';setTimeout(()=>{delete b.dataset.armado;b.textContent='🚩 Denunciar'},3500);return}
@@ -3533,7 +3554,7 @@ function lfome(m,custo){
  if(f<=0||sd<=0){m.sede=50;const b=LV.base(m.nivel);m.xp=b+Math.floor((m.xp-b)*.7);m.fome=50;m.fome_em=Date.now();m.dinheiro=Math.max(0,m.dinheiro-30);m.mortes++;m.trabalho=null;m.trabalho_inicio=null;return true}
  m.fome=Math.min(100,f);m.sede=Math.min(100,sd);m.fome_em=Date.now();return false;
 }
-const lest=()=>{const m=lme();return{id:'local',nome:m.nome,visual:m.visual,dinheiro:m.dinheiro,xp:m.xp,nivel:m.nivel,fome:Math.round(m.fome*10)/10,sede:Math.round(m.sede*10)/10,gasolina:m.gasolina??100,peixes:m.peixes,carros:m.carros.slice(),carro:m.carro,casa_id:m.casa_id,mortes:m.mortes,trabalho:m.trabalho,trabalho_inicio:m.trabalho_inicio,foto:m.foto||null,frase:m.frase||null,relacionamento:m.relacionamento||null,time_coracao:m.time_coracao||null,insta:m.insta||null}};
+const lest=()=>{const m=lme();return{id:'local',nome:m.nome,visual:m.visual,dinheiro:m.dinheiro,xp:m.xp,nivel:m.nivel,fome:Math.round(m.fome*10)/10,sede:Math.round(m.sede*10)/10,gasolina:m.gasolina??100,peixes:m.peixes,carros:m.carros.slice(),carro:m.carro,casa_id:m.casa_id,mortes:m.mortes,trabalho:m.trabalho,trabalho_inicio:m.trabalho_inicio,foto:m.foto||null,frase:m.frase||null,rastro:m.rastro||null,relacionamento:m.relacionamento||null,time_coracao:m.time_coracao||null,insta:m.insta||null}};
 function traduzAuth(m){m=m||'';if(/invalid login/i.test(m))return'E-mail ou senha errados. Se ainda não criou a conta, toque em "✨ Criar conta".';if(/already (been )?registered|already exists/i.test(m))return'Esse e-mail já tem conta. Use "Já tenho conta".';
  if(/password.*(6|characters)/i.test(m))return'A senha precisa ter pelo menos 6 letras ou números.';if(/email.*invalid|invalid.*email/i.test(m))return'E-mail inválido.';if(/not confirmed/i.test(m))return'Confirme seu e-mail pelo link que enviamos.';if(/rate limit/i.test(m))return'Muitas tentativas. Espere um pouco.';return m}
 const api=ONLINE?(()=>{
@@ -3553,7 +3574,7 @@ const api=ONLINE?(()=>{
   async esqueci(email){const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});if(error)throw new Error(traduzAuth(error.message))},
   async sair(){await sb.auth.signOut()},
   perfil:id=>q(sb.from('moradores').select('*').eq('id',id).maybeSingle()),
-  perfis:ids=>q(sb.from('moradores').select('id,admin,nome,visual,vip_ate,pet,carro,carro_cores,carro_mods,casa_id,nivel,foto,frase,relacionamento,time_coracao,insta').in('id',ids)),
+  perfis:ids=>q(sb.from('moradores').select('id,admin,nome,visual,vip_ate,rastro,pet,carro,carro_cores,carro_mods,casa_id,nivel,foto,frase,relacionamento,time_coracao,insta').in('id',ids)),
   atualizarPerfil:(f,r,t,i)=>rpc('atualizar_perfil',{p_frase:f,p_relacionamento:r,p_time:t,p_insta:i}),
   async enviarFoto(blob){const {data:u}=await sb.auth.getUser();const path=u.user.id+'/perfil.jpg';
    const {error}=await sb.storage.from('fotos').upload(path,blob,{upsert:true,contentType:'image/jpeg',cacheControl:'60'});if(error)throw new Error('Não consegui enviar a foto: '+error.message);
@@ -3591,6 +3612,7 @@ const api=ONLINE?(()=>{
   terminar:()=>rpc('terminar_trabalho'),
   tarefa:()=>rpc('tarefa_feita'),
   rondaPolicia:()=>rpc('ronda_policia'),
+  usarRastro:r=>rpc('usar_rastro',{p_rastro:r}),
   meuPasse:()=>rpc('meu_passe'),resgatarPasse:(n,t)=>rpc('resgatar_passe',{p_nivel:n,p_trilha:t}),presenteVip:()=>rpc('presente_vip'),vipInfo:()=>rpc('vip_info'),
   excluirConta:async()=>{try{const id=eu&&eu.id;if(id){const l=await sb.storage.from('fotos').list(id,{limit:1000});if(l&&l.data&&l.data.length)await sb.storage.from('fotos').remove(l.data.map(f=>id+'/'+f.name))}}catch(e){}
    await rpc('excluir_conta');try{await sb.auth.signOut()}catch(e){}},
@@ -3652,6 +3674,7 @@ const api=ONLINE?(()=>{
    let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(1,Math.round(J.xp/5*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    passeLocal(m,PONTOS_JOB[m.trabalho]||3);const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
+  async usarRastro(r){const m=lme();if(r==='ouro'&&!(m.vip_ate&&Date.parse(m.vip_ate)>Date.now()))fail('O brilho dourado é do VIP.');if(r==='natal'&&!(m.roupas||[]).includes('rastro:1'))fail('O brilho de Natal é do Passe Natal na Vila.');m.rastro=r;lsave();return{rastro:r}},
   async meuPasse(){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});return{temporada:'T1',nome:'Natal na Vila',fim:'2027-01-01T03:00:00Z',pontos:j.pontos,premium:j.premium,resgatados:j.resgatados,premios:PASSE_T1.flatMap(([n,g,p])=>[{nivel:n,trilha:'gratis',premio:g},{nivel:n,trilha:'premium',premio:p}])}},
   async resgatarPasse(n,t){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});if(j.pontos<n*PASSE_NV)fail('Você ainda não chegou nesse nível do passe.');if(t==='premium'&&!j.premium)fail('Esse prêmio é do Passe Premium.');const c=n+(t==='premium'?'p':'g');if(j.resgatados.includes(c))fail('Você já pegou esse prêmio.');
    const pr=PASSE_T1.find(x=>x[0]===n)[t==='premium'?2:1];if(pr.carro&&!CARS_PREMIUM[pr.carro])fail('O carro exclusivo chega em breve!');darPremioLocal(m,pr);j.resgatados.push(c);lsave();return{premio:pr,eu:lest()}},
@@ -3709,7 +3732,7 @@ const carOf=p=>{if(p===eu){if(trabalho&&trabalho.job==='policia')return trabalho
 const livre=()=>eu&&!emCasa&&!sinucaAberta&&(!trabalho||trabalho.job==='policia'||!!trabalho.entrega);
 function aplicarEstado(e){
  if(!e||!eu)return;
- eu.vip_ate=e.vip_ate||null;eu.pets=e.pets||[];eu.pet=e.pet||null;(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()?['neon']:[]).forEach(c=>{if(CARS_PREMIUM[c])CARS[c]=CARS_PREMIUM[c]});if(!souVip()&&ehVip(eu.v))eu.v=semVip(eu.v);
+ eu.vip_ate=e.vip_ate||null;eu.pets=e.pets||[];eu.pet=e.pet||null;eu.rastro=e.rastro||null;(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()?['neon']:[]).forEach(c=>{if(CARS_PREMIUM[c])CARS[c]=CARS_PREMIUM[c]});if(!souVip()&&ehVip(eu.v))eu.v=semVip(eu.v);
  Object.assign(eu,{dinheiro:e.dinheiro,xp:e.xp,nivel:e.nivel,fome:+e.fome,sede:e.sede!=null?+e.sede:100,gas:e.gasolina!=null?+e.gasolina:(eu.gas??100),peixes:e.peixes,carros:(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()&&!(e.carros||[]).includes('neon')?['neon']:[]),carro:e.carro,casa_id:e.casa_id,mortes:e.mortes||0,foto:e.foto||null,frase:e.frase||null,relacionamento:e.relacionamento||null,time_coracao:e.time_coracao||null,insta:e.insta||null});
  refreshHud();
 }
@@ -3798,6 +3821,7 @@ function abrirMapa(){if(!eu)return;const el=document.createElement('div');el.id=
 const NOVID='v20261125';
 const NOV_SLIDES=[
  {t:'🎟️ Passe Natal na Vila',x:'Novo <b>Passe</b> com 20 níveis: trabalhe, ganhe pontos (tarefas mais demoradas dão mais) e libere prêmios. No Premium tem o <b>🎅 gorro de Papai Noel brilhante</b> e um <b>🚗 carro exclusivo</b> que <b>nunca mais voltam</b> depois de 31/12! Abra pelo <b>🎟️</b> no menu ☰.',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎟️',110,125+Math.sin(t*3)*6);g.font='44px sans-serif';const L=['👕','🧢','👟','💰','🎨'];g.fillText(L[Math.floor(t/.8)%L.length],220,120);g.fillStyle='#ffc94a';g.fillRect(70,160,180*((t*.25)%1),10)}},
+ {t:'👕 Guarda-roupa e 🎒 Mochila novos',x:'Toque em você e em <b>👕 Guarda-roupa</b>: veja todas as suas roupas com o boneco vestindo, troque na hora, salve até <b>3 looks</b> e escolha o <b>✨ brilho no chão</b>. A <b>🎒 Mochila</b> agora tem abas: itens, roupas, carros e pets.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.4)%2?'🎒':'👕',110,125+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['👗','🧢','👟','✨'];L.forEach((e,i)=>g.fillText(e,190+(i%2)*55,85+Math.floor(i/2)*60))}},
  {t:'👑 VIP ficou melhor',x:'Roupas VIP novas: <b>jaqueta bomber dourada, moletom neon, jaqueta de veludo, smoking, vestido de lantejoulas, tênis e boné neon</b>. E o VIP ganha <b>🎁 presente todo mês</b>, <b>🏠 vai para casa num toque</b>, <b>+50% no passe</b> e a <b>🏎️ Lambordini</b>.',d:(g,t)=>{g.save();g.translate(110,95);g.scale(3,3);coroaVip(g,0,0);g.restore();g.textAlign='center';g.font='54px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏠':'🎁',225,125+Math.sin(t*3)*5)}},
  {t:'⭐ XP em dobro nos empregos',x:'Cada tarefa dos empregos agora dá <b>o dobro de XP</b>. Você sobe de nível bem mais rápido e libera empregos, casas e carros mais cedo!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText('⭐',110,125+Math.sin(t*3)*6);g.font='bold 54px Fredoka,sans-serif';g.fillStyle='#ffd23f';g.fillText('2x',215,128);g.font='26px sans-serif';g.fillText('⬆️',160,70-((t*30)%30))}},
  {t:'🏢 Imobiliária nova',x:'A <b>Imobiliária</b> abriu ao lado da Igreja. Fale com o corretor para <b>comprar ou alugar</b>: ele mostra no mapa as casas livres e os apartamentos do condomínio. As casas da cidade ficaram mais valorizadas.',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🏢',120,125);g.font='50px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🔑':'🧑‍💼',220,120+Math.sin(t*3)*5)}},
@@ -4507,7 +4531,7 @@ function syncPresence(){
  refreshHud();
 }
 function aplicarRemoto(p){
- const o=others.get(p.id);if(!o)return;o.carCores=p.carro_cores||{};o.carMods=p.carro_mods||{};o.nome=p.nome;o.pet=PETS[p.pet]?p.pet:null;o.vip_ate=p.vip_ate;o.v=decode(p.visual)||o.v;if(!(p.vip_ate&&Date.parse(p.vip_ate)>Date.now()))o.v=semVip(o.v);o.casa_id=p.casa_id;o.nivel=p.nivel||1;o.foto=p.foto;o.frase=p.frase;o.relacionamento=p.relacionamento;o.time_coracao=p.time_coracao;o.insta=p.insta;
+ const o=others.get(p.id);if(!o)return;o.carCores=p.carro_cores||{};o.carMods=p.carro_mods||{};o.nome=p.nome;o.pet=PETS[p.pet]?p.pet:null;o.vip_ate=p.vip_ate;o.rastro=p.rastro||null;o.v=decode(p.visual)||o.v;if(!(p.vip_ate&&Date.parse(p.vip_ate)>Date.now()))o.v=semVip(o.v);o.casa_id=p.casa_id;o.nivel=p.nivel||1;o.foto=p.foto;o.frase=p.frase;o.relacionamento=p.relacionamento;o.time_coracao=p.time_coracao;o.insta=p.insta;
  if(o.novo){o.novo=false;log(`👋 ${p.nome} está na cidade`);if(PREF_ID&&p.id===PREF_ID){let n=0;const kk='cidadeTonhao.prefAviso.'+new Date().toDateString();try{n=+localStorage.getItem(kk)||0}catch(_){}if(n<2){try{localStorage.setItem(kk,n+1)}catch(_){}bannerGrande('🏛️ O PREFEITO ENTROU NA CIDADE!','🏛️ '+p.nome)}}}
 }
 let lastSent=0,lastKey='';
@@ -5030,7 +5054,7 @@ function bioOf(r){if(!r||!r.isPlayer)return'';const p=[];if(r.frase)p.push('“'
 function pintarFoto(el,u){el.innerHTML='';if(u){const i=document.createElement('img');i.src=u;i.alt='';el.appendChild(i)}else el.textContent='🙂'}
 const brilhos=[];
 function desenhaBrilhos(c){for(let i=brilhos.length-1;i>=0;i--){const b=brilhos[i],a=now-b.t;if(a>.9){brilhos.splice(i,1);continue}
- const k=1-a/.9;c.save();c.globalAlpha=k;c.fillStyle=i%3?'#ffd700':'#fff6b0';c.translate(b.x,b.y-a*10);c.rotate(a*4);const z=2.2*k+.6;c.beginPath();
+ const k=1-a/.9;c.save();c.globalAlpha=k;c.fillStyle=b.k==='natal'?['#ff2a3d','#ffffff','#2ecc71'][i%3]:i%3?'#ffd700':'#fff6b0';c.translate(b.x,b.y-a*10);c.rotate(a*4);const z=2.2*k+.6;c.beginPath();
  for(let j=0;j<8;j++){const rr=j%2?z*.4:z,an=j*Math.PI/4;c.lineTo(Math.cos(an)*rr,Math.sin(an)*rr)}c.fill();c.restore()}}
 /* ----- pets ----- */
 const PETS={cachorro:{nome:'Cachorro Caramelo',ic:'🐕',c:'#c68642',c2:'#8d5524'},gato:{nome:'Gato Frajola',ic:'🐈',c:'#2d2d34',c2:'#fff'},galinha:{nome:'Galinha Pintadinha',ic:'🐔',c:'#fafafa',c2:'#e74c3c'},capivara:{nome:'Capivara',ic:'🦫',c:'#9a6b45',c2:'#6d4a2f'},papagaio:{nome:'Papagaio Louro',ic:'🦜',c:'#2ecc71',c2:'#f1c40f'}};
@@ -5058,14 +5082,14 @@ const reais=v=>'R$ '+v.toFixed(2).replace('.',',');
 /* ----- Passe da Temporada e VIP turbinado (prêmios só visuais ou dinheiro do jogo) ----- */
 // pontos do passe por tarefa: conforme o tempo que cada emprego leva (medido em 18/11/2026; ~15 pontos por minuto em qualquer emprego)
 const PONTOS_JOB={"bar":2,"posto":2,"concessionaria":2,"barbearia":2,"pescador":2,"mercadinho":3,"oficina":3,"prefeito":3,"banco":4,"delegado":4,"gerente":6,"lixeiro":7,"enfermeiro":8,"padaria":8,"medico":9,"fabrica":12,"prefeitura":15};
-const PASSE_NV=500; // pontos por nível do passe (20 níveis = ~11 h de trabalho)
+const PASSE_NV=300; // pontos por nível do passe (20 níveis = ~7 h de trabalho, ~2 semanas)
 const PASSE_T1=[[1,{dinheiro:300},{chapeu:[31,31]}],[2,{dinheiro:300},{roupa:[22,17]}],[3,{dinheiro:400},{chapeu:[6,8]}],[4,{estampa:5},{dinheiro:3000}],[5,{chapeu:[30,30]},{calca:[15,22]}],[6,{dinheiro:500},{roupa:[20,16]}],[7,{dinheiro:600},{calcado:[7,3]}],[8,{chapeu:[3,3]},{dinheiro:3000}],[9,{dinheiro:700},{roupa:[19,15]}],[10,{dinheiro:800},{dinheiro:10000}],
- [11,{dinheiro:800},{extra:[6,5]}],[12,{estampa:7},{calca:[13,23]}],[13,{dinheiro:900},{roupa:[21,13]}],[14,{dinheiro:1000},{chapeu:[7,7]}],[15,{dinheiro:1000},{dinheiro:4000}],[16,{roupa:[10,10]},{calcado:[6,7]}],[17,{dinheiro:1200},{roupa:[17,14]}],[18,{dinheiro:1200},{extra:[7,4]}],[19,{dinheiro:1500},{dinheiro:6000}],[20,{dinheiro:2000},{carro:'natal'}]];
+ [11,{dinheiro:800},{extra:[6,5]}],[12,{estampa:7},{rastro:1}],[13,{dinheiro:900},{roupa:[21,13]}],[14,{dinheiro:1000},{chapeu:[7,7]}],[15,{dinheiro:1000},{dinheiro:4000}],[16,{roupa:[10,10]},{calcado:[6,7]}],[17,{dinheiro:1200},{roupa:[17,14]}],[18,{dinheiro:1200},{extra:[7,4]}],[19,{dinheiro:1500},{dinheiro:6000}],[20,{dinheiro:2000},{carro:'natal'}]];
 const VIP_MENSAL={'2026-11':{roupa:[14,12]},'2026-12':{calca:[11,13]},'2027-01':{roupa:[18,11]},'2027-02':{estampa:10},'2027-03':{calcado:[5,6]},'2027-04':{chapeu:[8,6]}};
 const PR_IC={roupa:'👕',calca:'👖',calcado:'👟',chapeu:'🧢',extra:'💍'};
-function nomePremio(p){if(!p)return'';if(p.carro)return'🚗 '+(CARS_PREMIUM[p.carro]?CARS_PREMIUM[p.carro].nome:'Carro exclusivo');if(p.dinheiro)return'💰 R$ '+p.dinheiro.toLocaleString('pt-BR');if(p.estampa!=null)return'🎨 Estampa '+FIELDS.find(f=>f[0]==='estampa')[2][p.estampa];
+function nomePremio(p){if(!p)return'';if(p.rastro)return'✨ Brilho de Natal no chão';if(p.carro)return'🚗 '+(CARS_PREMIUM[p.carro]?CARS_PREMIUM[p.carro].nome:'Carro exclusivo');if(p.dinheiro)return'💰 R$ '+p.dinheiro.toLocaleString('pt-BR');if(p.estampa!=null)return'🎨 Estampa '+FIELDS.find(f=>f[0]==='estampa')[2][p.estampa];
  for(const k of Object.keys(PR_IC))if(p[k]){const s=sx(eu&&eu.v),ix=p[k][s==='f'?1:0],o=ix>=30&&ix<40?(OPC[k].exc||[])[ix-30]:OPC[k][s][ix];return PR_IC[k]+' '+(o?o[0]:k)}return'🎁 Prêmio'}
-function darPremioLocal(m,p){if(p.carro){m.carros=m.carros||[];if(!m.carros.includes(p.carro))m.carros.push(p.carro)}if(p.dinheiro)m.dinheiro+=p.dinheiro;m.roupas=m.roupas||[];const add=x=>{if(!m.roupas.includes(x))m.roupas.push(x)};if(p.estampa!=null)add('estampa:'+p.estampa);for(const k of Object.keys(PR_IC))if(p[k]){add(k+'_m:'+p[k][0]);add(k+'_f:'+p[k][1])}}
+function darPremioLocal(m,p){if(p.rastro){m.roupas=m.roupas||[];if(!m.roupas.includes('rastro:'+p.rastro))m.roupas.push('rastro:'+p.rastro)}if(p.carro){m.carros=m.carros||[];if(!m.carros.includes(p.carro))m.carros.push(p.carro)}if(p.dinheiro)m.dinheiro+=p.dinheiro;m.roupas=m.roupas||[];const add=x=>{if(!m.roupas.includes(x))m.roupas.push(x)};if(p.estampa!=null)add('estampa:'+p.estampa);for(const k of Object.keys(PR_IC))if(p[k]){add(k+'_m:'+p[k][0]);add(k+'_f:'+p[k][1])}}
 function passeLocal(m,n){const j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});const vip=m.vip_ate&&Date.parse(m.vip_ate)>Date.now();j.pontos=Math.min(PASSE_NV*20,j.pontos+Math.round(vip?n*1.5:n))}
 let PASSE=null;
 async function abrirPasse(){if(!eu)return;closePlace();$('mPasse').classList.remove('hidden');$('psLista').innerHTML='<div class="sub">Carregando…</div>';try{PASSE=await api.meuPasse()}catch(e){$('psLista').innerHTML='<div class="sub">'+esc(e.message||'Erro')+'</div>';return}pintaPasse()}
@@ -5074,6 +5098,7 @@ const PS_THUMB=new Map();
 function thumbPremio(p,W){W=W||140;const key=JSON.stringify(p)+'|'+(eu&&eu.v?encode(eu.v):'')+'|'+W;const copia=src=>{const o=document.createElement('canvas');o.width=o.height=W;o.getContext('2d').drawImage(src,0,0);return o};if(PS_THUMB.has(key))return copia(PS_THUMB.get(key));
  const cv=document.createElement('canvas');cv.width=cv.height=W;const g=cv.getContext('2d'),k=W/140;
  try{if(p.dinheiro){g.textAlign='center';g.textBaseline='middle';g.font=`${(p.dinheiro>=10000?38:p.dinheiro>=3000?52:p.dinheiro>=1000?72:62)*k}px sans-serif`;g.fillText(p.dinheiro>=10000?'💰💎💰':p.dinheiro>=3000?'💰💰':'💰',W/2,W*.52);if(p.dinheiro>=10000){g.font=`${40*k}px sans-serif`;g.fillText('✨',W*.8,W*.2)}}
+  else if(p.rastro){for(let i=0;i<14;i++){const a=i*2.4,r=12+i*3.2,x=W/2+Math.cos(a)*r*k,y=W*.55+Math.sin(a)*r*.55*k-i*1.5*k;g.fillStyle=['#ff2a3d','#ffffff','#2ecc71'][i%3];g.save();g.translate(x,y);g.rotate(a);const z=(7-i*.3)*k;g.beginPath();for(let j=0;j<8;j++){const q=j%2?z*.4:z,an=j*Math.PI/4;g.lineTo(Math.cos(an)*q,Math.sin(an)*q)}g.fill();g.restore()}g.font=`${34*k}px sans-serif`;g.textAlign='center';g.textBaseline='middle';g.fillText('👟',W/2,W*.78)}
   else if(p.carro){g.save();g.translate(W/2,W*.62);g.scale(1.45*k,1.45*k);try{drawCarStack(g,0,0,CARS_PREMIUM[p.carro]?p.carro:'gto',-.6,null,{})}catch(e){}g.restore();if(!CARS_PREMIUM[p.carro]){g.globalCompositeOperation='source-atop';g.fillStyle='#120a0e';g.fillRect(0,0,W,W);g.globalCompositeOperation='source-over';g.fillStyle='#ffc94a';g.textAlign='center';g.textBaseline='middle';g.font=`bold ${46*k}px Fredoka,sans-serif`;g.fillText('?',W/2,W*.5)}}
   else{const v=Object.assign({},eu.v),s0=sx(v),dd={roupa:'roupa',calca:'calca',calcado:'calcado',chapeu:'chapeu',extra:'extra'};
    if(p.estampa!=null){v.estampa=p.estampa;v.roupa=0}for(const q in dd)if(p[q])v[q]=p[q][s0==='f'?1:0];
@@ -5087,7 +5112,7 @@ function pintaPasse(){const P=PASSE;if(!P||!P.temporada){$('psTit').textContent=
  $('psNv').textContent=nv;$('psBarra').firstElementChild.style.width=(nv>=20?100:(P.pontos%PASSE_NV)/PASSE_NV*100)+'%';$('psNivel').textContent=nv>=20?'🏆 Nível máximo!':`${P.pontos%PASSE_NV}/${PASSE_NV} pontos para o nível ${nv+1}`;
  $('psSub').textContent='Ganhe pontos trabalhando: tarefas que demoram mais dão mais pontos (de 2 a 15), e cada pagamento da patrulha dá 15. 👑 VIP ganha +50%.';
  const cb=$('psComprar');cb.innerHTML='';
- if(!P.premium&&!NO_APP){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · 10 roupas · 💰 R$ 26 mil do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
+ if(!P.premium&&!NO_APP){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · ✨ brilho de Natal · 9 roupas · 💰 R$ 26 mil do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
  else if(P.premium)cb.innerHTML='<div class="psSub" style="color:#c9a8ff;text-align:center">👑 Você tem o Passe Premium desta temporada.</div>';
  const L=$('psLista');L.innerHTML='';const by={};for(const x of P.premios)by[x.nivel+x.trilha]=x.premio;
  for(let n=1;n<=20;n++){const col=document.createElement('div');col.className='psCol'+(n<=nv?' ok':'');col.innerHTML=`<div class="lv">${n}</div>`;
@@ -5190,7 +5215,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122y';
+const VERSAO_JOGO='v20261122z';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5242,6 +5267,56 @@ setInterval(()=>{if(!eu)return;
  if(eu.passa){const o=others.get(eu.passa);if(!o||!o.driving||!o.caronaLib){sairCarona();return}eu.x=o.x;eu.y=o.y}
  $('carBtns').classList.toggle('hidden',!(eu.driving&&!trabalho));{const tem=!!(eu.driving&&eu.carro&&(modsDe(eu,eu.carro)||{}).som);$('cbSom').classList.toggle('hidden',!tem);if(!tem&&eu.somLigado){eu.somLigado=false;$('cbSom').textContent='🔊 Ligar som';emitEv('som',{on:0})}}$('paBtns').classList.toggle('hidden',!eu.passa)},120);
 
+/* ----- guarda-roupa: as peças que o jogador tem, com miniatura; vestir sem passar pelo provador ----- */
+const GR_ABAS=[['roupa','👕 Roupas'],['calca','👖 Baixo'],['calcado','👟 Calçados'],['chapeu','🧢 Cabeça'],['extra','💍 Acessórios'],['estampa','🎨 Estampas'],['rastro','✨ Brilho']];
+let grV=null,grAba='roupa';
+const RASTROS=[['nenhum','Sem brilho','🚫'],['ouro','Dourado do VIP','👑'],['natal','Natal (vermelho e verde)','🎄']];
+function grTemRastro(k){return k==='nenhum'||(k==='ouro'&&souVip())||(k==='natal'&&lrTem.has('rastro:1'))}
+function rastroAtual(){return eu.rastro||(souVip()?'ouro':'nenhum')}
+async function abrirGuarda(aba){if(!eu)return;closePlace();try{lrTem=new Set(await api.roupas())}catch(e){}grV=Object.assign({},eu.v);grV._r=rastroAtual();if(aba)grAba=aba;$('mGuarda').classList.remove('hidden');pintaGuarda()}
+function grItens(k){const f=FIELDS.find(q=>q[0]===k);const L=[];optsOf(f,grV).forEach((o,i)=>{const nm=Array.isArray(o)?o[0]:o;if(Array.isArray(o)&&o[2]==='x')return;if(provLivre(k,i,grV))L.push([i,nm,''])});
+ excOf(f,grV).forEach((o,j)=>{if(provLivre(k,30+j,grV))L.push([30+j,o[0],'🎅'])});luxOf(f,grV).forEach((o,j)=>{if(provLivre(k,40+j,grV))L.push([40+j,o[0],'💎'])});if(souVip())vipOf(f,grV).forEach((o,j)=>{if(!COR_VIP.has(k))L.push([50+j,o[0],'👑'])});return L}
+function grThumb(k,i){const v=Object.assign({},grV);v[k]=i;if(k==='estampa'&&!v.roupa)v.roupa=0;const W=128,cv=document.createElement('canvas');cv.width=cv.height=W;const g=cv.getContext('2d');
+ const foco=k==='chapeu'?'cab':k==='calcado'?'pe':k==='extra'?(/corrente|perolas|cordao|pingente|colar|choker/i.test(estilo('extra',v))?'peito':'cab'):k==='calca'?'perna':'corpo';
+ const sc={cab:4,peito:3.3,pe:3,perna:2.3,corpo:2.4}[foco],oy={cab:W*1.8,peito:W*1.3,pe:W*.66,perna:W*.62,corpo:W*.96}[foco];try{g.translate(W/2,oy);g.scale(sc*W/140,sc*W/140);drawPersonReal(g,0,0,v,{cara:true})}catch(e){}return cv}
+function grBoneco(){const c=$('grBoneco'),g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);g.translate(120,282);g.scale(4.2,4.2);try{drawPersonReal(g,0,0,grV,{cara:true})}catch(e){}}
+function grLooks(){const box=$('grLooks');box.innerHTML='';let L=[];try{L=JSON.parse(localStorage.getItem('cidadeTonhao.looks.'+eu.id)||'[]')}catch(e){}
+ for(let n=0;n<3;n++){const b=document.createElement('button'),l=L[n];b.className=l?'tem':'';b.textContent=l?'👗 Look '+(n+1):'➕ Salvar';b.title=l?'Toque para vestir · segure para trocar':'';
+  let t=null;b.onpointerdown=()=>{t=setTimeout(()=>{t=null;L[n]=encode(grV);try{localStorage.setItem('cidadeTonhao.looks.'+eu.id,JSON.stringify(L))}catch(e){}toast('💾 Look '+(n+1)+' guardado!');grLooks()},600)};
+  b.onpointerup=()=>{if(!t)return;clearTimeout(t);t=null;if(l){const v=decode(l);if(v){const r=grV._r;grV=v;grV._r=r;FIELDS.forEach(q=>{if(!valido(q,grV,grV[q[0]])||(['roupa','calca','calcado','chapeu','extra','estampa'].includes(q[0])&&!provLivre(q[0],grV[q[0]],grV)&&!(grV[q[0]]>=50&&souVip())))grV[q[0]]=0});pintaGuarda()}}else{L[n]=encode(grV);try{localStorage.setItem('cidadeTonhao.looks.'+eu.id,JSON.stringify(L))}catch(e){}toast('💾 Look '+(n+1)+' guardado! Segure para trocar.');grLooks()}};box.appendChild(b)}}
+function pintaGuarda(){grBoneco();grLooks();const tb=$('grTabs');tb.innerHTML='';GR_ABAS.forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.className=k===grAba?'on':'';b.onclick=()=>{grAba=k;pintaGuarda()};tb.appendChild(b)});
+ const gr=$('grGrade');gr.innerHTML='';
+ if(grAba==='rastro'){for(const [k,nm,ic] of RASTROS){const tem=grTemRastro(k),d=document.createElement('div');d.className='grItem'+(grV._r===k?' on':'');const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d');
+   if(k==='natal')g.drawImage(thumbPremio({rastro:1},128),0,0);else{g.font='60px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(ic,64,64)}
+   if(!tem){g.fillStyle='rgba(0,0,0,.55)';g.fillRect(0,0,128,128);g.font='40px sans-serif';g.textAlign='center';g.fillText('🔒',64,64)}d.appendChild(cv);const sp=document.createElement('span');sp.textContent=nm;d.appendChild(sp);
+   d.onclick=()=>{if(!tem){toast(k==='ouro'?'👑 O brilho dourado é do VIP.':'🎟️ Ganhe no nível 12 do Passe Premium Natal na Vila.',3000);return}grV._r=k;pintaGuarda()};gr.appendChild(d)}return}
+ const itens=grItens(grAba);if(!itens.length){gr.innerHTML='<div class="psSub">Nada aqui ainda. Compre na 🛍️ Loja de roupas!</div>';return}
+ for(const [i,nm,tg] of itens){const d=document.createElement('div');d.className='grItem'+((grV[grAba]||0)===i?' on':'');d.appendChild(grThumb(grAba,i));const sp=document.createElement('span');sp.textContent=nm;d.appendChild(sp);if(tg)d.insertAdjacentHTML('beforeend','<i class="tg">'+tg+'</i>');
+  d.onclick=()=>{grV[grAba]=i;Som.play('clique');pintaGuarda()};gr.appendChild(d)}
+ setTimeout(()=>{const on=gr.querySelector('.on');if(on)on.scrollIntoView({block:'nearest'})},0)}
+$('grSalvar').onclick=()=>acao(async()=>{const r=grV._r,v=Object.assign({},grV);delete v._r;const code=encode(v);
+ if(code!==encode(eu.v)){const m=await api.criar(eu.nome,code);eu.v=decode(m.visual)||v;if(eu.casa_id)casasInfo.set(eu.casa_id,{dono:eu.id,nome:eu.nome});emitEv('perfil',{})}
+ if(r!==rastroAtual()){const x=await api.usarRastro(r);eu.rastro=x.rastro;emitEv('perfil',{})}
+ $('mGuarda').classList.add('hidden');Som.play('moeda');toast('✨ Visual salvo!',2000)});
+$('grCores').onclick=()=>{$('mGuarda').classList.add('hidden');abrirProvadorVisual()};
+$('grLoja').onclick=()=>{$('mGuarda').classList.add('hidden');if(typeof irAoLugar==='function')irAoLugar('roupas');toast('🛍️ A Loja de Roupas fica no Centro de Empregos. Siga a seta!',3000)};
+/* ----- mochila (inventário com abas: itens, roupas, carros, pets) ----- */
+let mcAba='itens',mcSel=null;
+function abrirMochilaNova(aba){if(!eu)return;closePlace();if(aba)mcAba=aba;$('mMochila').classList.remove('hidden');pintaMochila()}
+function pintaMochila(){const tb=$('mcTabs');tb.innerHTML='';[['itens','🍔 Itens'],['roupas','👕 Roupas'],['carros','🚗 Carros'],['pets','🐾 Pets']].forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.className=k===mcAba?'on':'';b.onclick=()=>{mcAba=k;if(k==='roupas'){$('mMochila').classList.add('hidden');abrirGuarda();return}pintaMochila()};tb.appendChild(b)});
+ const box=$('mcCorpo');box.innerHTML='';
+ if(mcAba==='itens'){const m=eu.mochila||{},ks=Object.keys(m).filter(k=>m[k]>0&&LOJA[k]),SL=20;const g=document.createElement('div');g.className='mcGrade';
+  for(let n=0;n<SL;n++){const k=ks[n],d=document.createElement('div');d.className='mcSlot'+(k&&k===mcSel?' on':'');if(k){d.innerHTML=(ICON[k]||'🍽️')+'<b>'+m[k]+'</b>';d.onclick=()=>{mcSel=k;pintaMochila()}}g.appendChild(d)}box.appendChild(g);
+  box.insertAdjacentHTML('beforeend',`<div class="psSub" style="margin-top:6px">${ks.reduce((a,k)=>a+m[k],0)} itens · até 20 de cada. Guarde comida e bebida tocando no 🎒 ao lado do item nas lojas.</div>`);
+  if(mcSel&&m[mcSel]>0&&LOJA[mcSel]){const it=LOJA[mcSel],inf=document.createElement('div');inf.className='mcInfo';inf.innerHTML=`<div class="ic">${ICON[mcSel]||'🍽️'}</div><div style="flex:1"><b>${esc(cap(it.nome))}</b> ×${m[mcSel]}<div class="psSub">${it.fome?'+'+it.fome+' 🍗 fome ':''}${it.sede?'+'+it.sede+' 💧 sede':''}</div></div>`;
+   const b=document.createElement('button');b.className='btn';b.textContent='Usar';b.onclick=()=>{const k=mcSel;usarItem(k);setTimeout(()=>{if(!(eu.mochila||{})[k])mcSel=null;if(!$('mMochila').classList.contains('hidden'))pintaMochila()},700)};inf.appendChild(b);box.appendChild(inf)}
+  else if(!ks.length)box.insertAdjacentHTML('beforeend','<div class="mcInfo"><div class="ic">🎒</div><div>Sua mochila está vazia. Nos lugares que vendem comida e bebida, toque no <b>🎒</b> ao lado do item para guardar.</div></div>');return}
+ if(mcAba==='carros'){const L=document.createElement('div');L.className='mcLista';const cs=(eu.carros||[]).filter(c=>CARS[c]);if(!cs.length)L.innerHTML='<div class="mcInfo"><div class="ic">🚗</div><div>Você ainda não tem carro. Compre na <b>Concessionária</b>!</div></div>';
+  for(const c of cs){const d=document.createElement('div');d.className='mcLin';const cv=document.createElement('canvas');cv.width=144;cv.height=96;d.appendChild(cv);try{const g=cv.getContext('2d');g.translate(72,66);g.scale(1.1,1.1);drawCarStack(g,0,0,c,-.6,null,{cor:(eu.carCores||{})[c]})}catch(e){}
+   d.insertAdjacentHTML('beforeend',`<div class="tx"><b>${esc(CARS[c].nome)}</b>${c===eu.carro?'<div class="psSub">✅ carro atual</div>':''}</div>`);const b=document.createElement('button');b.className='btn';b.textContent=eu.driving&&eu.carro===c?'🅿️ Estacionar':'🚗 Dirigir';
+   b.onclick=()=>{$('mMochila').classList.add('hidden');if(eu.driving&&eu.carro===c){estacionarAqui();return}if(trabalho){toast('Termine o trabalho primeiro.');return}if(eu.driving)estacionarAqui();if(eu.parkLoc&&eu.parkLoc.c!==c){parados.delete(eu.id);eu.parkLoc=null;emitEv('unpark',{})}eu.carro=c;api.usarCarro(c).catch(()=>{});pegarCarro()};d.appendChild(b);L.appendChild(d)}box.appendChild(L);return}
+ if(mcAba==='pets'){const L=document.createElement('div');L.className='mcLista';const ps=(eu.pets||[]).filter(p=>PETS[p]);if(!ps.length)L.innerHTML='<div class="mcInfo"><div class="ic">🐾</div><div>Você ainda não tem pet.'+(NO_APP?'':' Veja na 💎 Loja!')+'</div></div>';
+  for(const pt of ps){const P=PETS[pt],d=document.createElement('div');d.className='mcLin';d.innerHTML=`<div class="ic" style="font-size:34px;width:72px;text-align:center">${P.ic}</div><div class="tx"><b>${esc(P.nome)}</b>${eu.pet===pt?'<div class="psSub">✅ andando com você</div>':''}</div>`;const b=document.createElement('button');b.className='btn';b.textContent=eu.pet===pt?'Guardar':'Levar';b.onclick=()=>{usarPet(eu.pet===pt?null:pt);setTimeout(pintaMochila,600)};d.appendChild(b);L.appendChild(d)}box.appendChild(L)}}
 /* ----- mochila e atalho do carro ----- */
 function guardarItem(id){const it=LOJA[id];acao(async()=>{const r=tratar(await api.guardar(id));eu.mochila=r.mochila||{};msComprou(it);Som.play('compra');floatText(eu.x,eu.y-30,'-'+money(it.preco)+'  🎒','#ffd23f');toast('🎒 Guardado na mochila: '+it.nome,2200)})}
 function abrirMochila(){if(!eu)return;const m=eu.mochila||{},ks=Object.keys(m).filter(k=>m[k]>0&&LOJA[k]);
@@ -5250,7 +5325,7 @@ function abrirMochila(){if(!eu)return;const m=eu.mochila||{},ks=Object.keys(m).f
 function usarItem(id){const it=LOJA[id];acao(async()=>{const r=tratar(await api.usar(id));eu.mochila=r.mochila||{};
  const goles={cerveja:1,pinga:1.5}[id]||0;Som.play(goles?'beber':'comer');if(goles){const a=eu.alcool||0;eu.alcool=a+goles;eu.beer=true;if(a<=2&&eu.alcool>2)later(1.2,()=>{toast('🥴 Opa, bateu! Você está bêbado(a). Vai passando com o tempo…',4500);Som.play('soluco')})}
  if(it.fome||it.sede)floatText(eu.x,eu.y-30,(it.fome?'+'+it.fome+'🍗 ':'')+(it.sede?'+'+it.sede+'💧':''),'#9dff7a');say(eu,(ICON[id]||'')+' '+cap(it.nome)+'!',3,true);emitEv('item',{item:id})})}
-$('zmochila').onclick=abrirMochila;
+$('zmochila').onclick=()=>abrirMochilaNova();
 $('zcarro').onclick=()=>{if(!eu)return;if(!eu.carros.length){confirmar('🚗 Meu carro','Você ainda não tem carro. Compre um na <b>Concessionária</b>!',null,[['📍 Ir até lá',()=>irAoLugar('concessionaria')],['OK',()=>{}]]);return}
  if(eu.driving){estacionarAqui();return}if(trabalho){toast('Termine o trabalho primeiro.');return}
  if(eu.carros.length===1){pegarCarro();return}
