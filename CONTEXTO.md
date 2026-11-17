@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122z** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261123a** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -227,6 +227,9 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Brilho no chão (rastro):** coluna `moradores.rastro` ('ouro' VIP, 'natal' do passe nível 12 premium = `guarda_roupa(rastro,1)`, 'nenhum'); `usar_rastro()`; `_estado` devolve rastro; outros jogadores leem no select de perfil. Desenho em `desenhaBrilhos` (cores por `b.k`).
 - **Guarda-roupa** (`abrirGuarda`, modal `#mGuarda`): abas Roupas/Baixo/Calçados/Cabeça/Acessórios/Estampas/Brilho com miniaturas (`grThumb`), só peças que a pessoa tem (`provLivre` + VIP + exclusivas), 3 looks salvos no aparelho, "🎨 Cores e cabelo" abre o provador antigo (`abrirProvadorVisual`). Botão "👕 Guarda-roupa" no cartão do próprio jogador.
 - **Mochila nova** (`abrirMochilaNova`, `#mMochila`): abas Itens (grade de 20 espaços com quantidade e botão Usar), Roupas (abre o guarda-roupa), Carros (dirigir/estacionar) e Pets.
+- **Bônus e multa nas tarefas:** `moradores.tarefas_seq`; a cada 10 tarefas +R$ 50 (em `tarefa_feita`, devolve `bonus10`/`seq`); erro no minijogo chama `erro_tarefa()` = −R$ 25 (não abaixo de 0; pescador isento), ligado em `tarFeedback(false)`.
+- **Sinuca nova:** 15 bolas (1-7 lisas, 8 preta, 9-15 listradas), 10 tacadas sozinho (qualquer bola, 3 XP cada, `sinuca(p_bolas<=15)`). Dupla com regra de 8-ball: primeira bola define grupos (`dupla.grupo`), continua se derrubar a sua, branca = passa a vez, 8 antes da hora perde; fim chama `sinuca_dupla(venceu)` (30/10 XP, 90 s entre partidas). Lógica em `sinVez` com `sin.cai`.
+- **Segurança (auditoria 18/11):** nenhuma tabela aceita escrita direta; Pix conferido no Mercado Pago; funções internas fechadas. Risco conhecido: script chamando `tarefa_feita` a cada 2,5 s (robô). O usuário NÃO quer limite de ganho por hora.
 ### Pendências
 000. Carro exclusivo do passe (o usuário vai mandar).
 00. Confirmar se o usuário rodou a ETAPA 28 (`novidades.sql`). Antes: ETAPAS 26 e 27 já rodadas.

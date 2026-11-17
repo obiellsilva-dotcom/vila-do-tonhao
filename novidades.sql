@@ -1,4 +1,4 @@
--- Novidades: só a ETAPA 28 (Passe da Temporada e VIP turbinado). As etapas 21 a 27 já foram rodadas.
+-- Novidades: só a ETAPA 28 (Passe, VIP, guarda-roupa, bônus/multa nas tarefas e sinuca). As etapas 21 a 27 já foram rodadas.
 
 -- ===================== ETAPA 28: Passe da Temporada e VIP turbinado =====================
 -- Passe: 20 níveis (300 pontos cada, ~7 h de trabalho = ~2 semanas). Tarefa de emprego = 2 a 15 pontos conforme o tempo (_pontos_tarefa), pagamento da patrulha = 15, VIP ganha +50%.
@@ -90,6 +90,21 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- pontos do passe por tarefa conforme o tempo de cada emprego (~15 pontos por minuto em qualquer emprego)
+-- ===== bônus a cada 10 tarefas e multa de R$ 25 por erro nos minijogos =====
+alter table public.moradores add column if not exists tarefas_seq integer not null default 0;
+create or replace function public.erro_tarefa() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; multa integer;
+begin
+  m := _eu();
+  if m.trabalho is null or m.trabalho = 'pescador' then return json_build_object('multa', 0, 'eu', _estado(m.id)); end if;
+  multa := least(25, m.dinheiro);
+  update moradores set dinheiro = dinheiro - multa where id = m.id;
+  return json_build_object('multa', multa, 'eu', _estado(m.id));
+end $$;
+revoke execute on function public.erro_tarefa() from public, anon;
+grant execute on function public.erro_tarefa() to authenticated;
+
 create or replace function public._pontos_tarefa(p_job text) returns integer
 language sql immutable as $$
   select case p_job
@@ -248,7 +263,7 @@ grant execute on function public._entregar(uuid, text, numeric) to service_role;
 create or replace function public.tarefa_feita() returns json
 language plpgsql security definer set search_path = public as $$
 declare m public.moradores; t public.trabalhos; extra integer; pago integer; ganho integer; novo_xp integer;
-        novo_nivel integer; premio integer := 0; peixes_ganhos integer := 0; morreu boolean; cansado boolean := false;
+        novo_nivel integer; premio integer := 0; peixes_ganhos integer := 0; morreu boolean; cansado boolean := false; bonus integer := 0; seq integer;
 begin
   m := _eu();
   if m.trabalho is null then raise exception 'Você não está trabalhando.'; end if;
@@ -268,12 +283,15 @@ begin
   update moradores set dinheiro = dinheiro + pago + premio, xp = novo_xp, nivel = novo_nivel,
     peixes = peixes + peixes_ganhos, tarefa_em = now() where id = m.id;
   perform _passe_pontos(m.id, _pontos_tarefa(t.id));
+  -- bônus de R$ 50 a cada 10 tarefas
+  update moradores set tarefas_seq = tarefas_seq + 1 where id = m.id returning tarefas_seq into seq;
+  if seq % 10 = 0 then bonus := 50; update moradores set dinheiro = dinheiro + bonus where id = m.id; end if;
   morreu := _gastar_fome(m.id, t.fome / 6.0);
   if morreu or (select fome from moradores where id = m.id) < 10 then
     cansado := true;
     update moradores set trabalho = null, trabalho_inicio = null, turnos = turnos + 1 where id = m.id;
   end if;
-  return json_build_object('pago', pago, 'xp_ganho', ganho, 'subiu', novo_nivel - m.nivel, 'premio', premio,
+  return json_build_object('bonus10', bonus, 'seq', seq, 'pago', pago, 'xp_ganho', ganho, 'subiu', novo_nivel - m.nivel, 'premio', premio,
     'peixes_ganhos', peixes_ganhos, 'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
 end $$;
 
@@ -354,3 +372,44 @@ language sql stable security definer set search_path = public as $$
   from moradores where id = p_id
 $$;
 revoke execute on function public._estado(uuid) from authenticated;
+
+-- ===== sinuca: 15 bolas no modo sozinho e XP também no amistoso em dupla =====
+create or replace function public.sinuca(p_bolas integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; ganho integer; novo_xp integer; novo_nivel integer; premio integer := 0; morreu boolean;
+begin
+  m := _eu();
+  if p_bolas < 0 or p_bolas > 15 then raise exception 'Placar inválido.'; end if;
+  if m.sinuca_em is not null and now() - m.sinuca_em < interval '90 seconds' then
+    raise exception 'A mesa está ocupada. Próxima partida valendo XP em % s.', ceil(90 - extract(epoch from (now() - m.sinuca_em)));
+  end if;
+  ganho := p_bolas * 3;
+  novo_xp := m.xp + ganho;
+  novo_nivel := nivel_de(novo_xp);
+  if novo_nivel > m.nivel then
+    select coalesce(sum(50 * g), 0) into premio from generate_series(m.nivel + 1, novo_nivel) g;
+  end if;
+  update moradores set xp = novo_xp, nivel = novo_nivel, dinheiro = dinheiro + premio, sinuca_em = now() where id = m.id;
+  morreu := _gastar_fome(m.id, 2);
+  return json_build_object('xp_ganho', ganho, 'subiu', novo_nivel - m.nivel, 'premio', premio, 'morreu', morreu, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.sinuca(integer) to authenticated;
+create or replace function public.sinuca_dupla(p_venceu boolean) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; ganho integer; novo_xp integer; novo_nivel integer; premio integer := 0;
+begin
+  m := _eu();
+  if m.sinuca_em is not null and now() - m.sinuca_em < interval '90 seconds' then
+    raise exception 'XP da sinuca só a cada 90 s.';
+  end if;
+  ganho := case when p_venceu then 30 else 10 end;
+  novo_xp := m.xp + ganho;
+  novo_nivel := nivel_de(novo_xp);
+  if novo_nivel > m.nivel then
+    select coalesce(sum(50 * g), 0) into premio from generate_series(m.nivel + 1, novo_nivel) g;
+  end if;
+  update moradores set xp = novo_xp, nivel = novo_nivel, dinheiro = dinheiro + premio, sinuca_em = now() where id = m.id;
+  return json_build_object('xp_ganho', ganho, 'subiu', novo_nivel - m.nivel, 'premio', premio, 'eu', _estado(m.id));
+end $$;
+revoke execute on function public.sinuca_dupla(boolean) from public, anon;
+grant execute on function public.sinuca_dupla(boolean) to authenticated;

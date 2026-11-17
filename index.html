@@ -3612,6 +3612,7 @@ const api=ONLINE?(()=>{
   terminar:()=>rpc('terminar_trabalho'),
   tarefa:()=>rpc('tarefa_feita'),
   rondaPolicia:()=>rpc('ronda_policia'),
+  erroTarefa:()=>rpc('erro_tarefa'),sinucaDupla:v=>rpc('sinuca_dupla',{p_venceu:!!v}),
   usarRastro:r=>rpc('usar_rastro',{p_rastro:r}),
   meuPasse:()=>rpc('meu_passe'),resgatarPasse:(n,t)=>rpc('resgatar_passe',{p_nivel:n,p_trilha:t}),presenteVip:()=>rpc('presente_vip'),vipInfo:()=>rpc('vip_info'),
   excluirConta:async()=>{try{const id=eu&&eu.id;if(id){const l=await sb.storage.from('fotos').list(id,{limit:1000});if(l&&l.data&&l.data.length)await sb.storage.from('fotos').remove(l.data.map(f=>id+'/'+f.name))}}catch(e){}
@@ -3673,7 +3674,7 @@ const api=ONLINE?(()=>{
   async tarefa(){const m=lme();if(!m.trabalho)fail('Você não está trabalhando.');const J=JOBS[m.trabalho],ex=Math.max(0,m.nivel-J.nivel_min);
    let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(1,Math.round(J.xp/5*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
-   passeLocal(m,PONTOS_JOB[m.trabalho]||3);const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
+   passeLocal(m,PONTOS_JOB[m.trabalho]||3);m.tseq=(m.tseq||0)+1;const bonus10=m.tseq%10===0?50:0;m.dinheiro+=bonus10;const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{bonus10,seq:m.tseq,pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
   async usarRastro(r){const m=lme();if(r==='ouro'&&!(m.vip_ate&&Date.parse(m.vip_ate)>Date.now()))fail('O brilho dourado é do VIP.');if(r==='natal'&&!(m.roupas||[]).includes('rastro:1'))fail('O brilho de Natal é do Passe Natal na Vila.');m.rastro=r;lsave();return{rastro:r}},
   async meuPasse(){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});return{temporada:'T1',nome:'Natal na Vila',fim:'2027-01-01T03:00:00Z',pontos:j.pontos,premium:j.premium,resgatados:j.resgatados,premios:PASSE_T1.flatMap(([n,g,p])=>[{nivel:n,trilha:'gratis',premio:g},{nivel:n,trilha:'premium',premio:p}])}},
   async resgatarPasse(n,t){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});if(j.pontos<n*PASSE_NV)fail('Você ainda não chegou nesse nível do passe.');if(t==='premium'&&!j.premium)fail('Esse prêmio é do Passe Premium.');const c=n+(t==='premium'?'p':'g');if(j.resgatados.includes(c))fail('Você já pegou esse prêmio.');
@@ -3681,6 +3682,8 @@ const api=ONLINE?(()=>{
   async vipInfo(){const m=lme(),k=new Date().toISOString().slice(0,7);return{mes:k,premio:VIP_MENSAL[k]||null,pego:(m.vipPres||[]).includes(k)}},
   async presenteVip(){const m=lme(),k=new Date().toISOString().slice(0,7);if(!(m.vip_ate&&Date.parse(m.vip_ate)>Date.now()))fail('O presente do mês é só para quem é VIP.');if(!VIP_MENSAL[k])fail('O presente deste mês ainda não chegou.');m.vipPres=m.vipPres||[];if(m.vipPres.includes(k))fail('Você já pegou o presente deste mês.');darPremioLocal(m,VIP_MENSAL[k]);m.vipPres.push(k);lsave();return{premio:VIP_MENSAL[k],mes:k,eu:lest()}},
   async excluirConta(){L.me=null;lsave();try{localStorage.removeItem(LKEY)}catch(e){}},
+  async erroTarefa(){const m=lme();if(!m.trabalho||m.trabalho==='pescador')return{multa:0,eu:lest()};const multa=Math.min(25,m.dinheiro);m.dinheiro-=multa;lsave();return{multa,eu:lest()}},
+  async sinucaDupla(v){const m=lme();if(m.sinuca_em&&Date.now()-m.sinuca_em<90e3)fail('XP da sinuca só a cada 90 s.');const g=v?30:10,antes=m.nivel;m.xp+=g;const novo=LV.de(m.xp);let premio=0;for(let q=antes+1;q<=novo;q++)premio+=50*q;m.nivel=novo;m.dinheiro+=premio;m.sinuca_em=Date.now();lsave();return{xp_ganho:g,subiu:novo-antes,premio,eu:lest()}},
   async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=50+premio;
    passeLocal(m,15);const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:50,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
   async cidade(){return null},
@@ -3821,6 +3824,7 @@ function abrirMapa(){if(!eu)return;const el=document.createElement('div');el.id=
 const NOVID='v20261125';
 const NOV_SLIDES=[
  {t:'🎟️ Passe Natal na Vila',x:'Novo <b>Passe</b> com 20 níveis: trabalhe, ganhe pontos (tarefas mais demoradas dão mais) e libere prêmios. No Premium tem o <b>🎅 gorro de Papai Noel brilhante</b> e um <b>🚗 carro exclusivo</b> que <b>nunca mais voltam</b> depois de 31/12! Abra pelo <b>🎟️</b> no menu ☰.',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎟️',110,125+Math.sin(t*3)*6);g.font='44px sans-serif';const L=['👕','🧢','👟','💰','🎨'];g.fillText(L[Math.floor(t/.8)%L.length],220,120);g.fillStyle='#ffc94a';g.fillRect(70,160,180*((t*.25)%1),10)}},
+ {t:'🎱 Sinuca de verdade e 🎁 bônus',x:'A sinuca agora tem <b>15 bolas e 10 tacadas</b>. Em dupla vale a regra de verdade: <b>lisas × listradas</b> e a <b>8 preta</b> no final, e o amistoso dá XP (30 para quem vence). Nos empregos: a cada <b>10 tarefas, +R$ 50</b>, mas <b>errar o minijogo custa R$ 25</b>!',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎱',110,125+Math.sin(t*3)*5);g.font='40px sans-serif';g.fillText(Math.floor(t/1.3)%2?'🎁':'💰',225,120)}},
  {t:'👕 Guarda-roupa e 🎒 Mochila novos',x:'Toque em você e em <b>👕 Guarda-roupa</b>: veja todas as suas roupas com o boneco vestindo, troque na hora, salve até <b>3 looks</b> e escolha o <b>✨ brilho no chão</b>. A <b>🎒 Mochila</b> agora tem abas: itens, roupas, carros e pets.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.4)%2?'🎒':'👕',110,125+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['👗','🧢','👟','✨'];L.forEach((e,i)=>g.fillText(e,190+(i%2)*55,85+Math.floor(i/2)*60))}},
  {t:'👑 VIP ficou melhor',x:'Roupas VIP novas: <b>jaqueta bomber dourada, moletom neon, jaqueta de veludo, smoking, vestido de lantejoulas, tênis e boné neon</b>. E o VIP ganha <b>🎁 presente todo mês</b>, <b>🏠 vai para casa num toque</b>, <b>+50% no passe</b> e a <b>🏎️ Lambordini</b>.',d:(g,t)=>{g.save();g.translate(110,95);g.scale(3,3);coroaVip(g,0,0);g.restore();g.textAlign='center';g.font='54px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏠':'🎁',225,125+Math.sin(t*3)*5)}},
  {t:'⭐ XP em dobro nos empregos',x:'Cada tarefa dos empregos agora dá <b>o dobro de XP</b>. Você sobe de nível bem mais rápido e libera empregos, casas e carros mais cedo!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText('⭐',110,125+Math.sin(t*3)*6);g.font='bold 54px Fredoka,sans-serif';g.fillStyle='#ffd23f';g.fillText('2x',215,128);g.font='26px sans-serif';g.fillText('⬆️',160,70-((t*30)%30))}},
@@ -4161,7 +4165,7 @@ let tarAnim=null;
 function abrirTarefa(){if(!trabalho||!TAREFAS[trabalho.job])return;const T0=TAREFAS[trabalho.job],lug=lugarDoJob(trabalho.job);
  $('tCena').style.background=CENA[T0.cena]||CENA.prefeitura;$('tDeco').textContent=T0.deco;$('tTit').textContent=T0.tit;$('tarefa').classList.remove('hidden');proxTarefa()}
 function fecharTarefa(){cancelAnimationFrame(tarAnim);tarAnim=null;$('tarefa').classList.add('hidden')}
-function tarFeedback(ok){const f=$('tFb');f.textContent=ok?'✅':'❌';f.classList.remove('on');void f.offsetWidth;f.classList.add('on');setTimeout(()=>f.classList.remove('on'),550);Som.play(ok?'moeda':'erro')}
+function tarFeedback(ok){if(!ok&&trabalho&&trabalho.job!=='pescador')multaErro();const f=$('tFb');f.textContent=ok?'✅':'❌';f.classList.remove('on');void f.offsetWidth;f.classList.add('on');setTimeout(()=>f.classList.remove('on'),550);Som.play(ok?'moeda':'erro')}
 const INSP={feirinha:{n:'Feirinha',ic:'🍎',bom:['🍎 Frutas fresquinhas','⚖️ Balança aferida','🧼 Bancada limpa','🏷️ Preços na placa'],ruim:['🐀 Rato na barraca','🧊 Peixe sem gelo','🪰 Moscas nas frutas','🦠 Faca enferrujada']},
  padaria:{n:'Padaria',ic:'🥖',bom:['🧤 Padeiro de touca','🍞 Pão do dia','🔥 Forno revisado','🧯 Extintor no lugar'],ruim:['🕸️ Teia no forno','🥛 Leite vencido','🔌 Fio descascado','🐜 Formigas no açúcar']},
  posto:{n:'Posto',ic:'⛽',bom:['🧯 Extintor carregado','⛽ Bomba lacrada','🚻 Banheiro limpo','📋 Alvará em dia'],ruim:['🛢️ Vazamento de óleo','🚬 Gente fumando na bomba','⚠️ Placa caída','💧 Gasolina com água']},
@@ -4220,9 +4224,10 @@ function drawEntrega(c,e){e=e||(trabalho&&trabalho.entrega);if(!e)return;const b
  c.restore()}
 function drawSetaPe(c,e){if(!eu||Math.hypot(e.x-eu.x,e.y-eu.y)<T(3))return;const q1=isoP(eu.x,eu.y),q2=isoP(e.x,e.y),a=Math.atan2(q2[1]-q1[1],q2[0]-q1[0]),p=.85+Math.sin(now*6)*.15;
  c.save();c.translate(eu.x+Math.cos(a)*34*p,eu.y+2+Math.sin(a)*18*p);c.rotate(a);c.fillStyle='#ffd23f';c.strokeStyle='#3a1d10';c.lineWidth=2;c.beginPath();c.moveTo(14,0);c.lineTo(-6,-10);c.lineTo(-2,0);c.lineTo(-6,10);c.closePath();c.fill();c.stroke();c.restore()}
+function multaErro(){const tr=trabalho;api.erroTarefa().then(r=>{if(r&&r.eu)aplicarEstado(r.eu);if(r&&r.multa){if(tr)tr.ganhou-=r.multa;floatText(eu.x,eu.y-34,'-'+money(r.multa)+' (errou)','#ff6b6b');renderWork()}}).catch(()=>{})}
 function tarAcertou(reabrir){if(!trabalho)return;const tr=trabalho;tr.feitas++;if(!reabrir)tarFeedback(true);renderWork();const t0=Date.now();
  const vai=()=>api.tarefa().then(r=>{tratar(r);msTarefa();tr.ganhou+=r.pago;tr.xp+=r.xp_ganho;tr.peixes+=r.peixes_ganhos||0;
-  floatText(eu.x,eu.y-34,(r.pago?'+'+money(r.pago)+'  ':'')+(r.peixes_ganhos?'+🐟  ':'')+'+'+r.xp_ganho+' XP','#9dff7a');renderWork();
+  floatText(eu.x,eu.y-34,(r.pago?'+'+money(r.pago)+'  ':'')+(r.peixes_ganhos?'+🐟  ':'')+'+'+r.xp_ganho+' XP','#9dff7a');tr.seq=r.seq;if(r.bonus10){tr.ganhou+=r.bonus10;setTimeout(()=>floatText(eu.x,eu.y-52,'🎁 +'+money(r.bonus10)+' bônus de 10 tarefas!','#ffd23f'),500);Som.play('moeda');toast('🎁 10 tarefas seguidas! Bônus de '+money(r.bonus10),2500)}renderWork();
   if(r.cansado&&trabalho===tr){fimTurno();if(!r.morreu)toast('😩 Você está cansado(a) e com fome. Coma alguma coisa antes de voltar!',4500)}})
   .catch(e=>{if(/calma/i.test(e.message))setTimeout(vai,800);else toast(e.message,3000)});
  vai();setTimeout(()=>{if(trabalho===tr){if(RUA[tr.job]&&!reabrir)proxRua();else if(reabrir)abrirTarefa();else proxTarefa()}},reabrir?900:Math.max(600,2600-(Date.now()-t0)))}
@@ -4250,7 +4255,7 @@ function renderWork(){
   if(fal<=0&&!r.pagando){r.pagando=true;api.rondaPolicia().then(x=>{if(!trabalho||trabalho.ronda!==r)return;tratar(x);r.pago+=x.pago||0;r.xp+=x.xp_ganho||0;floatText(eu.x,eu.y-40,'+'+money(x.pago||0)+' · +'+(x.xp_ganho||0)+' XP','#7dff9a');Som.play('moeda');
    if(x.cansado){fimTurno();toast('😵 Você está com muita fome. Coma algo antes de voltar à patrulha.',4000)}}).catch(e=>toast(e.message||'Erro ao receber',2500)).finally(()=>{r.pagando=false;r.prox=Date.now()+90000});}
   return}
- else if(trabalho.porTarefa){const w=trabalho;$('workTxt').innerHTML=(w.job==='pescador'?'🎣 Pescando':'💼 '+J.nome)+` · <b>${w.feitas}</b> tarefas · `+(w.job==='pescador'?`🐟 ${w.peixes}`:`💰 ${money(w.ganhou)}`)+` · ⭐ ${w.xp} XP`;$('workBar').style.width=((w.feitas%10)*10)+'%';return}
+ else if(trabalho.porTarefa){const w=trabalho;$('workTxt').innerHTML=(w.job==='pescador'?'🎣 Pescando':'💼 '+J.nome)+` · <b>${w.feitas}</b> tarefas · `+(w.job==='pescador'?`🐟 ${w.peixes}`:`💰 ${money(w.ganhou)}`)+` · ⭐ ${w.xp} XP`+(w.job!=='pescador'&&w.seq!=null?` · 🎁 ${10-(w.seq%10)} p/ bônus`:'');$('workBar').style.width=((w.feitas%10)*10)+'%';return}
  else{$('workTxt').textContent=(trabalho.job==='pescador'?'🎣 Pescando':'💼 '+J.nome)+' · '+(left?left+'s':'recebendo…');$('workBar').style.width=Math.min(100,(1-left/trabalho.dur)*100)+'%'}
  if(left<=0&&(!trabalho.meta||trabalho.feitas>=trabalho.meta)&&!trabalho.pagando)receber(0);
 }
@@ -4951,7 +4956,8 @@ function levantar(){if(!eu)return;if(eu.seat){eu.seat.occ=null;eu.seat=null}if(e
 let sin=null,sinucaAberta=false;
 const SW=640,SH=340,BR=10,PR=17,SL=34,SR=SW-34,STP=34,SBT=SH-34;
 const POCKETS=[[SL,STP],[SW/2,STP-5],[SR,STP],[SL,SBT],[SW/2,SBT+5],[SR,SBT]];
-const SCORES=['#f1c40f','#2e6fd8','#e74c3c','#8e44ad','#e67e22','#27ae60','#7b241c'];
+const SCORES=['#f1c40f','#2e6fd8','#e74c3c','#8e44ad','#e67e22','#27ae60','#7b241c','#141414']; // bolas 1-8; 9-15 listradas com as cores 1-7
+const SIN_TAC=10;
 function abrirSinuca(dupla){
  if(!eu)return;levantar();sinucaAberta=true;eu.path=[];{const LUG=[[25.5,24.45],[27.6,24.45],[24.5,21.6],[28.4,21.6]],oc=[...others.values()].filter(o=>o.work==='sinuca'&&!o.hidden);const l=LUG.find(([lx,ly])=>!oc.some(o=>Math.hypot(o.x-T(lx),o.y-T(ly))<T(.8)))||LUG[0];eu.x=T(l[0]);eu.y=T(l[1]);eu.sinLug=l}eu.dir=1;eu.taco=true;sendPos(true);
  $('mSinuca').classList.remove('hidden');novaPartida(dupla);requestAnimationFrame(sinLoop);
@@ -4959,12 +4965,19 @@ function abrirSinuca(dupla){
 new MutationObserver(()=>{if(sinucaAberta&&$('mSinuca').classList.contains('hidden'))fecharSinuca()}).observe($('mSinuca'),{attributes:true,attributeFilter:['class']});
 function fecharSinuca(){if(sin&&sin.dupla&&!sin.fim)emitEv('sinSai',{para:sin.dupla.op});sinucaAberta=false;if(eu){const l=eu.sinLug||[25.5,24.45];eu.x=T(l[0]);eu.y=Math.max(T(l[1]),T(24.45));eu.path=[]}if(eu)eu.taco=false;$('mSinuca').classList.add('hidden');sin=null;sendPos(true)}
 function novaPartida(dupla){
- const b=[{x:SL+(SR-SL)*.25,y:SH/2,vx:0,vy:0,c:'#fdfdf5',cue:true,in:false}],ox=SL+(SR-SL)*.68;let k=0;
- for(let col=0;col<4&&k<7;col++)for(let row=0;row<=col&&k<7;row++)b.push({x:ox+col*BR*1.8,y:SH/2+(row-col/2)*BR*2.08,vx:0,vy:0,c:SCORES[k++],in:false});
- sin={b,tacadas:dupla?999:6,bolas:0,aim:null,moving:false,fim:false,enviado:false,last:0,acc:0,dupla:dupla||null};
- $('sinMsg').textContent='Arraste o dedo para trás (de qualquer ponto da mesa) e solte para tacar a bola branca.';$('sinNovo').classList.add('hidden');sinInfo();
+ const b=[{x:SL+(SR-SL)*.25,y:SH/2,vx:0,vy:0,c:'#fdfdf5',cue:true,in:false,n:0}],ox=SL+(SR-SL)*.7;
+ // triângulo de 15 bolas (ordem fixa: os dois jogadores montam igual), bola 8 no meio
+ const ORD=[1,9,2,10,8,3,11,4,12,5,13,6,14,7,15];let k=0;
+ for(let col=0;col<5;col++)for(let row=0;row<=col;row++){const n=ORD[k++];b.push({x:ox+col*BR*1.76,y:SH/2+(row-col/2)*BR*2.04,vx:0,vy:0,n,c:SCORES[(n-1)%8],lis:n>8,in:false})}
+ sin={b,tacadas:dupla?999:SIN_TAC,bolas:0,aim:null,moving:false,fim:false,enviado:false,last:0,acc:0,dupla:dupla||null,cai:[]};
+ if(dupla){dupla.grupo=dupla.grupo||{};dupla.pts=dupla.pts||{}}
+ $('sinMsg').textContent=dupla?'🎱 Regra de verdade: a primeira bola que cair define quem fica com as lisas (1-7) e as listradas (9-15). Derrube todas as suas e depois a 8 preta para vencer!':'Arraste o dedo para trás (de qualquer ponto da mesa) e solte. Sozinho vale qualquer bola!';$('sinNovo').classList.add('hidden');sinInfo();
 }
-function sinInfo(){if(!sin)return;const d=sin.dupla;if(d){const vez=d.vez===eu.id?'👉 SUA VEZ':'⏳ Vez de '+d.nomeOp;$('sinInfo').textContent=`🎱 Você ${d.pts[eu.id]||0} × ${d.pts[d.op]||0} ${d.nomeOp} · ${vez} · (amistoso, sem XP)`;return}$('sinInfo').textContent=`🎱 Bolas: ${sin.bolas}/7 · Tacadas: ${sin.tacadas} · cada bola vale 3 XP`}
+const grNome=g=>g==='lisas'?'🟡 lisas':'🟢 listradas';
+function restam(g){return sin.b.filter(o=>!o.cue&&!o.in&&o.n!==8&&(g==='lisas'?!o.lis:o.lis)).length}
+function sinInfo(){if(!sin)return;const d=sin.dupla;if(d){const vez=d.vez===eu.id?'👉 SUA VEZ':'⏳ Vez de '+d.nomeOp,gm=d.grupo[eu.id],go=d.grupo[d.op];
+  $('sinInfo').textContent=gm?`🎱 Você: ${grNome(gm)} (faltam ${restam(gm)}) × ${d.nomeOp}: ${grNome(go)} (faltam ${restam(go)}) · ${vez}`:`🎱 Mesa aberta · ${vez} · vencedor ganha 30 XP, perdedor 10 XP`;return}
+ $('sinInfo').textContent=`🎱 Bolas: ${sin.bolas}/15 · Tacadas: ${sin.tacadas}/${SIN_TAC} · cada bola vale 3 XP`}
 function sinStep(dt){
  // física: atrito de rolamento constante + resistência do pano, tabelas com perda de energia, choque elástico entre bolas
  const B=sin.b;let moving=false;
@@ -4973,7 +4986,7 @@ function sinStep(dt){
   b.x+=b.vx*dt;b.y+=b.vy*dt;if(Math.hypot(b.vx,b.vy)<4){b.vx=0;b.vy=0}else moving=true;
   for(let pi=0;pi<POCKETS.length;pi++){const [px,py]=POCKETS[pi],r=pi===1||pi===4?PR-1:PR,d=Math.hypot(b.x-px,b.y-py);
    if(d<r+BR*.6){b.vx+=(px-b.x)*dt*6;b.vy+=(py-b.y)*dt*6}
-   if(d<r-1){b.in=true;b.vx=b.vy=0;Som.play('cacapa');if(b.cue){sin.falta=true;sin.foiFalta=true}else{sin.bolas++;sinInfo()}break}}
+   if(d<r-1){b.in=true;b.vx=b.vy=0;Som.play('cacapa');if(b.cue){sin.falta=true;sin.foiFalta=true}else{sin.bolas++;(sin.cai=sin.cai||[]).push(b.n);sinInfo()}break}}
   if(b.in)continue;
   const perto=POCKETS.some(([px,py])=>Math.hypot(b.x-px,b.y-py)<PR+BR);
   if(!perto){const e=.78,tg=.95,bate=v=>{if(Math.abs(v)>80)Som.play('bola',40)};
@@ -4995,21 +5008,30 @@ function sinLoop(t){
  let mv=sin.moving;sin.acc+=dt;let nst=0;while(sin.acc>=1/300&&nst<24){mv=sinStep(1/300);sin.acc-=1/300;nst++}if(nst>=24)sin.acc=0;if(!sin.moving)mv=false;
  if(sin.moving&&!mv){sin.moving=false;
   if(sin.falta){sin.falta=false;const c=sin.b[0];c.in=false;c.x=SL+(SR-SL)*.25;c.y=SH/2;while(sin.b.some(o=>o!==c&&!o.in&&Math.hypot(o.x-c.x,o.y-c.y)<BR*2))c.y+=BR*2.2;$('sinMsg').textContent='Ih, a branca caiu! Ela volta para o começo.'}
-  if(sin.dupla)sinVez();else if(sin.bolas>=7||sin.tacadas<=0)fimSinuca();}
+  if(sin.dupla)sinVez();else if(sin.bolas>=15||sin.tacadas<=0)fimSinuca();}
  sin.moving=mv;
  desenharSinuca();requestAnimationFrame(sinLoop);
 }
-function sinVez(){const d=sin.dupla,ganhou=sin.bolas-(sin.antes||0);if(sin.antes==null)return;sin.antes=null;
- if(ganhou>0)d.pts[d.vez]=(d.pts[d.vez]||0)+ganhou;const continua=ganhou>0&&!sin.foiFalta;sin.foiFalta=false;if(!continua)d.vez=d.vez===eu.id?d.op:eu.id;
- if(d.vez===eu.id)Som.play('moeda');
- if(sin.bolas>=7){sin.fim=true;$('sinNovo').classList.add('hidden');const a=d.pts[eu.id]||0,b=d.pts[d.op]||0;$('sinMsg').textContent=a>b?`🏆 Você venceu ${a} × ${b}!`:a<b?`😅 ${d.nomeOp} venceu ${b} × ${a}. Revanche?`:`🤝 Empate ${a} × ${b}!`;if(a>b)log(`🎱 ${eu.nome} venceu ${d.nomeOp} na sinuca!`)}
- else $('sinMsg').textContent=d.vez===eu.id?(continua?'🎯 Encaçapou! Joga de novo.':'👉 Sua vez! Arraste para trás e solte.'):'⏳ Vez de '+d.nomeOp+'…';
+function sinVez(){const d=sin.dupla;if(sin.antes==null)return;sin.antes=null;
+ const quem=d.vez,outro=quem===eu.id?d.op:eu.id,cai=sin.cai||[];sin.cai=[];const falta=sin.foiFalta;sin.foiFalta=false;
+ const nomeDe=id=>id===eu.id?'Você':d.nomeOp,fim=(venc,porque)=>{sin.fim=true;$('sinNovo').classList.add('hidden');const ganhei=venc===eu.id;
+   $('sinMsg').textContent=(ganhei?'🏆 Você venceu! ':'😅 '+d.nomeOp+' venceu. ')+porque;if(ganhei)log(`🎱 ${eu.nome} venceu ${d.nomeOp} na sinuca!`);
+   api.sinucaDupla(ganhei).then(r=>{tratar(r);floatText(eu.x,eu.y-40,'+'+r.xp_ganho+' XP','#9dff7a');$('sinMsg').textContent+=` (+${r.xp_ganho} XP)`}).catch(e=>{$('sinMsg').textContent+=' · '+e.message});sinInfo()};
+ // bola 8
+ if(cai.includes(8)){const g=d.grupo[quem];if(g&&restam(g)===0&&!falta)fim(quem,nomeDe(quem)+' derrubou a 8 depois de limpar a mesa!');else fim(outro,'A bola 8 caiu antes da hora'+(falta?' (com a branca)':'')+'. Quem derrubou perde!');return}
+ // mesa aberta: a primeira bola que cai define os grupos
+ if(!d.grupo[quem]&&cai.length&&!falta){const g=cai[0]>8?'listradas':'lisas';d.grupo[quem]=g;d.grupo[outro]=g==='lisas'?'listradas':'lisas'}
+ const g=d.grupo[quem],minhas=cai.filter(n=>g&&(g==='lisas'?n<8:n>8)).length;
+ d.pts[quem]=(d.pts[quem]||0)+minhas;
+ const continua=!falta&&(g?minhas>0:cai.length>0);if(!continua)d.vez=outro;if(d.vez===eu.id)Som.play('moeda');
+ $('sinMsg').textContent=falta?'⚠️ A branca caiu! Passa a vez.':d.vez===eu.id?(continua?'🎯 Encaçapou a sua! Joga de novo.':'👉 Sua vez! Arraste para trás e solte.'):'⏳ Vez de '+d.nomeOp+'…';
+ if(g&&restam(g)===0&&d.vez===quem)$('sinMsg').textContent+=' Agora derrube a 🎱 8 preta!';
  sinInfo()}
 function onSinuca(o,p){if(!eu||p.para!==eu.id)return;
- if(p.k==='sinConv'){if(sinucaAberta||trabalho){emitEv('sinResp',{para:o.id,ok:0});return}confirmar('🎱 Sinuca','<b>'+o.nome+'</b> te chamou para uma partida de sinuca (amistosa, sem valer nada). Bora?',null,[['✅ Jogar',()=>{emitEv('sinResp',{para:o.id,ok:1});abrirSinuca({op:o.id,nomeOp:o.nome,vez:o.id,pts:{}})}],['❌ Agora não',()=>emitEv('sinResp',{para:o.id,ok:0})]]);return}
+ if(p.k==='sinConv'){if(sinucaAberta||trabalho){emitEv('sinResp',{para:o.id,ok:0});return}confirmar('🎱 Sinuca','<b>'+o.nome+'</b> te chamou para uma partida de sinuca (amistosa: quem vencer ganha 30 XP, quem perder 10 XP). Bora?',null,[['✅ Jogar',()=>{emitEv('sinResp',{para:o.id,ok:1});abrirSinuca({op:o.id,nomeOp:o.nome,vez:o.id,pts:{}})}],['❌ Agora não',()=>emitEv('sinResp',{para:o.id,ok:0})]]);return}
  if(p.k==='sinResp'){if(+p.ok){toast('🎱 '+o.nome+' aceitou! Você começa.',3000);abrirSinuca({op:o.id,nomeOp:o.nome,vez:eu.id,pts:{}})}else toast(o.nome+' não quis jogar agora.',3000);return}
  if(!sin||!sin.dupla||sin.dupla.op!==o.id)return;
- if(p.k==='sinTiro'&&Array.isArray(p.st)&&p.st.length===sin.b.length){p.st.forEach((q,i)=>{const bb=sin.b[i];bb.x=+q[0];bb.y=+q[1];bb.in=!!q[2];bb.vx=bb.vy=0});sin.antes=sin.bolas=sin.b.filter((bb,i)=>i&&bb.in).length;sin.antes=sin.bolas;sin.falta=false;const c=sin.b[0];c.vx=+p.vx;c.vy=+p.vy;sin.moving=true;sin.acc=0;Som.play('taco')}
+ if(p.k==='sinTiro'&&Array.isArray(p.st)&&p.st.length===sin.b.length){p.st.forEach((q,i)=>{const bb=sin.b[i];bb.x=+q[0];bb.y=+q[1];bb.in=!!q[2];bb.vx=bb.vy=0});sin.antes=sin.bolas=sin.b.filter((bb,i)=>i&&bb.in).length;sin.antes=sin.bolas;sin.falta=false;sin.cai=[];sin.foiFalta=false;const c=sin.b[0];c.vx=+p.vx;c.vy=+p.vy;sin.moving=true;sin.acc=0;Som.play('taco')}
  if(p.k==='sinSai'){sin.fim=true;$('sinMsg').textContent='🚪 '+o.nome+' saiu da mesa.';$('sinInfo').textContent='';}}
 function fimSinuca(){
  if(sin.fim)return;sin.fim=true;$('sinNovo').classList.remove('hidden');
@@ -5025,7 +5047,8 @@ function desenharSinuca(){
  g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=1.5;g.beginPath();g.moveTo(SL+(SR-SL)*.25,STP);g.lineTo(SL+(SR-SL)*.25,SBT);g.stroke();
  g.fillStyle='#e8d9a8';for(const k of [.125,.25,.375,.625,.75,.875]){circ(g,SL+(SR-SL)*k,STP-20,2.2);circ(g,SL+(SR-SL)*k,SBT+20,2.2)}
  g.fillStyle='#0b0b0b';for(const [px,py] of POCKETS)circ(g,px,py,PR);
- for(const b of sin.b){if(b.in)continue;g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(b.x+2.5,b.y+3.5,BR,BR*.8,0,0,7);g.fill();const gr=g.createRadialGradient(b.x-3,b.y-4,1,b.x,b.y,BR);gr.addColorStop(0,'#fff');gr.addColorStop(.25,b.c);gr.addColorStop(1,shade(b.c,-45));g.fillStyle=gr;circ(g,b.x,b.y,BR);if(!b.cue){g.fillStyle='rgba(255,255,255,.92)';circ(g,b.x,b.y,BR*.42)}g.fillStyle='rgba(255,255,255,.7)';circ(g,b.x-3.2,b.y-3.8,2.2)}
+ for(const b of sin.b){if(b.in)continue;g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(b.x+2.5,b.y+3.5,BR,BR*.8,0,0,7);g.fill();const gr=g.createRadialGradient(b.x-3,b.y-4,1,b.x,b.y,BR);gr.addColorStop(0,'#fff');gr.addColorStop(.25,b.c);gr.addColorStop(1,shade(b.c,-45));g.fillStyle=gr;circ(g,b.x,b.y,BR);if(b.lis){g.save();g.beginPath();g.arc(b.x,b.y,BR,0,7);g.clip();const gw=g.createRadialGradient(b.x-3,b.y-4,1,b.x,b.y,BR);gw.addColorStop(0,'#fff');gw.addColorStop(1,'#cfcfc4');g.fillStyle=gw;g.fillRect(b.x-BR,b.y-BR,BR*2,BR*2);const gb=g.createRadialGradient(b.x-3,b.y-4,1,b.x,b.y,BR);gb.addColorStop(0,shade(b.c,40));gb.addColorStop(1,shade(b.c,-40));g.fillStyle=gb;g.fillRect(b.x-BR,b.y-BR*.55,BR*2,BR*1.1);g.restore()}
+  if(!b.cue){g.fillStyle='rgba(255,255,255,.95)';circ(g,b.x,b.y,BR*.45);g.fillStyle='#111';g.font='bold 8px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(b.n,b.x,b.y+.5)}g.fillStyle='rgba(255,255,255,.7)';circ(g,b.x-3.2,b.y-3.8,2.2)}
  const c=sin.b[0];
  if(sin.aim&&!sin.moving&&!sin.fim&&!c.in){const a=sin.aim,dx=a.x0-a.x,dy=a.y0-a.y,d=Math.hypot(dx,dy);if(d>4){const nx=dx/d,ny=dy/d,pw=Math.min(d,180)/180;
   {const pr=sinPreve(c,nx,ny),gx=c.x+nx*pr.t,gy=c.y+ny*pr.t;g.setLineDash([6,6]);g.strokeStyle='rgba(255,255,255,.8)';g.lineWidth=2;g.beginPath();g.moveTo(c.x,c.y);g.lineTo(gx,gy);g.stroke();g.setLineDash([]);
@@ -5041,7 +5064,7 @@ function desenharSinuca(){
  cv.addEventListener('pointermove',e=>{if(!sin||!sin.aim)return;const [x,y]=pos(e);sin.aim.x=x;sin.aim.y=y});
  const solta=()=>{if(!sin||!sin.aim)return;const a=sin.aim,dx=a.x0-a.x,dy=a.y0-a.y,d=Math.hypot(dx,dy);sin.aim=null;if(d<8)return;
   if(sin.dupla&&sin.dupla.vez!==eu.id){$('sinMsg').textContent='⏳ Espere a sua vez!';return}Som.play('taco');const pw=Math.min(d,180)/180,c=sin.b[0],f=Math.pow(pw,1.25)*1350+60;
-  if(sin.dupla){sin.antes=sin.bolas;sin.falta=false;emitEv('sinTiro',{para:sin.dupla.op,st:sin.b.map(o=>[o.x,o.y,o.in?1:0]),vx:dx/d*f,vy:dy/d*f})}c.vx=dx/d*f;c.vy=dy/d*f;c.sl=1;sin.tacadas--;sin.moving=true;sinInfo();$('sinMsg').textContent=sin.tacadas?'Boa! Continue tacando.':'Última tacada…'};
+  sin.cai=[];if(sin.dupla){sin.antes=sin.bolas;sin.falta=false;sin.foiFalta=false;emitEv('sinTiro',{para:sin.dupla.op,st:sin.b.map(o=>[o.x,o.y,o.in?1:0]),vx:dx/d*f,vy:dy/d*f})}c.vx=dx/d*f;c.vy=dy/d*f;c.sl=1;sin.tacadas--;sin.moving=true;sinInfo();$('sinMsg').textContent=sin.tacadas?'Boa! Continue tacando.':'Última tacada…'};
  cv.addEventListener('pointerup',solta);cv.addEventListener('pointercancel',()=>{if(sin)sin.aim=null});
  $('sinNovo').onclick=novaPartida;$('sinSair').onclick=fecharSinuca;
 })();
@@ -5215,7 +5238,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122z';
+const VERSAO_JOGO='v20261123a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
