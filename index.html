@@ -258,15 +258,15 @@ body.joyEsq #painelEsq{top:150px}
 html.noApp #zloja{display:none!important}
 .psRow{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:stretch}.psRow .nv{display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:10px;background:rgba(255,255,255,.06)}.psRow.ok .nv{background:#ffc94a;color:#2a1a14}
 .psP{display:flex;flex-direction:column;gap:4px;padding:7px;border-radius:10px;border:1px solid rgba(255,201,74,.25);background:rgba(255,255,255,.05);font-size:12.5px;line-height:1.25}.psP.prem{border-color:rgba(160,120,255,.5);background:rgba(140,100,255,.12)}.psP button{border:0;border-radius:8px;padding:5px;font:700 12px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}.psP button:disabled{background:rgba(255,255,255,.12);color:#c9b4aa}
-.psBox{width:min(520px,100%);padding:0!important;overflow:hidden;background:linear-gradient(#2a1820,#1c1015)!important}
-.psHero{position:relative;padding:16px 16px 12px;background:radial-gradient(circle at 80% 20%,rgba(255,80,90,.45),transparent 55%),radial-gradient(circle at 15% 90%,rgba(40,170,90,.35),transparent 55%),linear-gradient(135deg,#7a1020,#3a0f18);border-bottom:2px solid #ffc94a}
-.psTag{display:inline-block;font:700 11px Fredoka,sans-serif;letter-spacing:1px;color:#2a1a14;background:#ffc94a;border-radius:6px;padding:2px 7px}.psHero h2{margin:4px 0 0;font-size:24px;color:#fff}.psTempo{color:#ffe1a8;font-size:13px;font-weight:600}
-.psShow{display:flex;gap:10px;margin-top:10px}.psExc{flex:1;display:flex;flex-direction:column;align-items:center;background:rgba(0,0,0,.28);border:1.5px solid rgba(255,201,74,.6);border-radius:14px;padding:6px;position:relative}.psExc canvas{width:100%;max-width:170px;height:auto}.psExc span{color:#fff;font:700 13px Fredoka,sans-serif;text-align:center;line-height:1.15}.psExc small{color:#ffd98a;font-weight:500}
+.psBox{width:min(520px,100%);padding:0!important;overflow-y:auto;overflow-x:hidden;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);-webkit-overflow-scrolling:touch;background:linear-gradient(#2a1820,#1c1015)!important}
+.psHero{position:relative;padding:10px 14px 8px;background:radial-gradient(circle at 80% 20%,rgba(255,80,90,.45),transparent 55%),radial-gradient(circle at 15% 90%,rgba(40,170,90,.35),transparent 55%),linear-gradient(135deg,#7a1020,#3a0f18);border-bottom:2px solid #ffc94a}
+.psTag{display:inline-block;font:700 11px Fredoka,sans-serif;letter-spacing:1px;color:#2a1a14;background:#ffc94a;border-radius:6px;padding:2px 7px}.psHero h2{margin:2px 0 0;font-size:18px;color:#fff}.psTempo{color:#ffe1a8;font-size:12px;font-weight:600}.psHeroTx{padding-right:26px}
+.psShow{display:flex;gap:8px;margin-top:8px}.psExc{flex:1;display:flex;flex-direction:row;gap:4px;align-items:center;background:rgba(0,0,0,.28);border:1.5px solid rgba(255,201,74,.6);border-radius:14px;padding:6px;position:relative}.psExc canvas{width:54px;height:54px;flex:none;object-fit:contain}.psExc span{color:#fff;font:700 12px Fredoka,sans-serif;text-align:left;line-height:1.15}.psExc small{color:#ffd98a;font-weight:500}
 .psExc::before{content:'EXCLUSIVO';position:absolute;top:-8px;left:50%;transform:translateX(-50%);font:700 10px Fredoka,sans-serif;background:#ff3d5e;color:#fff;padding:1px 7px;border-radius:6px}
-.psAviso{margin-top:9px;font-size:12.5px;color:#fff;background:rgba(0,0,0,.3);border-radius:10px;padding:6px 9px;text-align:center}
-.psProg{display:flex;gap:10px;align-items:center;padding:12px 16px 4px}.psNv{width:46px;height:46px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 20px Fredoka,sans-serif;color:#2a1a14;background:radial-gradient(#ffe7a0,#ffb52e);box-shadow:0 0 0 3px #3a1f25,0 0 0 5px #ffc94a}
+.psAviso{margin-top:7px;font-size:11.5px;padding:4px 8px!important;color:#fff;background:rgba(0,0,0,.3);border-radius:10px;padding:6px 9px;text-align:center}
+.psProg{display:flex;gap:10px;align-items:center;padding:8px 14px 2px}.psNv{width:36px;height:36px;font-size:16px!important;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 20px Fredoka,sans-serif;color:#2a1a14;background:radial-gradient(#ffe7a0,#ffb52e);box-shadow:0 0 0 3px #3a1f25,0 0 0 5px #ffc94a}
 .psBar{height:12px;border-radius:7px;background:rgba(255,255,255,.12);overflow:hidden}.psBar b{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffc94a,#ff7a3d)}.psSub{font-size:12.5px;color:#c9b4aa;margin-top:3px}
-#psComprar{padding:6px 16px}.psBuy{width:100%;border:0;border-radius:14px;padding:11px;font:700 16px Fredoka,sans-serif;color:#2a1a14;background:linear-gradient(90deg,#ffd86b,#ffae2e);box-shadow:0 4px 0 #b06f12;cursor:pointer}.psBuy small{display:block;font-weight:500;font-size:12px}
+#psComprar{padding:6px 16px}.psBuy{width:100%;border:0;border-radius:12px;padding:8px;font:700 15px Fredoka,sans-serif;color:#2a1a14;background:linear-gradient(90deg,#ffd86b,#ffae2e);box-shadow:0 4px 0 #b06f12;cursor:pointer}.psBuy small{display:block;font-weight:500;font-size:12px}
 .psTrilha{display:flex;gap:6px;padding:6px 0 4px 10px}.psLab{display:flex;flex-direction:column;gap:6px;flex:none;width:44px}.psLab span{height:118px;display:flex;align-items:center;justify-content:center;text-align:center;font:700 11px Fredoka,sans-serif;color:#fff;background:rgba(255,255,255,.07);border-radius:10px}.psLab span.pr{background:rgba(140,100,255,.25)}
 .psLista{display:flex;gap:6px;overflow-x:auto;padding-right:12px;scroll-snap-type:x proximity;scrollbar-width:thin}.psCol{display:flex;flex-direction:column;gap:6px;flex:none;width:92px;scroll-snap-align:start;position:relative}.psCol .lv{position:absolute;top:-1px;left:50%;transform:translate(-50%,-50%);z-index:2;font:700 11px Fredoka,sans-serif;background:#3a1f25;color:#c9b4aa;border:1.5px solid #6b4a50;border-radius:10px;padding:0 6px}.psCol.ok .lv{background:#ffc94a;color:#2a1a14;border-color:#ffc94a}
 .psCard{height:118px;border-radius:12px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4px;position:relative;overflow:hidden}.psCard.prem{background:linear-gradient(#3b2a6b,#26193f);border-color:rgba(170,140,255,.55)}.psCard.fin{background:linear-gradient(#7a1020,#3a0f18);border-color:#ffc94a}
@@ -345,7 +345,7 @@ html.noApp #zloja{display:none!important}
 <div id="mPasse" class="modal hidden"><div class="box psBox">
   <button class="x" data-close="mPasse">×</button>
   <div class="psHero"><div class="psHeroTx"><div class="psTag">TEMPORADA 1</div><h2 id="psTit">Natal na Vila</h2><div id="psTempo" class="psTempo"></div></div>
-   <div class="psShow"><div class="psExc"><canvas id="psCarro" width="180" height="120"></canvas><span>🚗 Carro exclusivo<br><small>prêmio final</small></span></div><div class="psExc"><canvas id="psGorro" width="120" height="120"></canvas><span>🎅 Gorro brilhante<br><small>nível 1</small></span></div></div>
+   <div class="psShow"><div class="psExc"><canvas id="psCarro" width="120" height="120"></canvas><span>🚗 Carro exclusivo<br><small>prêmio final</small></span></div><div class="psExc"><canvas id="psGorro" width="120" height="120"></canvas><span>🎅 Gorro brilhante<br><small>nível 1</small></span></div></div>
    <div class="psAviso">✨ Itens <b>exclusivos desta temporada</b>: depois de 31/12 <b>nunca mais voltam</b>.</div></div>
   <div class="psProg"><div class="psNv" id="psNv">1</div><div style="flex:1"><div id="psBarra" class="psBar"><b></b></div><div id="psNivel" class="psSub"></div></div></div>
   <div id="psComprar"></div>
@@ -5080,7 +5080,7 @@ function thumbPremio(p,W){W=W||140;const key=JSON.stringify(p)+'|'+(eu&&eu.v?enc
 function pintaPasse(){const P=PASSE;if(!P||!P.temporada){$('psTit').textContent='Passe da Temporada';$('psTempo').textContent='A próxima temporada começa em breve!';$('psLista').innerHTML='';$('psComprar').innerHTML='';return}
  const nv=Math.min(20,Math.floor(P.pontos/100)),ms=Date.parse(P.fim)-Date.now(),dias=Math.max(0,Math.floor(ms/864e5)),hs=Math.max(0,Math.floor(ms/36e5)%24);
  $('psTit').textContent=P.nome;$('psTempo').textContent=`⏳ Termina em ${dias}d ${hs}h`;
- {const c=$('psCarro'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.drawImage(thumbPremio({carro:'natal'},120),30,0,120,120);const d=$('psGorro'),h=d.getContext('2d');h.clearRect(0,0,120,120);h.drawImage(thumbPremio({chapeu:[31,31]},120),0,0)}
+ {const c=$('psCarro'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.drawImage(thumbPremio({carro:'natal'},120),0,0,120,120);const d=$('psGorro'),h=d.getContext('2d');h.clearRect(0,0,120,120);h.drawImage(thumbPremio({chapeu:[31,31]},120),0,0)}
  $('psNv').textContent=nv;$('psBarra').firstElementChild.style.width=(nv>=20?100:(P.pontos%100))+'%';$('psNivel').textContent=nv>=20?'🏆 Nível máximo!':`${P.pontos%100}/100 pontos para o nível ${nv+1}`;
  $('psSub').textContent='Ganhe pontos trabalhando: cada tarefa dá 10 e cada pagamento da patrulha dá 15. 👑 VIP ganha +50%.';
  const cb=$('psComprar');cb.innerHTML='';
@@ -5187,7 +5187,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122u';
+const VERSAO_JOGO='v20261122v';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
