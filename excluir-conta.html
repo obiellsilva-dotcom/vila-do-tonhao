@@ -1,0 +1,35 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Excluir conta - Cidade do Tonhão</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap"><style>
+:root{--bg:#24141a;--card:#3a2129;--gold:#ffc94a;--txt:#f6ece4;--muted:#c9b4aa;--red:#ff7b7b;--line:rgba(255,201,74,.3)}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.6 Fredoka,system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-left,0px)) 48px}
+h1{color:var(--gold);font-size:28px;line-height:1.2;margin:0 0 6px}h2{color:var(--gold);font-size:19px;margin:28px 0 6px}
+p,li{color:var(--txt)}.muted{color:var(--muted);font-size:14px}a{color:var(--gold)}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-top:18px}
+label{display:block;margin:10px 0 4px;color:var(--muted);font-size:14px}input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:#1c1016;color:var(--txt);font:inherit}
+button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:12px;font:700 16px Fredoka,sans-serif;background:var(--gold);color:#2a1a14;cursor:pointer}button.perigo{background:var(--red)}button:disabled{opacity:.5}
+#msg{margin-top:12px;min-height:1.6em}
+</style></head><body><main>
+<h1>🗑️ Excluir minha conta</h1><p class="muted">Cidade do Tonhão · viladotonhao.com.br</p>
+<p>Aqui você apaga a sua conta do jogo <b>para sempre</b>: personagem, dinheiro, nível, casa, carros, roupas, fotos, mensagens do chat, seguidores e o login. Compras já feitas não são devolvidas. Não dá para desfazer.</p>
+<p>Também dá para excluir dentro do jogo: ⚙️ Configurações → 🗑️ Excluir minha conta.</p>
+<div class="box" id="passo1"><b>1. Entre com a sua conta</b>
+<label for="email">E-mail</label><input id="email" type="email" autocomplete="email">
+<label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password">
+<button id="entrar">Entrar</button></div>
+<div class="box" id="passo2" hidden><b>2. Confirme</b><p id="quem"></p>
+<label for="conf">Para confirmar, escreva <b>EXCLUIR</b></label><input id="conf" autocomplete="off">
+<button id="apagar" class="perigo">Excluir minha conta para sempre</button></div>
+<p id="msg"></p><p class="muted"><a href="privacidade.html">Política de privacidade</a> · <a href="/">Voltar ao jogo</a></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+<script>
+const sb=window.supabase.createClient('https://fyviodritpungccrohvd.supabase.co','sb_publishable_H5k6RVmLVYTs3gzEtqWTgA_9KygIyDV');const $=id=>document.getElementById(id),msg=(t,er)=>{$('msg').textContent=t;$('msg').style.color=er?'#ff7b7b':'#9fffb0'};
+$('entrar').onclick=async()=>{const b=$('entrar');b.disabled=true;msg('Entrando…');try{const r=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('senha').value});if(r.error)throw r.error;
+ const u=r.data.user;let nome='';try{const q=await sb.from('moradores').select('nome').eq('id',u.id).maybeSingle();nome=q.data&&q.data.nome||''}catch(e){}
+ $('quem').textContent='Conta: '+u.email+(nome?' · personagem '+nome:'');$('passo1').hidden=true;$('passo2').hidden=false;msg('')}catch(e){msg('Não deu para entrar: confira o e-mail e a senha.',1)}b.disabled=false};
+$('apagar').onclick=async()=>{if($('conf').value.trim().toUpperCase()!=='EXCLUIR'){msg('Escreva EXCLUIR para confirmar.',1);return}const b=$('apagar');b.disabled=true;msg('Excluindo…');
+ try{const u=(await sb.auth.getUser()).data.user;if(u){const l=await sb.storage.from('fotos').list(u.id,{limit:1000});if(l.data&&l.data.length)await sb.storage.from('fotos').remove(l.data.map(f=>u.id+'/'+f.name))}}catch(e){}
+ const r=await sb.rpc('excluir_conta');if(r.error){msg('Não deu para excluir agora: '+r.error.message,1);b.disabled=false;return}try{await sb.auth.signOut()}catch(e){}
+ $('passo2').hidden=true;msg('Conta excluída. Todos os seus dados foram apagados. Até logo! 👋')};
+</script></body></html>

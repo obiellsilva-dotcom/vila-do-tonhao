@@ -276,6 +276,7 @@ body.joyEsq #painelEsq{top:150px}
 <label style="display:flex;flex-direction:row;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="cfgPerf" style="width:22px;height:22px;margin:0;flex:none;accent-color:#ffc94a"><span>📊 Mostrar desempenho</span></label>
 <button class="btn ghost hidden" id="cfgAdm" style="color:#ff6b6b">🛡️ Painel do Admin</button>
 <div id="cfgVip" class="hint" style="border:1px solid #d4af37;border-radius:12px;padding:10px"></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn ghost" href="privacidade.html" target="_blank" rel="noopener" style="flex:1;text-align:center;text-decoration:none">📄 Privacidade</a><button class="btn ghost" id="cfgExcluir" style="flex:1;color:#ff7b7b">🗑️ Excluir minha conta</button></div>
 <div style="display:flex;gap:6px"><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
 <div id="mIr" class="modal hidden"><div class="box" style="width:min(400px,100%)"><button class="x" data-close="mIr">×</button><h2>🔍 Ir para...</h2>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px"><div class="pill" id="pop">👥 0 moradores</div><div class="pill hidden" id="salaPill"></div></div>
@@ -446,6 +447,7 @@ body.joyEsq #painelEsq{top:150px}
       <button class="btn ghost hidden" id="cardCar">🔁 Trocar de carro</button>
       <button class="btn ghost hidden" id="cardLook">👕 Mudar visual</button>
       <button class="btn ghost hidden" id="cardReport">🚩 Denunciar</button>
+      <button class="btn ghost hidden" id="cardBloq">🔇 Bloquear</button>
     </div>
     <div class="acts hidden" id="cardInter"><button class="btn" data-t="abraco">🤗 Abraçar</button><button class="btn" data-t="beijo">💋 Beijar</button><button class="btn" data-t="danca">💃 Dançar junto</button><button class="btn" data-t="toca">✋ Toca aqui</button><button class="btn" id="cardSinuca">🎱 Sinuca</button><button class="btn hidden" id="cardCarona">🚗 Pegar carona</button></div>
   </div>
@@ -1474,7 +1476,7 @@ const PRACA_SEATS=PRACA_BANCOS.flatMap(([x,y])=>[{x:x+.38,y:y+.36,sit:true,dir:1
 const TON_HOME=[22.6,18.6];
 
 /* ================= STATIC PAINT ================= */
-const BGS=1.5,CH=512;
+const BGS=1.5,CH=256;
 function baseColor(x,y){
  const t=tileAt(x,y);
  if(x>=18&&x<=29&&y>=18&&y<=25)return t===G.BEHIND||(y===18||(y===19&&x<=27))?'wood2':'wood';
@@ -1748,7 +1750,7 @@ function paintBar(c){
 }
 // Fundo: uma miniatura da cidade inteira (para o zoom de longe) + pedaços
 // em alta resolução desenhados só quando aparecem na tela (com limite de memória).
-const OVS=.3,MAXCH=40;let OV=null,chunkBudget=0;const chunkCache=new Map();
+const OVS=.3,MAXCH=100;let OV=null,chunkBudget=0;const chunkCache=new Map();
 const MW=WX1-WX0,MH=WY1-WY0;
 function buildBg(){
  OV=document.createElement('canvas');OV.width=Math.ceil(MW*OVS);OV.height=Math.ceil(MH*OVS);
@@ -1770,7 +1772,7 @@ function drawGround(vx0,vy0,vx1,vy1){
  const vistos=[];for(let iy=iy0;iy<=iy1;iy++)for(let ix=ix0;ix<=ix1;ix++){const x=WX0+ix*CH,y=WY0+iy*CH,a=toScreen(x,y),b=toScreen(x+CH,y),c2=toScreen(x,y+CH),d=toScreen(x+CH,y+CH);
   if(Math.max(a[0],b[0],c2[0],d[0])<-20||Math.min(a[0],b[0],c2[0],d[0])>cw+20||Math.max(a[1],b[1],c2[1],d[1])<-20||Math.min(a[1],b[1],c2[1],d[1])>ch+20)continue;vistos.push([ix,iy])}
  if(vistos.length>MAXCH-4||cam.z<.5){ctx.drawImage(OV,WX0,WY0,MW,MH);return}
- chunkBudget=2;
+ chunkBudget=1;
  for(const [ix,iy] of vistos){
   const e=getChunk(ix,iy);
   if(e)ctx.drawImage(e.cv,e.x,e.y,e.cv.width/BGS,e.cv.height/BGS);
@@ -2669,13 +2671,13 @@ function _farol3(c,sh,P3,k){const [tp,kd,q]=sh,cor=sh[4]||FAROL_COR[tp],a0=c.glo
 const FAROL_CACHE={};
 function farolQuadro(kind,i,freio,base){const key=kind+'|'+i+'|'+(freio?1:0);if(FAROL_CACHE[key])return FAROL_CACHE[key];
  const P=FAROL_POS[kind],F=FAROL_FORMA[kind];if(!P||!F)return null;
- const cv=document.createElement('canvas');cv.width=cv.height=640;const c=cv.getContext('2d'),k=4;
+ const cv=document.createElement('canvas');cv.width=cv.height=320;const c=cv.getContext('2d'),k=2;
  const EL=.663,se=Math.sin(EL),ce=Math.cos(EL),th=-Math.PI+i*Math.PI/16,yaw=Math.atan2(Math.sin(th)/se,Math.cos(th))+P[7],cy=Math.cos(yaw),sy=Math.sin(yaw),C=P[6],halos=[];
  for(const fr of [1,-1]){const vis=fr*sy;if(vis<-.08)continue;const X=fr>0?P[0]:P[3],Z0=fr>0?P[1]:P[4],h=fr>0?P[2]:P[5],formas=fr>0?F.f:F.t;if(!formas.length)continue;
   const al=Math.min(1,.3+vis*1.1)*(fr>0?1:(freio?1:.6));
-  for(const s of (Z0>0?[1,-1]:[1])){const Z=Z0*s,u=X*cy-Z*sy,zp=X*sy+Z*cy,px=(80+u)*k,py=(zp*se-h*ce+C)*k,longe=Z*cy<0?Math.max(0,Math.min(1,(vis-1.2*Math.abs(cy))/.2)):1;if(longe<=0)continue;const al0=al;{const al=al0*longe;halos.push([px,py,fr,al]);
+  for(const s of (Z0>0?[1,-1]:[1])){const Z=Z0*s,u=X*cy-Z*sy,zp=X*sy+Z*cy,px=(80+u)*k,py=(zp*se-h*ce+C)*k,longe=Z*cy<0?Math.max(0,Math.min(1,(vis-1.2*Math.abs(cy))/.2)):1;if(longe<=0)continue;const al0=al;{const al=al0*longe;if(Z*cy>=0)halos.push([px,py,fr,al]);
    c.save();c.transform(s*-sy*k,s*cy*se*k,0,-ce*k,px,py);c.globalAlpha=al;for(const sh of formas)if(sh[1][0]!=='3')_farolForma(c,sh,k);c.restore();const P3=(X,Zz,hh)=>[(80+X*cy-s*Zz*sy)*k,((X*sy+s*Zz*cy)*se-hh*ce+C)*k];c.globalAlpha=al;for(const sh of formas)if(sh[1][0]==='3')_farol3(c,sh,P3,k)}}}
- if(base){c.globalCompositeOperation='destination-in';c.globalAlpha=1;c.drawImage(base,0,0,640,640)}
+ if(base){c.globalCompositeOperation='destination-in';c.globalAlpha=1;c.drawImage(base,0,0,320,320)}
  c.globalCompositeOperation='lighter';
  for(const [px,py,fr,al] of halos){const R=(fr>0?9:6)*k,g=c.createRadialGradient(px,py,0,px,py,R),cl=fr>0?'255,240,200':'255,40,30';
   g.addColorStop(0,`rgba(${cl},${.28*al})`);g.addColorStop(1,`rgba(${cl},0)`);c.fillStyle=g;c.fillRect(px-R,py-R,R*2,R*2)}
@@ -3266,11 +3268,13 @@ function drawAvatar(cv2,r,s){const c=cv2.getContext('2d');c.setTransform(1,0,0,1
  if(r===tonhao)drawPerson(c,cv2.width/2,cv2.height-8,r.v,{s:s*.9,belly:true,regata:true,apron:true,palito:true});else drawPerson(c,cv2.width/2,cv2.height-8,r.v,{s,suit:r.suit,belly:r.belly,beer:r.place==='bar'})}
 function openCard(r){closePlace();selected=r;$('card').classList.remove('hidden');$('cardName').textContent=r.nome+(r===eu?' (você)':'');{const f=$('cardFoto');if(r.foto){f.src=r.foto;f.classList.remove('hidden')}else f.classList.add('hidden')}drawAvatar($('cardAv'),r,1.65);refreshCard();carregaSeg(r)}
 function refreshCard(){if(!selected)return;$('cardStatus').textContent=statusOf(selected);$('cardBio').textContent=bioOf(selected);$('cardMoney').textContent=moneyOf(selected);$('cardFollow').textContent=follow===selected?'✋ Parar de acompanhar':'🎥 Acompanhar';
- $('cardInter').classList.toggle('hidden',!(selected&&selected.remote&&eu));$('cardCarona').classList.toggle('hidden',!(selected&&selected.remote&&selected.driving&&selected.caronaLib&&eu&&!eu.driving));const me=selected===eu,tem=me&&eu.carros.length>0;$('cardDrive').classList.toggle('hidden',!tem);$('cardCar').classList.toggle('hidden',!(tem&&eu.carros.length>1));$('cardLook').classList.toggle('hidden',!me);$('cardSocial').classList.toggle('hidden',!(selected.isPlayer&&ONLINE));$('cardReport').classList.toggle('hidden',!(selected.remote&&ONLINE));
+ $('cardInter').classList.toggle('hidden',!(selected&&selected.remote&&eu));$('cardCarona').classList.toggle('hidden',!(selected&&selected.remote&&selected.driving&&selected.caronaLib&&eu&&!eu.driving));const me=selected===eu,tem=me&&eu.carros.length>0;$('cardDrive').classList.toggle('hidden',!tem);$('cardCar').classList.toggle('hidden',!(tem&&eu.carros.length>1));$('cardLook').classList.toggle('hidden',!me);$('cardSocial').classList.toggle('hidden',!(selected.isPlayer&&ONLINE));$('cardReport').classList.toggle('hidden',!(selected.remote&&ONLINE));$('cardBloq').classList.toggle('hidden',!selected.remote);$('cardBloq').textContent=BLOQ.has(selected.id)?'🔈 Desbloquear':'🔇 Bloquear';
  if(tem)$('cardDrive').textContent=eu.driving?'🅿️ Descer do carro':'🚗 Dirigir '+art(eu.carro||eu.carros[0])+' '+CARS[eu.carro||eu.carros[0]].nome}
 $('cardDrive').onclick=()=>{if(!livre()||(trabalho))return;if(eu.driving)descerDoCarro();else pegarCarro();refreshCard()};
 $('cardCar').onclick=()=>{const i=eu.carros.indexOf(eu.carro),n=eu.carros[(i+1)%eu.carros.length];eu.carro=n;api.usarCarro(n).catch(e=>toast(e.message));const vi=eu.parked&&vagasInfo.get(eu.parked);if(vi)vi.carro=n;toast('Agora com '+art(n)+' '+CARS[n].nome,1800);sendPos(true);refreshCard()};
 $('cardLook').onclick=()=>{provCarregaRoupas();prov=Object.assign({},eu.v);$('provName').value=eu.nome;$('enter').textContent='Salvar visual';renderProv();$('mProv').classList.remove('hidden')};
+$('cardBloq').onclick=()=>{const o=selected;if(!o||!o.remote)return;if(BLOQ.has(o.id)){BLOQ.delete(o.id);salvaBloq();toast(`🔈 ${o.nome} desbloqueado(a).`,2500);refreshCard();return}
+ confirmar('🔇 Bloquear '+esc(o.nome)+'?','Você não vai mais ver as mensagens, balões, convites e propostas dessa pessoa. Dá para desbloquear depois tocando no nome dela.',()=>{BLOQ.add(o.id);salvaBloq();chatMsgs.splice(0,chatMsgs.length,...chatMsgs.filter(m=>m.morador!==o.id));o.bub=null;pintaPainel();toast(`🔇 ${o.nome} bloqueado(a).`,2500);refreshCard()})};
 $('cardReport').onclick=()=>{const o=selected;if(!o||!o.remote)return;const b=$('cardReport');if(!b.dataset.armado){b.dataset.armado=1;b.textContent='Denunciar '+o.nome+'? Toque de novo';setTimeout(()=>{delete b.dataset.armado;b.textContent='🚩 Denunciar'},3500);return}
  delete b.dataset.armado;b.textContent='🚩 Denunciar';api.denunciar(o.id,'comportamento no jogo').then(()=>toast('Denúncia enviada. Valeu por ajudar! 🙏')).catch(e=>toast(e.message))};
 function closeCard(){selected=null;$('card').classList.add('hidden')}
@@ -3490,6 +3494,8 @@ const api=ONLINE?(()=>{
   terminar:()=>rpc('terminar_trabalho'),
   tarefa:()=>rpc('tarefa_feita'),
   rondaPolicia:()=>rpc('ronda_policia'),
+  excluirConta:async()=>{try{const id=eu&&eu.id;if(id){const l=await sb.storage.from('fotos').list(id,{limit:1000});if(l&&l.data&&l.data.length)await sb.storage.from('fotos').remove(l.data.map(f=>id+'/'+f.name))}}catch(e){}
+   await rpc('excluir_conta');try{await sb.auth.signOut()}catch(e){}},
   missao:p=>rpc('missao_passo',{p_passo:p}),
   abastecer:g=>rpc('abastecer',{p_nivel:g}),
   salvarGas:g=>rpc('salvar_gasolina',{p_nivel:g}),
@@ -3548,6 +3554,7 @@ const api=ONLINE?(()=>{
    let pago=Math.round(J.salario/6*(1+.06*ex)),ganho=Math.max(1,Math.round(J.xp/5*(1+.04*ex))),peixes=0;if(m.trabalho==='pescador'){pago=0;peixes=Math.random()<.6?1:0}
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
+  async excluirConta(){L.me=null;lsave();try{localStorage.removeItem(LKEY)}catch(e){}},
   async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=50+premio;
    const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:50,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
   async cidade(){return null},
@@ -4428,13 +4435,13 @@ function onEv(p){
  if(p.k==='emote'&&(EMO_LIVRE.includes(p.e)||(vipP(o)&&EMOTES.includes(p.e))))say(o,p.e,3.5,true);
  if(p.k==='som'){o.somLigado=!!p.on}else if(p.k==='danca'){o.danca=DANCAS.some(d=>d[0]===p.d)?p.d:null;o.dancaIni=now}
  if(p.k==='gesto'&&GESTOS.some(g=>g[0]===p.g))o.gesto={t:p.g,ate:now+3};
- if(p.k==='convite')onConvite(o,p);
+ if(p.k==='convite'&&!BLOQ.has(o.id))onConvite(o,p);
  if(p.k==='kick'||p.k==='admAviso')onAdmin(o,p);
  if(p.k==='anuncio'&&ehAdm(o.id)&&typeof p.t==='string')bannerGrande('📢 AVISO DO ADMIN',esc(p.t.slice(0,90)));
- if(p.k==='proposta'||p.k==='propResp')onProposta(o,p);
+ if((p.k==='proposta'||p.k==='propResp')&&!BLOQ.has(o.id))onProposta(o,p);
  if(p.k==='prefeito')carregaPref();
   if(p.k==='moveis'&&eu&&eu.rm&&eu.rm.n===p.n)carregaMoveis();
- if(/^sin(Conv|Resp|Tiro|Sai)$/.test(p.k))onSinuca(o,p);
+ if(/^sin(Conv|Resp|Tiro|Sai)$/.test(p.k)&&!(p.k==='sinConv'&&BLOQ.has(o.id)))onSinuca(o,p);
  if(p.k==='resp')onResp(o,p);
  if(p.k==='inter')onInter(o,p);
  if(p.k==='chegou'&&vipP(o)){log(`👑 ${o.nome} chegou na cidade!`);toast(`👑 VIP ${o.nome} chegou na cidade!`,3500)}
@@ -4445,8 +4452,11 @@ function onEv(p){
 
 /* ----- chat ----- */
 const hhmm=d=>{const t=d?new Date(d):new Date();return String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')};
+// jogadores bloqueados (só neste aparelho): some o chat, os balões, convites e propostas deles
+const BLOQ=new Set((()=>{try{return JSON.parse(localStorage.getItem('cidadeTonhao.bloq')||'[]')}catch(e){return[]}})());
+function salvaBloq(){try{localStorage.setItem('cidadeTonhao.bloq',JSON.stringify([...BLOQ]))}catch(e){}}
 function onChat(r,hist){
- if(!r||vistos.has(r.id))return;vistos.add(r.id);chatMsgs.push(r);if(chatMsgs.length>50)chatMsgs.shift();
+ if(!r||vistos.has(r.id))return;vistos.add(r.id);if(BLOQ.has(r.morador))return;chatMsgs.push(r);if(chatMsgs.length>50)chatMsgs.shift();
  if(!hist){const o=eu&&r.morador===eu.id?eu:others.get(r.morador);if(o)say(o,short(r.texto),5,true);Som.play('msg',300)}
  pushFeed(ehAdm(r.morador)?'chata':PREF_ID&&r.morador===PREF_ID?'chatp':vipId(r.morador)?'chatv':'chat',(ehAdm(r.morador)?'🛡️ ADM ':PREF_ID&&r.morador===PREF_ID?'🏛️ ':vipId(r.morador)?'👑 ':'')+r.nome,r.texto,hist?8:40);pintaPainel();
  if(!$('mChat').classList.contains('hidden'))renderChat();
@@ -4735,6 +4745,9 @@ $('zsom').onclick=()=>{Som.toggle();pintaSom();Som.play('clique');toast(Som.on?'
  document.querySelectorAll('.cfgg button[data-g]').forEach(b=>b.onclick=()=>{CFG.graf=b.dataset.g;salvaCfg();resize();pinta()});
  const joyLado=()=>document.body.classList.toggle('joyEsq',CFG.joy==='esq');joyLado();
  document.querySelectorAll('.cfgj button').forEach(b=>b.onclick=()=>{CFG.joy=b.dataset.j;salvaCfg();joyLado();pinta()});
+ $('cfgExcluir').onclick=()=>{if(!eu){toast('Você ainda não tem conta.');return}$('cfg').classList.add('hidden');
+  confirmar('🗑️ Excluir minha conta','Isso apaga <b>para sempre</b> o seu personagem, dinheiro, nível, casa, carros, fotos, mensagens e o seu login. Compras feitas não são devolvidas. Não dá para desfazer.',()=>{
+   confirmar('Tem certeza mesmo?','Última chance: depois de excluir, não tem como recuperar a conta <b>'+esc(eu.nome)+'</b>.',null,[['🗑️ Sim, excluir tudo',()=>acao(async()=>{await api.excluirConta();toast('Conta excluída. Até logo! 👋',3000);setTimeout(()=>location.reload(),1800)})],['Cancelar',()=>{}]])})};
  $('cfgPerf').onchange=e=>{CFG.perf=e.target.checked;salvaCfg()};
  $('cfgAdm').onclick=()=>{$('cfg').classList.add('hidden');$('zadm').click()}})();
 $('zmus').onclick=()=>{const m=Som.toggleMusica();pintaSom();toast(m?'🎵 Música ligada':'🎵 Música desligada (os outros sons continuam)',1800)};pintaSom();
@@ -5015,7 +5028,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122p';
+const VERSAO_JOGO='v20261122q';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

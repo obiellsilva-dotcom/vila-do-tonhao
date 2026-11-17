@@ -2159,3 +2159,25 @@ begin
 end $$;
 revoke execute on function public.ronda_policia() from public, anon;
 grant execute on function public.ronda_policia() to authenticated;
+
+-- ===================== ETAPA 27: excluir a própria conta (exigência da Play Store) =====================
+-- Apaga o login; o personagem, chat, posts, seguidores, roupas, frutas, denúncias, propostas e pedidos somem junto (cascade).
+-- A casa/apartamento fica livre e sem móveis. As fotos são apagadas pelo jogo antes (Storage); aqui tenta de novo por garantia.
+create or replace function public.excluir_conta() returns json
+language plpgsql security definer set search_path = public as $$
+declare u uuid := auth.uid();
+begin
+  if u is null then raise exception 'Entre na sua conta primeiro.'; end if;
+  update casas set dono = null, comprada_em = null, aberta = false, alugada = false, aluguel_ate = null,
+    moveis = '[]'::jsonb, geladeira = '{}'::jsonb where dono = u;
+  update cidade set prefeito = null, desde = null where prefeito = u;
+  begin
+    delete from storage.objects where bucket_id = 'fotos' and (storage.foldername(name))[1] = u::text;
+  exception when others then null;
+  end;
+  delete from moradores where id = u;
+  delete from auth.users where id = u;
+  return json_build_object('ok', true);
+end $$;
+revoke execute on function public.excluir_conta() from public, anon;
+grant execute on function public.excluir_conta() to authenticated;
