@@ -3653,7 +3653,7 @@ const api=ONLINE?(()=>{
    const antes=m.nivel;m.xp+=ganho;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=pago+premio;m.peixes+=peixes;
    passeLocal(m,PONTOS_JOB[m.trabalho]||3);const morreu=lfome(m,J.fome/6),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago,xp_ganho:ganho,subiu:novo-antes,premio,peixes_ganhos:peixes,morreu,cansado,eu:lest()}},
   async meuPasse(){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});return{temporada:'T1',nome:'Natal na Vila',fim:'2027-01-01T03:00:00Z',pontos:j.pontos,premium:j.premium,resgatados:j.resgatados,premios:PASSE_T1.flatMap(([n,g,p])=>[{nivel:n,trilha:'gratis',premio:g},{nivel:n,trilha:'premium',premio:p}])}},
-  async resgatarPasse(n,t){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});if(j.pontos<n*100)fail('Você ainda não chegou nesse nível do passe.');if(t==='premium'&&!j.premium)fail('Esse prêmio é do Passe Premium.');const c=n+(t==='premium'?'p':'g');if(j.resgatados.includes(c))fail('Você já pegou esse prêmio.');
+  async resgatarPasse(n,t){const m=lme(),j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});if(j.pontos<n*PASSE_NV)fail('Você ainda não chegou nesse nível do passe.');if(t==='premium'&&!j.premium)fail('Esse prêmio é do Passe Premium.');const c=n+(t==='premium'?'p':'g');if(j.resgatados.includes(c))fail('Você já pegou esse prêmio.');
    const pr=PASSE_T1.find(x=>x[0]===n)[t==='premium'?2:1];if(pr.carro&&!CARS_PREMIUM[pr.carro])fail('O carro exclusivo chega em breve!');darPremioLocal(m,pr);j.resgatados.push(c);lsave();return{premio:pr,eu:lest()}},
   async vipInfo(){const m=lme(),k=new Date().toISOString().slice(0,7);return{mes:k,premio:VIP_MENSAL[k]||null,pego:(m.vipPres||[]).includes(k)}},
   async presenteVip(){const m=lme(),k=new Date().toISOString().slice(0,7);if(!(m.vip_ate&&Date.parse(m.vip_ate)>Date.now()))fail('O presente do mês é só para quem é VIP.');if(!VIP_MENSAL[k])fail('O presente deste mês ainda não chegou.');m.vipPres=m.vipPres||[];if(m.vipPres.includes(k))fail('Você já pegou o presente deste mês.');darPremioLocal(m,VIP_MENSAL[k]);m.vipPres.push(k);lsave();return{premio:VIP_MENSAL[k],mes:k,eu:lest()}},
@@ -5058,6 +5058,7 @@ const reais=v=>'R$ '+v.toFixed(2).replace('.',',');
 /* ----- Passe da Temporada e VIP turbinado (prêmios só visuais ou dinheiro do jogo) ----- */
 // pontos do passe por tarefa: conforme o tempo que cada emprego leva (medido em 18/11/2026; ~15 pontos por minuto em qualquer emprego)
 const PONTOS_JOB={"bar":2,"posto":2,"concessionaria":2,"barbearia":2,"pescador":2,"mercadinho":3,"oficina":3,"prefeito":3,"banco":4,"delegado":4,"gerente":6,"lixeiro":7,"enfermeiro":8,"padaria":8,"medico":9,"fabrica":12,"prefeitura":15};
+const PASSE_NV=500; // pontos por nível do passe (20 níveis = ~11 h de trabalho)
 const PASSE_T1=[[1,{dinheiro:300},{chapeu:[31,31]}],[2,{dinheiro:300},{roupa:[22,17]}],[3,{dinheiro:400},{chapeu:[6,8]}],[4,{estampa:5},{dinheiro:3000}],[5,{chapeu:[30,30]},{calca:[15,22]}],[6,{dinheiro:500},{roupa:[20,16]}],[7,{dinheiro:600},{calcado:[7,3]}],[8,{chapeu:[3,3]},{dinheiro:3000}],[9,{dinheiro:700},{roupa:[19,15]}],[10,{dinheiro:800},{dinheiro:10000}],
  [11,{dinheiro:800},{extra:[6,5]}],[12,{estampa:7},{calca:[13,23]}],[13,{dinheiro:900},{roupa:[21,13]}],[14,{dinheiro:1000},{chapeu:[7,7]}],[15,{dinheiro:1000},{dinheiro:4000}],[16,{roupa:[10,10]},{calcado:[6,7]}],[17,{dinheiro:1200},{roupa:[17,14]}],[18,{dinheiro:1200},{extra:[7,4]}],[19,{dinheiro:1500},{dinheiro:6000}],[20,{dinheiro:2000},{carro:'natal'}]];
 const VIP_MENSAL={'2026-11':{roupa:[14,12]},'2026-12':{calca:[11,13]},'2027-01':{roupa:[18,11]},'2027-02':{estampa:10},'2027-03':{calcado:[5,6]},'2027-04':{chapeu:[8,6]}};
@@ -5065,7 +5066,7 @@ const PR_IC={roupa:'👕',calca:'👖',calcado:'👟',chapeu:'🧢',extra:'💍'
 function nomePremio(p){if(!p)return'';if(p.carro)return'🚗 '+(CARS_PREMIUM[p.carro]?CARS_PREMIUM[p.carro].nome:'Carro exclusivo');if(p.dinheiro)return'💰 R$ '+p.dinheiro.toLocaleString('pt-BR');if(p.estampa!=null)return'🎨 Estampa '+FIELDS.find(f=>f[0]==='estampa')[2][p.estampa];
  for(const k of Object.keys(PR_IC))if(p[k]){const s=sx(eu&&eu.v),ix=p[k][s==='f'?1:0],o=ix>=30&&ix<40?(OPC[k].exc||[])[ix-30]:OPC[k][s][ix];return PR_IC[k]+' '+(o?o[0]:k)}return'🎁 Prêmio'}
 function darPremioLocal(m,p){if(p.carro){m.carros=m.carros||[];if(!m.carros.includes(p.carro))m.carros.push(p.carro)}if(p.dinheiro)m.dinheiro+=p.dinheiro;m.roupas=m.roupas||[];const add=x=>{if(!m.roupas.includes(x))m.roupas.push(x)};if(p.estampa!=null)add('estampa:'+p.estampa);for(const k of Object.keys(PR_IC))if(p[k]){add(k+'_m:'+p[k][0]);add(k+'_f:'+p[k][1])}}
-function passeLocal(m,n){const j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});const vip=m.vip_ate&&Date.parse(m.vip_ate)>Date.now();j.pontos=Math.min(2000,j.pontos+Math.round(vip?n*1.5:n))}
+function passeLocal(m,n){const j=m.passe||(m.passe={pontos:0,premium:false,resgatados:[]});const vip=m.vip_ate&&Date.parse(m.vip_ate)>Date.now();j.pontos=Math.min(PASSE_NV*20,j.pontos+Math.round(vip?n*1.5:n))}
 let PASSE=null;
 async function abrirPasse(){if(!eu)return;closePlace();$('mPasse').classList.remove('hidden');$('psLista').innerHTML='<div class="sub">Carregando…</div>';try{PASSE=await api.meuPasse()}catch(e){$('psLista').innerHTML='<div class="sub">'+esc(e.message||'Erro')+'</div>';return}pintaPasse()}
 // miniatura do prêmio: o próprio boneco do jogador vestindo a peça
@@ -5080,10 +5081,10 @@ function thumbPremio(p,W){W=W||140;const key=JSON.stringify(p)+'|'+(eu&&eu.v?enc
    g.save();g.translate(W/2,oy);g.scale(sc*k,sc*k);drawPersonReal(g,0,0,v,{cara:true});g.restore()}}catch(e){}
  PS_THUMB.set(key,cv);return copia(cv)}
 function pintaPasse(){const P=PASSE;if(!P||!P.temporada){$('psTit').textContent='Passe da Temporada';$('psTempo').textContent='A próxima temporada começa em breve!';$('psLista').innerHTML='';$('psComprar').innerHTML='';return}
- const nv=Math.min(20,Math.floor(P.pontos/100)),ms=Date.parse(P.fim)-Date.now(),dias=Math.max(0,Math.floor(ms/864e5)),hs=Math.max(0,Math.floor(ms/36e5)%24);
+ const nv=Math.min(20,Math.floor(P.pontos/PASSE_NV)),ms=Date.parse(P.fim)-Date.now(),dias=Math.max(0,Math.floor(ms/864e5)),hs=Math.max(0,Math.floor(ms/36e5)%24);
  $('psTit').textContent=P.nome;$('psTempo').textContent=`⏳ Termina em ${dias}d ${hs}h`;
  {const c=$('psCarro'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.drawImage(thumbPremio({carro:'natal'},120),0,0,120,120);const d=$('psGorro'),h=d.getContext('2d');h.clearRect(0,0,120,120);h.drawImage(thumbPremio({chapeu:[31,31]},120),0,0)}
- $('psNv').textContent=nv;$('psBarra').firstElementChild.style.width=(nv>=20?100:(P.pontos%100))+'%';$('psNivel').textContent=nv>=20?'🏆 Nível máximo!':`${P.pontos%100}/100 pontos para o nível ${nv+1}`;
+ $('psNv').textContent=nv;$('psBarra').firstElementChild.style.width=(nv>=20?100:(P.pontos%PASSE_NV)/PASSE_NV*100)+'%';$('psNivel').textContent=nv>=20?'🏆 Nível máximo!':`${P.pontos%PASSE_NV}/${PASSE_NV} pontos para o nível ${nv+1}`;
  $('psSub').textContent='Ganhe pontos trabalhando: tarefas que demoram mais dão mais pontos (de 2 a 15), e cada pagamento da patrulha dá 15. 👑 VIP ganha +50%.';
  const cb=$('psComprar');cb.innerHTML='';
  if(!P.premium&&!NO_APP){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · 10 roupas · 💰 R$ 26 mil do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
@@ -5189,7 +5190,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122x';
+const VERSAO_JOGO='v20261122y';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

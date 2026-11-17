@@ -1,7 +1,7 @@
 -- Novidades: só a ETAPA 28 (Passe da Temporada e VIP turbinado). As etapas 21 a 27 já foram rodadas.
 
 -- ===================== ETAPA 28: Passe da Temporada e VIP turbinado =====================
--- Passe: 20 níveis (100 pontos cada). Tarefa de emprego = 2 a 15 pontos conforme o tempo (_pontos_tarefa), pagamento da patrulha = 15, VIP ganha +50%.
+-- Passe: 20 níveis (500 pontos cada, ~11 h de trabalho). Tarefa de emprego = 2 a 15 pontos conforme o tempo (_pontos_tarefa), pagamento da patrulha = 15, VIP ganha +50%.
 -- Trilha grátis para todos; trilha premium comprada no Pix (produto passe_T1). Prêmios só visuais ou dinheiro do jogo.
 alter table public.produtos drop constraint if exists produtos_tipo_check;
 alter table public.produtos add constraint produtos_tipo_check check (tipo in ('vip','pet','carro','passe'));
@@ -120,8 +120,8 @@ declare t text := _temporada_atual(); vip boolean;
 begin
   if t is null then return; end if;
   select coalesce(vip_ate > now(), false) into vip from moradores where id = p_morador;
-  insert into passe_jogador(morador, temporada, pontos) values (p_morador, t, least(2000, case when vip then round(p_pontos * 1.5) else p_pontos end))
-  on conflict (morador, temporada) do update set pontos = least(2000, passe_jogador.pontos + case when vip then round(p_pontos * 1.5) else p_pontos end);
+  insert into passe_jogador(morador, temporada, pontos) values (p_morador, t, least(10000, case when vip then round(p_pontos * 1.5) else p_pontos end))
+  on conflict (morador, temporada) do update set pontos = least(10000, passe_jogador.pontos + case when vip then round(p_pontos * 1.5) else p_pontos end);
 end $$;
 revoke execute on function public._passe_pontos(uuid, integer) from public, anon, authenticated;
 revoke execute on function public._temporada_atual() from public, anon;
@@ -163,7 +163,7 @@ begin
   m := _eu();
   if t is null then raise exception 'Nenhuma temporada ativa agora.'; end if;
   select * into j from passe_jogador where morador = m.id and temporada = t for update;
-  if j.morador is null or j.pontos < p_nivel * 100 then raise exception 'Você ainda não chegou nesse nível do passe.'; end if;
+  if j.morador is null or j.pontos < p_nivel * 500 then raise exception 'Você ainda não chegou nesse nível do passe.'; end if;
   if p_trilha = 'premium' and not j.premium then raise exception 'Esse prêmio é do Passe Premium.'; end if;
   cod := p_nivel || case when p_trilha = 'premium' then 'p' else 'g' end;
   if cod = any(j.resgatados) then raise exception 'Você já pegou esse prêmio.'; end if;
