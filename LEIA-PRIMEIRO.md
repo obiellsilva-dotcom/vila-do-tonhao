@@ -7,6 +7,7 @@
 
 
 ## 0. ⚠️ TRABALHO EM ANDAMENTO (leia antes de tudo) — versão `v20261124a`, AINDA NÃO PUBLICADA
+> No ar: **v20261123c** = v20261123b + correção do botão de fechar do Passe (× por cima da faixa e botão "⬅️ Voltar"). Essa correção também já está no index.html em andamento.
 O `index.html` do pacote já tem estas mudanças (commitadas no ramo `ccr-e8b9720b-5amd2g`), mas **não foram testadas no navegador nem enviadas como site.zip**. O site no ar está na `v20261123b`.
 
 ### 0.1 Concessionária nova (feita, mas o dono pediu ajustes — ver 0.3)
@@ -54,7 +55,7 @@ Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométr
 **NÃO mande para ninguém**: `cidade-do-tonhao.keystore` e `senha-da-chave.txt` (chave do app Android). Guarde em 2 lugares (Drive + pendrive). Sem ela não dá para atualizar o app nunca mais.
 
 ## 3. Situação AGORA (18/11/2026)
-- **Versão do jogo:** no ar `v20261123b`; em andamento `v20261124a` (seção 0) (trocar a cada versão nova: o jogo avisa "🆕 Atualização").
+- **Versão do jogo:** no ar `v20261123c`; em andamento `v20261124a` (seção 0) (trocar a cada versão nova: o jogo avisa "🆕 Atualização").
 - **Banco:** o dono rodou **todas as etapas até a 28** (a 28 em 4 partes). Nada pendente de SQL.
 - **Site:** confirmar se ele subiu o `site.zip` **v20261123b** (a última). Se não, mandar subir.
 - **⚠️ Supabase estourou o plano grátis:** *Realtime Messages* 2,33 mi de 2 mi (117%) no ciclo 13/11–13/12. **Restrição a partir de 16/12/2026** se continuar acima. Já cortado na v20261123b (posição a cada ~0,5 s, parado a cada 15 s, nada com aba escondida; aluguel sem gravação à toa). **Solução definitiva = mover o tempo real para o Cloudflare (seção 6).**
