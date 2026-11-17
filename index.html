@@ -273,6 +273,7 @@ body.joyEsq #painelEsq{top:150px}
 <div>🖥️ Gráficos</div><div class="cfgg"><button data-g="baixo">Leve</button><button data-g="medio">Médio</button><button data-g="alto">Alto</button></div>
 <p class="hint">Leve: menos detalhe e 30 quadros por segundo, bom para celular fraco ou economizar bateria.</p>
 <div>🕹️ Joystick</div><div class="cfgg cfgj"><button data-j="esq">⬅️ Esquerda</button><button data-j="dir">Direita ➡️</button></div>
+<label style="display:flex;flex-direction:row;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="cfgPerf" style="width:22px;height:22px;margin:0;flex:none;accent-color:#ffc94a"><span>📊 Mostrar desempenho</span></label>
 <button class="btn ghost hidden" id="cfgAdm" style="color:#ff6b6b">🛡️ Painel do Admin</button>
 <div id="cfgVip" class="hint" style="border:1px solid #d4af37;border-radius:12px;padding:10px"></div>
 <div style="display:flex;gap:6px"><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
@@ -4724,7 +4725,7 @@ addEventListener('keydown',()=>Som.iniciarMusica(),{once:true});
 const pintaSom=()=>{$('zsom').textContent=Som.on?'🔊':'🔇';$('zsom').setAttribute('aria-label',Som.on?'desligar todos os sons':'ligar os sons');
  $('zmus').textContent='🎵';$('zmus').classList.toggle('off',!Som.musica);$('zmus').setAttribute('aria-label',Som.musica?'desligar só a música':'ligar a música')};
 $('zsom').onclick=()=>{Som.toggle();pintaSom();Som.play('clique');toast(Som.on?'🔊 Sons ligados':'🔇 Todos os sons desligados',1500)};
-(()=>{const pinta=()=>{$('cfgMus').value=CFG.mus;$('cfgSfx').value=CFG.sfx;$('cfgMusV').textContent=CFG.mus+'%';$('cfgSfxV').textContent=CFG.sfx+'%';document.querySelectorAll('.cfgg button[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===CFG.graf));document.querySelectorAll('.cfgj button').forEach(b=>b.classList.toggle('on',b.dataset.j===(CFG.joy||'dir')));$('cfgAdm').classList.toggle('hidden',!(eu&&eu.admin))};
+(()=>{const pinta=()=>{$('cfgMus').value=CFG.mus;$('cfgSfx').value=CFG.sfx;$('cfgMusV').textContent=CFG.mus+'%';$('cfgSfxV').textContent=CFG.sfx+'%';document.querySelectorAll('.cfgg button[data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===CFG.graf));document.querySelectorAll('.cfgj button').forEach(b=>b.classList.toggle('on',b.dataset.j===(CFG.joy||'dir')));$('cfgAdm').classList.toggle('hidden',!(eu&&eu.admin));$('cfgPerf').checked=!!CFG.perf};
  $('zcfg').onclick=()=>{pinta();$('cfgVip').innerHTML=souVip()?`👑 <b>Você é VIP</b> até ${new Date(eu.vip_ate).toLocaleDateString('pt-BR')}. Aproveite as roupas e cores exclusivas!`:'👑 <b>Seja VIP</b>: coroa e tag VIP no nome, roupas e cores exclusivas (dourado, prata e neon). Fale com o administrador da cidade para ativar.';$('cfg').classList.remove('hidden')};$('cfgX').onclick=()=>$('cfg').classList.add('hidden');$('cfg').onclick=e=>{if(e.target.id==='cfg')$('cfg').classList.add('hidden')};
  $('cfgTuto').onclick=()=>{$('cfg').classList.add('hidden');tutorial()};
  $('cfgConta').onclick=async()=>{$('cfg').classList.add('hidden');if(!ONLINE){toast('Modo local: não precisa de conta.');return}const c=await api.conta();
@@ -4734,6 +4735,7 @@ $('zsom').onclick=()=>{Som.toggle();pintaSom();Som.play('clique');toast(Som.on?'
  document.querySelectorAll('.cfgg button[data-g]').forEach(b=>b.onclick=()=>{CFG.graf=b.dataset.g;salvaCfg();resize();pinta()});
  const joyLado=()=>document.body.classList.toggle('joyEsq',CFG.joy==='esq');joyLado();
  document.querySelectorAll('.cfgj button').forEach(b=>b.onclick=()=>{CFG.joy=b.dataset.j;salvaCfg();joyLado();pinta()});
+ $('cfgPerf').onchange=e=>{CFG.perf=e.target.checked;salvaCfg()};
  $('cfgAdm').onclick=()=>{$('cfg').classList.add('hidden');$('zadm').click()}})();
 $('zmus').onclick=()=>{const m=Som.toggleMusica();pintaSom();toast(m?'🎵 Música ligada':'🎵 Música desligada (os outros sons continuam)',1800)};pintaSom();
 function sonsMotores(){
@@ -5013,7 +5015,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122o';
+const VERSAO_JOGO='v20261122p';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5346,7 +5348,10 @@ log('🍺 O Tonhão abriu o bar. A geladeira de 1987 ainda tá funcionando.');
 let last=performance.now();
 let mediaQ=16,contaQ=0;
 let ERRO_TELA=null;function erroTela(e,onde){const m=onde+': '+((e&&e.message)||e);if(ERRO_TELA!==m){ERRO_TELA=m;console.error(m,e);try{toast('⚠️ Erro na tela ('+m.slice(0,90)+'). Tire um print e mande ao admin.',6000)}catch(_){}}}
-function frame(t){requestAnimationFrame(frame);if(CFG.graf==='baixo'&&t-last<30)return;const dt=Math.min(.1,(t-last)/1000);last=t;if(eu&&!(isFinite(eu.x)&&isFinite(eu.y))){eu.rm=null;eu.path=[];eu.x=T(25);eu.y=T(29.5)}if(!(isFinite(cam.x)&&isFinite(cam.y)&&isFinite(cam.z)&&cam.z>0)){cam.x=eu?eu.x:T(25);cam.y=eu?eu.y:T(29.5);cam.z=1.5}for(const o of others.values())if(!(isFinite(o.x)&&isFinite(o.y))){o.x=T(25);o.y=T(29.5);o.hidden=true}if(eu&&eu.rm){const R=eu.rm.R;if(!R||eu.x<T(R.x0-3)||eu.x>T(R.x1+4)||eu.y<T(R.y0-3)||eu.y>T(R.y1+4)){eu.rm=null;eu.placing=null;try{levantarCasa()}catch(_){}}}try{update(dt)}catch(e){erroTela(e,'update')}try{draw()}catch(e){erroTela(e,'draw')}}
+function frame(t){requestAnimationFrame(frame);perfTick(t);if(CFG.graf==='baixo'&&t-last<30)return;const dt=Math.min(.1,(t-last)/1000);last=t;if(eu&&!(isFinite(eu.x)&&isFinite(eu.y))){eu.rm=null;eu.path=[];eu.x=T(25);eu.y=T(29.5)}if(!(isFinite(cam.x)&&isFinite(cam.y)&&isFinite(cam.z)&&cam.z>0)){cam.x=eu?eu.x:T(25);cam.y=eu?eu.y:T(29.5);cam.z=1.5}for(const o of others.values())if(!(isFinite(o.x)&&isFinite(o.y))){o.x=T(25);o.y=T(29.5);o.hidden=true}if(eu&&eu.rm){const R=eu.rm.R;if(!R||eu.x<T(R.x0-3)||eu.x>T(R.x1+4)||eu.y<T(R.y0-3)||eu.y>T(R.y1+4)){eu.rm=null;eu.placing=null;try{levantarCasa()}catch(_){}}}try{update(dt)}catch(e){erroTela(e,'update')}try{draw()}catch(e){erroTela(e,'draw')}}
+// medidor de desempenho (⚙️ Configurações): quadros por segundo e travadas (quadro com mais de 0,1 s)
+let PERF=null;function perfTick(t){if(!CFG.perf){if(PERF){PERF.el.remove();PERF=null}return}if(!PERF){const el=document.createElement('div');el.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:30;background:rgba(20,10,14,.85);color:#9fffb0;font:600 12px Fredoka,sans-serif;padding:4px 10px;border-radius:10px;border:1px solid rgba(255,201,74,.4);pointer-events:none;white-space:nowrap';document.body.appendChild(el);PERF={el,n:0,t0:t,last:t,trav:[],fps:0}}
+ const P=PERF,dt=t-P.last;P.last=t;P.n++;if(dt>100)P.trav.push(t);P.trav=P.trav.filter(x=>t-x<10000);if(t-P.t0>=1000){P.fps=Math.round(P.n*1000/(t-P.t0));P.n=0;P.t0=t;P.el.textContent=`📊 ${P.fps} quadros/s · ${P.trav.length} travadas · ${CFG.graf==='baixo'?'Leve':CFG.graf==='alto'?'Alto':'Médio'}`;P.el.style.color=P.fps>=40?'#9fffb0':P.fps>=25?'#ffd23f':'#ff7b7b'}}
 function begin(){buildBg();uiTick();requestAnimationFrame(t=>{last=t;frame(t)});setTimeout(()=>{const l=$('loading');l.style.opacity=0;setTimeout(()=>l.remove(),450)},350)}
 (document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]):Promise.resolve()).then(begin).then(iniciarOnline);
 window.__dbg={houses,comprarCasa,residents,tonhao,queue,get gm(){return gm},set gm(v){gmOff+=v-gm;gm=v},cam,get eu(){return eu},others,get trabalho(){return trabalho},get L(){return L},VAGAS,vagasInfo,CRUZ};

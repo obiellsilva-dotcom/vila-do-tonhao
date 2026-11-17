@@ -81,6 +81,7 @@ Painel do admin (🛡️, só para `admin=true`, definido pelo e-mail), tag 🛡
 - Do ramo da sessão anterior (`claude/new-session-cwzmp3`) vieram no SQL: sede, gasolina/posto, primeira missão e prefeito automático no nível 20.
 
 - **Relógio do jogo:** `SPEED=1` → 1 hora do jogo = 1 minuto real, 1 dia = 24 minutos (antes 8).
+- **Medidor de desempenho** (⚙️ → 📊 Mostrar desempenho, `CFG.perf`, `perfTick`): quadros por segundo e travadas (quadro > 0,1 s) nos últimos 10 s. O computador de teste desenha sem placa de vídeo e não serve para medir; trocar degradês da luz por imagem pronta PIOROU aqui e foi desfeito.
 ### Pendências
 1. **Brecha:** o provador ainda deixa escolher roupas pagas de graça. Falta o passo "criação de personagem com 4 peças grátis" + `criar_morador` conferir o `guarda_roupa` (joias 40–49 também).
 2. Joia: só uma por vez (relógio OU colar OU brinco). Se quiser junto, criar campo separado.
@@ -166,6 +167,7 @@ Versão VERSAO_JOGO v20261118b. Ramo `claude/new-session-zudz0a`. Subir: `site.z
 - Chat do prefeito só levemente amarelo (só emoji 🏛️, sem a palavra prefeito). Tiradas as músicas Forró do Dragão e Festa Boa.
 - Scripts do estúdio de fotos (render2.py, auto.py, folha.py, integra.py) ficaram no scratchpad e se perdem; o código de faróis acesos (`LUZ_IMG`, `LUZES_FRAME`) já está no jogo mas sem as fotos de luz.
 - **Relógio do jogo:** `SPEED=1` → 1 hora do jogo = 1 minuto real, 1 dia = 24 minutos (antes 8).
+- **Medidor de desempenho** (⚙️ → 📊 Mostrar desempenho, `CFG.perf`, `perfTick`): quadros por segundo e travadas (quadro > 0,1 s) nos últimos 10 s. O computador de teste desenha sem placa de vídeo e não serve para medir; trocar degradês da luz por imagem pronta PIOROU aqui e foi desfeito.
 ### Pendências
 1. Faróis acendendo ao dirigir (falta tirar as fotos de luz de cada carro).
 2. Kombi e Fusca Dourado: o usuário vai mandar os modelos.
@@ -197,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122o** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122p** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -209,6 +211,7 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Polícia:** patrulha sem limite (`trabalho.ronda`: um ponto azul atrás do outro, opcional); a cada 90 s paga R$ 50 + 20 XP pela função nova `ronda_policia` (**ETAPA 26**, `novidades.sql`; limite de 85 s no servidor). A viatura não some mais.
 - **Entregas pela cidade:** `pontosCidade()`/`pontoCidade()` (calçada G.WALK colada em rua) para padeiro, operário (fábrica) e lixeiro.
 - **Arquivo de teste:** o "trapaça" também atualiza o banco local (`L.me`), então os trabalhos de nível alto abrem.
+- **Medidor de desempenho** (⚙️ → 📊 Mostrar desempenho, `CFG.perf`, `perfTick`): quadros por segundo e travadas (quadro > 0,1 s) nos últimos 10 s. O computador de teste desenha sem placa de vídeo e não serve para medir; trocar degradês da luz por imagem pronta PIOROU aqui e foi desfeito.
 ### Pendências
 0. Confirmar se o usuário rodou a ETAPA 26.
 1. Desempenho itens 2 e 3 (o usuário reclamou que o jogo trava).
