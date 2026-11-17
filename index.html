@@ -5074,7 +5074,7 @@ function thumbPremio(p,W){W=W||140;const key=JSON.stringify(p)+'|'+(eu&&eu.v?enc
   else if(p.carro){g.save();g.translate(W/2,W*.62);g.scale(1.45*k,1.45*k);try{drawCarStack(g,0,0,CARS_PREMIUM[p.carro]?p.carro:'gto',-.6,null,{})}catch(e){}g.restore();if(!CARS_PREMIUM[p.carro]){g.globalCompositeOperation='source-atop';g.fillStyle='#120a0e';g.fillRect(0,0,W,W);g.globalCompositeOperation='source-over';g.fillStyle='#ffc94a';g.textAlign='center';g.textBaseline='middle';g.font=`bold ${46*k}px Fredoka,sans-serif`;g.fillText('?',W/2,W*.5)}}
   else{const v=Object.assign({},eu.v),s0=sx(v),dd={roupa:'roupa',calca:'calca',calcado:'calcado',chapeu:'chapeu',extra:'extra'};
    if(p.estampa!=null){v.estampa=p.estampa;v.roupa=0}for(const q in dd)if(p[q])v[q]=p[q][s0==='f'?1:0];
-   const foco=p.chapeu||p.extra?'cab':p.calcado?'pe':'corpo',sc=foco==='cab'?4.4:foco==='pe'?3.2:2.6,oy=foco==='cab'?W*1.95:foco==='pe'?W*.72:W*1.04;
+   const exN=p.extra?estilo('extra',v):'',peito=/corrente|perolas|cordao|pingente|colar|choker/i.test(exN),foco=p.chapeu||(p.extra&&!peito)?'cab':peito?'peito':p.calcado?'pe':'corpo',_=peito?(v.camisa=9,v.roupa=0,v.estampa=0):0,sc=foco==='cab'?4.4:foco==='peito'?3.6:foco==='pe'?3.2:2.6,oy=foco==='cab'?W*1.95:foco==='peito'?W*1.42:foco==='pe'?W*.72:W*1.04;
    g.save();g.translate(W/2,oy);g.scale(sc*k,sc*k);drawPersonReal(g,0,0,v,{cara:true});g.restore()}}catch(e){}
  PS_THUMB.set(key,cv);return copia(cv)}
 function pintaPasse(){const P=PASSE;if(!P||!P.temporada){$('psTit').textContent='Passe da Temporada';$('psTempo').textContent='A próxima temporada começa em breve!';$('psLista').innerHTML='';$('psComprar').innerHTML='';return}
@@ -5187,7 +5187,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122v';
+const VERSAO_JOGO='v20261122w';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

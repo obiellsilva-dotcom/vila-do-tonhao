@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122v** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122w** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
