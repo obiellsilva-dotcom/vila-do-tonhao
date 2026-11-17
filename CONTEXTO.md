@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122r** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122s** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -218,7 +218,10 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Bloquear jogador:** botão 🔇 no cartão; lista `BLOQ` no aparelho (some chat, balões, convites, propostas, sinuca).
 - **Menos travadas:** chão em blocos de 256 (antes 512) e 1 bloco novo por quadro; camada de faróis 320 px (antes 640); brilho do farol do outro lado só quando visível.
 - **Manifest/ícones:** `manifest.webmanifest`, `icones/` (emoji 🍺 da fonte Noto).
+- **Passe da Temporada (ETAPA 28):** tabelas `passe_temporadas`, `passe_premios`, `passe_jogador`; temporada T1 "Natal na Vila" até 01/01/2027; 20 níveis × 100 pontos; tarefa = 10, patrulha = 15, VIP +50% (`_passe_pontos`, chamado em `tarefa_feita` e `ronda_policia`); `meu_passe()`, `resgatar_passe(nivel,trilha)`; prêmios por `_dar_premio` (dinheiro, estampa, roupa/calca/calcado/chapeu/extra para os dois sexos no `guarda_roupa`). Premium = produto Pix `passe_T1` (R$ 9,90, tipo 'passe' no `_entregar`). Cliente: `PASSE_T1` (cópia dos prêmios para o modo offline), `abrirPasse`/`pintaPasse`, botão 🎟️ no menu. Nova temporada = inserir em `passe_temporadas` + `passe_premios` + produto `passe_T2` e atualizar o cliente.
+- **VIP turbinado:** `vip_mensal` (presente por mês até 2027-04) + `presente_vip()`/`vip_info()`; botões 🎁 Presente do mês e 🏠 Ir para casa (`irParaCasa`) em ⚙️; produto `vip90` (R$ 39,90). Novidades `NOVID='v20261125'` com 2 páginas novas.
 ### Pendências
+00. Confirmar se o usuário rodou a ETAPA 28 (`novidades.sql`). Antes: ETAPAS 26 e 27 já rodadas.
 0. Confirmar se o usuário rodou as ETAPAS 26 e 27 e se `/.well-known/assetlinks.json` abriu no site depois de subir (o Cloudflare pode ignorar pasta com ponto).
 1. Desempenho itens 2 e 3 (o usuário reclamou que o jogo trava).
 2. Interiores das lojas em outra dimensão. 3. Curva de XP para a Play Store.
