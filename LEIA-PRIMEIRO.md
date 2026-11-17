@@ -1,9 +1,36 @@
-# Cidade do Tonhão — passagem para um chat novo (atualizado em 18/11/2026)
+# Cidade do Tonhão — passagem para um chat novo (atualizado em 18/11/2026, fim da sessão)
 
 > **Cole este arquivo no começo do chat novo** e anexe o `pacote-novo-chat.zip` (ou, se não der, os arquivos soltos listados na seção 2).
 > Pedido ao assistente: o dono **não é programador**, usa **só o celular** e tem **pouco limite de uso**. Responda em **português do Brasil, simples, passo a passo e curto**. Edite pontos específicos, não reescreva arquivos inteiros. Antes de mandar `site.zip`, mande **foto + link de teste** para ele aprovar. Pesquise na internet quando tiver dúvida (ele pede).
 
 ---
+
+
+## 0. ⚠️ TRABALHO EM ANDAMENTO (leia antes de tudo) — versão `v20261124a`, AINDA NÃO PUBLICADA
+O `index.html` do pacote já tem estas mudanças (commitadas no ramo `ccr-e8b9720b-5amd2g`), mas **não foram testadas no navegador nem enviadas como site.zip**. O site no ar está na `v20261123b`.
+
+### 0.1 Concessionária nova (feita, mas o dono pediu ajustes — ver 0.3)
+- **Casa 59 removida** (`HOUSE_OFF.add(58)` logo depois da criação de `HOUSE_OFF`). ⚠️ Se alguém já tinha comprado a casa 59 no banco, ela some do mapa: conferir no Supabase (`select dono from casas where id=59`) e, se tiver dono, devolver o dinheiro ou trocar a casa.
+- Prédio: `conc=addB({kind:'concessionaria',x:85,y:15,w:10,h:5,front:[90,20]})`. Pátio de asfalto `y20..28, x85..94` (tiles `G.ROAD`), muros laterais nas colunas 85 e 94, muro da frente na linha 28 com **portão nas colunas 89–90**, carros do pátio bloqueiam o tile.
+- `CONC={X0:85,X1:95,Y0:15,Y1:20,P1:29,dentro:[kombi_tonhao,gto,neon],fora:[caminhonete,jipe,esportivo,sedan,opala,fusca,moto]}` com posição e ângulo de cada carro.
+- Desenho próprio em `concIso(list)` (chamado no laço de prédios do `drawCena` no lugar de `predioFatias` quando `b.kind==='concessionaria'`): piso, faixas das vagas, parede do fundo com escritório, mesa do vendedor, plantas, carros do Pix dentro com plaquinha, fachada de vidro com colunas e letreiro "CARROS DO ZÉ", carros do pátio com plaquinha de nome e preço (`placaCarro`), muros, pilares do portão e totem. `FOCUS.concessionaria=[90,22,1.25]`.
+- Plaquinha da **Lambordini (`neon`) mostra "👑 VIP"** (ela é do VIP, NÃO do Pix). Caminhonete do Tonhão e Ferrarini = "💎 Pix".
+
+### 0.2 Tour obrigatório pela cidade (feito, NÃO testado)
+- `tourCidade(forcar)` + lista `TOUR` (11 paradas: Bar, Centro de Empregos, Loja de Roupas, Concessionária, Posto/Oficina, Casas à venda, Imobiliária, Condomínio, Delegacia, Hospital, Prefeitura), câmera desliza (1,6 s) e para (3,4 s) com quadro explicando; tela bloqueada, sem botão de pular (o dono quer obrigatório). 1 vez por pessoa (`localStorage cidadeTonhao.tour.<id>`).
+- Dispara: 3,2 s depois do bônus da **missão 1** (`msPasso(1)`), ao tocar em **Pular** no tutorial (`tutoPular`) e ao **pular a missão** (`msX`).
+- Testar: as coordenadas de "Casas à venda" `[92,40]` e do condomínio `[15,-11]` podem precisar de ajuste; conferir que `follow` volta para o jogador e que nada fica travado.
+
+### 0.3 O QUE O DONO PEDIU E AINDA FALTA FAZER (prioridade máxima)
+1. **Fechar o showroom por fora**: o prédio da concessionária (x85–94, y15–19) vira um **prédio fechado** com telhado, fachada bonita (vidro escuro/espelhado, não transparente), letreiro e **uma porta dupla de vidro decente** (ele achou a porta atual feia). **Tirar os carros de dentro do desenho externo** (eles ficavam "abertos" e a casa 61 de trás tampava a Lambordini — "muito estranho").
+2. **Showroom em OUTRA DIMENSÃO** (igual à imobiliária): criar `SALAS.show` num canto livre (sugestão `x0:-19,y0:80,x1:-7,y1:86,porta:[-13,87]`, piso porcelanato claro, parede `#eef1f5`; conferir que não bate em `mansao2` que fica em y92–98) e um objeto `SHOW={n:'show',kind:'show',front:[90,20],fixos:[mesa do vendedor, cadeiras, sofá de espera, estantes, plantas, tapete…]}` (móveis do `MOV`). Ajustar `salaDe` (`kind==='show'`→`SALAS.show`) e `salaNome` ("🚗 Showroom Carros do Zé"). Perto da porta (`conc.front`): botão **"🚗 Entrar no showroom"** → `entrarSala(SHOW)` (ver como `perto(imob.front…)` faz). Dentro: desenhar os 3 carros (Caminhonete do Tonhão 💎 Pix, Ferrarini 💎 Pix, Lambordini 👑 VIP) em discos de exposição com plaquinha (chamar de dentro do `salaItens` quando `R===SALAS.show`), e em `salaOpcoes` um botão **"🚗 Ver e comprar carros"** → `abrirLugar(conc)` (loja normal da concessionária; no app o Pix fica escondido por `NO_APP`). "Programar a área para ser mobiliada" = móveis fixos bonitos (não é para o jogador decorar).
+3. **Pátio sem grama**: os tiles com muro/carro (`G.BLD`) aparecem verdes. Pintar asfalto `#3d3c44` sobre todo o retângulo `T(85)..T(95) × T(20)..T(29)` no item de piso (antes das faixas).
+4. **Sedã tampado pela cobertura do posto**: mudar os carros do lado direito para a **fileira da frente** (y≈25,5), longe da cobertura. Sugestão: `fora=[['caminhonete',86.3,22.1],['jipe',87.8,22.1],['opala',86.3,25.5],['fusca',87.8,25.5],['esportivo',92.1,25.5],['sedan',93.5,25.5],['moto',91.8,22.3]]` (ângulo 1.57) e testar em print.
+5. Testar tudo com print (de dia e de noite, zoom 1,5), trocar `VERSAO_JOGO`, gerar `site.zip` + `index.html`, mandar foto + link de teste para o dono aprovar.
+6. Atualizar a tela de novidades (`NOV_SLIDES`/`NOVID`) com "Concessionária nova" e o tour.
+
+### 0.4 Como gerar o site.zip
+Pasta com: `index.html`, `privacidade.html`, `excluir-conta.html`, `manifest.webmanifest`, `icones/`, `.well-known/assetlinks.json`, `musicas/` (charrete.mp3, futilidades-entre-nos.mp3, o-campeao.mp3) e `sons/` (diesel, esportivo, fusca, gto, moto, neon, opala, sedan .mp3). Os mp3 estão no GitHub (pastas `musicas/` e `sons/`). Zipar a partir de dentro da pasta.
 
 ## 1. O que é o jogo
 Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométrica 2.5D**) de uma cidadezinha brasileira com o **Bar do Tonhão**. Personagens customizáveis, empregos com minijogos, fome/sede, XP e nível (até 50), casas e apartamentos (comprar/alugar), carros 3D (fotos de 32 ângulos), chat por salas (50 por sala, até 60 salas), sinuca, VIP, loja Pix, pets, perfil social, passe de temporada, prefeito.
@@ -27,7 +54,7 @@ Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométr
 **NÃO mande para ninguém**: `cidade-do-tonhao.keystore` e `senha-da-chave.txt` (chave do app Android). Guarde em 2 lugares (Drive + pendrive). Sem ela não dá para atualizar o app nunca mais.
 
 ## 3. Situação AGORA (18/11/2026)
-- **Versão do jogo:** `VERSAO_JOGO='v20261123b'` (trocar a cada versão nova: o jogo avisa "🆕 Atualização").
+- **Versão do jogo:** no ar `v20261123b`; em andamento `v20261124a` (seção 0) (trocar a cada versão nova: o jogo avisa "🆕 Atualização").
 - **Banco:** o dono rodou **todas as etapas até a 28** (a 28 em 4 partes). Nada pendente de SQL.
 - **Site:** confirmar se ele subiu o `site.zip` **v20261123b** (a última). Se não, mandar subir.
 - **⚠️ Supabase estourou o plano grátis:** *Realtime Messages* 2,33 mi de 2 mi (117%) no ciclo 13/11–13/12. **Restrição a partir de 16/12/2026** se continuar acima. Já cortado na v20261123b (posição a cada ~0,5 s, parado a cada 15 s, nada com aba escondida; aluguel sem gravação à toa). **Solução definitiva = mover o tempo real para o Cloudflare (seção 6).**
