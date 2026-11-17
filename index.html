@@ -578,7 +578,7 @@ const CORES_N=['Vermelha','Azul','Amarela','Verde','Branca','Roxa','Laranja','Tu
 const VIPCOR=['#d4af37','#c9ced6','#39ff14'],VIPCOR_N=['Dourada','Prata','Neon'];
 const corRoupa=i=>i>=50?VIPCOR[i-50]||CORES[0]:CORES[i]||CORES[0];  // cor da roupa (sem "padrão")
 const corOpc=i=>!i?null:i>=50?VIPCOR[i-50]||null:CORES[i-1]||null;  // 0 = cor padrão da peça
-const ESTILO_BASE={listrada:'camiseta',colete:'camiseta',camisaJeans:'social',agasalho:'jaqueta',banda:'camiseta',degrade:'curto',lateral:'curto',surfista:'curto',mullet:'curto',espetado:'curto',couro:'jaqueta',bomberOuro:'jaqueta',moletomNeon:'moletom',veludo:'jaqueta',smoking:'terno',lantejoula:'vestido',tenisNeon:'tenis',boneNeon:'bone',tonhao:'time',ternoBranco:'terno',gala:'vestidoLongo',havaiana:'camiseta',cargo:'bege',boneOuro:'bone',diamante:'corrente',tenisOuro:'tenis'};
+const ESTILO_BASE={listrada:'camiseta',colete:'camiseta',camisaJeans:'social',agasalho:'jaqueta',banda:'camiseta',degrade:'curto',lateral:'curto',surfista:'curto',mullet:'curto',espetado:'curto',couro:'jaqueta',bomberOuro:'jaqueta',moletomNeon:'puffer',veludo:'jaqueta',smoking:'terno',lantejoula:'vestido',tenisNeon:'tenis',boneNeon:'bone',tonhao:'time',ternoBranco:'terno',gala:'vestidoLongo',havaiana:'camiseta',cargo:'bege',boneOuro:'bone',diamante:'corrente',tenisOuro:'tenis'};
 // Cada opção do provador tem nome (o que o jogador vê) e estilo (o que o desenho usa), por sexo.
 // sexo 0 = masculino (é o padrão dos códigos antigos, que continuam iguais), 1 = feminino.
 const OPC={
@@ -590,7 +590,7 @@ const OPC={
   f:[['Nenhum','nenhum'],['Boné','bone'],['Chapéu de palha','palha'],['Touca','touca'],['Bandana','bandana'],['Tiara','tiara'],['Flor no cabelo','flor'],['Chapéu de cowboy','cowboy'],['Laço','laco'],['Chapéu de pescador','pescador']]},
  extra:{lux:[['Relógio de prata','relogioPrata'],['Relógio de ouro','relogioOuro'],['Cordão de ouro grosso','cordao']],luxm:[['Corrente com pingente','pingente']],luxf:[['Brincos de pérola','brincoPerola'],['Brincos de diamante','brincoDiamante'],['Colar de esmeralda','esmeralda'],['Choker de ouro','choker']],vip:[['Corrente de diamante','diamante']],m:[['Nada','nada'],['Óculos','oculos'],['Bigode','bigode'],['Óculos escuros','escuros'],['Barba','barba'],['Palito na boca','palito'],['Corrente de ouro','corrente'],['Brinco','brinco']],
   f:[['Nada','nada'],['Óculos','oculos'],['Batom','batom'],['Óculos escuros','escuros'],['Argola grande','argola'],['Colar de pérolas','perolas'],['Corrente de ouro','corrente'],['Brinco','brinco']]},
- roupa:{vip:[['Jaqueta de couro','couro'],['Camisa do Tonhão','tonhao']],vipm:[['Terno branco','ternoBranco'],['Jaqueta bomber dourada','bomberOuro'],['Moletom neon','moletomNeon'],['Jaqueta de veludo','veludo'],['Smoking','smoking']],vipf:[['Vestido de gala','gala'],['Jaqueta bomber dourada','bomberOuro'],['Moletom neon','moletomNeon'],['Jaqueta de veludo','veludo'],['Vestido de lantejoulas','lantejoula']],m:[['Camiseta','camiseta'],['Regata','regata'],['Camisa social','social'],['Jaqueta','jaqueta'],['Moletom','moletom'],['Camisa polo','polo'],['Camisa de time','time'],['Macacão','macacao'],['Camisa xadrez','xadrez'],['Terno','terno'],['Camisa havaiana','havaiana'],['Camiseta listrada','listrada'],['Colete','colete'],['Camisa jeans','camisaJeans'],['Agasalho esportivo','agasalho'],['Camiseta de banda','banda'],['Camiseta oversized','oversized'],['Jaqueta jeans','jaquetaJeans'],['Corta-vento','cortaVento'],['Jaqueta puffer','puffer'],['Blazer','blazer'],['Suéter de tricô','sueter'],['Camisa aberta florida','camisaAberta']],
+ roupa:{vip:[['Jaqueta de couro','couro'],['Camisa do Tonhão','tonhao']],vipm:[['Terno branco','ternoBranco'],['Bomber dourada com pelo','bomberOuro'],['Puffer neon','moletomNeon'],['Sobretudo de veludo','veludo'],['Smoking com capa','smoking']],vipf:[['Vestido de gala','gala'],['Bomber dourada com pelo','bomberOuro'],['Puffer neon','moletomNeon'],['Sobretudo de veludo','veludo'],['Vestido de lantejoulas','lantejoula']],m:[['Camiseta','camiseta'],['Regata','regata'],['Camisa social','social'],['Jaqueta','jaqueta'],['Moletom','moletom'],['Camisa polo','polo'],['Camisa de time','time'],['Macacão','macacao'],['Camisa xadrez','xadrez'],['Terno','terno'],['Camisa havaiana','havaiana'],['Camiseta listrada','listrada'],['Colete','colete'],['Camisa jeans','camisaJeans'],['Agasalho esportivo','agasalho'],['Camiseta de banda','banda'],['Camiseta oversized','oversized'],['Jaqueta jeans','jaquetaJeans'],['Corta-vento','cortaVento'],['Jaqueta puffer','puffer'],['Blazer','blazer'],['Suéter de tricô','sueter'],['Camisa aberta florida','camisaAberta']],
   f:[['Blusinha','blusinha'],['Cropped','cropped'],['Vestido','vestido'],['Vestido longo','vestidoLongo'],['Jaqueta','jaqueta'],['Moletom','moletom'],['Camisa de time','time'],['Macacão','macacao'],['Camisa xadrez','xadrez'],['Regata','regataF'],['Camisa havaiana','havaiana'],['Top de alcinha','topAlca'],['Blusa ombro a ombro','ombro'],['Cardigan','cardigan'],['Jaqueta jeans','jaquetaJeans'],['Jaqueta puffer','puffer'],['Blazer','blazer'],['Vestido tubinho','tubinho'],['Camiseta oversized','oversized']]},
  barba:{m:[['Nenhuma','nenhuma'],['Por fazer','rala'],['Cheia','cheia'],['Cavanhaque','cavanhaque'],['Bigode grosso','bigodeGrosso'],['Bigodinho','bigodinho'],['Lenhador','lenhador'],['Costeleta','costeleta'],['Bode','bode']],f:[['Nenhuma','nenhuma']]},
  calcado:{vip:[['Tênis de ouro','tenisOuro'],['Tênis neon','tenisNeon']],m:[['Tênis','tenis'],['Chinelo','chinelo'],['Bota','bota'],['Sapato social','social'],['Tênis chunky','chunky'],['Tênis cano alto','cano'],['Coturno','coturno'],['Mocassim','mocassim'],['Sandália','sandalia']],
@@ -1286,6 +1286,32 @@ if(!o.tonhao&&!macacao&&!vest){c.lineCap='round';c.strokeStyle='rgba(0,0,0,.16)'
    c.fillStyle='#1a1a1f';circ(c,0,by+5.4,.3);circ(c,0,by+7.4,.3);c.strokeStyle='#45454f';c.lineWidth=.35;c.beginPath();c.moveTo(-1.9,by);c.lineTo(-3.4,by+6);c.moveTo(1.9,by);c.lineTo(3.4,by+6);c.stroke()}
   if(roupaR==='lantejoula'){for(let i=0;i<46;i++){const h=Math.sin(i*12.9898)*43758.5,u=h-Math.floor(h),w=Math.sin(i*78.233)*43758.5,q=w-Math.floor(w),tw=.5+.5*Math.sin(now*4+i*1.7);c.fillStyle=i%3?`rgba(255,220,240,${.35+.5*tw})`:`rgba(255,255,255,${.4+.6*tw})`;circ(c,-bw/2+u*bw,by+q*(bh+8),.35+.15*(i%2))}}
  c.restore()}
+ // formatos próprios das roupas VIP (saem do corpo)
+ {const pf=!!(o.perfil||o.lado),d=dir||1,bot=by+bh;
+  const pelo=(x0,x1,y,r)=>{for(let x=x0;x<=x1;x+=r*.9){const yy=y+Math.sin(x*1.7)*.25;c.fillStyle='#efe3c8';circ(c,x,yy,r);c.fillStyle='rgba(255,255,255,.55)';circ(c,x-r*.3,yy-r*.3,r*.45)}};
+  if(roupaR==='bomberOuro'){ // gola de pelo grande e punho largo
+   if(back){pelo(-5.2,5.2,by+.6,1.3)}else if(pf){pelo(-2.6*d,3.4*d>0?3.4:-2.6,by+.6,1.25);pelo(Math.min(-2.6*d,3.4*d),Math.max(-2.6*d,3.4*d),by+.6,1.25)}else{pelo(-5.6,-1.2,by+.7,1.3);pelo(1.2,5.6,by+.7,1.3);c.fillStyle='#efe3c8';circ(c,-1.9,by+2.6,1.2);circ(c,1.9,by+2.6,1.2)}
+   c.fillStyle='#17171c';rr(c,-bw/2-.7,bot-3.4,bw+1.4,2.6,1.2);c.fill();c.fillStyle='#d4af37';c.fillRect(-bw/2-.7,bot-2.4,bw+1.4,.45);
+   if(!back&&!pf){c.fillStyle='#17171c';circ(c,bw*.24,by+6.4,1.5);c.fillStyle='#ffd23f';c.font='bold 2px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('★',bw*.24,by+6.5);c.textAlign='left';c.textBaseline='alphabetic'}}
+  if(roupaR==='moletomNeon'){ // puffer volumoso: gomos que passam da largura do corpo
+   const gomos=5,hh=(bh-1)/gomos;c.save();c.shadowColor='#14ffd0';c.shadowBlur=4;
+   for(let k=0;k<gomos;k++){const y=by+.4+k*hh,ex=1.6-Math.abs(k-1.6)*.25,g=c.createLinearGradient(0,y,0,y+hh);g.addColorStop(0,'#6dfff0');g.addColorStop(.5,'#13d6b4');g.addColorStop(1,'#0a8f7a');c.fillStyle=g;rr(c,-bw/2-ex,y,bw+ex*2,hh+.35,hh*.5);c.fill()}
+   c.restore();c.strokeStyle='#ff3dd2';c.lineWidth=.35;for(let k=1;k<gomos;k++){c.beginPath();c.moveTo(-bw/2-1,by+.4+k*hh);c.lineTo(bw/2+1,by+.4+k*hh);c.stroke()}
+   if(!back){c.fillStyle='#ff3dd2';rr(c,-.35,by+.4,.7,bh-1,.3);c.fill()}c.fillStyle='#0a8f7a';rr(c,-4.2,by-1.4,8.4,2.6,1.3);c.fill()}
+  if(roupaR==='veludo'){ // sobretudo longo até o joelho
+   const col='#5b1f86',g=c.createLinearGradient(-bw/2,0,bw/2,0);g.addColorStop(0,shade(col,30));g.addColorStop(.5,col);g.addColorStop(1,shade(col,-35));c.fillStyle=g;const y0=bot-2.5,y1=-6.2,ab=back?0:pf?0:1.5;
+   if(pf){c.beginPath();c.moveTo(-bw/2+.4,y0);c.lineTo(bw/2-.4,y0);c.lineTo(bw/2+1.4,y1);c.lineTo(-bw/2-1,y1);c.closePath();c.fill()}
+   else{for(const sgn of [-1,1]){c.beginPath();c.moveTo(sgn*ab,y0);c.lineTo(sgn*(bw/2+.3),y0);c.lineTo(sgn*(bw/2+1.6),y1);c.lineTo(sgn*(ab+(back?0:.6)),y1);c.closePath();c.fill()}}
+   c.strokeStyle='#d4af37';c.lineWidth=.45;c.beginPath();c.moveTo(-bw/2-1.6,y1);c.lineTo(bw/2+1.6,y1);if(!back&&!pf){c.moveTo(-ab,y0-bh+2.5);c.lineTo(-ab-.6,y1);c.moveTo(ab,y0-bh+2.5);c.lineTo(ab+.6,y1)}c.stroke();
+   c.fillStyle='#d4af37';if(!back&&!pf)for(let y=by+4;y<y1;y+=3.2){circ(c,-ab-.9,y,.4);circ(c,ab+.9,y,.4)}
+   if(!back){c.fillStyle='#3a0f57';c.beginPath();c.moveTo(-5.4,by-.3);c.lineTo(-1.6,by+4.8);c.lineTo(-1.4,by-.4);c.closePath();c.moveTo(5.4,by-.3);c.lineTo(1.6,by+4.8);c.lineTo(1.4,by-.4);c.closePath();c.fill()}}
+  if(roupaR==='smoking'){ // capa preta com forro vermelho + flor na lapela
+   const cy0=by-.2,cy1=-5.2;
+   if(back){const g=c.createLinearGradient(0,cy0,0,cy1);g.addColorStop(0,'#2a2a33');g.addColorStop(1,'#0c0c10');c.fillStyle=g;c.beginPath();c.moveTo(-bw/2-.8,cy0);c.lineTo(bw/2+.8,cy0);c.quadraticCurveTo(bw/2+3.2,(cy0+cy1)/2,bw/2+3,cy1);c.quadraticCurveTo(0,cy1+1.4,-bw/2-3,cy1);c.quadraticCurveTo(-bw/2-3.2,(cy0+cy1)/2,-bw/2-.8,cy0);c.fill();c.fillStyle='#b0122b';c.fillRect(-bw/2-.8,cy0,bw+1.6,.9)}
+   else{for(const sgn of pf?[-d]:[-1,1]){c.fillStyle='#b0122b';c.beginPath();c.moveTo(sgn*(bw/2),cy0);c.quadraticCurveTo(sgn*(bw/2+2.6),(cy0+cy1)/2,sgn*(bw/2+2.4),cy1);c.lineTo(sgn*(bw/2+1),cy1);c.lineTo(sgn*(bw/2-.2),cy0+2);c.closePath();c.fill();c.fillStyle='#0c0c10';c.beginPath();c.moveTo(sgn*(bw/2+.3),cy0);c.quadraticCurveTo(sgn*(bw/2+3.2),(cy0+cy1)/2,sgn*(bw/2+3),cy1);c.lineTo(sgn*(bw/2+2.3),cy1);c.quadraticCurveTo(sgn*(bw/2+2.4),(cy0+cy1)/2,sgn*(bw/2),cy0+.8);c.closePath();c.fill()}
+    if(!pf){c.fillStyle='#e0182d';circ(c,-3.1,by+3,1);c.fillStyle='#ff6b81';circ(c,-3.3,by+2.7,.45);c.fillStyle='#d4af37';c.fillRect(1.6,by+7,2.4,.35)}}}
+  if(roupaR==='lantejoula'){c.save();c.globalCompositeOperation='lighter';for(let i=0;i<5;i++){const a=now*1.3+i*1.26,r=bw*.75;const x=Math.cos(a)*r,y=by+bh*.6+Math.sin(a)*bh*.7;c.fillStyle='rgba(255,200,230,.55)';circ(c,x,y,.55)}c.restore()}
+ }
  if(baixoR==='cargo'&&!saia&&!sit){c.fillStyle=shade(pants,-20);for(const k of [-1,1])c.fillRect(k*2.6-1.6,-11,3.2,2.6)}
  {c.save();c.clip(CORPO);if(roupa==='xadrez'){c.strokeStyle=shirtD;c.lineWidth=1;for(let i=-bw/2+2;i<bw/2;i+=3.2){c.beginPath();c.moveTo(i,by+1);c.lineTo(i,by+bh-1);c.stroke()}for(let j=by+3;j<by+bh;j+=3.2){c.beginPath();c.moveTo(-bw/2+1,j);c.lineTo(bw/2-1,j);c.stroke()}}c.restore()}
  if(!o.tonhao&&!o.policia&&!o.suit)estampa(c,CORPO,v.estampa||0,shirt,bw,by,bh,back,!!(o.perfil||o.lado),dir);
@@ -5022,7 +5048,7 @@ function desenhaPet(c,p){const P=PETS[p.pet];if(!P||carOf(p))return;
   c.fillStyle=P.c;const pe=mv?Math.sin(now*14)*1.5:0;c.fillRect(-6,-3,2,3+pe);c.fillRect(3,-3,2,3-pe);c.fillStyle='#000';circ(c,7.5,-10.5,.8);circ(c,9.6,-9.5,.9)}
  c.restore()}
 const PRODUTOS={
- passe_T1:{tab:'vip',ic:'🎟️',nome:'Passe Natal na Vila',desc:'🚗 Carro exclusivo + 🎅 gorro brilhante (nunca mais voltam), roupas, estampas e R$ 6.500 do jogo. Termina em 31/12!',preco:9.90,passe:1},
+ passe_T1:{tab:'vip',ic:'🎟️',nome:'Passe Natal na Vila',desc:'🚗 Carro exclusivo + 🎅 gorro brilhante (nunca mais voltam), 10 roupas e 💰 R$ 26 mil do jogo. Termina em 31/12!',preco:9.90,passe:1},
  vip90:{tab:'vip',ic:'👑',nome:'VIP 90 dias',desc:'Tudo do VIP por 3 meses pagando menos: coroa azul, roupas e cores exclusivas, Lambordini, presente do mês, ir para casa num toque e +50% de pontos no passe.',preco:39.90,dias:90},
  vip30:{tab:'vip',ic:'👑',nome:'VIP 30 dias',desc:'Coroa azul, roupas e cores exclusivas, Lambordini, emotes, fome mais lenta, música da jukebox, 🎁 presente do mês, 🏠 ir para casa num toque e +50% de pontos no passe.',preco:15.99},
  pet_cachorro:{tab:'pets',pet:'cachorro',preco:3.90},pet_gato:{tab:'pets',pet:'gato',preco:3.90},pet_galinha:{tab:'pets',pet:'galinha',preco:3.90},pet_capivara:{tab:'pets',pet:'capivara',preco:3.90},pet_papagaio:{tab:'pets',pet:'papagaio',preco:3.90},
@@ -5030,8 +5056,8 @@ const PRODUTOS={
 const TABS=[['vip','👑 VIP'],['roupas','👕 Roupas'],['pets','🐾 Pets'],['carros','🚗 Carros']];let lojaTab='vip',pixTimer=null;
 const reais=v=>'R$ '+v.toFixed(2).replace('.',',');
 /* ----- Passe da Temporada e VIP turbinado (prêmios só visuais ou dinheiro do jogo) ----- */
-const PASSE_T1=[[1,{dinheiro:300},{chapeu:[31,31]}],[2,{dinheiro:300},{roupa:[22,17]}],[3,{dinheiro:400},{chapeu:[6,8]}],[4,{estampa:5},{dinheiro:1500}],[5,{chapeu:[30,30]},{calca:[15,22]}],[6,{dinheiro:500},{roupa:[20,16]}],[7,{dinheiro:600},{calcado:[7,3]}],[8,{chapeu:[3,3]},{estampa:11}],[9,{dinheiro:700},{roupa:[19,15]}],[10,{dinheiro:800},{dinheiro:5000}],
- [11,{dinheiro:800},{extra:[6,5]}],[12,{estampa:7},{calca:[13,23]}],[13,{dinheiro:900},{roupa:[21,13]}],[14,{dinheiro:1000},{chapeu:[7,7]}],[15,{dinheiro:1000},{estampa:8}],[16,{roupa:[10,10]},{calcado:[6,7]}],[17,{dinheiro:1200},{roupa:[17,14]}],[18,{dinheiro:1200},{extra:[7,4]}],[19,{dinheiro:1500},{estampa:9}],[20,{dinheiro:2000},{carro:'natal'}]];
+const PASSE_T1=[[1,{dinheiro:300},{chapeu:[31,31]}],[2,{dinheiro:300},{roupa:[22,17]}],[3,{dinheiro:400},{chapeu:[6,8]}],[4,{estampa:5},{dinheiro:3000}],[5,{chapeu:[30,30]},{calca:[15,22]}],[6,{dinheiro:500},{roupa:[20,16]}],[7,{dinheiro:600},{calcado:[7,3]}],[8,{chapeu:[3,3]},{dinheiro:3000}],[9,{dinheiro:700},{roupa:[19,15]}],[10,{dinheiro:800},{dinheiro:10000}],
+ [11,{dinheiro:800},{extra:[6,5]}],[12,{estampa:7},{calca:[13,23]}],[13,{dinheiro:900},{roupa:[21,13]}],[14,{dinheiro:1000},{chapeu:[7,7]}],[15,{dinheiro:1000},{dinheiro:4000}],[16,{roupa:[10,10]},{calcado:[6,7]}],[17,{dinheiro:1200},{roupa:[17,14]}],[18,{dinheiro:1200},{extra:[7,4]}],[19,{dinheiro:1500},{dinheiro:6000}],[20,{dinheiro:2000},{carro:'natal'}]];
 const VIP_MENSAL={'2026-11':{roupa:[14,12]},'2026-12':{calca:[11,13]},'2027-01':{roupa:[18,11]},'2027-02':{estampa:10},'2027-03':{calcado:[5,6]},'2027-04':{chapeu:[8,6]}};
 const PR_IC={roupa:'👕',calca:'👖',calcado:'👟',chapeu:'🧢',extra:'💍'};
 function nomePremio(p){if(!p)return'';if(p.carro)return'🚗 '+(CARS_PREMIUM[p.carro]?CARS_PREMIUM[p.carro].nome:'Carro exclusivo');if(p.dinheiro)return'💰 R$ '+p.dinheiro.toLocaleString('pt-BR');if(p.estampa!=null)return'🎨 Estampa '+FIELDS.find(f=>f[0]==='estampa')[2][p.estampa];
@@ -5044,7 +5070,7 @@ async function abrirPasse(){if(!eu)return;closePlace();$('mPasse').classList.rem
 const PS_THUMB=new Map();
 function thumbPremio(p,W){W=W||140;const key=JSON.stringify(p)+'|'+(eu&&eu.v?encode(eu.v):'')+'|'+W;const copia=src=>{const o=document.createElement('canvas');o.width=o.height=W;o.getContext('2d').drawImage(src,0,0);return o};if(PS_THUMB.has(key))return copia(PS_THUMB.get(key));
  const cv=document.createElement('canvas');cv.width=cv.height=W;const g=cv.getContext('2d'),k=W/140;
- try{if(p.dinheiro){g.textAlign='center';g.textBaseline='middle';g.font=`${(p.dinheiro>=2000?50:p.dinheiro>=1000?72:62)*k}px sans-serif`;g.fillText(p.dinheiro>=2000?'💰💰':'💰',W/2,W*.52)}
+ try{if(p.dinheiro){g.textAlign='center';g.textBaseline='middle';g.font=`${(p.dinheiro>=3000?52:p.dinheiro>=1000?72:62)*k}px sans-serif`;g.fillText(p.dinheiro>=10000?'💰💎💰':p.dinheiro>=3000?'💰💰':'💰',W/2,W*.52);if(p.dinheiro>=10000){g.font=`${40*k}px sans-serif`;g.fillText('✨',W*.8,W*.2)}}
   else if(p.carro){g.save();g.translate(W/2,W*.62);g.scale(1.45*k,1.45*k);try{drawCarStack(g,0,0,CARS_PREMIUM[p.carro]?p.carro:'gto',-.6,null,{})}catch(e){}g.restore();if(!CARS_PREMIUM[p.carro]){g.globalCompositeOperation='source-atop';g.fillStyle='#120a0e';g.fillRect(0,0,W,W);g.globalCompositeOperation='source-over';g.fillStyle='#ffc94a';g.textAlign='center';g.textBaseline='middle';g.font=`bold ${46*k}px Fredoka,sans-serif`;g.fillText('?',W/2,W*.5)}}
   else{const v=Object.assign({},eu.v),s0=sx(v),dd={roupa:'roupa',calca:'calca',calcado:'calcado',chapeu:'chapeu',extra:'extra'};
    if(p.estampa!=null){v.estampa=p.estampa;v.roupa=0}for(const q in dd)if(p[q])v[q]=p[q][s0==='f'?1:0];
@@ -5058,7 +5084,7 @@ function pintaPasse(){const P=PASSE;if(!P||!P.temporada){$('psTit').textContent=
  $('psNv').textContent=nv;$('psBarra').firstElementChild.style.width=(nv>=20?100:(P.pontos%100))+'%';$('psNivel').textContent=nv>=20?'🏆 Nível máximo!':`${P.pontos%100}/100 pontos para o nível ${nv+1}`;
  $('psSub').textContent='Ganhe pontos trabalhando: cada tarefa dá 10 e cada pagamento da patrulha dá 15. 👑 VIP ganha +50%.';
  const cb=$('psComprar');cb.innerHTML='';
- if(!P.premium&&!NO_APP){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · 10 roupas · estampas · R$ 6.500 do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
+ if(!P.premium&&!NO_APP){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · 10 roupas · 💰 R$ 26 mil do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
  else if(P.premium)cb.innerHTML='<div class="psSub" style="color:#c9a8ff;text-align:center">👑 Você tem o Passe Premium desta temporada.</div>';
  const L=$('psLista');L.innerHTML='';const by={};for(const x of P.premios)by[x.nivel+x.trilha]=x.premio;
  for(let n=1;n<=20;n++){const col=document.createElement('div');col.className='psCol'+(n<=nv?' ok':'');col.innerHTML=`<div class="lv">${n}</div>`;
@@ -5161,7 +5187,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261122t';
+const VERSAO_JOGO='v20261122u';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

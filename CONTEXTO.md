@@ -199,7 +199,7 @@ Combinado de trabalho: primeiro FOTO + link de teste (Artifact privado https://c
 5. Curva de XP para a Play Store (anotada na sessão anterior).
 
 ## SITUAÇÃO EM 22/11/2026 (sétima sessão) — LEIA PRIMEIRO
-Versão VERSAO_JOGO **v20261122t** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
+Versão VERSAO_JOGO **v20261122u** (ramo `ccr-e8b9720b-5amd2g`). O usuário rodou a **etapa 25** no Supabase nesta sessão. Para subir: `site.zip` = `index.html` + `musicas/` + **`sons/` (pasta nova, obrigatória)**. Nenhum SQL novo nesta versão.
 Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botão "🧪 Carros" com todos os veículos inclusive de trabalho): https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d
 ### O que entrou
 - **Desempenho:** `imageSmoothingQuality` do ctx principal 'high' → 'low' (35 → 48 qps no teste). Pendentes: luz da noite mais leve; guardar prontos prédios/muros (maior ganho que sobra).
@@ -223,7 +223,7 @@ Teste sem servidor (Artifact privado, ONLINE forçado false, entra direto, botã
 - **Itens exclusivos (índices 30-39, `OPC.chapeu.exc`, `excOf`)**: gorro de Papai Noel (30, grátis nível 5) e gorro brilhante (31, premium nível 1; todos veem brilhando). Não vendem (`preco_roupa` 999999, `comprar_roupa` recusa).
 - **Prêmio final do passe:** `{"carro":"natal"}` (premium nível 20). Bloqueado até `passe_temporadas.carro_pronto = true` e até existir `CARS_PREMIUM.natal` no cliente. Quando o usuário mandar o carro: adicionar o sprite com id `natal`, `CARS_PREMIUM.natal` e rodar `update passe_temporadas set carro_pronto = true where id = 'T1'`.
 - **Tela do passe nova** (estilo Fortnite/Clash): vitrine com carro (silhueta "?") e gorro, aviso "nunca mais voltam", trilha horizontal grátis/premium com miniaturas do próprio boneco (`thumbPremio`). Loja VIP com quadro de benefícios e a Lambordini desenhada.
-- **Roupas VIP novas** (no fim de `vipm`/`vipf`, 53-56): bomber dourada, moletom neon, jaqueta de veludo, smoking (m) / vestido de lantejoulas (f); tênis neon (calçado 51) e boné neon (chapéu 52). **Estampas redesenhadas** (mesmos índices).
+- **Roupas VIP novas** (no fim de `vipm`/`vipf`, 53-56): Bomber dourada com pelo, Puffer neon (gomos), Sobretudo de veludo (até o joelho), Smoking com capa (m) / vestido de lantejoulas (f), com formatos próprios desenhados fora do corpo; tênis neon (calçado 51) e boné neon (chapéu 52). **Estampas redesenhadas** (mesmos índices).
 ### Pendências
 000. Carro exclusivo do passe (o usuário vai mandar).
 00. Confirmar se o usuário rodou a ETAPA 28 (`novidades.sql`). Antes: ETAPAS 26 e 27 já rodadas.
