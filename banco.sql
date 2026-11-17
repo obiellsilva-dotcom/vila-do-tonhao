@@ -2183,7 +2183,7 @@ revoke execute on function public.excluir_conta() from public, anon;
 grant execute on function public.excluir_conta() to authenticated;
 
 -- ===================== ETAPA 28: Passe da Temporada e VIP turbinado =====================
--- Passe: 20 níveis (100 pontos cada). Tarefa de emprego = 10 pontos, pagamento da patrulha = 15, VIP ganha +50%.
+-- Passe: 20 níveis (100 pontos cada). Tarefa de emprego = 2 a 15 pontos conforme o tempo (_pontos_tarefa), pagamento da patrulha = 15, VIP ganha +50%.
 -- Trilha grátis para todos; trilha premium comprada no Pix (produto passe_T1). Prêmios só visuais ou dinheiro do jogo.
 alter table public.produtos drop constraint if exists produtos_tipo_check;
 alter table public.produtos add constraint produtos_tipo_check check (tipo in ('vip','pet','carro','passe'));
@@ -2270,6 +2270,31 @@ create or replace function public._temporada_atual() returns text
 language sql stable security definer set search_path = public as $$
   select id from passe_temporadas where now() >= inicio and now() < fim order by inicio desc limit 1
 $$;
+
+-- pontos do passe por tarefa conforme o tempo de cada emprego (~15 pontos por minuto em qualquer emprego)
+create or replace function public._pontos_tarefa(p_job text) returns integer
+language sql immutable as $$
+  select case p_job
+    when 'bar' then 2
+    when 'posto' then 2
+    when 'concessionaria' then 2
+    when 'barbearia' then 2
+    when 'pescador' then 2
+    when 'mercadinho' then 3
+    when 'oficina' then 3
+    when 'prefeito' then 3
+    when 'banco' then 4
+    when 'delegado' then 4
+    when 'gerente' then 6
+    when 'lixeiro' then 7
+    when 'enfermeiro' then 8
+    when 'padaria' then 8
+    when 'medico' then 9
+    when 'fabrica' then 12
+    when 'prefeitura' then 15
+    else 3 end
+$$;
+revoke execute on function public._pontos_tarefa(text) from public, anon;
 
 create or replace function public._passe_pontos(p_morador uuid, p_pontos integer) returns void
 language plpgsql security definer set search_path = public as $$
@@ -2423,7 +2448,7 @@ begin
   end if;
   update moradores set dinheiro = dinheiro + pago + premio, xp = novo_xp, nivel = novo_nivel,
     peixes = peixes + peixes_ganhos, tarefa_em = now() where id = m.id;
-  perform _passe_pontos(m.id, 10);
+  perform _passe_pontos(m.id, _pontos_tarefa(t.id));
   morreu := _gastar_fome(m.id, t.fome / 6.0);
   if morreu or (select fome from moradores where id = m.id) < 10 then
     cansado := true;
