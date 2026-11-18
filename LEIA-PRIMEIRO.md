@@ -22,6 +22,7 @@ Tudo commitado. O dono recebeu o `site.zip` v20261124e (confirmar se subiu). SQL
 - **🎵 Músicas (v20261124k):** catálogo = 3 da Vila + 6 sertanejo do Pixabay (`MUS`, crédito em privacidade.html); as 18 do Kevin MacLeod foram removidas a pedido (só brasileiras).
 - **⚡ Desempenho (v20261124k):** corte do que está fora da tela no laço de desenho (`CULL`, itens podem ter `cb:[x0,y0,x1,y1,altura]` ou `nc:1` para nunca cortar); `quadro` faz no máximo 1 tratamento pesado por quadro (`QBUD`); pintura de carro só no ângulo visível (`spriteCor` devolve objeto `tint`, `tintQuadro`); fotos grandes abertas em segundo plano (`pronta(img)` com `img.decode()`). Medido com CPU 4x mais lenta: 6,5 → 10,7 fps, pior travada 6,4 s → 1,2 s. Ferramentas de medição em scratchpad (perf/conta/trava).
 - **🛋️ Móveis novos (v20261124l, SQL etapa 33):** 50 móveis em `MOV` (bloco "móveis novos (leva 2)"), abas banho/lazer/efeito/luxo; efeitos animados por `D.fx(c,P,alpha)` (P = ponto já girado); `vip:1` = só VIP (cliente + `movel_vip` no servidor); `preco_movel` atualizado.
+- **Móveis funcionais (v20261124m, SQL etapa 34):** `agua:z` (banheira, piscina, hidro) → "🏊 Entrar na água" (`noMovel(...,'agua')`, `aguaPorCima`); vitrola `juke:1` toca como jukebox (`temJuke` usa `MOV[t].juke`); `liga:1` → ligar/desligar pelo dono (`ligarMovel`, função `ligar_movel`, campo `off` no móvel).
 - Novidades: `NOVID='v20261127'` com slides Furacão GT, Concessionária nova e Passeio.
 - **Próximos passos:** tempo real no Cloudflare (seção 6) e Play Store (seção 7).
 

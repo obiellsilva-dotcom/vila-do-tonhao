@@ -3135,3 +3135,20 @@ begin
   update casas set moveis = moveis || jsonb_build_array(jsonb_build_object('t', p_tipo, 'x', p_x, 'y', p_y, 'a', p_andar, 'r', p_r)) where id = c.id;
   return json_build_object('moveis', (select moveis from casas where id = c.id), 'eu', _estado(m.id));
 end $$;
+
+-- ===================== ETAPA 34: Ligar/desligar móveis (lareira, neon, globo, luminárias...) =====================
+create or replace function public.ligar_movel(p_casa integer, p_i integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; e jsonb;
+begin
+  m := _eu();
+  select * into c from casas where id = p_casa and dono = m.id for update;
+  if c.id is null then raise exception 'Só o dono da casa liga e desliga.'; end if;
+  if p_i < 0 or p_i >= jsonb_array_length(c.moveis) then raise exception 'Móvel não encontrado.'; end if;
+  e := c.moveis -> p_i;
+  e := jsonb_set(e, '{off}', to_jsonb(not coalesce((e ->> 'off')::boolean, false)));
+  update casas set moveis = jsonb_set(moveis, array[p_i::text], e) where id = c.id;
+  return json_build_object('moveis', (select moveis from casas where id = c.id));
+end $$;
+revoke execute on function public.ligar_movel(integer, integer) from public, anon;
+grant execute on function public.ligar_movel(integer, integer) to authenticated;
