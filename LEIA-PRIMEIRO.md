@@ -143,3 +143,4 @@ Tabelas novas da etapa 28: `passe_temporadas`, `passe_premios`, `passe_jogador`,
 - Não usar conteúdo com direitos autorais (sons de GTA/FiveM, marcas reais).
 - Ele **recusou** dar o token da API do Cloudflare ao assistente: usar o caminho pelo GitHub.
 - **Não colocar limite de ganho por hora** nas tarefas.
+- **Só gerar/mandar `site.zip`, `index.html` e SQL quando o dono disser "vamos subir".** Até lá, ir juntando as mudanças (commitar no GitHub normalmente) e, na hora, mandar tudo de uma vez com a lista do que mudou e o SQL pendente.
