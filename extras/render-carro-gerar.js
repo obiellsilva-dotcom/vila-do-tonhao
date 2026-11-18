@@ -1,0 +1,3 @@
+const {chromium}=require('playwright');const fs=require('fs');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});const p=await b.newPage();p.on('pageerror',e=>console.log('E',e.message));p.on('console',m=>{if(m.type()==='error')console.log('C',m.text())});
+await p.goto('http://localhost:8765/render-carro.html');await p.waitForFunction(()=>window.R,null,{timeout:300000});console.log(JSON.stringify(await p.evaluate(()=>window.R)));
+for(const [mode,k,out] of JSON.parse(process.argv[2])){const d=await p.evaluate(([m,k])=>window.renderSheet(m,k),[mode,k]);fs.writeFileSync(out,Buffer.from(d.split(',')[1],'base64'));console.log('ok',out)}await b.close()})();

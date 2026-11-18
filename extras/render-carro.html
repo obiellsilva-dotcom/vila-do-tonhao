@@ -1,0 +1,51 @@
+<body style="margin:0;background:#7a8c7a"><script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const P=new URLSearchParams(location.search);
+const U=22.7,C=74,EL=.663,WZ=[1.2495,-1.3785],WY=0.3255,WR=0.335;
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:true});r.setPixelRatio(1);r.setSize(320,320);r.outputColorSpace=THREE.SRGBColorSpace;r.setClearColor(0x000000,0);
+const sc=new THREE.Scene();
+const cam=new THREE.OrthographicCamera(-80,80,C,C-160,-2000,2000);cam.position.set(0,Math.sin(EL)*500,Math.cos(EL)*500);cam.up.set(0,1,0);cam.lookAt(0,0,0);
+const yawG=new THREE.Group(),baseG=new THREE.Group();sc.add(yawG);yawG.add(baseG);baseG.scale.setScalar(U);baseG.rotation.y=Math.PI/2;
+function cls(name,c){const [x,y,z]=c,ax=Math.abs(x);
+ if(name==='Object_14')return'hide';
+ if(name==='Object_7'&&ax<0.09&&z>1.99&&y>0.585&&y<0.716)return'hide';
+ if(name==='Object_7'&&ax<0.058&&z<-2.04&&y>0.844&&y<0.958)return'hide';
+ if(name==='Object_6'&&ax>0.44&&ax<0.58&&z<-1.98&&y>0.76&&y<0.81)return'hide';
+ if((name==='Object_6'||name==='Object_7')&&x<-0.285&&x>-0.415&&z>1.945&&z<2.04&&y>0.632&&y<0.68)return'hide';
+ if(name==='Object_5'&&x>0.46&&x<0.56&&z<-1.998&&y>0.77&&y<0.802)return'hide';
+ if(name!=='Object_11'&&name!=='Object_13'&&ax>0.5)for(let k=0;k<2;k++)if(Math.hypot(y-WY,z-WZ[k])<WR)return'w'+k+(x>0?'L':'R');
+ if(name==='Object_11'){if(z>1.8&&y>0.55&&y<0.86&&ax>0.4)return'lf';if(z<-1.8&&y>0.76&&y<1.0&&ax>0.3)return'lr'}
+ return'body'}
+const parts={};// part -> list of meshes
+new GLTFLoader().load('g21.glb',g=>{const m=g.scene;m.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(m);
+ const meshes=[];m.traverse(o=>{if(o.isMesh)meshes.push(o)});
+ for(const o of meshes){const geo=o.geometry,pos=geo.attributes.position,idx=geo.index,n=idx?idx.count/3:pos.count/3,v=new THREE.Vector3(),buck={};
+  for(let t=0;t<n;t++){let s=[0,0,0];const ii=[];for(let k=0;k<3;k++){const i=idx?idx.getX(t*3+k):t*3+k;ii.push(i);v.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld);s[0]+=v.x/3;s[1]+=v.y/3;s[2]+=v.z/3}
+   const p=cls(o.name,s);(buck[p]=buck[p]||[]).push(...ii)}
+  for(const p in buck){if(p==='hide')continue;const g2=new THREE.BufferGeometry();for(const a in geo.attributes)g2.setAttribute(a,geo.attributes[a]);g2.setIndex(buck[p]);
+   let mat=o.material.clone();if(mat.metalness!==undefined){mat.metalness=0;}if(o.material.name==='Paint_Color'){mat.aoMap=null;mat.color.set(0xf2f2f2);mat.roughness=.45;mat.metalness=0}
+   const mm=new THREE.Mesh(g2,mat);mm.matrixAutoUpdate=false;mm.matrix.copy(o.matrixWorld);mm.userData.orig=mat;mm.userData.paint=o.material.name==='Paint_Color';if(o.material.name==='Index_0_3'&&p==='body'){mat.emissive=new THREE.Color(0x232c38);mat.emissiveIntensity=1;mat.opacity=1;mat.transparent=false}
+   let holder=mm;if(p[0]==='w'){const k=+p[1];const piv=new THREE.Group();piv.position.set(0,WY,WZ[k]);const inner=new THREE.Group();inner.position.set(0,-WY,-WZ[k]);piv.add(inner);inner.add(mm);holder=piv;mm.userData.piv=piv}
+   baseG.add(holder);const key=p[0]==='w'?'wheel':p;(parts[key]=parts[key]||[]).push(mm)}}
+ // centre: x,z centre and y min = 0 (model already y>=0)
+ const cz=(box.min.z+box.max.z)/2;baseG.position.set(0,0,0);baseG.children.forEach(ch=>ch.position.z-=cz);
+ sc.add(new THREE.HemisphereLight(0xffffff,0x8a8a8a,2.2));const dl=new THREE.DirectionalLight(0xffffff,1.6);dl.position.set(-2,6,4);sc.add(dl);const dl2=new THREE.DirectionalLight(0xffffff,.6);dl2.position.set(3,2,-3);sc.add(dl2);
+ const big=document.createElement('canvas');big.width=2560;big.height=1280;const bg=big.getContext('2d');
+ const occ=new THREE.MeshBasicMaterial({colorWrite:false}),white=new THREE.MeshBasicMaterial({color:0xffffff}),black=new THREE.MeshBasicMaterial({color:0x000000});
+ const lfM=new THREE.MeshBasicMaterial({color:0xfff4d8,side:THREE.DoubleSide}),lrM=new THREE.MeshBasicMaterial({color:0xff2a2a,side:THREE.DoubleSide});
+ window.renderSheet=(mode,k)=>{const all=Object.values(parts).flat();
+  for(const mm of all){mm.visible=true;mm.renderOrder=0;mm.material=mm.userData.orig}
+  if(mode==='body'){parts.wheel.forEach(mm=>mm.visible=false);parts.lf.forEach(mm=>mm.material=mm.userData.orig);}
+  if(mode==='mask'){r.setClearColor(0x000000,1);all.forEach(mm=>{mm.material=mm.userData.paint?white:black});parts.wheel.forEach(mm=>mm.visible=false)}else r.setClearColor(0x000000,0);
+  if(mode==='wheel'){all.forEach(mm=>{if(!parts.wheel.includes(mm)){mm.material=occ;mm.renderOrder=-1}});parts.wheel.forEach(mm=>{mm.userData.piv.rotation.x=k*Math.PI/10})}
+  if(mode==='lf'||mode==='lr'){all.forEach(mm=>{mm.material=occ;mm.renderOrder=-1});parts.wheel.forEach(mm=>mm.visible=true);parts.lf.forEach(mm=>{mm.visible=mode==='lf';mm.material=lfM;mm.renderOrder=1});parts.lr.forEach(mm=>{mm.visible=mode==='lr';mm.material=lrM;mm.renderOrder=1})}
+  if(mode==='full'){/* tudo com rodas */}
+  bg.clearRect(0,0,2560,1280);
+  for(let i=0;i<32;i++){const th=-Math.PI+i*Math.PI/16,se=Math.sin(EL),yaw=Math.atan2(Math.sin(th)/se,Math.cos(th));yawG.rotation.y=-yaw;r.render(sc,cam);bg.drawImage(r.domElement,(i%8)*320,Math.floor(i/8)*320)}
+  if(mode==='wheel')parts.wheel.forEach(mm=>mm.userData.piv.rotation.x=0);
+  return big.toDataURL(mode==='mask'?'image/png':'image/png')};
+ window.closeup=(th,h,z,mode)=>{const W=640;r.setSize(W,W);for(const mm of Object.values(parts).flat()){mm.visible=true;mm.material=mm.userData.orig}const se=Math.sin(EL),yaw=Math.atan2(Math.sin(th)/se,Math.cos(th));yawG.rotation.y=-yaw;const c2=new THREE.OrthographicCamera(-80/z,80/z,80/z+h,-80/z+h,-2000,2000);c2.position.copy(cam.position);c2.lookAt(0,0,0);c2.position.y+=h;c2.updateProjectionMatrix();r.setClearColor(0x7a8c7a,1);r.render(sc,c2);const d=r.domElement.toDataURL();r.setSize(320,320);r.setClearColor(0,0);return d};
+ window.R={parts:Object.fromEntries(Object.entries(parts).map(([k,v])=>[k,v.length])),cz};
+});
+</script>
