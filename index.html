@@ -4779,7 +4779,8 @@ function noMovel(m,tipo,fala){const R=eu.rm.R,[w,h]=movTam(m.t,m.r|0),X=T(R.x0+m
   const cen=gira(W0/2,H0/2),ocup=[...others.values()].filter(o=>o.sit&&!o.hidden&&o.rm===salaKey(eu));let lugar=null;
   for(const L of (D.lugares||[[W0/2,H0/2]])){const q=gira(L[0],L[1]),lx=X+q[0],ly=Y+q[1];if(!ocup.some(o=>Math.hypot(o.x-lx,o.y-ly)<12)){lugar=[lx,ly];break}}
   if(!lugar){eu.casaAcao=null;toast('🏊 Está cheio! Espere alguém sair.',2500);return}
-  eu.x=lugar[0];eu.y=lugar[1];const emCima=isoP(lugar[0],lugar[1])[1]<isoP(X+cen[0],Y+cen[1])[1]-2;eu.sit=true;eu.mz=D.agua-4;eu.sv=1;eu.back=false;eu.frente=emCima;eu.dir=1}
+  eu.x=lugar[0];eu.y=lugar[1];const qs=isoP(lugar[0],lugar[1]),qc=isoP(X+cen[0],Y+cen[1]),ddx=qs[0]-qc[0]; // um olhando para o outro: esquerda olha para a direita e vice-versa
+  eu.sit=true;eu.mz=D.agua-4;eu.sv=1;eu.back=false;eu.frente=false;eu.dir=ddx<-3?1:ddx>3?-1:(qs[1]<qc[1]?-1:1)}
  say(eu,fala,3,true);sendPos(true)}
 function acaoDe(m){const D=MOV[m.t];if(D.agua)return()=>noMovel(m,'agua',pick(['🏊 Que delícia!','💦 Água boa!','🫧 Relaxando…']));if(D.deita)return()=>noMovel(m,'cama','💤 Hora de dormir…');if(D.senta)return()=>noMovel(m,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']));if(D.tv)return()=>noMovel(m,'tv','📺 Bora ver TV!');if(D.gel)return()=>((casasInfo.get(eu.rm.n)||{}).dono===eu.id?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000));return null}
 function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Math.floor(wy/TILE)-R.y0;let m=null;for(const q of (eu.rm.moveis||[])){if(!movAqui(q)||!MOV[q.t]||MOV[q.t].anda)continue;const [w,h]=movTam(q.t,q.r|0);if(tx>=q.x&&tx<q.x+w&&ty>=q.y&&ty<q.y+h){m=q;break}}
@@ -5702,7 +5703,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124p';
+const VERSAO_JOGO='v20261124q';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
