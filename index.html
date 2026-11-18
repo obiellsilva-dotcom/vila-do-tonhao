@@ -158,6 +158,7 @@ body.faminto::after{content:"";position:fixed;inset:0;pointer-events:none;z-inde
 @media (max-height:740px){#zoom{gap:5px}#zoom button{width:36px;height:36px;font-size:19px}#joy{width:76px;height:76px}}
 #zoom button.off{opacity:.45;text-decoration:line-through}
 #zoom button{position:relative}
+#zoom .bdgc{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#ff3b30;color:#fff;font:700 11px Fredoka,sans-serif;display:none;align-items:center;justify-content:center;border:2px solid #fff;pointer-events:none}
 body:has(#zoom:not(.min)) #joy{display:none!important}
 #zoom:not(.min){top:150px;transform:none;max-height:calc(100vh - 230px);overflow-y:auto;overflow-x:visible;padding-left:200px;margin-left:-200px;scrollbar-width:none}#zoom.min button:not(#zmenu):not(#zloja){display:none}
 #zoom:not(.min) button[data-l]::after{content:attr(data-l);position:absolute;right:50px;top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--panel);color:#fff;font-size:13px;font-weight:600;padding:4px 9px;border-radius:9px;border:1px solid rgba(255,201,74,.35);pointer-events:none}
@@ -291,7 +292,7 @@ html.noApp #zloja{display:none!important}
   <div class="row"><button id="irBtn" class="pill hidden" aria-label="pessoas online">🟢 1 online</button><div class="pill hidden" id="peixeP">🐟 0</div><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill hidden" id="sedeP">💧 100%</div><div class="pill hidden" id="gasP">⛽ 100%</div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
 </div>
 
-<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" style="display:none" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Perfil e fotos" aria-label="meu perfil">👤</button><button id="zin" style="display:none" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" style="display:none" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b;display:none">🛡️</button><button id="zpasse" class="hidden" data-l="Passe da Temporada" aria-label="passe da temporada">🎟️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
+<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zcel" class="hidden" data-l="Celular" aria-label="celular">📱</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" style="display:none" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Perfil e fotos" aria-label="meu perfil">👤</button><button id="zin" style="display:none" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" style="display:none" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b;display:none">🛡️</button><button id="zpasse" class="hidden" data-l="Passe da Temporada" aria-label="passe da temporada">🎟️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
 <div id="cfg" class="hidden"><div class="cfgbox"><button class="x" id="cfgX">×</button><h3>⚙️ Configurações</h3>
 <label>🎵 Volume da música <b id="cfgMusV"></b><input type="range" id="cfgMus" min="0" max="100"></label>
 <label>🔊 Volume dos efeitos <b id="cfgSfxV"></b><input type="range" id="cfgSfx" min="0" max="100"></label>
@@ -497,6 +498,8 @@ html.noApp #zloja{display:none!important}
       <button class="btn hidden" id="cardDrive">🚗 Dirigir</button>
       <button class="btn ghost hidden" id="cardCar">🔁 Trocar de carro</button>
       <button class="btn ghost hidden" id="cardLook">👕 Guarda-roupa</button>
+      <button class="btn hidden" id="cardAmigo">➕ Adicionar amigo</button>
+      <button class="btn hidden" id="cardDm">💬 Mensagem</button>
       <button class="btn ghost hidden" id="cardReport">🚩 Denunciar</button>
       <button class="btn ghost hidden" id="cardBloq">🔇 Bloquear</button>
     </div>
@@ -3454,11 +3457,14 @@ function drawAvatar(cv2,r,s){const c=cv2.getContext('2d');c.setTransform(1,0,0,1
 function openCard(r){closePlace();selected=r;$('card').classList.remove('hidden');$('cardName').textContent=r.nome+(r===eu?' (você)':'');{const f=$('cardFoto');if(r.foto){f.src=r.foto;f.classList.remove('hidden')}else f.classList.add('hidden')}drawAvatar($('cardAv'),r,1.65);refreshCard();carregaSeg(r)}
 function refreshCard(){if(!selected)return;$('cardStatus').textContent=statusOf(selected);$('cardBio').textContent=bioOf(selected);$('cardMoney').textContent=moneyOf(selected);$('cardFollow').textContent=follow===selected?'✋ Parar de acompanhar':'🎥 Acompanhar';
  $('cardInter').classList.toggle('hidden',!(selected&&selected.remote&&eu));$('cardCarona').classList.toggle('hidden',!(selected&&selected.remote&&selected.driving&&selected.caronaLib&&eu&&!eu.driving));const me=selected===eu,tem=me&&eu.carros.length>0;$('cardDrive').classList.toggle('hidden',!tem);$('cardCar').classList.toggle('hidden',!(tem&&eu.carros.length>1));$('cardLook').classList.toggle('hidden',!me);$('cardSocial').classList.toggle('hidden',!(selected.isPlayer&&ONLINE));$('cardReport').classList.toggle('hidden',!(selected.remote&&ONLINE));$('cardBloq').classList.toggle('hidden',!selected.remote);$('cardBloq').textContent=BLOQ.has(selected.id)?'🔈 Desbloquear':'🔇 Bloquear';
+ {const o=selected,pode=!!(o.remote&&ONLINE&&eu),st=pode?CEL_AMIGOS.get(o.id):null;$('cardAmigo').classList.toggle('hidden',!pode||st==='amigo');$('cardDm').classList.toggle('hidden',!(pode&&st==='amigo'));$('cardAmigo').textContent=st==='enviado'?'⏳ Pedido enviado':st==='recebido'?'✅ Aceitar amizade':'➕ Adicionar amigo'}
  if(tem)$('cardDrive').textContent=eu.driving?'🅿️ Descer do carro':'🚗 Dirigir '+art(eu.carro||eu.carros[0])+' '+CARS[eu.carro||eu.carros[0]].nome}
 $('cardDrive').onclick=()=>{if(!livre()||(trabalho))return;if(eu.driving)descerDoCarro();else pegarCarro();refreshCard()};
 $('cardCar').onclick=()=>{const i=eu.carros.indexOf(eu.carro),n=eu.carros[(i+1)%eu.carros.length];eu.carro=n;api.usarCarro(n).catch(e=>toast(e.message));const vi=eu.parked&&vagasInfo.get(eu.parked);if(vi)vi.carro=n;toast('Agora com '+art(n)+' '+CARS[n].nome,1800);sendPos(true);refreshCard()};
 function abrirProvadorVisual(){provCarregaRoupas();prov=Object.assign({},eu.v);$('provName').value=eu.nome;$('enter').textContent='Salvar visual';renderProv();$('mProv').classList.remove('hidden')};
 $('cardLook').onclick=()=>abrirGuarda();
+$('cardAmigo').onclick=()=>{const o=selected;if(!o||!o.remote)return;const st=CEL_AMIGOS.get(o.id);if(st==='enviado')return;if(st==='recebido'){api.responderAmizade(o.id,true).then(()=>{CEL_AMIGOS.set(o.id,'amigo');toast('🤝 Agora você e '+o.nome+' são amigos!',2500);Som.play('moeda');refreshCard();celAvisos()}).catch(e=>toast(e.message,3000));return}celPedir({id:o.id,nome:o.nome})};
+$('cardDm').onclick=()=>{const o=selected;if(!o)return;abrirCelular('home');celChat({id:o.id,nome:o.nome,foto:o.foto,visual:encode(o.v),vip_ate:o.vip_ate,online:true})};
 $('cardBloq').onclick=()=>{const o=selected;if(!o||!o.remote)return;if(BLOQ.has(o.id)){BLOQ.delete(o.id);salvaBloq();toast(`🔈 ${o.nome} desbloqueado(a).`,2500);refreshCard();return}
  confirmar('🔇 Bloquear '+esc(o.nome)+'?','Você não vai mais ver as mensagens, balões, convites e propostas dessa pessoa. Dá para desbloquear depois tocando no nome dela.',()=>{BLOQ.add(o.id);salvaBloq();chatMsgs.splice(0,chatMsgs.length,...chatMsgs.filter(m=>m.morador!==o.id));o.bub=null;pintaPainel();toast(`🔇 ${o.nome} bloqueado(a).`,2500);refreshCard()})};
 $('cardReport').onclick=()=>{const o=selected;if(!o||!o.remote)return;const b=$('cardReport');if(!b.dataset.armado){b.dataset.armado=1;b.textContent='Denunciar '+o.nome+'? Toque de novo';setTimeout(()=>{delete b.dataset.armado;b.textContent='🚩 Denunciar'},3500);return}
@@ -3628,6 +3634,7 @@ function lfome(m,custo){
 const lest=()=>{const m=lme();return{id:'local',nome:m.nome,visual:m.visual,dinheiro:m.dinheiro,xp:m.xp,nivel:m.nivel,fome:Math.round(m.fome*10)/10,sede:Math.round(m.sede*10)/10,gasolina:m.gasolina??100,peixes:m.peixes,carros:m.carros.slice(),carro:m.carro,casa_id:m.casa_id,mortes:m.mortes,trabalho:m.trabalho,trabalho_inicio:m.trabalho_inicio,foto:m.foto||null,frase:m.frase||null,rastro:m.rastro||null,relacionamento:m.relacionamento||null,time_coracao:m.time_coracao||null,insta:m.insta||null}};
 function traduzAuth(m){m=m||'';if(/invalid login/i.test(m))return'E-mail ou senha errados. Se ainda não criou a conta, toque em "✨ Criar conta".';if(/already (been )?registered|already exists/i.test(m))return'Esse e-mail já tem conta. Use "Já tenho conta".';
  if(/password.*(6|characters)/i.test(m))return'A senha precisa ter pelo menos 6 letras ou números.';if(/email.*invalid|invalid.*email/i.test(m))return'E-mail inválido.';if(/not confirmed/i.test(m))return'Confirme seu e-mail pelo link que enviamos.';if(/rate limit/i.test(m))return'Muitas tentativas. Espere um pouco.';return m}
+const OFFCEL={n:0,msgs:{off1:[{id:0,de:'off1',texto:'E aí! Bora pescar no rio depois do trampo? 🎣',criado_em:new Date(Date.now()-36e5).toISOString()}]},amigos:[{id:'off1',nome:'Zé da Padaria',nivel:12,status:'amigo',online:true,visual:null},{id:'off2',nome:'Maria Flor',nivel:7,status:'recebido',online:false,visual:null}]};
 const api=ONLINE?(()=>{
  sb=window.supabase.createClient(CONF.supabaseUrl,CONF.supabaseAnonKey);
  const rpc=async(fn,a)=>{const {data,error}=await sb.rpc(fn,a||{});if(error)throw new Error(error.message||'Erro no servidor');return data};
@@ -3717,11 +3724,35 @@ const api=ONLINE?(()=>{
   sairVaga:()=>rpc('sair_vaga'),
   comprarCasa:n=>rpc('comprar_casa',{p_casa:n}),
   msg:(s,t)=>rpc('enviar_msg',{p_sala:s,p_texto:t}),
+  amigos:()=>rpc('meus_amigos'),
+  pedirAmizade:id=>rpc('pedir_amizade',{p_id:id}),
+  responderAmizade:(id,ok)=>rpc('responder_amizade',{p_id:id,p_aceitar:ok}),
+  desfazerAmizade:id=>rpc('desfazer_amizade',{p_id:id}),
+  buscarMoradores:t=>rpc('buscar_moradores',{p_nome:t}),
+  conversas:()=>rpc('conversas'),
+  conversa:(id,antes)=>rpc('conversa',{p_com:id,p_antes:antes||null}),
+  enviarDm:(id,t)=>rpc('enviar_dm',{p_para:id,p_texto:t}),
+  naoLidas:()=>rpc('nao_lidas'),
+  banco:()=>rpc('banco_info'),
+  investir:v=>rpc('investir',{p_valor:v}),
+  resgatar:v=>rpc('resgatar',{p_valor:v}),
   denunciar:(id,m)=>rpc('denunciar',{p_alvo:id,p_motivo:m})
  }})():{
   async sessao(){return L.me?'local':null},
   async conta(){return{id:'local',anon:false}},
   async login(){return'local'},
+  // celular no modo de teste (sem internet do jogo): amigos de exemplo e banco local
+  async amigos(){return OFFCEL.amigos},async pedirAmizade(){return{pedido:true}},
+  async responderAmizade(id,ok){const i=OFFCEL.amigos.findIndex(x=>x.id===id);if(i>=0){if(ok)OFFCEL.amigos[i].status='amigo';else OFFCEL.amigos.splice(i,1)}return{ok:true}},
+  async desfazerAmizade(id){OFFCEL.amigos=OFFCEL.amigos.filter(x=>x.id!==id);return{ok:true}},
+  async buscarMoradores(t){return[{id:'off3',nome:t+' da Silva',nivel:4,visual:null}]},
+  async conversas(){return OFFCEL.amigos.filter(x=>x.status==='amigo').map(a=>{const l=(OFFCEL.msgs[a.id]||[]).slice(-1)[0];return Object.assign({},a,{ultima:l&&l.texto,ultima_de:l&&l.de,ultima_em:l&&l.criado_em,naolidas:0})})},
+  async conversa(id){return OFFCEL.msgs[id]||[]},
+  async enviarDm(id,t){const m={id:++OFFCEL.n,de:eu.id,texto:t,criado_em:new Date().toISOString()};(OFFCEL.msgs[id]=OFFCEL.msgs[id]||[]).push(m);return m},
+  async naoLidas(){return{msgs:0,pedidos:OFFCEL.amigos.filter(x=>x.status==='recebido').length}},
+  async banco(){const m=L.me;return{saldo:m.dinheiro,investido:m.inv||0,ganho:m.invg||0,por_dia:Math.floor(Math.min(m.inv||0,1e5)*.01),bloq_ate:m.invb||null,limite:1e5,taxa:1}},
+  async investir(v){const m=L.me;if(v>m.dinheiro)fail('Você não tem esse dinheiro na carteira.');if((m.inv||0)+v>1e5)fail('O limite do investimento é R$ 100.000.');m.dinheiro-=v;m.inv=(m.inv||0)+v;m.invb=new Date(Date.now()+864e5).toISOString();lsave();return{banco:await this.banco(),eu:lest()}},
+  async resgatar(v){const m=L.me;if(m.invb&&Date.parse(m.invb)>Date.now())fail('O dinheiro fica guardado 24 horas depois de cada depósito. Tente de novo mais tarde.');if(v>(m.inv||0))fail('Você não tem tudo isso investido.');m.inv-=v;m.dinheiro+=v;lsave();return{banco:await this.banco(),eu:lest()}},
   async perfil(){return L.me?lest():null},
   async perfis(){return[]},
   async catalogo(){return null},
@@ -3898,9 +3929,142 @@ function abrirMapa(){if(!eu)return;const el=document.createElement('div');el.id=
  cv3.onclick=ev=>{const r=cv3.getBoundingClientRect(),mx=(ev.clientX-r.left)*cv3.width/r.width,my=(ev.clientY-r.top)*cv3.height/r.height;let best=null,bd=34;for(const L of LUG){const q=mapaP(T(L[2]),T(L[3])),d=Math.hypot(q[0]-mx,q[1]-16-my);if(d<bd){bd=d;best=L}}if(best){fecha();follow=eu;toast('📍 Indo até: '+best[1],2200);best[4]();return}
   const o=mapaP(0,0),A2=(mx-o[0])/(MK*IA),B2=(my-o[1])/(MK*IB),wx=(A2+B2)/2,wy=(B2-A2)/2;if(wx<T(BX0)||wy<T(BY0)||wx>T(BX1)||wy>T(BY1))return;MAPA_MARCA={x:wx,y:wy,rotulo:'📍 Marcação'};Som.play('clique');pintaTm();toast('📍 Marcado! Siga a seta amarela no chão.',2200)}}
 
+/* ================= 📱 CELULAR: mensagens privadas, amigos, banco e investimento ================= */
+const CEL={app:'home',com:null,conv:[],amigos:[],pedidos:0,msgs:0,ultimaAviso:0,banco:null,timer:0,aba:'amigos'};
+const celH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const celHora=t=>{const d=new Date(t);if(isNaN(d))return'';const h=new Date();return d.toDateString()===h.toDateString()?d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})};
+function celRosto(p,tam){tam=tam||40;const w=document.createElement('div');w.className='celRosto'+(vipP(p)?' vip':'');w.style.width=w.style.height=tam+'px';
+ if(p.foto){const im=document.createElement('img');im.src=p.foto;im.alt='';w.appendChild(im)}
+ else{const cv=document.createElement('canvas');cv.width=cv.height=tam*2;const g=cv.getContext('2d');try{const v=decode(p.visual)||visFromName(p.nome||'x');drawPerson(g,tam,tam*2.75,vipP(p)?v:semVip(v),{s:tam/19,cara:true})}catch(e){}w.appendChild(cv)}
+ if(p.online){const o=document.createElement('i');o.className='on';w.appendChild(o)}return w}
+function celUI(){let el=$('cel');if(el)return el;el=document.createElement('div');el.id='cel';el.className='hidden';el.innerHTML=`<style>
+#cel{position:fixed;inset:0;z-index:9;background:rgba(10,5,8,.72);display:flex;align-items:center;justify-content:center;padding:10px;font-family:Fredoka,sans-serif}
+#cel.hidden{display:none}
+#cel .fone{position:relative;width:min(360px,100%);height:min(720px,calc(100vh - 20px));background:#0e0e12;border-radius:38px;padding:10px;box-shadow:0 18px 60px rgba(0,0,0,.6),inset 0 0 0 2px #2b2b33;display:flex;flex-direction:column}
+#cel .tela{position:relative;flex:1;border-radius:30px;overflow:hidden;background:linear-gradient(160deg,#ffcf6b 0%,#f08a4b 45%,#7b3b6e 100%);display:flex;flex-direction:column;color:#1d1418}
+#cel .barra{display:flex;align-items:center;justify-content:space-between;padding:10px 20px 4px;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+#cel .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#0e0e12;border-radius:14px;z-index:3}
+#cel .corpo{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+#cel .home{padding:30px 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 10px;align-content:start}
+#cel .ic{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:#fff;font:600 12px Fredoka,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer;position:relative}
+#cel .ic b{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+#cel .bdg{position:absolute;top:-6px;right:2px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#ff3b30;color:#fff;font:700 12px Fredoka,sans-serif;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+#cel .relogio{grid-column:1/-1;text-align:center;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);margin-bottom:10px}#cel .relogio div{font-size:58px;font-weight:700;line-height:1}#cel .relogio span{font-size:14px;opacity:.9}
+#cel .app{flex:1;background:#f4f2f5;display:flex;flex-direction:column;min-height:0}
+#cel .topo{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e6e1e8}
+#cel .topo h3{margin:0;flex:1;font-size:18px;display:flex;align-items:center;gap:8px;min-width:0}#cel .topo h3 span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#cel .volta{background:none;border:0;font:700 22px Fredoka,sans-serif;color:#2e6fd8;padding:0 4px;cursor:pointer}
+#cel .lista{flex:1;overflow-y:auto}
+#cel .item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #ebe6ee;background:#fff;cursor:pointer}
+#cel .item .tx{flex:1;min-width:0}#cel .item .tx b{display:block;font-size:15px}#cel .item .tx small{display:block;color:#7a6f7e;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cel .item .lado{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:11px;color:#8a8090}
+#cel .item .n{background:#25d366;color:#fff;border-radius:10px;min-width:20px;height:20px;padding:0 6px;font:700 12px Fredoka,sans-serif;display:flex;align-items:center;justify-content:center}
+#cel .celRosto{position:relative;flex:none;border-radius:50%;overflow:hidden;background:linear-gradient(#cfe6f5,#9fc6e0)}#cel .celRosto.vip{box-shadow:0 0 0 2px #5fd0ff}
+#cel .celRosto img,#cel .celRosto canvas{width:100%;height:100%;object-fit:cover;display:block}
+#cel .celRosto .on{position:absolute;right:1px;bottom:1px;width:11px;height:11px;border-radius:50%;background:#25d366;border:2px solid #fff}
+#cel .vazio{padding:30px 20px;text-align:center;color:#7a6f7e;font-size:14px;line-height:1.4}
+#cel .bt{border:0;border-radius:12px;padding:8px 12px;font:700 13px Fredoka,sans-serif;cursor:pointer;background:#2e6fd8;color:#fff}#cel .bt.g{background:#e9e4ec;color:#3a2a33}#cel .bt.v{background:#25a35a}#cel .bt.r{background:#e05a4e}
+#cel .conversa{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;background:#efe7dd url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23d9cfc2'/%3E%3C/svg%3E")}
+#cel .bal{max-width:78%;padding:7px 10px 5px;border-radius:12px;font-size:14px;line-height:1.3;word-wrap:break-word;box-shadow:0 1px 1px rgba(0,0,0,.08);background:#fff;align-self:flex-start}
+#cel .bal.eu{background:#d9fdd3;align-self:flex-end}#cel .bal time{display:block;text-align:right;font-size:10px;color:#8a8090;margin-top:2px}
+#cel .digita{display:flex;gap:6px;padding:8px;background:#f0edf2}#cel .digita input{flex:1;border:0;border-radius:20px;padding:10px 14px;font:500 15px Fredoka,sans-serif;min-width:0}#cel .digita button{width:44px;height:44px;border-radius:50%;border:0;background:#25a35a;color:#fff;font-size:18px;cursor:pointer}
+#cel .abas{display:flex;gap:6px;padding:8px 10px;background:#fff;border-bottom:1px solid #e6e1e8}#cel .abas button{flex:1;border:0;border-radius:10px;padding:8px 4px;background:#efeaf2;font:700 13px Fredoka,sans-serif;color:#4a3a44;position:relative}#cel .abas button.on{background:#2e6fd8;color:#fff}
+#cel .abas .bdg{top:-6px;right:-2px}
+#cel .busca{display:flex;gap:6px;padding:10px}#cel .busca input{flex:1;border:1px solid #ddd5e0;border-radius:12px;padding:10px;font:500 15px Fredoka,sans-serif;min-width:0}
+#cel .cartao{margin:12px;border-radius:18px;padding:16px;color:#fff;background:linear-gradient(135deg,#1f5a8a,#2e86c1);box-shadow:0 6px 16px rgba(31,90,138,.35)}
+#cel .cartao small{opacity:.85;font-size:13px}#cel .cartao .v{font-size:30px;font-weight:700;margin:2px 0 8px}
+#cel .cartao.inv{background:linear-gradient(135deg,#1e8449,#27ae60)}
+#cel .linha{display:flex;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid #ebe6ee;font-size:14px}#cel .linha b{color:#1e8449}
+#cel .info{margin:10px 12px;padding:10px 12px;background:#fff8e1;border-radius:12px;font-size:13px;line-height:1.4;color:#6b5320}
+#cel .valor{display:flex;gap:6px;padding:0 12px;flex-wrap:wrap}#cel .valor input{flex:1 1 100%;border:1px solid #ddd5e0;border-radius:12px;padding:12px;font:700 18px Fredoka,sans-serif}
+#cel .valor .r{display:flex;gap:6px;flex:1 1 100%}#cel .valor .r .bt{flex:1}
+#cel .home2{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(255,255,255,.75);border:0;cursor:pointer;z-index:3}
+#cel .fecha{position:absolute;top:-4px;right:-4px;width:36px;height:36px;border-radius:50%;border:0;background:#ffc94a;color:#2a1a14;font:700 18px Fredoka,sans-serif;z-index:4;box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
+</style><div class="fone"><button class="fecha" aria-label="fechar">✕</button><div class="tela"><div class="notch"></div><div class="barra"><span class="hr">--:--</span><span>📶 🔋</span></div><div class="corpo"></div><button class="home2" aria-label="tela inicial"></button></div></div>`;
+ document.body.appendChild(el);el.querySelector('.fecha').onclick=celFechar;el.querySelector('.home2').onclick=()=>celAbrirApp('home');el.addEventListener('click',e=>{if(e.target===el)celFechar()});return el}
+function celFechar(){const el=$('cel');if(el)el.classList.add('hidden');clearInterval(CEL.timer);CEL.com=null}
+function abrirCelular(app){if(!eu)return;closeCard();closePlace();const el=celUI();el.classList.remove('hidden');celAbrirApp(app||'home')}
+function celCorpo(){const c=$('cel').querySelector('.corpo');c.innerHTML='';$('cel').querySelector('.hr').textContent=clockStr();return c}
+function celTopo(c,tit,volta){const t=document.createElement('div');t.className='topo';t.innerHTML=`<button class="volta" aria-label="voltar">‹</button><h3></h3>`;t.querySelector('h3').append(...(typeof tit==='string'?[Object.assign(document.createElement('span'),{textContent:tit})]:tit));t.querySelector('.volta').onclick=volta||(()=>celAbrirApp('home'));c.appendChild(t);return t}
+function celAbrirApp(app){CEL.app=app;clearInterval(CEL.timer);if(app!=='chat')CEL.com=null;
+ if(app==='home')return celHome();if(app==='msgs')return celMsgs();if(app==='amigos')return celAmigos();if(app==='banco')return celBanco();if(app==='invest')return celInvest()}
+function celHome(){const c=celCorpo(),h=document.createElement('div');h.className='home';
+ const d=new Date();h.innerHTML=`<div class="relogio"><div>${clockStr()}</div><span>${celH(d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}))}</span></div>`;
+ for(const [k,ic,nm,cor,n] of [['msgs','💬','Mensagens','#25d366',CEL.msgs],['amigos','👥','Amigos','#5b8def',CEL.pedidos],['banco','🏦','Banco','#1f5a8a',0],['invest','📈','Investir','#27ae60',0]]){
+  const b=document.createElement('button');b.className='ic';b.innerHTML=`<b style="background:${cor}">${ic}</b>${nm}`+(n?`<span class="bdg">${n>99?'99+':n}</span>`:'');b.onclick=()=>celAbrirApp(k);h.appendChild(b)}
+ c.appendChild(h)}
+// ---- 💬 mensagens ----
+async function celMsgs(){const c=celCorpo(),a=document.createElement('div');a.className='app';c.appendChild(a);celTopo(a,'💬 Mensagens');const L=document.createElement('div');L.className='lista';L.innerHTML='<div class="vazio">Carregando…</div>';a.appendChild(L);
+ try{CEL.conv=await api.conversas()}catch(e){L.innerHTML=`<div class="vazio">${celH(e.message)}</div>`;return}if(CEL.app!=='msgs')return;
+ L.innerHTML='';if(!CEL.conv.length){L.innerHTML='<div class="vazio">Você ainda não tem amigos para conversar.<br><br>Adicione amigos no app <b>👥 Amigos</b> ou tocando em um jogador e em <b>➕ Adicionar amigo</b>.</div>';return}
+ for(const p of CEL.conv){if(BLOQ.has(p.id))continue;const it=document.createElement('div');it.className='item';it.appendChild(celRosto(p,44));const tx=document.createElement('div');tx.className='tx';
+  tx.innerHTML=`<b></b><small></small>`;tx.querySelector('b').textContent=p.nome;tx.querySelector('small').textContent=p.ultima?(p.ultima_de===eu.id?'Você: ':'')+p.ultima:'Toque para conversar';it.appendChild(tx);
+  const ld=document.createElement('div');ld.className='lado';ld.innerHTML=(p.ultima_em?celH(celHora(p.ultima_em)):'')+(p.naolidas?`<span class="n">${p.naolidas}</span>`:'');it.appendChild(ld);it.onclick=()=>celChat(p);L.appendChild(it)}}
+async function celChat(p){CEL.app='chat';CEL.com=p;clearInterval(CEL.timer);const c=celCorpo(),a=document.createElement('div');a.className='app';c.appendChild(a);
+ const st=Object.assign(document.createElement('span'),{textContent:p.nome});celTopo(a,[celRosto(p,32),st],()=>celAbrirApp('msgs'));
+ const C=document.createElement('div');C.className='conversa';a.appendChild(C);const D=document.createElement('div');D.className='digita';D.innerHTML='<input maxlength="300" placeholder="Mensagem" enterkeyhint="send"><button aria-label="enviar">➤</button>';a.appendChild(D);
+ const inp=D.querySelector('input');let ult=-1,vazio=false;
+ const poe=(rows,todos)=>{if(todos)C.innerHTML='';for(const m of rows){if(m.id<=ult)continue;ult=m.id;const b=document.createElement('div');b.className='bal'+(m.de===eu.id?' eu':'');b.textContent=m.texto;const t=document.createElement('time');t.textContent=celHora(m.criado_em);b.appendChild(t);C.appendChild(b)}C.scrollTop=C.scrollHeight};
+ const carrega=async todos=>{try{const r=await api.conversa(p.id);if(CEL.com!==p)return;if(todos&&!r.length){vazio=true;C.innerHTML='<div class="vazio">Mande a primeira mensagem para '+celH(p.nome)+' 👋</div>'}else{if(todos||vazio)C.innerHTML='';vazio=false;poe(r)}celAvisos()}catch(e){}};
+ await carrega(true);
+ const manda=async()=>{const t=inp.value.trim();if(!t)return;inp.value='';try{const m=await api.enviarDm(p.id,t);if(vazio){C.innerHTML='';vazio=false}poe([m]);emitEv('dm',{para:p.id});Som.play('msg',300)}catch(e){toast(e.message,3000);inp.value=t}};
+ D.querySelector('button').onclick=manda;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();manda()}};
+ CEL.timer=setInterval(()=>{if(CEL.com===p&&!document.hidden)carrega(false)},4000)}
+// ---- 👥 amigos ----
+async function celAmigos(aba){if(aba)CEL.aba=aba;const c=celCorpo(),a=document.createElement('div');a.className='app';c.appendChild(a);celTopo(a,'👥 Amigos');
+ const A=document.createElement('div');A.className='abas';a.appendChild(A);const L=document.createElement('div');L.className='lista';a.appendChild(L);
+ try{CEL.amigos=await api.amigos();CEL_AMIGOS.clear();CEL.amigos.forEach(x=>CEL_AMIGOS.set(x.id,x.status))}catch(e){L.innerHTML=`<div class="vazio">${celH(e.message)}</div>`;return}if(CEL.app!=='amigos')return;
+ const rec=CEL.amigos.filter(x=>x.status==='recebido'),env=CEL.amigos.filter(x=>x.status==='enviado'),ami=CEL.amigos.filter(x=>x.status==='amigo');
+ for(const [k,nm,n] of [['amigos','Amigos ('+ami.length+')',0],['pedidos','Pedidos',rec.length],['add','➕ Adicionar',0]]){const b=document.createElement('button');b.className=CEL.aba===k?'on':'';b.innerHTML=celH(nm)+(n?`<span class="bdg">${n}</span>`:'');b.onclick=()=>celAmigos(k);A.appendChild(b)}
+ const linha=(p,sub,botoes)=>{const it=document.createElement('div');it.className='item';it.appendChild(celRosto(p,44));const tx=document.createElement('div');tx.className='tx';tx.innerHTML='<b></b><small></small>';tx.querySelector('b').textContent=p.nome;tx.querySelector('small').textContent=sub;it.appendChild(tx);const ld=document.createElement('div');ld.style.cssText='display:flex;gap:6px';for(const [t,cl,fn] of botoes){const b=document.createElement('button');b.className='bt '+cl;b.textContent=t;b.onclick=ev=>{ev.stopPropagation();fn()};ld.appendChild(b)}it.appendChild(ld);L.appendChild(it);return it};
+ if(CEL.aba==='amigos'){if(!ami.length){L.innerHTML='<div class="vazio">Nenhum amigo ainda. Toque em <b>➕ Adicionar</b> e procure pelo nome, ou toque num jogador na cidade.</div>';return}
+  for(const p of ami){const o=others.get(p.id),sub=(p.online?'🟢 Na cidade':'⚪ Offline')+' · Nv '+p.nivel;
+   const it=linha(p,sub,[['💬','v',()=>celChat(p)]].concat(o&&o.seen&&!o.hidden?[['📍','',()=>{celFechar();follow=null;irPara(o.x,o.y);toast('📍 Indo até '+p.nome,2000)}]]:[]));
+   it.onclick=()=>confirmar('👥 '+celH(p.nome),'Nível '+p.nivel+(p.online?' · 🟢 na cidade agora':''),null,[['💬 Mensagem',()=>celChat(p)],['❌ Desfazer amizade',()=>confirmar('Desfazer amizade?','Você e <b>'+celH(p.nome)+'</b> deixam de ser amigos e não podem mais trocar mensagens.',()=>api.desfazerAmizade(p.id).then(()=>{toast('Amizade desfeita.',2000);celAmigos()}).catch(e=>toast(e.message,3000)))],['Voltar',()=>{}]])}}
+ else if(CEL.aba==='pedidos'){if(!rec.length&&!env.length){L.innerHTML='<div class="vazio">Nenhum pedido de amizade.</div>';return}
+  for(const p of rec)linha(p,'Quer ser seu amigo',[['✓','v',()=>api.responderAmizade(p.id,true).then(()=>{toast('🤝 Agora você e '+p.nome+' são amigos!',2500);Som.play('moeda');celAmigos();celAvisos()}).catch(e=>toast(e.message,3000))],['✕','r',()=>api.responderAmizade(p.id,false).then(()=>{celAmigos();celAvisos()}).catch(e=>toast(e.message,3000))]]);
+  for(const p of env)linha(p,'⏳ Esperando responder',[['Cancelar','g',()=>api.desfazerAmizade(p.id).then(()=>celAmigos()).catch(e=>toast(e.message,3000))]])}
+ else{const B=document.createElement('div');B.className='busca';B.innerHTML='<input placeholder="Nome do jogador" maxlength="22"><button class="bt">🔎</button>';L.appendChild(B);const R=document.createElement('div');L.appendChild(R);const inp=B.querySelector('input');
+  const busca=async()=>{const t=inp.value.trim();if(t.length<2){R.innerHTML='<div class="vazio">Digite pelo menos 2 letras do nome.</div>';return}R.innerHTML='<div class="vazio">Procurando…</div>';
+   try{const rows=await api.buscarMoradores(t);R.innerHTML='';if(!rows.length){R.innerHTML='<div class="vazio">Ninguém com esse nome.</div>';return}
+    const st=new Map(CEL.amigos.map(x=>[x.id,x.status]));for(const p of rows){const s=st.get(p.id);const it=document.createElement('div');R.appendChild(it);
+     const lin=linha(p,'Nível '+p.nivel,s==='amigo'?[['💬','v',()=>celChat(p)]]:s==='enviado'?[['⏳ Enviado','g',()=>{}]]:[['➕','',()=>celPedir(p,()=>busca())]]);R.replaceChild(lin,it)}}catch(e){R.innerHTML=`<div class="vazio">${celH(e.message)}</div>`}};
+  B.querySelector('button').onclick=busca;inp.onkeydown=e=>{if(e.key==='Enter')busca()};R.innerHTML='<div class="vazio">Procure pelo nome. Dica: também dá para tocar num jogador na cidade e em <b>➕ Adicionar amigo</b>.</div>';setTimeout(()=>inp.focus(),50)}}
+function celPedir(p,depois){api.pedirAmizade(p.id).then(r=>{if(r&&r.amigos){toast('🤝 Agora você e '+p.nome+' são amigos!',2500);Som.play('moeda')}else toast('📨 Pedido de amizade enviado para '+p.nome+'!',2500);emitEv('amizade',{para:p.id});CEL_AMIGOS.set(p.id,r&&r.amigos?'amigo':'enviado');depois&&depois();if(selected&&selected.id===p.id)refreshCard()}).catch(e=>toast(e.message,3000))}
+// ---- 🏦 banco ----
+async function celBanco(){const c=celCorpo(),a=document.createElement('div');a.className='app';c.appendChild(a);celTopo(a,'🏦 Banco da Vila');const L=document.createElement('div');L.className='lista';a.appendChild(L);L.innerHTML='<div class="vazio">Carregando…</div>';
+ let b;try{b=CEL.banco=await api.banco()}catch(e){L.innerHTML=`<div class="vazio">${celH(e.message)}</div>`;return}if(CEL.app!=='banco')return;
+ L.innerHTML=`<div class="cartao"><small>Saldo na carteira</small><div class="v">${money(b.saldo)}</div><small>🏦 ${celH(eu.nome)} · conta da Vila</small></div>
+ <div class="linha"><span>📈 Investido</span><b>${money(b.investido)}</b></div><div class="linha"><span>💰 Já rendeu</span><b>${money(b.ganho)}</b></div><div class="linha"><span>📆 Rende por dia</span><b>${money(b.por_dia)}</b></div>
+ <div class="info">O dinheiro da <b>carteira</b> é o que você usa para comprar. O dinheiro <b>investido</b> rende ${b.taxa}% ao dia e fica guardado no banco.</div>`;
+ const bt=document.createElement('button');bt.className='bt v';bt.style.cssText='margin:6px 12px;padding:12px';bt.textContent='📈 Investir ou resgatar';bt.onclick=()=>celAbrirApp('invest');L.appendChild(bt)}
+// ---- 📈 investimento ----
+async function celInvest(){const c=celCorpo(),a=document.createElement('div');a.className='app';c.appendChild(a);celTopo(a,'📈 Investimentos');const L=document.createElement('div');L.className='lista';a.appendChild(L);L.innerHTML='<div class="vazio">Carregando…</div>';
+ let b;try{b=CEL.banco=await api.banco()}catch(e){L.innerHTML=`<div class="vazio">${celH(e.message)}</div>`;return}if(CEL.app!=='invest')return;
+ const preso=b.bloq_ate&&Date.parse(b.bloq_ate)>Date.now(),libera=preso?new Date(b.bloq_ate).toLocaleString('pt-BR',{weekday:'short',hour:'2-digit',minute:'2-digit'}):'';
+ L.innerHTML=`<div class="cartao inv"><small>Investido</small><div class="v">${money(b.investido)}</div><small>Rende ${money(b.por_dia)} por dia · já rendeu ${money(b.ganho)}</small></div>
+ <div class="info">📌 Rende <b>${b.taxa}% ao dia</b> (dia de verdade), sobre até <b>${money(b.limite)}</b>.<br>🔒 Cada depósito deixa o dinheiro <b>guardado por 24 horas</b>.${preso?'<br>⏳ Resgate liberado: <b>'+celH(libera)+'</b>':''}<br>💼 Na carteira: <b>${money(b.saldo)}</b></div>
+ <div class="valor"><input type="number" inputmode="numeric" min="1" placeholder="Valor em R$"><div class="r"><button class="bt g" data-v="1000">R$ 1 mil</button><button class="bt g" data-v="10000">R$ 10 mil</button><button class="bt g" data-v="tudo">Tudo</button></div>
+ <div class="r" style="margin-top:4px"><button class="bt v" data-a="inv">📈 Investir</button><button class="bt" data-a="res"${preso?' disabled style="opacity:.5"':''}>💰 Resgatar</button></div></div>`;
+ const inp=L.querySelector('input');L.querySelectorAll('[data-v]').forEach(x=>x.onclick=()=>{inp.value=x.dataset.v==='tudo'?Math.max(0,Math.min(b.saldo,b.limite-b.investido)):x.dataset.v});
+ L.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>{const v=Math.floor(+inp.value||0);if(v<1){toast('Digite um valor.',2000);return}const inv=x.dataset.a==='inv';
+  confirmar(inv?'📈 Investir':'💰 Resgatar',inv?`Investir <b>${money(v)}</b>? O dinheiro fica guardado por 24 horas.`:`Resgatar <b>${money(v)}</b> para a carteira?`,()=>acao(async()=>{const r=await(inv?api.investir(v):api.resgatar(v));tratar(r);Som.play('moeda');toast(inv?'📈 Investido! Rende '+money(Math.floor(Math.min(r.banco.investido,r.banco.limite)*r.banco.taxa/100))+' por dia.':'💰 '+money(v)+' na carteira!',3000);celInvest()}))})}
+// ---- avisos (bolinha vermelha) ----
+const CEL_AMIGOS=new Map();
+function celBadge(){const n=CEL.msgs+CEL.pedidos,b=$('zcel');if(b){let i=b.querySelector('.bdgc');if(!i){i=document.createElement('span');i.className='bdgc';b.appendChild(i)}i.textContent=n>99?'99+':n;i.style.display=n?'flex':'none'}
+ const m=$('zmenu');if(m){let i=m.querySelector('.bdgc');if(!i){i=document.createElement('span');i.className='bdgc';m.appendChild(i)}i.style.display=n&&$('zoom').classList.contains('min')?'flex':'none';i.textContent=n>99?'99+':n}
+ if($('cel')&&!$('cel').classList.contains('hidden')&&CEL.app==='home')celHome()}
+async function celAvisos(){if(!eu)return;try{const r=await api.naoLidas();if(!r)return;const novo=r.ultima_id&&r.ultima_id>CEL.ultimaAviso&&CEL.ultimaAviso>0;
+ if(r.ultima_id)CEL.ultimaAviso=Math.max(CEL.ultimaAviso,r.ultima_id);else if(!CEL.ultimaAviso)CEL.ultimaAviso=1;
+ const pedNovo=r.pedidos>CEL.pedidos;CEL.msgs=r.msgs|0;CEL.pedidos=r.pedidos|0;celBadge();
+ if(novo&&!(CEL.app==='chat'&&$('cel')&&!$('cel').classList.contains('hidden'))){Som.play('msg',300);toast('💬 Nova mensagem de '+(r.ultima_de||'um amigo')+' · abra o 📱',3500)}
+ if(pedNovo)toast('👥 Novo pedido de amizade! Abra o 📱',3500)}catch(e){}}
+setInterval(()=>{if(eu&&!document.hidden)celAvisos()},25000);
+
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261127';
+const NOVID='v20261128';
 const NOV_SLIDES=[
+ {t:'📱 Celular novo!',x:'Toque no <b>📱</b> do menu ☰: <b>💬 mensagens privadas</b> com seus amigos, <b>👥 amigos</b> (peça amizade tocando num jogador ou procurando pelo nome), <b>🏦 banco</b> e <b>📈 investimento</b>: guarde dinheiro e ele <b>rende 1% por dia</b> (até R$ 100 mil investidos).',d:(g,t)=>{g.textAlign='center';g.font='78px sans-serif';g.fillText('📱',110,130+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['💬','👥','🏦','📈'];g.fillText(L[Math.floor(t/.9)%L.length],225,115)}},
  {t:'🚗 Furacão GT no Passe',x:'O carro exclusivo do <b>Passe Premium</b> chegou: o <b>Furacão GT</b>, com rodas girando, faróis de LED e lanternas que acendem à noite. Libere no <b>nível 20</b> do Passe e pinte da cor que quiser na <b>🔧 Oficina</b>. Ele <b>nunca mais volta</b> depois de 31/12!',d:(g,t)=>{g.save();g.translate(160,130);g.scale(2.2,2.2);try{drawCarStack(g,0,0,'natal',-.6+Math.sin(t*.8)*.5,null,{luz:Math.floor(t)%2===0})}catch(e){}g.restore()}},
  {t:'🚗 Concessionária nova',x:'A <b>Carros do Zé</b> mudou: prédio novo com <b>pátio cheio de carros</b> (veja o preço na plaquinha) e um <b>showroom</b> por dentro, com a Caminhonete do Tonhão, a Ferrarini e a Lambordini em exposição. Entre pela <b>porta de vidro</b>!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏎️':'🚗',110+Math.sin(t*2)*10,125);g.font='44px sans-serif';g.fillText('🔑',225,115+Math.sin(t*3)*6)}},
  {t:'🗺️ Passeio pela cidade',x:'Quem chega agora ganha um <b>passeio guiado</b>: a câmera visita o bar, os empregos, as lojas, as casas, o condomínio, a delegacia, o hospital e a prefeitura, explicando cada lugar.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText('🗺️',110,125);g.font='40px sans-serif';const L=['🍺','💼','🚗','🏠','🏛️'];g.fillText(L[Math.floor(t/.9)%L.length],225,120+Math.sin(t*3)*5)}},
@@ -3932,7 +4096,7 @@ async function aplicarPerfil(m,anunciar){
  if(!novo){refreshHud();return}
  {const h=m.casa_id>1000?{front:[27,-10]}:m.casa_id?houses[m.casa_id-1]:null;if(h){eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE}else{eu.x=T(rand(19,29));eu.y=T(29.5)}}
  follow=eu;cam.x=eu.x;cam.y=eu.y;cam.z=Math.max(cam.z,1.5);
- ['zpasse','rankTop','irBtn','chatbar','money','salaPill','zme','zperfil','lvl','fomeP','sedeP','zloja','zjobs','zdanca','zfotos','zcarro','zmochila'].forEach(id=>$(id).classList.remove('hidden'));if(matchMedia('(pointer: coarse)').matches)$('joy').classList.remove('hidden');$('join').classList.add('hidden');$('barstat').classList.add('hidden');document.body.classList.add('jogando');
+ setTimeout(()=>{celAvisos();if(ONLINE)api.amigos().then(l=>{CEL_AMIGOS.clear();l.forEach(x=>CEL_AMIGOS.set(x.id,x.status))}).catch(()=>{})},4000);['zpasse','zcel','rankTop','irBtn','chatbar','money','salaPill','zme','zperfil','lvl','fomeP','sedeP','zloja','zjobs','zdanca','zfotos','zcarro','zmochila'].forEach(id=>$(id).classList.remove('hidden'));if(matchMedia('(pointer: coarse)').matches)$('joy').classList.remove('hidden');$('join').classList.add('hidden');$('barstat').classList.add('hidden');document.body.classList.add('jogando');
  await carregarVagas();for(const [id,i] of vagasInfo)if(i.morador===eu.id)eu.parked=id;
  if(m.trabalho&&JOBS[m.trabalho]){const J=JOBS[m.trabalho];iniciarTurno(m.trabalho,Date.parse(m.trabalho_inicio),J.duracao)}
  conectar();if(souVip())later(5,()=>emitEv('chegou',{}));setTimeout(cobrarAluguel,6000);
@@ -4702,6 +4866,7 @@ function onEv(p){
  if(p.k==='campOk'&&eu&&p.para===eu.id&&aptoDe(p.ap)){const ap=aptoDe(p.ap);INTER_OK.add(ap.n);toast('🔓 '+o.nome+' abriu a porta!',2500);if(!carOf(eu)&&!trabalho)entrarSala(ap)}
  if(p.k==='campNao'&&eu&&p.para===eu.id)toast('🚪 '+o.nome+' não abriu a porta.',2500);
  if(p.k==='carona'&&eu&&p.com===eu.id)toast(+p.s?'🚗 '+o.nome+' entrou no seu carro!':o.nome+' desceu do seu carro.',2500);
+ if((p.k==='dm'||p.k==='amizade')&&eu&&p.para===eu.id)celAvisos();
  if(p.k==='carro'&&CARS[p.c])log(`🚗 ${o.nome} comprou ${art(p.c)==='a'?'uma':'um'} ${CARS[p.c].nome}!`);
  if(p.k==='nivel'&&+p.n>0&&+p.n<200){o.nivel=+p.n;say(o,'🎉 Nível '+o.nivel+'!',4,true);log(`⭐ ${o.nome} chegou ao nível ${o.nivel}!`)}
  if(p.k==='emote'&&(EMO_LIVRE.includes(p.e)||(vipP(o)&&EMOTES.includes(p.e))))say(o,p.e,3.5,true);
@@ -5377,7 +5542,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124g';
+const VERSAO_JOGO='v20261124h';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5386,6 +5551,7 @@ setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now()
  z.addEventListener('click',e=>{if(e.target!==mb&&e.target.closest('button')&&!/zin|zout/.test(e.target.id)){z.classList.add('min');mb.textContent='☰'}});
  document.addEventListener('pointerdown',e=>{if(!z.classList.contains('min')&&!z.contains(e.target)){z.classList.add('min');mb.textContent='☰'}},true)}
 $('zpasse').onclick=abrirPasse;
+$('zcel').onclick=()=>abrirCelular();
 $('zdanca').onclick=()=>{renderEmo();$('emoBox').classList.remove('hidden')};
 $('zfotos').onclick=()=>{if(eu)abrirSocial(eu)};
 function irAoLugar(k){const f=FOCUS[k];if(!f)return;follow=null;cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.max(cam.z,1.2);marker={x:T(f[0]),y:T(f[1]),t:now};
