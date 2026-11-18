@@ -1150,7 +1150,7 @@ function drawPersonReal0(c,x,y,v,o={}){
   if(o.frente){const lc=saia||corte?skin:pants;
    for(const k of [-1,1]){const hx=k*(fem?2.3:2.7);c.fillStyle=shade(lc,-8);rr(c,hx-2.3,-12.5,4.6,5,2.2);c.fill();c.fillStyle='rgba(255,255,255,.12)';rr(c,hx-1.6,-12,2,3,1);c.fill();
     c.fillStyle=corte||saia?skin:lc;rr(c,hx+k*.3-2,-8.6,4,8.2,1.8);c.fill();shoe(hx+k*.4,0)}}
-  else if(!back&&o.sv34){const lc=saia?skin:pants;pernasDepois=()=>{
+  else if(!back&&(o.sv34||!(o.lado||o.perfil))){const lc=saia?skin:pants;pernasDepois=()=>{
    // sentado em 3/4: as duas coxas para a frente na diagonal, joelhos separados, canelas até o chão
    for(const k of [-1,1]){const perto=k===1,hx=dir*k*2.4,hy=-10.6,kx=hx+dir*6.6,ky=-7.4,cl=perto?lc:shade(lc,-24),sk=perto?skin:shade(skin,-20);
     c.save();c.translate(hx,hy);c.rotate(Math.atan2(ky-hy,kx-hx));c.fillStyle=cl;rr(c,-1.8,-2.6,Math.hypot(kx-hx,ky-hy)+3.6,5.2,2.5);c.fill();
@@ -1158,7 +1158,7 @@ function drawPersonReal0(c,x,y,v,o={}){
     c.fillStyle='rgba(255,255,255,.1)';rr(c,0,-2,Math.hypot(kx-hx,ky-hy),1.4,.7);c.fill();c.restore();
     c.fillStyle=corte||saia?sk:cl;rr(c,kx-2,ky-1,4.1,-ky+1,1.8);c.fill();c.fillStyle='rgba(0,0,0,.16)';circ(c,kx,ky+.2,1.5);shoe(kx+dir*.7,0)}}}
   else if(!back){const lc=saia||corte?skin:pants;
-   for(const k of [1,0]){const oy=k?-1.2:0,cl=k?shade(lc,-22):lc,x0=dir>0?-3:3,kx=dir*8.5;
+   for(const k of [1,0]){const oy=k?-2.4:0,cl=k?shade(lc,-26):lc,x0=(dir>0?-3:3)-(k?dir*1:0),kx=dir*8.5-(k?dir*4.2:0); // perna de trás um pouco atrás e acima: as duas aparecem
     c.fillStyle=cl;rr(c,Math.min(x0,kx)-2,-12.6+oy,Math.abs(kx-x0)+4,4.8,2.2);c.fill();
     if(corte&&!saia){c.fillStyle=pants;rr(c,Math.min(x0,x0+dir*corte)-2,-12.6+oy,corte+2,4.8,2.2);c.fill()}
     c.fillStyle=corte||saia?skin:cl;rr(c,kx-2,-10.5+oy,4.2,10+(k?.6:0)-oy,1.8);c.fill();
@@ -2587,7 +2587,7 @@ Object.assign(MOV,{
  piabanho:{n:'Pia com espelho',ic:'🪞',cat:'banho',pr:900,w:1,h:1,p:()=>[[4,12,28,28,0,26,'#ffffff'],[3,11,29,29,26,28,'#dfe6ea'],[9,15,23,25,26,28.4,'#cfe3ee'],[15,11,17,14,28,34,MVCROMO],[15,13,17,16,32,34,MVCROMO],[5,2,27,5,36,66,'#9aa3ad'],[6,4.6,26,5.2,38,64,'#cfeaf6']]},
  chuveiro:{n:'Box com chuveiro',ic:'🚿',cat:'banho',pr:1500,w:1,h:1,anda:1,liga:1,p:()=>[[2,2,30,30,0,2,'#dce6ec'],[2,2,30,4,2,72,'#a9d3e3'],[2,2,4,30,2,72,'#bfe0ec'],[14,4,18,6,30,62,MVCROMO],[12,6,20,14,60,62,MVCROMO]],
   fx:(c,P,al)=>{c.save();c.globalAlpha=(al??1)*.7;c.strokeStyle='#bfe8ff';c.lineWidth=1;for(let k=0;k<7;k++){const f=((now*1.6+k/7)%1),a=P(13+k,9+(k%3)*2,58-f*56);c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(a[0],a[1]+4);c.stroke()}c.restore()}},
- banheira:{n:'Banheira',ic:'🛁',cat:'banho',pr:3200,w:2,h:1,agua:16,p:()=>[[5,8,59,27,0,16,'#7fd0f2'],[2,5,62,8,0,24,MVBR],[2,5,5,30,0,24,MVBR],[59,5,62,30,0,24,'#e9eef2'],[2,27,62,30,0,24,MVBR],[52,5,56,8,24,34,MVCROMO],[50,5,58,8,32,34,MVCROMO]]},
+ banheira:{n:'Banheira',ic:'🛁',cat:'banho',pr:3200,w:2,h:1,agua:16,lugares:[[17,17],[47,17]],p:()=>[[5,8,59,27,0,16,'#7fd0f2'],[2,5,62,8,0,24,MVBR],[2,5,5,30,0,24,MVBR],[59,5,62,30,0,24,'#e9eef2'],[2,27,62,30,0,24,MVBR],[52,5,56,8,24,34,MVCROMO],[50,5,58,8,32,34,MVCROMO]]},
  toalheiro:{n:'Toalheiro',ic:'🧺',cat:'banho',pr:400,w:1,h:1,p:()=>[[5,12,7,16,0,50,MVCROMO],[25,12,27,16,0,50,MVCROMO],[5,12,27,16,48,50,MVCROMO],[8,13,24,15,26,48,'#3fa7d6'],[8,13,24,15,26,28,'#2c86b0']]},
  // ---------- 🍳 cozinha e varanda ----------
  armpar:{n:'Armário de parede',ic:'🗄️',cat:'cozinha',pr:1100,w:2,h:1,anda:0,p:()=>[[2,2,62,16,40,66,'#f2efe8'],[2,2,62,16,66,68,'#d9d3c6'],[31.5,15.8,32.5,16.4,42,64,'#cfc8b8'],[26,16,28,17,44,52,'#9aa3ad'],[36,16,38,17,44,52,'#9aa3ad']]},
@@ -2599,7 +2599,7 @@ Object.assign(MOV,{
  // ---------- 🌴 lazer ----------
  rede:{n:'Rede de varanda',ic:'🏝️',cat:'lazer',pr:900,w:2,h:1,deita:18,p:()=>[[2,13,6,19,0,48,MAD],[58,13,62,19,0,48,MAD],[6,10,58,22,16,18,'#e74c3c'],[6,10,58,22,18,18.6,'#f1c40f'],[6,12,58,14,18,19,'#27ae60'],[6,18,58,20,18,19,'#2980b9']]},
  cadpraia:{n:'Cadeira de praia',ic:'⛱️',cat:'lazer',pr:450,w:1,h:1,senta:1,alt:12,p:()=>[[6,8,8,28,0,12,'#bbb'],[24,8,26,28,0,12,'#bbb'],[7,10,25,28,10,12,'#ff7f50'],[7,4,25,10,12,34,'#ff7f50'],[7,6,25,8,12,34,'#ffffff'],[7,16,25,20,12,12.4,'#ffffff']]},
- piscina:{n:'Piscina de plástico',ic:'🏊',cat:'lazer',pr:1800,w:2,h:2,agua:11,p:()=>[[5,5,59,59,0,11,'#6fd0fa'],[2,2,62,5,0,15,'#3c8dde'],[2,2,5,62,0,15,'#3c8dde'],[59,2,62,62,0,15,'#2f7cc8'],[2,59,62,62,0,15,'#4a9ae6']],
+ piscina:{n:'Piscina de plástico',ic:'🏊',cat:'lazer',pr:1800,w:2,h:2,agua:11,lugares:[[19,19],[45,19],[19,45],[45,45]],p:()=>[[5,5,59,59,0,11,'#6fd0fa'],[2,2,62,5,0,15,'#3c8dde'],[2,2,5,62,0,15,'#3c8dde'],[59,2,62,62,0,15,'#2f7cc8'],[2,59,62,62,0,15,'#4a9ae6']],
   fx:(c,P,al)=>{c.save();c.globalAlpha=(al??1)*.5;c.strokeStyle='#ffffff';c.lineWidth=1;for(let k=0;k<3;k++){const f=(now*.4+k/3)%1,a=P(32,32,12);c.beginPath();c.ellipse(a[0],a[1],8+f*30,(8+f*30)*.5,0,0,7);c.globalAlpha=(al??1)*.5*(1-f);c.stroke()}c.restore()}},
  gamer:{n:'Mesa gamer',ic:'🖥️',cat:'lazer',pr:4500,w:2,h:1,p:()=>[[4,8,8,26,0,26,MVPRETO],[56,8,60,26,0,26,MVPRETO],[2,6,62,28,26,29,'#2b2b30'],[2,27.6,62,28.2,26,29,mvPisca(0,95,90)],[22,8,42,11,29,32,'#111'],[30,9,34,11,32,38,'#222'],[16,8,48,11,38,58,'#111'],[17,10.6,47,11.2,39,57,mvPisca(180,70,40)],[10,18,26,24,29,30,'#333'],[46,18,52,24,29,31,'#333']]},
  cadgamer:{n:'Cadeira gamer',ic:'🪑',cat:'lazer',pr:2200,w:1,h:1,senta:1,p:()=>[[14,14,18,18,0,12,'#333'],[6,6,26,26,0,2,'#222'],[6,8,26,26,12,17,MVPRETO],[7,4,25,9,17,52,MVPRETO],[7,8.6,25,9.2,22,50,MVVERM],[3,10,7,24,17,24,'#2b2b30'],[25,10,29,24,17,24,'#2b2b30']]},
@@ -2638,7 +2638,7 @@ Object.assign(MOV,{
   fx:(c,P,al)=>{const o=P(14,17,31);c.save();c.fillStyle='#111';c.beginPath();c.ellipse(o[0],o[1],9,4.5,0,0,7);c.fill();c.strokeStyle='#e74c3c';c.lineWidth=1.2;c.beginPath();c.ellipse(o[0],o[1],3,1.5,0,0,7);c.stroke();const a=now*4;c.strokeStyle='rgba(255,255,255,.35)';c.beginPath();c.moveTo(o[0],o[1]);c.lineTo(o[0]+Math.cos(a)*8,o[1]+Math.sin(a)*4);c.stroke();c.restore()}},
  // ---------- 👑 VIP ----------
  trono:{n:'Trono dourado',ic:'👑',cat:'luxo',vip:1,pr:20000,w:1,h:1,senta:1,alt:20,p:()=>[[4,6,28,30,0,16,MVOURO],[4,2,28,9,16,62,MVOURO],[6,8.6,26,9.2,20,58,'#8e1b3a'],[6,10,26,30,16,20,'#a8193f'],[1,6,5,30,0,30,'#b8932b'],[27,6,31,30,0,30,'#b8932b'],['o',16,5,66,4,'#e74c3c'],['o',6,5,63,2.5,'#3498db'],['o',26,5,63,2.5,'#3498db']]},
- hidro:{n:'Hidromassagem',ic:'🫧',cat:'luxo',vip:1,pr:24000,w:2,h:2,agua:17,p:()=>[[6,6,58,58,0,17,'#56c4ee'],[2,2,62,6,0,24,'#e9eef2'],[2,2,6,62,0,24,'#e9eef2'],[58,2,62,62,0,24,'#dfe6ea'],[2,58,62,62,0,24,'#f4f7f9'],[3,3,9,9,24,28,MVCROMO]],
+ hidro:{n:'Hidromassagem',ic:'🫧',cat:'luxo',vip:1,pr:24000,w:2,h:2,agua:17,lugares:[[19,19],[45,19],[19,45],[45,45]],p:()=>[[6,6,58,58,0,17,'#56c4ee'],[2,2,62,6,0,24,'#e9eef2'],[2,2,6,62,0,24,'#e9eef2'],[58,2,62,62,0,24,'#dfe6ea'],[2,58,62,62,0,24,'#f4f7f9'],[3,3,9,9,24,28,MVCROMO]],
   fx:(c,P,al)=>{c.save();c.globalAlpha=(al??1)*.8;c.fillStyle='#ffffff';for(let k=0;k<14;k++){const f=(now*.8+k*.137)%1,a=P(12+((k*37)%40),12+((k*23)%40),19+f*6);c.globalAlpha=(al??1)*(1-f)*.8;c.beginPath();c.arc(a[0],a[1],1+f*2,0,7);c.fill()}c.restore()}},
  massag:{n:'Poltrona massageadora',ic:'💆',cat:'luxo',vip:1,pr:16000,w:1,h:1,senta:1,p:()=>[[3,8,29,30,0,10,'#2b2b30'],[4,2,28,10,10,46,'#3a3a44'],[5,10,27,30,10,18,'#4a4a56'],[0,6,5,30,0,26,'#2b2b30'],[27,6,32,30,0,26,'#2b2b30'],[6,9.6,26,10.2,16,44,mvPisca(200,90,120)]]},
  arcade:{n:'Fliperama',ic:'🕹️',cat:'luxo',vip:1,pr:14000,w:1,h:1,p:()=>[[4,6,28,28,0,60,'#4a1a6b'],[4,6,28,28,60,64,'#6b2a9b'],[5,22,27,30,26,30,MVPRETO],[7,27.6,25,28.2,36,56,mvPisca(0,90,160)],['o',11,26,31,1.8,'#e74c3c'],['o',20,26,31,1.8,'#f1c40f'],['o',23,24,31,1.8,'#2ecc71']]},
@@ -2948,7 +2948,7 @@ function farolQuadro(kind,i,freio,base){const key=kind+'|'+i+'|'+(freio?1:0);if(
  const P=FAROL_POS[kind],FI=FAROL_IMG[kind],F=FAROL_FORMA[kind]||(FI?{f:[],t:[]}:null);if(!P||!F)return null;
  const cv=document.createElement('canvas');cv.width=cv.height=320;const c=cv.getContext('2d'),k=2;
  const EL=.663,se=Math.sin(EL),ce=Math.cos(EL),th=-Math.PI+i*Math.PI/16,yaw=Math.atan2(Math.sin(th)/se,Math.cos(th))+P[7],cy=Math.cos(yaw),sy=Math.sin(yaw),C=P[6],halos=[];
-  if(FI){if(!pronta(FI[0])||!pronta(FI[1]))return null;if(FI[0].naturalWidth)c.drawImage(quadro(FI[0],null,i),0,0,320,320);if(FI[1].naturalWidth){c.globalAlpha=freio?1:.6;c.drawImage(quadro(FI[1],null,i),0,0,320,320);c.globalAlpha=1}}
+  if(FI){{const f0=pronta(FI[0]),f1=pronta(FI[1]);if(!f0||!f1)return null}if(FI[0].naturalWidth)c.drawImage(quadro(FI[0],null,i),0,0,320,320);if(FI[1].naturalWidth){c.globalAlpha=freio?1:.6;c.drawImage(quadro(FI[1],null,i),0,0,320,320);c.globalAlpha=1}}
  for(const fr of [1,-1]){const vis=fr*sy;if(vis<-.08)continue;const X=fr>0?P[0]:P[3],Z0=fr>0?P[1]:P[4],h=fr>0?P[2]:P[5],formas=fr>0?F.f:F.t;if(!formas.length&&!FI)continue;
   const al=Math.min(1,.3+vis*1.1)*(fr>0?1:(freio?1:.6));
   for(const s of (Z0>0?[1,-1]:[1])){const Z=Z0*s,u=X*cy-Z*sy,zp=X*sy+Z*cy,px=(80+u)*k,py=(zp*se-h*ce+C)*k,longe=Z*cy<0?Math.max(0,Math.min(1,(vis-1.2*Math.abs(cy))/.2)):1;if(longe<=0)continue;const al0=al;{const al=al0*longe;if(Z*cy>=0)halos.push([px,py,fr,al]);
@@ -3064,12 +3064,18 @@ function drawCarSprite(c,x,y,img,ang,o,off=0){const N=32,T=77*CK*(o.esc||1),i=((
  const bob=(o.pitch||0)*6;const Y0=o.chao?y-T*.475+bob*.4:y-T/2-5.4*CK+bob;c.drawImage(quadro(img,CAR_MOD_ATUAL,i),0,0,320,320,x-T/2,Y0,T,T);if(o.rodasImg){const ri=o.rodasImg[((Math.floor(-(o.giroRoda||0)*.35/(Math.PI*2/5/4))%4)+4)%4];if(ri&&ri.naturalWidth&&pronta(ri))c.drawImage(quadro(ri,null,i),0,0,320,320,x-T/2,Y0,T,T)}if(o.farol){const q=farolQuadro(o.farol,i,o.freio,quadro(img,CAR_MOD_ATUAL,i));if(q){c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.75;c.drawImage(q,0,0,q.width,q.height,x-T/2,Y0,T,T);c.restore();LUZES_FRAME.push([q,x-T/2,Y0,T,c.getTransform()])}}if(!o.farol&&o.luzImg&&o.luzImg.naturalWidth){const q=quadro(o.luzImg,null,i);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.4;c.drawImage(q,0,0,320,320,x-T/2,Y0,T,T);c.restore();LUZES_FRAME.push([q,x-T/2,Y0,T,c.getTransform()])}else if(o.rodas)drawRodas(c,x-T/2,Y0,T/160,i,o.rodas,o.giroRoda||0,CAR_MOD_ATUAL?CAR_MOD_ATUAL.roda|0:0,o.rodaAnda);
  if(o.giroV){giroflexV(c,x-T/2,Y0,T/160,i,o.giroV);GIRO_FRAME.push([x-T/2,Y0,T/160,i,c.getTransform(),o.giroV])}
  if(o.freio&&!o.farol){const cs=Math.cos(ang),sn=Math.sin(ang);c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,40,40,.35)';c.beginPath();c.ellipse(x-cs*30*CK,y-sn*30*SY*CK-8*CK,5,3,0,0,7);c.fill();c.restore()}}
+// piloto da moto: tamanho normal, sentado no banco (um pouco para trás do centro) e virado igual à moto (frente, 3/4, perfil, costas)
+let MOTO_HOP=11;
+function pilotoMoto(c,x,y,v,th,ang,o){const a=Math.atan2(Math.sin(th),Math.abs(Math.cos(th)))*180/Math.PI,vs=a>67.5?'f':a>22.5?'l':a>-22.5?'p':a>-67.5?'cl':'c',vo=VISTA_OPC(vs),E=CAR_ESC.moto||1.3;
+ const bx=-Math.cos(th)*3.5*E,by=-Math.sin(th)*1.6*E;drawPerson(c,x+bx,y+by-MOTO_HOP*E,v,{s:PS,sit:true,dir:Math.cos(th)>=0?1:-1,lado:!!vo.lado,c34:!!vo.c34,cara:!!vo.cara,back:!!vo.back});
+ // de frente, 3/4 e de costas: a carenagem e o banco ficam na frente das pernas (de perfil a perna de fora aparece)
+ if(vs!=='p'){c.save();c.beginPath();c.rect(x-300,y-(MOTO_HOP-1)*E,600,400);c.clip();drawCarStack(c,x,y,'moto',ang,null,Object.assign({},o||{},{semSomb:1}));c.restore()}}
 const SP_OK=k=>{const im={duster:SPR_DUSTER,sw4:SPR_SW4,frontier:SPR_FRONT,caminhao:SPR_CAMINHAO,lixo:SPR_LIXO}[k];return im&&im.naturalWidth};
 function drawCarStack(c,x,y,kind,ang,v,o={}){if((kind==='duster'||kind==='sw4')&&!SP_OK(kind))kind='viatura';if((kind==='frontier'||kind==='caminhao'||kind==='lixo')&&!SP_OK(kind))kind='caminhonete';
  if(CAR_SOM_ATUAL){const t=now*2.2;c.save();c.globalCompositeOperation='lighter';for(let k=0;k<3;k++){const f=(t+k/3)%1;c.strokeStyle=`rgba(255,80,200,${(1-f)*.55})`;c.lineWidth=2.2;c.beginPath();c.ellipse(x,y-6,20+f*46,9+f*21,0,0,7);c.stroke()}c.restore();c.font='14px sans-serif';c.textAlign='center';c.fillText(['🎵','🎶','🔊'][Math.floor(now*2)%3],x+Math.sin(now*3)*18,y-48-((now*30)%18))}
  const SP3={fusca:[SPR_FUSCA,SPR_FUSCA_M],sedan:[SPR_SEDAN,SPR_SEDAN_M],moto:[SPR_MOTO,SPR_MOTO_M],opala:[SPR_OPALA,SPR_OPALA_M],esportivo:[SPR_ESP,SPR_ESP_M],kombi_tonhao:[SPR_KT,SPR_KT_M],viatura:[SPR_VIAT,null],duster:[SPR_DUSTER,null],caminhonete:[SPR_AMAROK,SPR_AMAROK_M],sw4:[SPR_SW4,null],frontier:[SPR_FRONT,null],caminhao:[SPR_CAMINHAO,null],lixo:[SPR_LIXO,null],neon:[SPR_LAMBO,SPR_LAMBO_M],jipe:[SPR_JIPE,SPR_JIPE_M],gto:[SPR_GTO,null],natal:[SPR_NATAL,SPR_NATAL_M]}[kind];
- if(SP3&&SP3[0].complete&&SP3[0].naturalWidth){if(!pronta(SP3[0])||(SP3[1]&&!pronta(SP3[1])))return;const sp=SP3[1]?spriteCor(SP3[0],SP3[1],o.cor||CAR_COR_ATUAL||CAR_COLOR[kind],kind==='natal'):SP3[0];if(sp){const th=Math.atan2((Math.cos(ang)+Math.sin(ang))*IB,(Math.cos(ang)-Math.sin(ang))*IA);{const cs=Math.cos(ang),sn=Math.sin(ang),E0=CAR_ESC[kind]||1,L=(kind==='moto'?14:21)*CK*E0,Wd=(kind==='moto'?3.5:8.5)*CK*E0,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];c.fillStyle='rgba(10,10,20,.22)';c.beginPath();[[L,Wd],[L,-Wd],[-L,-Wd],[-L,Wd]].forEach(([u,w],k2)=>{const q=P(cs*u-sn*w,sn*u+cs*w);k2?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fill()}
-   {const oy=({caminhao:19,lixo:11.5}[kind]||0)*77*CK*(CAR_ESC[kind]||1)/160;drawCarSprite(c,x,y-oy,sp,th,Object.assign({},o,{semSombra:1,chao:1,esc:CAR_ESC[kind]||1,rodas:RODAS[kind],rodasImg:RODA_IMG[kind],luzImg:o.luz?LUZ_IMG[kind]:null,farol:o.luz&&FAROL_POS[kind]?kind:null,giroV:kind==='viatura'&&o.giro?o.giro:0}))}if(kind==='moto'&&v)drawPerson(c,x,y-9,v,{s:.62,sit:true,dir:Math.cos(th)>=0?1:-1,back:Math.sin(th)<-.4});return}}
+ if(SP3&&SP3[0].complete&&SP3[0].naturalWidth){{const a0=pronta(SP3[0]),a1=SP3[1]?pronta(SP3[1]):true;if(!a0||!a1)return}const sp=SP3[1]?spriteCor(SP3[0],SP3[1],o.cor||CAR_COR_ATUAL||CAR_COLOR[kind],kind==='natal'||kind==='moto'):SP3[0];if(sp){const th=Math.atan2((Math.cos(ang)+Math.sin(ang))*IB,(Math.cos(ang)-Math.sin(ang))*IA);{const cs=Math.cos(ang),sn=Math.sin(ang),E0=CAR_ESC[kind]||1,L=(kind==='moto'?14:21)*CK*E0,Wd=(kind==='moto'?3.5:8.5)*CK*E0,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];if(!o.semSomb){c.fillStyle='rgba(10,10,20,.22)';c.beginPath();[[L,Wd],[L,-Wd],[-L,-Wd],[-L,Wd]].forEach(([u,w],k2)=>{const q=P(cs*u-sn*w,sn*u+cs*w);k2?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1])});c.closePath();c.fill()}}
+   {const oy=({caminhao:19,lixo:11.5}[kind]||0)*77*CK*(CAR_ESC[kind]||1)/160;drawCarSprite(c,x,y-oy,sp,th,Object.assign({},o,{semSombra:1,chao:1,esc:CAR_ESC[kind]||1,rodas:RODAS[kind],rodasImg:RODA_IMG[kind],luzImg:o.luz?LUZ_IMG[kind]:null,farol:o.luz&&FAROL_POS[kind]?kind:null,giroV:kind==='viatura'&&o.giro?o.giro:0}))}if(kind==='moto'&&v)pilotoMoto(c,x,y,v,th,ang,o);return}}
  ang+=Math.PI/4;
 {const ANT=kind==='caminhonete'?[SPR_PICK,0]:kind==='neon'?[SPR_VIP,16]:null;
  if(ANT&&ANT[0].complete&&ANT[0].naturalWidth){const a0=ang-Math.PI/4,th0=Math.atan2((Math.cos(a0)+Math.sin(a0))*IB,(Math.cos(a0)-Math.sin(a0))*IA),th=Math.atan2(Math.sin(th0)/.78,Math.cos(th0)),cs=Math.cos(a0),sn=Math.sin(a0),L=(kind==='caminhonete'?25:22)*CK*(CAR_ESC[kind]||1)/1.1,Wd=9.5*CK*(CAR_ESC[kind]||1)/1.1,P=(dx,dy)=>[x+(dx-dy)*IA,y+(dx+dy)*IB];
@@ -4752,7 +4758,12 @@ function noMovel(m,tipo,fala){const R=eu.rm.R,[w,h]=movTam(m.t,m.r|0),X=T(R.x0+m
  if(tipo==='cama'){const [dx,dy]=CABECA[r];eu.x=X+w*16-dx*38;eu.y=Y+h*16-dy*38;eu.deitado=1+r+(m.t==='colchao'?4:0);eu.sit=false}
  else if(tipo==='sofa'){const [fx,fy]=FRENTE[r];let tx=Math.max(0,Math.min(w-1,Math.floor((eu.x-X)/32))),ty=Math.max(0,Math.min(h-1,Math.floor((eu.y-Y)/32)));eu.x=X+tx*32+16-fx*4;eu.y=Y+ty*32+16-fy*4;eu.sit=true;eu.mz=MOV[m.t].alt||(m.t==='cadeira'?17:m.t==='caixote'?17:18);const sx=(fx-fy)*IA,sy=(fx+fy)*IB;eu.sv=sy>0?1:2;eu.frente=false;eu.back=sy<=0;eu.dir=sx>=0?1:-1}
  else if(tipo==='tv'){eu.vendoTV=m}
- else if(tipo==='agua'){const D=MOV[m.t];eu.x=X+w*16+(Math.random()-.5)*Math.max(0,w*32-28);eu.y=Y+h*16+(Math.random()-.5)*Math.max(0,h*32-28);eu.sit=true;eu.mz=Math.max(1,D.agua-12);eu.sv=1;eu.frente=false;eu.back=false;eu.dir=Math.random()<.5?1:-1}
+ else if(tipo==='agua'){ // lugares fixos (como no Habbo): o primeiro livre; cada um virado para o centro
+  const D=MOV[m.t],W0=D.w*32,H0=D.h*32,gira=(x0,y0)=>{let px=x0,py=y0,W=W0,H=H0;for(let k=0;k<(r&3);k++){const nx=py,ny=W-px;px=nx;py=ny;const t2=W;W=H;H=t2}return[px,py]};
+  const cen=gira(W0/2,H0/2),ocup=[...others.values()].filter(o=>o.sit&&!o.hidden&&o.rm===salaKey(eu));let lugar=null;
+  for(const L of (D.lugares||[[W0/2,H0/2]])){const q=gira(L[0],L[1]),lx=X+q[0],ly=Y+q[1];if(!ocup.some(o=>Math.hypot(o.x-lx,o.y-ly)<12)){lugar=[lx,ly];break}}
+  if(!lugar){eu.casaAcao=null;toast('🏊 Está cheio! Espere alguém sair.',2500);return}
+  eu.x=lugar[0];eu.y=lugar[1];const fx=X+cen[0]-lugar[0],fy=Y+cen[1]-lugar[1],sx=(fx-fy)*IA,sy=(fx+fy)*IB;eu.sit=true;eu.mz=Math.max(1,D.agua-12);eu.sv=sy>0?1:2;eu.back=sy<=0;eu.frente=false;eu.dir=sx>=0?1:-1}
  say(eu,fala,3,true);sendPos(true)}
 function acaoDe(m){const D=MOV[m.t];if(D.agua)return()=>noMovel(m,'agua',pick(['🏊 Que delícia!','💦 Água boa!','🫧 Relaxando…']));if(D.deita)return()=>noMovel(m,'cama','💤 Hora de dormir…');if(D.senta)return()=>noMovel(m,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']));if(D.tv)return()=>noMovel(m,'tv','📺 Bora ver TV!');if(D.gel)return()=>((casasInfo.get(eu.rm.n)||{}).dono===eu.id?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000));return null}
 function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Math.floor(wy/TILE)-R.y0;let m=null;for(const q of (eu.rm.moveis||[])){if(!movAqui(q)||!MOV[q.t]||MOV[q.t].anda)continue;const [w,h]=movTam(q.t,q.r|0);if(tx>=q.x&&tx<q.x+w&&ty>=q.y&&ty<q.y+h){m=q;break}}
@@ -5675,7 +5686,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124n';
+const VERSAO_JOGO='v20261124o';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
