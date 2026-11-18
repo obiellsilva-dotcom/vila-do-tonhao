@@ -4582,10 +4582,53 @@ function trocarPorta(b,a){acao(async()=>{await api.porta(b.n,a);portas.set(b.n,a
 function sairCasa(){emCasa=false;eu.hidden=false;$('work').classList.add('hidden');sendPos(true)}
 $('workStop').onclick=()=>{if(emCasa){sairCasa();return}if(!trabalho)return;const w=trabalho;api.largar().catch(()=>{});fimTurno();if(w.ronda){toast(`✅ Patrulha encerrada: ${money(w.ronda.pago)} e ${w.ronda.xp} XP.`,3500);return}toast(w.porTarefa?`✅ Turno encerrado: ${w.feitas} tarefas, `+(w.job==='pescador'?`${w.peixes} peixe(s)`:money(w.ganhou))+` e ${w.xp} XP.`:'Largou o turno. Sem pagamento dessa vez.',4000)};
 
+/* ----- tempo real no Cloudflare (Durable Objects): posições, avisos, chat e quem está na sala ----- */
+// Se o servidor do Cloudflare falhar, o jogo volta sozinho para o Supabase Realtime (código antigo logo abaixo).
+const RT_URL=(CONF.realtimeUrl||'wss://vila-tempo-real.obiellsilva.workers.dev').replace(/\/$/,'');
+let RT_OFF=!!CONF.semCloudflare,dbCh=null;
+function tirarCanal(c){if(!c)return;if(c.rt)c.close();else{try{sb.removeChannel(c)}catch(_){}}}
+function rtCanal(n,token,h){
+ const q=token?'?token='+encodeURIComponent(token)+'&k='+encodeURIComponent(CONF.supabaseAnonKey||''):'';
+ const c={rt:true,n,ids:new Set(),state:'joining',ws:null,fechado:false,pg:0,
+  presenceState(){const o={};this.ids.forEach(id=>{o[id]=[{}]});return o},
+  send(m){try{if(this.ws&&this.ws.readyState===1)this.ws.send(JSON.stringify({t:m.event,p:m.payload}))}catch(e){}return Promise.resolve()},
+  chat(r){try{if(this.ws&&this.ws.readyState===1)this.ws.send(JSON.stringify({t:'chat',r}))}catch(e){}},
+  track(){return Promise.resolve()},
+  close(){this.fechado=true;this.state='closed';clearInterval(this.pg);try{this.ws&&this.ws.close(1000)}catch(e){}}};
+ let ws;try{ws=new WebSocket(RT_URL+'/sala/'+n+q)}catch(e){setTimeout(()=>h.fim(null),0);return c}
+ c.ws=ws;let ok=false;const t0=setTimeout(()=>{if(!ok){h.fim(null);c.close()}},8000);
+ ws.onmessage=e=>{let d;try{d=JSON.parse(e.data)}catch(_){return}if(!d)return;
+  if(d.t==='oi'){ok=true;clearTimeout(t0);c.state='joined';c.ids=new Set(d.ids||[]);h.fim(false);h.pres&&h.pres()}
+  else if(d.t==='cheia'){ok=true;clearTimeout(t0);c.fechado=true;h.fim(true)}
+  else if(d.t==='entrou'){c.ids.add(d.id);h.pres&&h.pres()}
+  else if(d.t==='saiu'){c.ids.delete(d.id);h.pres&&h.pres()}
+  else if(d.t==='pos'){h.pos&&h.pos(d.p)}else if(d.t==='ev'){h.ev&&h.ev(d.p)}else if(d.t==='chat'){h.chat&&h.chat(d.r)}};
+ ws.onerror=()=>{};
+ ws.onclose=e=>{c.state='closed';clearInterval(c.pg);if(!ok){clearTimeout(t0);h.fim(null)}else if(!c.fechado&&h.caiu)h.caiu(e.code)};
+ c.pg=setInterval(()=>{if(ws.readyState===1&&!document.hidden)try{ws.send('{"t":"ping"}')}catch(_){}},30000);
+ return c}
+// avisos do banco (casa comprada, vaga ocupada): poucos, continuam no Supabase
+function dbCanal(){if(dbCh||!ONLINE)return;dbCh=sb.channel('db-mudancas').on('postgres_changes',{event:'UPDATE',schema:'public',table:'casas'},p=>{if(p.new)onCasa(p.new)}).on('postgres_changes',{event:'UPDATE',schema:'public',table:'vagas'},p=>{if(p.new)onVaga(p.new)}).subscribe()}
+async function conectarRT(){let tk=null;try{const {data}=await sb.auth.getSession();tk=data&&data.session&&data.session.access_token}catch(_){}if(!tk)return false;
+ if(canal){const c0=canal;canal=null;tirarCanal(c0)}
+ for(let n=1;n<=60;n++){let ativo=false,c=null;
+  const cheia=await new Promise(res=>{let done=false;const fim=v=>{if(!done){done=true;res(v)}};
+   c=rtCanal(n,tk,{fim,pos:p=>{if(ativo)onPos(p)},ev:p=>{if(ativo)onEv(p)},pres:()=>{if(ativo)syncPresence()},
+    chat:r=>{if(!ativo||!r||typeof r.texto!=='string')return;const o=others.get(r.morador);if(o&&o.nome&&o.nome!=='…')r.nome=o.nome;r.sala=n;onChat(r,false)},
+    caiu:cod=>{if(canal!==c)return;canal=null;if(cod===4001){toast('📱 Você abriu o jogo em outra aba ou aparelho.',5000);return}setTimeout(()=>{if(!canal&&eu)conectar()},2500)}})});
+  if(cheia===null){c.close();return false}
+  if(cheia){c.close();continue}
+  ativo=true;canal=c;sala=n;dbCanal();
+  syncPresence();sendPos(true);refreshHud();log(`🌐 Você entrou na sala ${n} da cidade`);
+  api.chat(n).then(rows=>rows.forEach(r=>onChat(r,true))).catch(()=>{});
+  return true}
+ toast('Todas as salas estão cheias! Tente daqui a pouco.',5000);return true}
+
 /* ----- salas online (Supabase Realtime) ----- */
 async function conectar(){
  if(!ONLINE){refreshHud();return}
- if(espiaCh){const e=espiaCh;espiaCh=null;others.clear();try{await sb.removeChannel(e)}catch(_){}await new Promise(r=>setTimeout(r,400))}
+ if(espiaCh){const e=espiaCh;espiaCh=null;others.clear();tirarCanal(e);await new Promise(r=>setTimeout(r,400))}
+ if(!RT_OFF){if(await conectarRT())return;RT_OFF=true;console.warn('Tempo real do Cloudflare falhou: usando o Supabase')}
  for(const c of sb.getChannels())if(/^realtime:sala-/.test(c.topic)){try{await sb.removeChannel(c)}catch(_){}}
  for(let n=1;n<=60;n++){
   let ativo=false;
@@ -4610,14 +4653,16 @@ async function conectar(){
  toast('Todas as salas estão cheias! Tente daqui a pouco.',5000);
 }
 let espiaCh=null;
-function espiar(){if(eu||!ONLINE||canal||espiaCh)return;const ch=sb.channel('sala-1',{config:{broadcast:{self:false}}});espiaCh=ch;
+function espiar(){if(eu||!ONLINE||canal||espiaCh)return;
+ if(!RT_OFF){const c=rtCanal(1,null,{fim:v=>{if(v===null&&espiaCh===c){espiaCh=null;RT_OFF=true;espiar()}},pos:p=>{if(espiaCh===c&&!canal)onPos(p)},pres:()=>{if(espiaCh===c&&!canal)syncPresence()}});espiaCh=c;return}
+ const ch=sb.channel('sala-1',{config:{broadcast:{self:false}}});espiaCh=ch;
  ch.on('presence',{event:'sync'},()=>{if(espiaCh===ch&&!canal)syncPresence()}).on('broadcast',{event:'pos'},({payload})=>{if(espiaCh===ch&&!canal)onPos(payload)}).subscribe()}
 setTimeout(espiar,800);
 // vigia: se eu não apareço na sala (canal caiu), entra de novo
-async function vigiaSala(){if(!ONLINE||!eu)return;if(!canal){conectar();return}try{const st=canal.state,on=!!canal.presenceState()[eu.id];if(st!=='joined'){const c=canal;canal=null;try{await sb.removeChannel(c)}catch(_){}conectar();return}if(!on)await canal.track({t:Date.now()})}catch(_){}}
+async function vigiaSala(){if(!ONLINE||!eu)return;if(!canal){conectar();return}try{const st=canal.state,on=!!canal.presenceState()[eu.id];if(st!=='joined'){const c=canal;canal=null;tirarCanal(c);conectar();return}if(!on)await canal.track({t:Date.now()})}catch(_){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(vigiaSala,800)});addEventListener('online',()=>setTimeout(vigiaSala,800));
 setInterval(async()=>{if(!ONLINE||!eu||!canal)return;try{const st=canal.state,eu_on=!!canal.presenceState()[eu.id];
- if(st!=='joined'){const c=canal;canal=null;try{await sb.removeChannel(c)}catch(_){}conectar();return}
+ if(st!=='joined'){const c=canal;canal=null;tirarCanal(c);conectar();return}
  if(!eu_on)await canal.track({t:Date.now()})}catch(_){}},10000);
 function syncPresence(){
  const chP=canal||espiaCh;if(!chP)return;const ids=Object.keys(chP.presenceState()).filter(id=>!eu||id!==eu.id);
@@ -4643,7 +4688,7 @@ function onPos(p){
  if(!p||typeof p.i!=='string')return;const o=others.get(p.i);if(!o)return;
  const x=clamp(+p.x||0,WX0,WX1),y=clamp(+p.y||0,WY0,WY1);
  if(!o.seen){o.x=x;o.y=y;o.seen=true}
- o.tx=x;o.ty=y;o.gM=(p.gf|0)%10;o.giro=o.gM>0;o.sirM=Math.floor((p.gf|0)/10);o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c(\d+|imob)s?$/.test(p.rm)?p.rm:0;o.deitado=Math.max(0,Math.min(8,p.dt|0));o.mz=Math.max(0,Math.min(20,p.mz|0));o.sv=p.sv===1||p.sv===2?p.sv:0;
+ o.tx=x;o.ty=y;o.gM=(p.gf|0)%10;o.giro=o.gM>0;o.sirM=Math.floor((p.gf|0)/10);o.caronaLib=!!p.cr;o.re=!!p.re;o.dir=p.d<0?-1:1;o.moving=!!p.m;o.hidden=!!p.h;o.driving=CAR_COLOR[p.c]?p.c:null;o.beer=!!p.b;o.work=JOBS[p.w]?p.w:p.w==='sinuca'?'sinuca':0;o.sit=p.st>0;o.back=p.st===2;o.frente=p.st===3;o.bebado=Math.max(0,Math.min(1,+p.bb||0));o.rm=typeof p.rm==='string'&&/^c(\d+|imob|show)s?$/.test(p.rm)?p.rm:0;o.deitado=Math.max(0,Math.min(8,p.dt|0));o.mz=Math.max(0,Math.min(20,p.mz|0));o.sv=p.sv===1||p.sv===2?p.sv:0;
 }
 function emitEv(k,data){if(canal&&eu)canal.send({type:'broadcast',event:'ev',payload:Object.assign({i:eu.id,k},data)}).catch(()=>{})}
 function onEv(p){
@@ -4699,7 +4744,7 @@ function renderChat(){
 }
 async function enviar(){
  const t=$('msg').value.trim();if(!t||!eu)return;$('msg').value='';
- try{onChat(await api.msg(sala||1,t),false)}catch(e){toast(e.message,3000);$('msg').value=t}
+ try{const r=await api.msg(sala||1,t);onChat(r,false);if(canal&&canal.rt)canal.chat(r)}catch(e){toast(e.message,3000);$('msg').value=t}
  if($('chatPainel').classList.contains('on'))$('msg').focus();
 }
 $('send').onclick=enviar;$('send').addEventListener('pointerdown',e=>{if(document.activeElement===$('msg'))e.preventDefault()});
@@ -5332,7 +5377,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124f';
+const VERSAO_JOGO='v20261124g';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
