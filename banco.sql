@@ -2618,3 +2618,7 @@ begin
   return json_build_object('pago', pago, 'atrasado', c.aluguel_ate < now(), 'valor', c.valor_aluguel, 'eu', _estado(m.id));
 end $$;
 grant execute on function public.cobrar_aluguel() to authenticated;
+
+
+-- etapa 29: carro exclusivo do Passe (Furacão GT) entrou no jogo
+update public.passe_temporadas set carro_pronto = true where id = 'T1';
