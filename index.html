@@ -1520,8 +1520,9 @@ const bank=addB({kind:'banco',x:37,y:15,w:8,h:6});
 const igreja=addB({kind:'igreja',x:48,y:40,w:7,h:8});
 // concessionária nova (12x8): showroom de vidro com escritório no fundo (x85-95, y21-23) e pátio murado com os carros na frente (y24-28)
 const conc=addB({kind:'concessionaria',x:85,y:15,w:10,h:5,front:[90,20]});
-const CONC={X0:85,X1:95,Y0:15,Y1:20,P1:29,dentro:[['kombi_tonhao',87.1,17.7,.55],['gto',90.0,17.6,.55],['neon',92.9,17.7,.55]],
- fora:[['caminhonete',86.3,22.1,1.57],['jipe',87.8,22.1,1.57],['esportivo',92.2,22.1,1.57],['sedan',93.7,22.1,1.57],['opala',86.3,25.5,1.57],['fusca',87.8,25.5,1.57],['moto',92.7,25.6,1.57]]};
+const CONC={X0:85,X1:95,Y0:15,Y1:20,P1:29,dentro:[['kombi_tonhao',-16.2,84.6,.55],['gto',-12.5,83.0,.55],['neon',-8.7,84.6,.55]], // dentro = showroom (SALAS.show)
+ fora:[['caminhonete',86.3,22.1,1.57],['jipe',87.8,22.1,1.57],['opala',86.3,25.5,1.57],['fusca',87.8,25.5,1.57],['esportivo',92.1,25.5,1.57],['sedan',93.5,25.5,1.57],['moto',91.8,22.3,1.57]]};
+const SHOW={n:'show',kind:'show',front:conc.front,fixos:[{t:'planta',x:0,y:0},{t:'mesa',x:1,y:1},{t:'cadeira',x:1,y:3,r:2},{t:'cadeira',x:2,y:3,r:2},{t:'estante',x:4,y:0},{t:'estante',x:8,y:0},{t:'sofa',x:10,y:1},{t:'planta',x:12,y:0},{t:'planta',x:0,y:6},{t:'planta',x:12,y:6}]};
 for(let y=20;y<=28;y++)for(let x=85;x<=94;x++)grid[y][x]=G.ROAD; // pátio de asfalto (dá para entrar de carro)
 for(let y=20;y<=28;y++){grid[y][85]=G.BLD;grid[y][94]=G.BLD} // muros laterais
 for(let x=85;x<=94;x++)if(x<89||x>90)grid[28][x]=G.BLD; // muro da frente com portão no meio
@@ -2293,34 +2294,45 @@ function drawFeira(c,b){const X0=T(b.x),Y0=T(b.y),Y1=T(b.y+b.h),n=4,w=(T(b.w)-12
    c.beginPath();c.moveTo(a0[0],a0[1]-zf);c.lineTo(a1[0],a1[1]-zf);c.lineTo(a1[0],a1[1]-zf+5);c.lineTo(a0[0],a0[1]-zf+5);c.fill()}}
  const pl=isoP(X0+T(b.w)/2,Y1+4);c.fillStyle='#6d4426';c.fillRect(pl[0]-1.5,pl[1]-22,3,22);c.fillStyle='#f3e3bd';rr(c,pl[0]-34,pl[1]-34,68,14,4);c.fill();c.fillStyle='#5a3a22';c.font='700 9px Fredoka, sans-serif';c.textAlign='center';c.fillText('🍎 FEIRINHA 🥬',pl[0],pl[1]-24);c.textAlign='left'}
 // concessionária desenhada à mão (showroom de vidro, escritório no fundo, pátio murado com carros e plaquinhas de preço)
-function concIso(list){const C=CONC,X0=T(C.X0),X1=T(C.X1),Y0=T(C.Y0),Y1=T(C.Y1),P1=T(C.P1),H=50,vid=darkness()>.3?'rgba(255,214,120,.22)':'rgba(170,215,240,.28)';
- // piso do showroom (porcelanato) e faixas do pátio
- list.push({x:X0,y:Y0,k:X0+Y0-30,g:1,f:()=>{setWorld(ctx);for(let y=Y0;y<Y1;y+=16)for(let x=X0;x<X1;x+=16){ctx.fillStyle=((x+y)/16)%2?'#e9edf1':'#dfe4ea';ctx.fillRect(x,y,16,16)}
+function concFachada(c,X0,X1,Y1,H,noite){const z=v=>Y1-v/WK,PX=[T(89.15),T(90.85)],W=X1-X0;
+ // base, vidro espelhado escuro (por fora não se vê o interior)
+ c.fillStyle='#3a3f47';c.fillRect(X0,z(5),W,5/WK);
+ const g=c.createLinearGradient(0,z(H-16),0,z(5));if(noite){g.addColorStop(0,'#2a2a3c');g.addColorStop(.6,'#3c3a46');g.addColorStop(1,'#5a4a36')}else{g.addColorStop(0,'#5b7f9c');g.addColorStop(.45,'#2c445c');g.addColorStop(1,'#1b2a3a')}
+ c.fillStyle=g;c.fillRect(X0,z(H-16),W,(H-21)/WK);
+ // reflexos diagonais
+ c.save();c.beginPath();c.rect(X0,z(H-16),W,(H-21)/WK);c.clip();c.fillStyle=noite?'rgba(255,220,150,.07)':'rgba(255,255,255,.13)';for(let x=X0-40;x<X1;x+=46){c.beginPath();c.moveTo(x,z(5));c.lineTo(x+14,z(5));c.lineTo(x+44,z(H-16));c.lineTo(x+30,z(H-16));c.fill()}
+ if(noite){c.fillStyle='rgba(255,200,110,.18)';c.fillRect(X0,z(30),W,25/WK)}c.restore();
+ // caixilhos de alumínio
+ c.fillStyle='#aab3bd';for(let x=X0;x<=X1+.5;x+=TILE){if(x>PX[0]-2&&x<PX[1]+2)continue;c.fillRect(Math.min(x,X1-1.6)-.8,z(H-16),1.6,(H-21)/WK)}
+ c.fillRect(X0,z(36),PX[0]-X0-4,1.2/WK);c.fillRect(PX[1]+4,z(36),X1-PX[1]-4,1.2/WK);c.fillRect(X0,z(H-16),W,1.6/WK);
+ // faixa do letreiro
+ c.fillStyle='#1f5a8a';c.fillRect(X0,z(H),W,16/WK);c.fillStyle='#ffc94a';c.fillRect(X0,z(H-14.5),W,1.3/WK);c.fillStyle='#174a73';c.fillRect(X0,z(H),W,1.5/WK);
+ c.fillStyle=noite?'#ffe08a':'#ffc94a';c.font='700 11px Fredoka, sans-serif';c.textAlign='center';if(noite){c.shadowColor='#ffcf5a';c.shadowBlur=6}c.fillText('🚗 CARROS DO ZÉ',(X0+X1)/2,z(H-12.5));c.shadowBlur=0;
+ // porta dupla de vidro
+ const d0=PX[0],d1=PX[1],dm=(d0+d1)/2;c.fillStyle='#c4cbd2';c.fillRect(d0-3,z(42),d1-d0+6,42/WK);
+ const gd=c.createLinearGradient(0,z(39),0,z(1));gd.addColorStop(0,noite?'#7a6a4a':'#8fb6cf');gd.addColorStop(1,noite?'#e8c27a':'#cfe4f0');c.fillStyle=gd;c.fillRect(d0,z(39),dm-d0-1,38/WK);c.fillRect(dm+1,z(39),d1-dm-1,38/WK);
+ c.fillStyle='rgba(255,255,255,.4)';for(const x of [d0+3,dm+4]){c.beginPath();c.moveTo(x,z(4));c.lineTo(x+3,z(4));c.lineTo(x+9,z(36));c.lineTo(x+6,z(36));c.fill()}
+ c.fillStyle='#7f8a95';c.fillRect(dm-1,z(39),2,38/WK);c.fillStyle='#e9edf1';c.fillRect(dm-4,z(27),1.4,14/WK);c.fillRect(dm+2.6,z(27),1.4,14/WK);
+ c.fillStyle='#1f5a8a';c.fillRect(dm-9,z(22),18,4/WK);c.fillStyle='#fff';c.font='600 3.2px Fredoka, sans-serif';c.fillText('ABERTO',dm,z(19.3));c.textAlign='left'}
+function concIso(list){const C=CONC,X0=T(C.X0),X1=T(C.X1),Y0=T(C.Y0),Y1=T(C.Y1),P1=T(C.P1),H=64,noite=darkness()>.3;
+ // pátio de asfalto inteiro (sem grama sob os muros e carros) e faixas das vagas
+ list.push({x:X0,y:Y1,k:-1e8,g:1,f:()=>{setWorld(ctx);ctx.fillStyle='#3d3c44';ctx.fillRect(X0,Y1,X1-X0,P1-Y1);
   ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.4;for(const vx of [85.55,87.05,88.55,91.45,92.95,94.45])for(const [a,b] of [[20.8,23.6],[24.2,27]]){ctx.beginPath();ctx.moveTo(T(vx),T(a));ctx.lineTo(T(vx),T(b));ctx.stroke()}
-  ctx.fillStyle='rgba(255,201,74,.85)';ctx.fillRect(T(89),T(20),T(2),3);ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(T(89.1),T(20.2),T(1.8),T(7.8));for(const [,cx,cy] of C.dentro){ctx.fillStyle='rgba(30,30,40,.16)';ctx.beginPath();ctx.ellipse(T(cx),T(cy)+3,40,14,0,0,7);ctx.fill();ctx.strokeStyle='#c9ced6';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(T(cx),T(cy)+3,40,14,0,0,7);ctx.stroke()}}});
- // parede do fundo com o escritório
- list.push({x:(X0+X1)/2,y:Y0,k:X0+Y0+4,cam:1,f:()=>{isoBox(ctx,X0,Y0,X1,Y0+5,0,H,'#f2f4f7');isoBox(ctx,X0,Y0,X0+5,Y1,0,H,'#e4e8ee');
-  wallSet(ctx,Y0+5);const z=v=>Y0+5-v/WK;ctx.fillStyle='#1f5a8a';ctx.fillRect(X0+8,z(H-4),X1-X0-16,10/WK);ctx.fillStyle='#ffc94a';ctx.font='700 7px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('CARROS DO ZÉ  ·  SHOWROOM',(X0+X1)/2,z(H-11));
-  const ox=X1-T(3.2);ctx.fillStyle='#8a5a2b';ctx.fillRect(ox,z(40),T(2.6),40/WK);ctx.fillStyle='#cfe6f5';ctx.fillRect(ox+3,z(37),T(1.2)-4,22/WK);ctx.fillStyle='#6b4423';ctx.fillRect(ox+T(1.4),z(36),T(1)-2,36/WK);ctx.fillStyle='#ffd23f';ctx.fillRect(ox+T(2.2),z(18),2,2/WK);
-  ctx.fillStyle='#2b2b30';ctx.font='600 5px Fredoka, sans-serif';ctx.fillText('ESCRITÓRIO',ox+T(1.3),z(44));
-  ctx.fillStyle='#d9dde3';ctx.fillRect(X0+T(1.2),z(44),T(2.4),18/WK);ctx.fillStyle='#2e6fd8';ctx.fillRect(X0+T(1.3),z(42),T(2.2),14/WK);ctx.fillStyle='#fff';ctx.font='600 4.5px Fredoka, sans-serif';ctx.fillText('FINANCIAMOS!',X0+T(2.4),z(33));ctx.textAlign='left';setCam(ctx)}});
- // mesa do vendedor (escritório) e plantas
- list.push({x:X1-T(2),y:Y0+T(1),cam:1,f:()=>{const x=X1-T(2.9),y=Y0+T(.9);sombraChao(ctx,x,y,x+T(1.8),y+T(.8));isoBox(ctx,x,y,x+T(1.8),y+T(.8),12,15,'#6b4423');isoBox(ctx,x+3,y+3,x+6,y+T(.8)-3,0,12,'#4a2e17');isoBox(ctx,x+T(1.8)-6,y+3,x+T(1.8)-3,y+T(.8)-3,0,12,'#4a2e17');
-  isoBox(ctx,x+T(.6),y+4,x+T(1.1),y+9,15,24,'#1d1d22');isoBox(ctx,x+T(.6)+1,y+4,x+T(1.1)-1,y+5,16,23,'#5fa8e8');isoBox(ctx,x+T(.7),y+T(1.1),x+T(1.1),y+T(1.5),0,10,'#2b2b30');isoBox(ctx,x+T(.7),y+T(1.4),x+T(1.1),y+T(1.5),10,20,'#2b2b30')}});
- for(const px of [X0+10,X1-12])list.push({x:px,y:Y1-10,cam:1,f:()=>{isoBox(ctx,px-4,Y1-14,px+4,Y1-6,0,8,'#b5651d');ctx.fillStyle='#2e8b57';const q=isoP(px,Y1-10);for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(q[0]+Math.cos(i*1.3)*4,q[1]-16-Math.sin(i*2)*4,4,7,i,0,7);ctx.fill()}}});
- // carros do Pix em exposição dentro (giram devagar)
- for(const [k,cx,cy,a0] of C.dentro)list.push({x:T(cx),y:T(cy),f:()=>{const a=a0;try{drawCarStack(ctx,T(cx),T(cy),k,a,null,{})}catch(e){}placaCarro(T(cx),T(cy),k,true)}});
- // vidro da frente com colunas e a faixa do letreiro (por cima dos carros de dentro)
- list.push({x:(X0+X1)/2,y:Y1,k:X1+Y1+2,cam:1,f:()=>{const A=isoP(X0,Y1),B2=isoP(X1,Y1),Cc=isoP(X1,Y0),porta=[T(89.1),T(90.9)];
-  ctx.fillStyle=vid;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B2[0],B2[1]);ctx.lineTo(B2[0],B2[1]-H+8);ctx.lineTo(A[0],A[1]-H+8);ctx.closePath();ctx.fill();
-  ctx.fillStyle=vid;ctx.beginPath();ctx.moveTo(B2[0],B2[1]);ctx.lineTo(Cc[0],Cc[1]);ctx.lineTo(Cc[0],Cc[1]-H+8);ctx.lineTo(B2[0],B2[1]-H+8);ctx.closePath();ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,.35)';for(let i=0;i<5;i++){const t=i/5+.05,p=[A[0]+(B2[0]-A[0])*t,A[1]+(B2[1]-A[1])*t];ctx.beginPath();ctx.moveTo(p[0]+4,p[1]-6);ctx.lineTo(p[0]+14,p[1]-6);ctx.lineTo(p[0]+24,p[1]-H+14);ctx.lineTo(p[0]+14,p[1]-H+14);ctx.fill()}
-  for(let x=X0;x<=X1+1;x+=T(2.2))isoBox(ctx,Math.min(x,X1)-2,Y1-2,Math.min(x,X1)+2,Y1+2,0,H-6,'#9aa3ad');isoBox(ctx,X1-3,Y0,X1+1,Y0+4,0,H-6,'#9aa3ad');
-  isoBox(ctx,porta[0],Y1-1,porta[1],Y1+1,0,40,'rgba(120,170,200,.35)');isoBox(ctx,porta[0]-1,Y1-2,porta[0]+1,Y1+2,0,40,'#7d8790');isoBox(ctx,porta[1]-1,Y1-2,porta[1]+1,Y1+2,0,40,'#7d8790');
-  isoBox(ctx,X0-3,Y1-6,X1+3,Y1+3,H-8,H+4,'#1f5a8a');isoBox(ctx,X1-1,Y0-2,X1+3,Y1+3,H-8,H+4,'#174a73');
-  wallSet(ctx,Y1+3);ctx.fillStyle='#ffc94a';ctx.font='700 9px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('🚗 CARROS DO ZÉ',(X0+X1)/2,Y1+3-(H-5)/WK);ctx.textAlign='left';setCam(ctx)}});
+  ctx.fillStyle='#cfd4da';ctx.fillRect(T(89.1),Y1,T(1.8),T(8));ctx.fillStyle='#8c3a2e';ctx.fillRect(T(89.25),Y1+2,T(1.5),12)}});
+ // prédio fechado, em fatias (para os bonecos ficarem na frente/atrás certo)
+ const a=artDe('concF'+(noite?1:0),X0-2,Y1-(H+2)/WK,X1-X0+4,(H+2)/WK+2,c=>concFachada(c,X0,X1,Y1,H,noite));
+ for(let i=0;i<C.X1-C.X0;i++){const xa=X0+i*TILE,xb=xa+TILE,ult=i===C.X1-C.X0-1,pri=i===0;
+  list.push({x:xa+TILE/2,y:Y1,k:xa+TILE/2+Y1-2,cam:1,f:()=>{isoBox(ctx,xa,Y0,xb,Y1,0,H,'#cfd5dc');
+   wallSet(ctx,Y1);artFatia(ctx,a,xa,xb,Y1-(H+2)/WK,Y1+1);setCam(ctx);
+   if(ult){const B=isoP(X1,Y1),Cc=isoP(X1,Y0);ctx.fillStyle='#174a73';ctx.beginPath();ctx.moveTo(B[0],B[1]-H);ctx.lineTo(Cc[0],Cc[1]-H);ctx.lineTo(Cc[0],Cc[1]-H+16);ctx.lineTo(B[0],B[1]-H+16);ctx.fill();ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.moveTo(B[0],B[1]);ctx.lineTo(Cc[0],Cc[1]);ctx.lineTo(Cc[0],Cc[1]-6);ctx.lineTo(B[0],B[1]-6);ctx.fill()}
+   // platibanda (mureta do telhado)
+   isoBox(ctx,xa,Y1-5,xb,Y1,H,H+6,'#1f5a8a');isoBox(ctx,xa,Y0,xb,Y0+4,H,H+5,'#9aa3ad');if(pri)isoBox(ctx,X0,Y0,X0+4,Y1-5,H,H+5,'#9aa3ad');if(ult)isoBox(ctx,X1-4,Y0,X1,Y1-5,H,H+5,'#9aa3ad');
+   if(i===2||i===7){const x=xa+6,y=Y0+20;isoBox(ctx,x,y,x+20,y+22,H,H+12,'#b8bfc7');ctx.fillStyle='#5b636c';const q=isoP(x+10,y+11);ctx.beginPath();ctx.ellipse(q[0],q[1]-H-12,6,3,0,0,7);ctx.fill()}}});}
+ // marquise sobre a porta e plantas na entrada
+ list.push({x:T(90),y:Y1+10,k:T(90)+Y1+3,cam:1,f:()=>{isoBox(ctx,T(88.9),Y1,T(91.1),Y1+12,42,45,'#1f5a8a');isoBox(ctx,T(88.9),Y1+10,T(91.1),Y1+12,40,42,'#ffc94a')}});
+ for(const px of [T(88.55),T(91.45)])list.push({x:px,y:Y1+8,cam:1,f:()=>{isoBox(ctx,px-5,Y1+3,px+5,Y1+13,0,10,'#e9edf1');ctx.fillStyle='#2e8b57';const q=isoP(px,Y1+8);for(let i=0;i<6;i++){ctx.beginPath();ctx.ellipse(q[0]+Math.cos(i*1.1)*5,q[1]-18-Math.sin(i*2)*5,4,8,i,0,7);ctx.fill()}}});
  // carros do pátio
- for(const [k,cx,cy,a] of C.fora)list.push({x:T(cx),y:T(cy),f:()=>{try{drawCarStack(ctx,T(cx),T(cy),k,a,null,{})}catch(e){}placaCarro(T(cx),T(cy),k,false)}});
+ for(const [k,cx,cy,a2] of C.fora)list.push({x:T(cx),y:T(cy),f:()=>{try{drawCarStack(ctx,T(cx),T(cy),k,a2,null,{})}catch(e){}placaCarro(T(cx),T(cy),k,false)}});
  // muros (laterais e frente, com portão) e totem
  const muro=(x0,y0,x1,y1)=>list.push({x:(x0+x1)/2,y:(y0+y1)/2,k:(x0+x1)/2+(y0+y1)/2+2,cam:1,f:()=>{isoBox(ctx,x0,y0,x1,y1,0,13,'#d9d1c3');isoBox(ctx,x0-1,y0-1,x1+1,y1+1,13,15,'#b8ad99')}});
  for(let y=20;y<29;y++){muro(X0,T(y),X0+6,T(y+1));muro(X1-6,T(y),X1,T(y+1))}
@@ -2516,12 +2528,13 @@ const SALAS={casa:{x0:123,y0:82,x1:132,y1:89,porta:[127,90],parede:'#efe2c8',pis
  mansao2:{x0:-19,y0:92,x1:-2,y1:98,porta:null,esc:{x0:-3,y0:92,x1:-2,y1:95},parede:'#e8eef4',piso:['#c9b08a','#bfa47c'],cima:1},
  kit:{x0:112,y0:-17,x1:117,y1:-14,porta:[114,-13],parede:'#f1ead9',piso:['#cfc6b8','#c4bbab']},
  ap2:{x0:122,y0:-18,x1:129,y1:-14,porta:[125,-13],parede:'#e6eef2',piso:['#b8946a','#ad8a60']},
- imob:{x0:112,y0:-8,x1:119,y1:-3,porta:[115,-2],parede:'#e3eef6',piso:['#e2ddd3','#d6d0c4']}};
+ imob:{x0:112,y0:-8,x1:119,y1:-3,porta:[115,-2],parede:'#e3eef6',piso:['#e2ddd3','#d6d0c4']},
+ show:{x0:-19,y0:80,x1:-7,y1:86,porta:[-13,87],parede:'#eef1f5',piso:['#f1f3f6','#e4e8ed']}};
 for(const R of Object.values(SALAS)){for(let y=R.y0-1;y<=R.y1+1;y++)for(let x=R.x0-1;x<=R.x1+1;x++)setTile(x,y,(x<R.x0||x>R.x1||y<R.y0||y>R.y1)?G.BLD:G.FLOOR);if(R.porta)setTile(R.porta[0],R.porta[1],G.FLOOR)}
 const movAqui=m=>!m.g&&(m.a|0)===((eu&&eu.rm&&eu.rm.andar)|0);
 const naEsc=(R,tx,ty)=>!!R.esc&&tx>=R.esc.x0&&tx<=R.esc.x1&&ty>=R.esc.y0&&ty<=R.esc.y1;
 const casaTipo=b=>(b.apto?'apto':b.preco>=75000?'mansao':b.preco>=15000?'media':'barata');
-const salaDe=(b,a)=>b.kind==='imob'?SALAS.imob:b.kind==='kit'?SALAS.kit:b.kind==='ap2'?SALAS.ap2:b.kind==='mansao'?(a?SALAS.mansao2:SALAS.mansao):SALAS.casa;
+const salaDe=(b,a)=>b.kind==='imob'?SALAS.imob:b.kind==='show'?SALAS.show:b.kind==='kit'?SALAS.kit:b.kind==='ap2'?SALAS.ap2:b.kind==='mansao'?(a?SALAS.mansao2:SALAS.mansao):SALAS.casa;
 // móveis da casa: guardados no banco (posição relativa à sala e andar)
 // ===== móveis das casas: modelos detalhados (caixas e bolas em 3D isométrico), com 4 giros =====
 // cada parte: [x0,y0,x1,y1,z0,z1,cor] (em pixels dentro do espaço do móvel, frente virada para +y) ou ['o',cx,cy,cz,raio,cor]
@@ -2571,7 +2584,8 @@ function desenhaMovel(c,t,X,Y,r,m,alpha,cam){const D=MOV[t];if(!D)return;const [
  c.globalAlpha=1}
 
 function salaTiles(){if(!eu||!eu.rm)return;const R=eu.rm.R;for(let y=R.y0;y<=R.y1;y++)for(let x=R.x0;x<=R.x1;x++)setTile(x,y,G.FLOOR);if(R.esc&&R.cima)for(let y=R.esc.y0+1;y<=R.esc.y1;y++)for(let x=R.esc.x0;x<=R.esc.x1;x++)setTile(x,y,G.BLD);
- for(const m of (eu.rm.moveis||[])){if(!movAqui(m)||!MOV[m.t]||MOV[m.t].anda)continue;const [w,h]=movTam(m.t,m.r|0);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(R.x0+m.x+x<=R.x1&&R.y0+m.y+y<=R.y1)setTile(R.x0+m.x+x,R.y0+m.y+y,G.BLD)}}
+ for(const m of (eu.rm.moveis||[])){if(!movAqui(m)||!MOV[m.t]||MOV[m.t].anda)continue;const [w,h]=movTam(m.t,m.r|0);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(R.x0+m.x+x<=R.x1&&R.y0+m.y+y<=R.y1)setTile(R.x0+m.x+x,R.y0+m.y+y,G.BLD)}
+ if(R===SALAS.show)for(const [,cx,cy] of CONC.dentro)for(let y=Math.floor(cy-.4);y<=Math.floor(cy+.4);y++)for(let x=Math.floor(cx-1.1);x<=Math.floor(cx+1.1);x++)setTile(x,y,G.BLD)}
 function movLivre(t,r,x,y,ign){const R=eu.rm.R,[w,h]=movTam(t,r),an=MOV[t].anda;if(x<0||y<0||R.x0+x+w-1>R.x1||R.y0+y+h-1>R.y1)return false;
  for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){const tx=R.x0+x+xx,ty=R.y0+y+yy;if(naEsc(R,tx,ty))return false;if(R.porta&&tx===R.porta[0]&&ty===R.porta[1]-1)return false;if(!an&&Math.floor(eu.x/TILE)===tx&&Math.floor(eu.y/TILE)===ty)return false}
  return !(eu.rm.moveis||[]).some((m,k)=>{if(k===ign||!movAqui(m)||!MOV[m.t])return false;if(an!==!!MOV[m.t].anda)return false;const [w2,h2]=movTam(m.t,m.r|0);return x<m.x+w2&&m.x<x+w&&y<m.y+h2&&m.y<y+h})}
@@ -3869,8 +3883,10 @@ function abrirMapa(){if(!eu)return;const el=document.createElement('div');el.id=
   const o=mapaP(0,0),A2=(mx-o[0])/(MK*IA),B2=(my-o[1])/(MK*IB),wx=(A2+B2)/2,wy=(B2-A2)/2;if(wx<-T(4)||wy<-T(4)||wx>T(W+4)||wy>T(H+4))return;MAPA_MARCA={x:wx,y:wy,rotulo:'📍 Marcação'};Som.play('clique');pintaTm();toast('📍 Marcado! Siga a seta amarela no chão.',2200)}}
 
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261125';
+const NOVID='v20261126';
 const NOV_SLIDES=[
+ {t:'🚗 Concessionária nova',x:'A <b>Carros do Zé</b> mudou: prédio novo com <b>pátio cheio de carros</b> (veja o preço na plaquinha) e um <b>showroom</b> por dentro, com a Caminhonete do Tonhão, a Ferrarini e a Lambordini em exposição. Entre pela <b>porta de vidro</b>!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏎️':'🚗',110+Math.sin(t*2)*10,125);g.font='44px sans-serif';g.fillText('🔑',225,115+Math.sin(t*3)*6)}},
+ {t:'🗺️ Passeio pela cidade',x:'Quem chega agora ganha um <b>passeio guiado</b>: a câmera visita o bar, os empregos, as lojas, as casas, o condomínio, a delegacia, o hospital e a prefeitura, explicando cada lugar.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText('🗺️',110,125);g.font='40px sans-serif';const L=['🍺','💼','🚗','🏠','🏛️'];g.fillText(L[Math.floor(t/.9)%L.length],225,120+Math.sin(t*3)*5)}},
  {t:'🎟️ Passe Natal na Vila',x:'Novo <b>Passe</b> com 20 níveis: trabalhe, ganhe pontos (tarefas mais demoradas dão mais) e libere prêmios. No Premium tem o <b>🎅 gorro de Papai Noel brilhante</b> e um <b>🚗 carro exclusivo</b> que <b>nunca mais voltam</b> depois de 31/12! Abra pelo <b>🎟️</b> no menu ☰.',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎟️',110,125+Math.sin(t*3)*6);g.font='44px sans-serif';const L=['👕','🧢','👟','💰','🎨'];g.fillText(L[Math.floor(t/.8)%L.length],220,120);g.fillStyle='#ffc94a';g.fillRect(70,160,180*((t*.25)%1),10)}},
  {t:'🎱 Sinuca de verdade e 🎁 bônus',x:'A sinuca agora tem <b>15 bolas e 10 tacadas</b>. Em dupla vale a regra de verdade: <b>lisas × listradas</b> e a <b>8 preta</b> no final, e o amistoso dá XP (30 para quem vence). Nos empregos: a cada <b>10 tarefas, +R$ 50</b>, mas <b>errar o minijogo custa R$ 25</b>!',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎱',110,125+Math.sin(t*3)*5);g.font='40px sans-serif';g.fillText(Math.floor(t/1.3)%2?'🎁':'💰',225,120)}},
  {t:'👕 Guarda-roupa e 🎒 Mochila novos',x:'Toque em você e em <b>👕 Guarda-roupa</b>: veja todas as suas roupas com o boneco vestindo, troque na hora, salve até <b>3 looks</b> e escolha o <b>✨ brilho no chão</b>. A <b>🎒 Mochila</b> agora tem abas: itens, roupas, carros e pets.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.4)%2?'🎒':'👕',110,125+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['👗','🧢','👟','✨'];L.forEach((e,i)=>g.fillText(e,190+(i%2)*55,85+Math.floor(i/2)*60))}},
@@ -4335,7 +4351,7 @@ function fimTurno(){eu.giro=false;eu.sirM=0;eu.gM=0;$('viatPainel').classList.ad
 houses.forEach(b=>{if(b.off||b.loja||!b.moveis)return;for(const [x,y] of b.moveis){grid[y][x]=G.CASA;casaTile.set(x+','+y,b)}b.moveis=[]}); // casas vêm vazias (móveis agora ficam na sala)
 function entrarSala(b){if(emCasa){emCasa=false;eu.hidden=false;$('work').classList.add('hidden')}joyV.x=joyV.y=0;salaCD=now+1.2;pertoKey='';const R=salaDe(b,0);eu.rm={n:b.n,b,R,andar:0,moveis:b.fixos?b.fixos.map(m=>Object.assign({a:0,r:0},m)):[]};salaTiles();carregaMoveis();eu.path=[];eu.onArrive=null;eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7);eu.dir=1;follow=eu;eu._zoomAntes=cam.z;cam.z=Math.max(cam.z,1.5);cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');closeCard();sendPos(true);
  const i=casasInfo.get(b.n)||{};toast(salaNome(b,i)+' · para sair, ande até a porta.',2500)}
-function salaNome(b,i){i=i||{};if(b.kind==='imob')return'🏘️ Imobiliária do Tonhão';if(b.apto)return'🏢 Apto '+b.num+' · Bloco '+b.bloco.nome+(i.nome?' ('+i.nome+')':'');return i.nome?'🏠 Casa de '+i.nome:(b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n}
+function salaNome(b,i){i=i||{};if(b.kind==='imob')return'🏘️ Imobiliária do Tonhão';if(b.kind==='show')return'🚗 Showroom Carros do Zé';if(b.apto)return'🏢 Apto '+b.num+' · Bloco '+b.bloco.nome+(i.nome?' ('+i.nome+')':'');return i.nome?'🏠 Casa de '+i.nome:(b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n}
 function sairSala(){if(MOB.ativo)fecharMob();joyV.x=joyV.y=0;salaCD=now+1.5;pertoKey='';const b=eu.rm.b;levantarCasa();eu.rm=null;eu.placing=null;eu.path=[];eu.onArrive=null;eu.x=T(b.front[0]+.5);eu.y=T(b.front[1]+1.1);follow=eu;if(eu._zoomAntes)cam.z=eu._zoomAntes;cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');sendPos(true)}
 let salaFade=0,salaCD=0,SALA_ON=false;const SALA_ESC=1.8;
 setInterval(()=>{if(!eu||eu.driving||eu.hidden||now<salaCD)return;if(eu.rm){const R=eu.rm.R;if(eu.x<T(R.x0-1)||eu.x>T(R.x1+2)||eu.y<T(R.y0-1)||eu.y>T(R.y1+2)){if(R.porta){eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7)}else{eu.x=T(R.esc.x0-.5);eu.y=T(R.esc.y0+.5)}eu.path=[]}}if(!eu.rm){const b=casaEm(eu.x,eu.y);if(b&&!b.loja&&!b.off&&houses.includes(b))entrarSala(b)}else{const R=eu.rm.R,tx=Math.floor(eu.x/TILE),ty=Math.floor(eu.y/TILE);if(R.porta&&tx===R.porta[0]&&ty===R.porta[1])sairSala();else if(R.esc&&ty===R.esc.y0&&tx>=R.esc.x0&&tx<=R.esc.x1)trocaAndar()}},120);
@@ -4392,11 +4408,22 @@ function condoItens(list){const C=CONDO,cx=T((C.x0+C.x1)/2),cy=T((C.y0+C.y1)/2);
 const CORRETOR={nome:'Corretor Zé',v:null,fala:null,qtd:0};
 function saudacao(){const h=hour();return h>=5&&h<12?'Bom dia':h>=12&&h<18?'Boa tarde':'Boa noite'}
 function corretorFala(){CORRETOR.fala={t:saudacao()+'! Seja bem-vindo(a) à Imobiliária do Tonhão. Como posso te ajudar? 😊',ate:now+6}}
+const VENDEDOR={v:null,nome:''};
+function showItens(list,R){const X0=T(R.x0),X1=T(R.x1+1),Y0=T(R.y0);
+ if(!VENDEDOR.v){VENDEDOR.v=Object.assign({},visFromName('Vendedor Carros Ze'));VENDEDOR.nome=VENDEDOR.v.sexo?'Vendedora Zuleide':'Vendedor Zé'}
+ // discos de exposição (no chão)
+ for(const [,cx,cy] of CONC.dentro)list.push({x:T(cx),y:T(cy),k:-1e8+1,g:1,f:()=>{const x=T(cx),y=T(cy);ctx.fillStyle='rgba(0,0,0,.12)';ctx.beginPath();ctx.arc(x+4,y+4,T(1.3),0,7);ctx.fill();ctx.fillStyle='#fbfcfd';ctx.beginPath();ctx.arc(x,y,T(1.3),0,7);ctx.fill();ctx.strokeStyle='#c9a227';ctx.lineWidth=3;ctx.stroke();ctx.strokeStyle='rgba(201,162,39,.35)';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y,T(1.12),0,7);ctx.stroke()}});
+ // carros (Caminhonete do Tonhão e Ferrarini = Pix; Lambordini = VIP)
+ for(const [k,cx,cy,a] of CONC.dentro)list.push({x:T(cx),y:T(cy),f:()=>{try{drawCarStack(ctx,T(cx),T(cy),k,a,null,{})}catch(e){}placaCarro(T(cx),T(cy),k,true)}});
+ // letreiro na parede do fundo
+ list.push({x:(X0+X1)/2,y:Y0,k:X1+Y0-29,cam:1,f:()=>{wallSet(ctx,Y0);const z=v=>Y0-v/WK,mx=(X0+X1)/2;ctx.fillStyle='#1f5a8a';ctx.fillRect(mx-70,z(68),140,12/WK);ctx.fillStyle='#ffc94a';ctx.fillRect(mx-70,z(57),140,1.2/WK);ctx.font='700 8px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillText('🚗 CARROS DO ZÉ',mx,z(59));ctx.textAlign='left';setCam(ctx)}});
+ // vendedor atrás da mesa
+ const x=T(R.x0+2),y=T(R.y0+.75);list.push({x,y,k:x+y-6,f:()=>{drawPerson(ctx,x,y,VENDEDOR.v,{s:PS*SALA_ESC,cara:true,dir:1});nameTag(ctx,x,y-46*PS*SALA_ESC-3,'💼 '+VENDEDOR.nome,false,true)}})}
 function corretorItem(list,R){if(!CORRETOR.v){CORRETOR.v=Object.assign({},visFromName('Corretor Ze'));CORRETOR.nome=CORRETOR.v.sexo?'Corretora Zélia':'Corretor Zé'}
  const n=1+[...others.values()].filter(o=>o.rm==='cimob'&&!o.hidden).length;if(n>CORRETOR.qtd)corretorFala();CORRETOR.qtd=n;
  const x=T(R.x0+4.5),y=T(R.y0+.75);list.push({x,y,k:x+y-6,f:()=>{drawPerson(ctx,x,y,CORRETOR.v,{s:PS*SALA_ESC,cara:true,dir:1});
   const top=y-46*PS*SALA_ESC-3;nameTag(ctx,x,top,'💼 '+CORRETOR.nome,false,true);if(CORRETOR.fala&&CORRETOR.fala.ate>now)bubble(ctx,x,top-12,CORRETOR.fala.t)}})}
-function salaItens(list,R){if(R===SALAS.imob)corretorItem(list,R);const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(R.y0),Y1=T(R.y1+1);
+function salaItens(list,R){if(R===SALAS.imob)corretorItem(list,R);if(R===SALAS.show)showItens(list,R);const H=72,cor=R.parede,X0=T(R.x0),X1=T(R.x1+1),Y0=T(R.y0),Y1=T(R.y1+1);
  for(let x=R.x0;x<=R.x1;x++)list.push({x:T(x+.5),y:Y0,k:T(x+.5)+Y0-30,cam:1,f:()=>{isoBox(ctx,T(x),Y0-6,T(x+1),Y0,0,H,cor);if(x%3===1){const a=isoP(T(x)+6,Y0),b=isoP(T(x+1)-6,Y0);ctx.fillStyle=darkness()>.3?'#ffd98a':'#9fd3f2';ctx.beginPath();ctx.moveTo(a[0],a[1]-26);ctx.lineTo(b[0],b[1]-26);ctx.lineTo(b[0],b[1]-50);ctx.lineTo(a[0],a[1]-50);ctx.fill()}}});
  for(let y=R.y0;y<=R.y1;y++)list.push({x:X0,y:T(y+.5),k:X0+T(y+.5)-30,cam:1,f:()=>isoBox(ctx,X0-6,T(y),X0,T(y+1),0,H,shade(cor,-8))});
  for(let x=R.x0;x<=R.x1;x++)if(!R.porta||x!==R.porta[0])list.push({x:T(x+.5),y:Y1,k:T(x+.5)+Y1+6,cam:1,f:()=>isoBox(ctx,T(x),Y1,T(x+1),Y1+6,0,12,shade(cor,-15))});
@@ -4425,6 +4452,7 @@ function salaOpcoes(){const o=[],dono=(casasInfo.get(eu.rm.n)||{}).dono===eu.id;
  if(eu.casaAcao){o.push(['🧍 Levantar',levantarCasa]);if(eu.casaAcao==='tv')o.push(['📺 Mudar de canal',()=>say(eu,pick(['📺 Jornal da Vila','📺 Novela das 8','⚽ Futebol!','📺 Desenho animado','🎤 Programa de auditório']),3,true)]);return o}
  const best=movPerto();if(best){const D=MOV[best.t];if(D.deita)o.push(['😴 Deitar',()=>noMovel(best,'cama','💤 Hora de dormir…')]);else if(D.senta)o.push(['🪑 Sentar',()=>noMovel(best,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']))]);else if(D.tv)o.push(['📺 Ver TV',()=>noMovel(best,'tv','📺 Bora ver TV!')]);else if(D.gel)o.push(['🧊 Abrir geladeira',()=>dono?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000)]);else if(D.juke&&typeof Som!=='undefined'&&Som.faixa)o.push(['🎵 Trocar a música',()=>{Som.iniciarMusica&&Som.iniciarMusica();Som.faixa(Math.floor(Math.random()*5))}])}
  if(eu.rm.n==='imob')o.unshift(['🏘️ Falar com o corretor',abrirImobiliaria]);
+ if(eu.rm.n==='show')o.unshift(['🚗 Ver e comprar carros',()=>abrirLugar(conc)]);
  if(dono)o.push(['🛋️ Decorar',abrirMobilia]);return o.slice(0,3)}
 function mobUI(){let el=$('mobUI');if(el)return el;el=document.createElement('div');el.id='mobUI';el.innerHTML=`<style>
 #mobBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));z-index:60;background:rgba(30,16,22,.95);border:1px solid rgba(255,201,74,.45);border-radius:16px;padding:8px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px);box-shadow:0 6px 24px rgba(0,0,0,.45);color:#fff;font:600 13px Fredoka,sans-serif}
@@ -4979,6 +5007,7 @@ function pertoOpcoes(){
  
  {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  if(perto((imob.front[0]+.5)*TILE,(imob.front[1]+.5)*TILE,T(1.7)))o.push(['🏘️ Entrar na Imobiliária',()=>entrarSala(IMOB)]);
+ if(perto((conc.front[0]+.5)*TILE,(conc.front[1]+.5)*TILE,T(1.8)))o.unshift(['🚗 Entrar no showroom',()=>entrarSala(SHOW)]);
  for(const bl of BLOCOS)if(perto((bl.front[0]+.5)*TILE,(bl.front[1]+.5)*TILE,T(1.7))){o.push(['🏢 Bloco '+bl.nome+': apartamentos',()=>abrirBloco(bl)]);break}
  for(const b of houses)if(!b.off&&!casaEm(eu.x,eu.y)&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3))){const i=casasInfo.get(b.n)||{};o.push([i.dono&&i.dono===eu.id?'🏠 Minha casa':i.dono?'🏠 Casa de '+(i.nome||'alguém'):'🔑 Casa '+b.n+' à venda',()=>abrirLugar(b)]);break}
  for(const f of FRUTAS)if(perto(f.x,f.y+8,T(1.4))&&!(frutaCD[f.id]>Date.now())){o.push([f.tipo==='manga'?'🥭 Pegar manga':'🍐 Pegar goiaba',()=>comerFruta(f)]);break}
@@ -5286,7 +5315,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124a';
+const VERSAO_JOGO='v20261124b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5601,7 +5630,7 @@ setInterval(msRender,400);
 const TOUR=[[24,22.5,1.35,'🍺 Bar do Tonhão','O coração da cidade: bebida, comida, sinuca e conversa. O <b>garçom</b> é o primeiro emprego.'],
  [44,21,1.05,'💼 Centro de Empregos','Mercadinho, Padaria, Barbearia e Banco. Toque em <b>☰ → 💼 Empregos</b> para trabalhar e ganhar dinheiro e XP.'],
  [54,25.5,1.35,'👕 Loja de Roupas','Roupas, calçados, chapéus e joias. Depois troque tudo no <b>👕 Guarda-roupa</b>.'],
- [90,22,1.2,'🚗 Concessionária Carros do Zé','Carros de verdade no pátio e os especiais 💎 no showroom. Comprou, saiu dirigindo!'],
+ [90,22,1.2,'🚗 Concessionária Carros do Zé','Carros no pátio e os especiais 💎 dentro do <b>showroom</b>: entre pela porta de vidro. Comprou, saiu dirigindo!'],
  [101,25,1.2,'⛽ Posto e 🔧 Oficina','Abasteça o carro no posto e troque a cor na oficina.'],
  [92,40,.95,'🏠 Casas à venda','Placa <b>VENDE-SE</b> = casa livre. Dá para entrar, decorar e convidar amigos.'],
  [41.5,44,1.3,'🏢 Imobiliária','Fale com o corretor para <b>comprar ou alugar</b> casas e apartamentos.'],
