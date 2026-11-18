@@ -6,32 +6,16 @@
 ---
 
 
-## 0. ⚠️ TRABALHO EM ANDAMENTO (leia antes de tudo) — versão `v20261124a`, AINDA NÃO PUBLICADA
-> No ar: **v20261123c** = v20261123b + correção do botão de fechar do Passe (× por cima da faixa e botão "⬅️ Voltar"). Essa correção também já está no index.html em andamento.
-O `index.html` do pacote já tem estas mudanças (commitadas no ramo `ccr-e8b9720b-5amd2g`), mas **não foram testadas no navegador nem enviadas como site.zip**. O site no ar está na `v20261123b`.
-
-### 0.1 Concessionária nova (feita, mas o dono pediu ajustes — ver 0.3)
-- **Casa 59 removida** (`HOUSE_OFF.add(58)` logo depois da criação de `HOUSE_OFF`). ⚠️ Se alguém já tinha comprado a casa 59 no banco, ela some do mapa: conferir no Supabase (`select dono from casas where id=59`) e, se tiver dono, devolver o dinheiro ou trocar a casa.
-- Prédio: `conc=addB({kind:'concessionaria',x:85,y:15,w:10,h:5,front:[90,20]})`. Pátio de asfalto `y20..28, x85..94` (tiles `G.ROAD`), muros laterais nas colunas 85 e 94, muro da frente na linha 28 com **portão nas colunas 89–90**, carros do pátio bloqueiam o tile.
-- `CONC={X0:85,X1:95,Y0:15,Y1:20,P1:29,dentro:[kombi_tonhao,gto,neon],fora:[caminhonete,jipe,esportivo,sedan,opala,fusca,moto]}` com posição e ângulo de cada carro.
-- Desenho próprio em `concIso(list)` (chamado no laço de prédios do `drawCena` no lugar de `predioFatias` quando `b.kind==='concessionaria'`): piso, faixas das vagas, parede do fundo com escritório, mesa do vendedor, plantas, carros do Pix dentro com plaquinha, fachada de vidro com colunas e letreiro "CARROS DO ZÉ", carros do pátio com plaquinha de nome e preço (`placaCarro`), muros, pilares do portão e totem. `FOCUS.concessionaria=[90,22,1.25]`.
-- Plaquinha da **Lambordini (`neon`) mostra "👑 VIP"** (ela é do VIP, NÃO do Pix). Caminhonete do Tonhão e Ferrarini = "💎 Pix".
-
-### 0.2 Tour obrigatório pela cidade (feito, NÃO testado)
-- `tourCidade(forcar)` + lista `TOUR` (11 paradas: Bar, Centro de Empregos, Loja de Roupas, Concessionária, Posto/Oficina, Casas à venda, Imobiliária, Condomínio, Delegacia, Hospital, Prefeitura), câmera desliza (1,6 s) e para (3,4 s) com quadro explicando; tela bloqueada, sem botão de pular (o dono quer obrigatório). 1 vez por pessoa (`localStorage cidadeTonhao.tour.<id>`).
-- Dispara: 3,2 s depois do bônus da **missão 1** (`msPasso(1)`), ao tocar em **Pular** no tutorial (`tutoPular`) e ao **pular a missão** (`msX`).
-- Testar: as coordenadas de "Casas à venda" `[92,40]` e do condomínio `[15,-11]` podem precisar de ajuste; conferir que `follow` volta para o jogador e que nada fica travado.
-
-### 0.3 O QUE O DONO PEDIU E AINDA FALTA FAZER (prioridade máxima)
-1. **Fechar o showroom por fora**: o prédio da concessionária (x85–94, y15–19) vira um **prédio fechado** com telhado, fachada bonita (vidro escuro/espelhado, não transparente), letreiro e **uma porta dupla de vidro decente** (ele achou a porta atual feia). **Tirar os carros de dentro do desenho externo** (eles ficavam "abertos" e a casa 61 de trás tampava a Lambordini — "muito estranho").
-2. **Showroom em OUTRA DIMENSÃO** (igual à imobiliária): criar `SALAS.show` num canto livre (sugestão `x0:-19,y0:80,x1:-7,y1:86,porta:[-13,87]`, piso porcelanato claro, parede `#eef1f5`; conferir que não bate em `mansao2` que fica em y92–98) e um objeto `SHOW={n:'show',kind:'show',front:[90,20],fixos:[mesa do vendedor, cadeiras, sofá de espera, estantes, plantas, tapete…]}` (móveis do `MOV`). Ajustar `salaDe` (`kind==='show'`→`SALAS.show`) e `salaNome` ("🚗 Showroom Carros do Zé"). Perto da porta (`conc.front`): botão **"🚗 Entrar no showroom"** → `entrarSala(SHOW)` (ver como `perto(imob.front…)` faz). Dentro: desenhar os 3 carros (Caminhonete do Tonhão 💎 Pix, Ferrarini 💎 Pix, Lambordini 👑 VIP) em discos de exposição com plaquinha (chamar de dentro do `salaItens` quando `R===SALAS.show`), e em `salaOpcoes` um botão **"🚗 Ver e comprar carros"** → `abrirLugar(conc)` (loja normal da concessionária; no app o Pix fica escondido por `NO_APP`). "Programar a área para ser mobiliada" = móveis fixos bonitos (não é para o jogador decorar).
-3. **Pátio sem grama**: os tiles com muro/carro (`G.BLD`) aparecem verdes. Pintar asfalto `#3d3c44` sobre todo o retângulo `T(85)..T(95) × T(20)..T(29)` no item de piso (antes das faixas).
-4. **Sedã tampado pela cobertura do posto**: mudar os carros do lado direito para a **fileira da frente** (y≈25,5), longe da cobertura. Sugestão: `fora=[['caminhonete',86.3,22.1],['jipe',87.8,22.1],['opala',86.3,25.5],['fusca',87.8,25.5],['esportivo',92.1,25.5],['sedan',93.5,25.5],['moto',91.8,22.3]]` (ângulo 1.57) e testar em print.
-5. Testar tudo com print (de dia e de noite, zoom 1,5), trocar `VERSAO_JOGO`, gerar `site.zip` + `index.html`, mandar foto + link de teste para o dono aprovar.
-6. Atualizar a tela de novidades (`NOV_SLIDES`/`NOVID`) com "Concessionária nova" e o tour.
-
-### 0.4 Como gerar o site.zip
-Pasta com: `index.html`, `privacidade.html`, `excluir-conta.html`, `manifest.webmanifest`, `icones/`, `.well-known/assetlinks.json`, `musicas/` (charrete.mp3, futilidades-entre-nos.mp3, o-campeao.mp3) e `sons/` (diesel, esportivo, fusca, gto, moto, neon, opala, sedan .mp3). Os mp3 estão no GitHub (pastas `musicas/` e `sons/`). Zipar a partir de dentro da pasta.
+## 0. ÚLTIMA SESSÃO (18/11/2026) — versão `v20261124e`, ramo `ccr-fe2fa98f-j3vukg`
+Tudo commitado. O dono recebeu o `site.zip` v20261124e (confirmar se subiu). SQL: **todas as etapas até a 29 rodadas** (29 = `carro_pronto=true` do passe T1).
+- **Concessionária:** prédio fechado (vidro escuro, telhado, porta dupla, marquise) desenhado em `concIso`/`concFachada`; pátio de asfalto; carros do pátio em `CONC.fora`. Casa 59 removida (sem dono, conferido).
+- **Showroom em outra dimensão:** `SALAS.show` (x-19..-7, y80..86), objeto `SHOW`, carros em `CONC.dentro` (coordenadas da sala), `showItens` (discos, carros, letreiro, vendedor), botões "🚗 Entrar no showroom" e "🚗 Ver e comprar carros".
+- **Tour pela cidade** (`tourCidade`, 11 paradas) testado: funciona e devolve a câmera.
+- **Pix do passe corrigido:** `comprarPix` agora abre `#mLoja` para mostrar o QR (antes ficava escondido).
+- **Carro do Passe = "Furacão GT" (id `natal`)**: modelo "Volkswagen Golf GTI 2021" de ItsDiyor (Sketchfab, **CC BY 4.0**, crédito em `privacidade.html`), sem logos/placa. `SPR_NATAL`/`SPR_NATAL_M` (máscara de pintura), `RODA_IMG.natal` (4 quadros), `FAROL_IMG.natal` (camadas de luz dianteira/traseira usadas em `farolQuadro`), `spriteCor(...,fiel)` só para ele (vidros/faróis não escurecem). Renderizador em `extras/render-carro.html` + `extras/render-carro-gerar.js` (three.js 0.160 + Playwright, servidor local). Os modelos do autor "Ddiaz Design" são **CC-BY-NC** (não usar).
+- **Mapa e mapinha:** área ampliada (`MAPX0/MAPY0...`, `naSala`, `MAPA_BLOCOS`), mostram condomínio, lagoa e acampamento; nomes Imobiliária e Condomínio no mapa grande.
+- Novidades: `NOVID='v20261127'` com slides Furacão GT, Concessionária nova e Passeio.
+- **Próximos passos:** tempo real no Cloudflare (seção 6) e Play Store (seção 7).
 
 ## 1. O que é o jogo
 Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométrica 2.5D**) de uma cidadezinha brasileira com o **Bar do Tonhão**. Personagens customizáveis, empregos com minijogos, fome/sede, XP e nível (até 50), casas e apartamentos (comprar/alugar), carros 3D (fotos de 32 ângulos), chat por salas (50 por sala, até 60 salas), sinuca, VIP, loja Pix, pets, perfil social, passe de temporada, prefeito.
@@ -45,8 +29,8 @@ Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométr
 | **Banco** | Supabase, projeto ref `fyviodritpungccrohvd`, plano **Free** |
 | **SQL** | `banco.sql` = banco **completo** (pode rodar de novo sem perder dados). `novidades.sql` = só a última etapa. Pelo celular o editor trava com arquivo grande: **dividir em partes de ~6,5 mil letras** (ver `sql-celular/`) |
 | **Pagamento** | Mercado Pago (API de Orders, Pix), Edge Function `pix` no Supabase (arquivo `pix-funcao.ts`). Preço vem da tabela `produtos`. O webhook não confia no aviso: confere no Mercado Pago |
-| **Repositório** | GitHub `obiellsilva-dotcom/vila-do-tonhao`, ramo atual **`ccr-e8b9720b-5amd2g`** (tudo commitado) |
-| **Link de teste** | https://claude.ai/artifact/C4QSmTKE8EojyVzA72WX4d (artifact privado da conta antiga; cópia offline com nível 30, R$ 300 mil, VIP, todos os carros, botão "🧪 Carros"). **Na conta nova crie outro**: copie o index trocando `const ONLINE=!!(` por `const ONLINE=false&&!!(` e inserindo antes de `window.__dbg={` o bloco "trapaça" (ver seção 9) |
+| **Repositório** | GitHub `obiellsilva-dotcom/vila-do-tonhao`, ramo atual **`ccr-fe2fa98f-j3vukg`** (tudo commitado) |
+| **Link de teste** | https://claude.ai/artifact/RFsiyLQ5LoK1cGEiWNE72V (cópia offline, dá o Furacão GT ao entrar). Antigo: C4QSmTKE8EojyVzA72WX4d (conta antiga; cópia offline com nível 30, R$ 300 mil, VIP, todos os carros, botão "🧪 Carros"). **Na conta nova crie outro**: copie o index trocando `const ONLINE=!!(` por `const ONLINE=false&&!!(` e inserindo antes de `window.__dbg={` o bloco "trapaça" (ver seção 9) |
 | **E-mails** | Conta Google Play Console: **obiellsilva@gmail.com** (conta de desenvolvedor pessoal, criada em 17/11/2026, em análise). Admin do jogo = coluna `moradores.admin` (marcada direto no banco) |
 
 ### Arquivos para anexar no chat novo
