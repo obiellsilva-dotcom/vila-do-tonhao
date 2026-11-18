@@ -3152,3 +3152,16 @@ begin
 end $$;
 revoke execute on function public.ligar_movel(integer, integer) from public, anon;
 grant execute on function public.ligar_movel(integer, integer) to authenticated;
+
+-- ===================== ETAPA 35: Carros novos (Pantera GT e Rolezinho) e nomes sem marca =====================
+-- Pantera GT entra no lugar do Fusca Dourado (mesmo preço da Rosso GT). Rolezinho entra no lugar da Kombi.
+-- Brutona (antiga Amarok) passa a custar 123 mil. Nomes trocados para não usar marcas registradas.
+update public.loja set nome = 'Besouro'       where id = 'fusca'       and tipo = 'carro';
+update public.loja set nome = 'Rolezinho'     where id = 'kombi'       and tipo = 'carro';
+update public.loja set nome = 'Clássico 79'   where id = 'opala'       and tipo = 'carro';
+update public.loja set nome = 'Brutona', preco = 123000 where id = 'caminhonete' and tipo = 'carro';
+update public.loja set nome = 'Jipe Aventura' where id = 'jipe'        and tipo = 'carro';
+update public.loja set nome = 'Explorador'    where id = 'esportivo'   and tipo = 'carro';
+update public.produtos set nome = 'Pantera GT', preco = 19.90 where id = 'carro_fusca_ouro';
+update public.produtos set nome = 'Rosso GT'    where id = 'carro_gto';
+update public.produtos set nome = 'Lâmina V12'  where id = 'carro_neon';

@@ -25,7 +25,9 @@ Tudo commitado. O dono recebeu o `site.zip` v20261124e (confirmar se subiu). SQL
 - **Móveis funcionais (v20261124m, SQL etapa 34):** `agua:z` (banheira, piscina, hidro) → "🏊 Entrar na água" (`noMovel(...,'agua')`, `aguaPorCima`); vitrola `juke:1` toca como jukebox (`temJuke` usa `MOV[t].juke`); `liga:1` → ligar/desligar pelo dono (`ligarMovel`, função `ligar_movel`, campo `off` no móvel).
 - **Sentar e moto (v20261124o):** pose sentada em 3/4 usa as duas coxas abertas (antes só em `sv34`); no perfil a perna de trás aparece. Água com **lugares fixos** (`lugares` no MOV, estilo Habbo; cheio = aviso). Moto: `pilotoMoto` (tamanho normal PS, no banco, vista certa pelo ângulo, carenagem redesenhada por cima das pernas, `MOTO_HOP`), pintura fiel (sem peças pretas).
 - **Água e moto (v20261124p):** na água o boneco afunda (hop negativo só com `aguaZ(p)`), é cortado na linha da água (clip no item do jogador), sem mancha por cima (só ondinha); lugares fixos em duplas: `lugares:[x,y,vx,vy]` (vx,vy = para onde o corpo vira, girado junto com o móvel; sv/back/dir calculados como no sofá). Moto: pose `moto` (pernas dos dois lados, joelho dobrado no perfil, braços `arms`), `MOTO_HOP=5`, `MOTO_CLIP=8`. Sentado 3/4: duas pernas lado a lado.
-- Novidades: `NOVID='v20261127'` com slides Furacão GT, Concessionária nova e Passeio.
+- **🏎️ Carros novos (v20261124s, SQL etapa 35):** **Pantera GT** (Porsche CC-BY de Batman KNIGHTs) no lugar do Fusca Dourado (id `fusca_ouro`, Pix R$ 19,90, som da Rosso GT) e **Rolezinho** (Ford Fiesta Mk5 CC-BY de romanian_guy_0069) no lugar da Kombi (id `kombi`, som do Sedã). Sprites `SPR_PANTERA`/`SPR_ROLE` (+`_M`), `RODA_IMG`, `FAROL_IMG`, `FAROL_POS`, `CAR_ESC` 1.338. Renderizador genérico: `extras/render-carro2.html` (`?car=porsche|fiesta`). Brutona (ex-Amarok) = R$ 123.000. **Nomes sem marca:** Fusca→Besouro, Kombi→Rolezinho, Opala→Clássico 79, Amarok→Brutona, Jipe Renegado→Jipe Aventura, Rover→Explorador, Ferrarini→Rosso GT, Lâmina V12→Lâmina V12, Zé da Kombi→Zé da Van. `NOVID='v20261201'` (slide dos carros).
+- **PENDENTE DE SUBIR:** site v20261124s + SQL etapas 31 a 35.
+- Novidades antigas: `NOVID='v20261127'` com slides Furacão GT, Concessionária nova e Passeio.
 - **Próximos passos:** tempo real no Cloudflare (seção 6) e Play Store (seção 7).
 
 ## 1. O que é o jogo
@@ -91,8 +93,8 @@ Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométr
 - 15 bolas (1–7 lisas, 8 preta, 9–15 listradas). Sozinho: 10 tacadas, 3 XP por bola (`sinuca(p_bolas<=15)`). Dupla: regra 8-ball (primeira bola define grupos, 8 antes da hora perde), vencedor 30 XP / perdedor 10 XP (`sinuca_dupla`), 90 s entre partidas com XP.
 
 **Monetização**
-- Loja 💎 (Pix): VIP 30 dias (R$ 15,99), VIP 90 dias (R$ 39,90), pets, carros premium (Fusca Dourado, Caminhonete do Tonhão, Ferrarini), **Passe Premium Natal na Vila R$ 9,90** (`passe_T1`).
-- **VIP:** coroa azul, Lambordini liberada, roupas/cores exclusivas, 🎁 presente do mês (`vip_mensal` até 2027-04, `presente_vip`), 🏠 ir para casa, +50% pontos no passe, brilho dourado.
+- Loja 💎 (Pix): VIP 30 dias (R$ 15,99), VIP 90 dias (R$ 39,90), pets, carros premium (Pantera GT, Caminhonete do Tonhão, Rosso GT), **Passe Premium Natal na Vila R$ 9,90** (`passe_T1`).
+- **VIP:** coroa azul, Lâmina V12 liberada, roupas/cores exclusivas, 🎁 presente do mês (`vip_mensal` até 2027-04, `presente_vip`), 🏠 ir para casa, +50% pontos no passe, brilho dourado.
 - **Passe "Natal na Vila"** (T1, até 01/01/2027): 20 níveis × **300 pontos**; grátis = dinheiro + gorro normal (nível 5) + estampas; premium = gorro brilhante (1), roupas, brilho de Natal (12), **R$ 26 mil** (níveis 4, 8, 10, 15, 19) e **carro exclusivo no nível 20** (`{"carro":"natal"}`, travado até `passe_temporadas.carro_pronto=true` e existir `CARS_PREMIUM.natal` no cliente). Quem compra o premium depois recebe tudo que já alcançou. Tela estilo Fortnite/Clash (`abrirPasse`, `thumbPremio`).
 - **No app da Play Store a loja Pix fica escondida** (`NO_APP`, detecta `?app=1`): regra do Google (jogos só podem usar o faturamento do Google). Compras pelo site valem no app.
 
@@ -131,10 +133,9 @@ Tabelas novas da etapa 28: `passe_temporadas`, `passe_premios`, `passe_jogador`,
 - Equilibrar **dinheiro por emprego** (hoje garçom ~R$ 64/min e servidor público ~R$ 12/min) — o dono ainda não decidiu.
 - **Missões diárias** (pontos extras do passe 1×/dia) — sugerido.
 - Desempenho: luz da noite mais leve e prédios/muros pré-desenhados (o dono reclamou de travadas; medir com o 📊).
-- Kombi e Fusca Dourado: modelos 3D novos (o dono mandaria).
 - Interiores de todas as lojas em "outra dimensão" (menos o bar).
 - Curva de XP para a Play Store (níveis 1–9 ×0,7; 10–19 ×0,91; 20–34 ×1,18; 35–50 ×1,54 do passo 50×n), convertendo o XP de cada jogador.
-- Fechar compra da Lambordini pelo Pix (produto `carro_neon` ainda existe; hoje ela vem com o VIP).
+- Fechar compra da Lâmina V12 pelo Pix (produto `carro_neon` ainda existe; hoje ela vem com o VIP).
 - Próxima temporada do passe (T2): inserir em `passe_temporadas`/`passe_premios`, produto `passe_T2`, atualizar `PASSE_T1`/textos no cliente e o item exclusivo novo.
 
 ## 9. Como testar (ambiente do assistente)
