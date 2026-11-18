@@ -1,0 +1,17 @@
+# Servidor ao vivo da Cidade do Tonhão (posições, avisos e chat em tempo real)
+# Cloudflare Workers + Durable Objects (plano Workers Paid, US$ 5/mês). Uma sala = um Durable Object.
+name = "vila-tempo-real"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[[durable_objects.bindings]]
+name = "SALA"
+class_name = "Sala"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Sala"]
+
+[vars]
+SUPABASE_URL = "https://fyviodritpungccrohvd.supabase.co"
+MAX_SALA = "50"
