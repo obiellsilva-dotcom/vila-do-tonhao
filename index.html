@@ -158,6 +158,7 @@ body.faminto::after{content:"";position:fixed;inset:0;pointer-events:none;z-inde
 @media (max-height:740px){#zoom{gap:5px}#zoom button{width:36px;height:36px;font-size:19px}#joy{width:76px;height:76px}}
 #zoom button.off{opacity:.45;text-decoration:line-through}
 #zoom button{position:relative}
+body.emTour #missao,body.emTour #perto,body.emTour #painelEsq,body.emTour #mini,body.emTour #zoom{display:none!important}
 #zoom .bdgc{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#ff3b30;color:#fff;font:700 11px Fredoka,sans-serif;display:none;align-items:center;justify-content:center;border:2px solid #fff;pointer-events:none}
 body:has(#zoom:not(.min)) #joy{display:none!important}
 #zoom:not(.min){top:150px;transform:none;max-height:calc(100vh - 230px);overflow-y:auto;overflow-x:visible;padding-left:200px;margin-left:-200px;scrollbar-width:none}#zoom.min button:not(#zmenu):not(#zloja){display:none}
@@ -304,7 +305,7 @@ html.noApp #zloja{display:none!important}
 <div id="cfgVip" class="hint" style="border:1px solid #d4af37;border-radius:12px;padding:10px"></div>
 <div style="display:flex;gap:6px"><button class="btn ghost" id="cfgPresente" style="flex:1">🎁 Presente do mês</button><button class="btn ghost" id="cfgCasa" style="flex:1">🏠 Ir para casa</button></div>
 <div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn ghost" href="privacidade.html" target="_blank" rel="noopener" style="flex:1;text-align:center;text-decoration:none">📄 Privacidade</a><button class="btn ghost" id="cfgExcluir" style="flex:1;color:#ff7b7b">🗑️ Excluir minha conta</button></div>
-<div style="display:flex;gap:6px"><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
+<div style="display:flex;gap:6px"><button class="btn ghost" id="cfgFb" style="flex:1">💬 Ideias e problemas</button><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
 <div id="mIr" class="modal hidden"><div class="box" style="width:min(400px,100%)"><button class="x" data-close="mIr">×</button><h2>🔍 Ir para...</h2>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px"><div class="pill" id="pop">👥 0 moradores</div><div class="pill hidden" id="salaPill"></div></div>
 <div style="display:flex;gap:6px;margin-bottom:8px"><input id="q" placeholder="procure um morador" autocomplete="off" style="flex:1;min-width:0"><button id="go" class="btn">ir</button></div>
@@ -3467,8 +3468,7 @@ $('cardAmigo').onclick=()=>{const o=selected;if(!o||!o.remote)return;const st=CE
 $('cardDm').onclick=()=>{const o=selected;if(!o)return;abrirCelular('home');celChat({id:o.id,nome:o.nome,foto:o.foto,visual:encode(o.v),vip_ate:o.vip_ate,online:true})};
 $('cardBloq').onclick=()=>{const o=selected;if(!o||!o.remote)return;if(BLOQ.has(o.id)){BLOQ.delete(o.id);salvaBloq();toast(`🔈 ${o.nome} desbloqueado(a).`,2500);refreshCard();return}
  confirmar('🔇 Bloquear '+esc(o.nome)+'?','Você não vai mais ver as mensagens, balões, convites e propostas dessa pessoa. Dá para desbloquear depois tocando no nome dela.',()=>{BLOQ.add(o.id);salvaBloq();chatMsgs.splice(0,chatMsgs.length,...chatMsgs.filter(m=>m.morador!==o.id));o.bub=null;pintaPainel();toast(`🔇 ${o.nome} bloqueado(a).`,2500);refreshCard()})};
-$('cardReport').onclick=()=>{const o=selected;if(!o||!o.remote)return;const b=$('cardReport');if(!b.dataset.armado){b.dataset.armado=1;b.textContent='Denunciar '+o.nome+'? Toque de novo';setTimeout(()=>{delete b.dataset.armado;b.textContent='🚩 Denunciar'},3500);return}
- delete b.dataset.armado;b.textContent='🚩 Denunciar';api.denunciar(o.id,'comportamento no jogo').then(()=>toast('Denúncia enviada. Valeu por ajudar! 🙏')).catch(e=>toast(e.message))};
+$('cardReport').onclick=()=>{const o=selected;if(!o||!o.remote)return;denunciarJogador(o)};
 function closeCard(){selected=null;$('card').classList.add('hidden')}
 $('cardX').onclick=closeCard;
 $('cardFollow').onclick=()=>{follow=follow===selected?null:selected;refreshCard()};
@@ -3736,11 +3736,17 @@ const api=ONLINE?(()=>{
   banco:()=>rpc('banco_info'),
   investir:v=>rpc('investir',{p_valor:v}),
   resgatar:v=>rpc('resgatar',{p_valor:v}),
+  feedback:(tp,t)=>rpc('enviar_feedback',{p_tipo:tp,p_texto:t}),
+  admDenuncias:t=>rpc('admin_denuncias',{p_todas:!!t}),
+  admFeedbacks:()=>rpc('admin_feedbacks'),
+  admResolver:(tp,id)=>rpc('admin_resolver',{p_tipo:tp,p_id:id}),
+  admContagem:()=>rpc('admin_contagem'),
   denunciar:(id,m)=>rpc('denunciar',{p_alvo:id,p_motivo:m})
  }})():{
   async sessao(){return L.me?'local':null},
   async conta(){return{id:'local',anon:false}},
   async login(){return'local'},
+  async feedback(){return{ok:true}},
   // celular no modo de teste (sem internet do jogo): amigos de exemplo e banco local
   async amigos(){return OFFCEL.amigos},async pedirAmizade(){return{pedido:true}},
   async responderAmizade(id,ok){const i=OFFCEL.amigos.findIndex(x=>x.id===id);if(i>=0){if(ok)OFFCEL.amigos[i].status='amigo';else OFFCEL.amigos.splice(i,1)}return{ok:true}},
@@ -3938,18 +3944,18 @@ function celRosto(p,tam){tam=tam||40;const w=document.createElement('div');w.cla
  else{const cv=document.createElement('canvas');cv.width=cv.height=tam*2;const g=cv.getContext('2d');try{const v=decode(p.visual)||visFromName(p.nome||'x');drawPerson(g,tam,tam*2.75,vipP(p)?v:semVip(v),{s:tam/19,cara:true})}catch(e){}w.appendChild(cv)}
  if(p.online){const o=document.createElement('i');o.className='on';w.appendChild(o)}return w}
 function celUI(){let el=$('cel');if(el)return el;el=document.createElement('div');el.id='cel';el.className='hidden';el.innerHTML=`<style>
-#cel{position:fixed;inset:0;z-index:9;background:rgba(10,5,8,.72);display:flex;align-items:center;justify-content:center;padding:10px;font-family:Fredoka,sans-serif}
+#cel{position:fixed;inset:0;z-index:9;background:rgba(10,5,8,.72);display:flex;align-items:center;justify-content:center;padding:max(8px,env(safe-area-inset-top,0px)) 8px max(8px,env(safe-area-inset-bottom,0px));font-family:Fredoka,sans-serif}
 #cel.hidden{display:none}
-#cel .fone{position:relative;width:min(360px,100%);height:min(720px,calc(100vh - 20px));background:#0e0e12;border-radius:38px;padding:10px;box-shadow:0 18px 60px rgba(0,0,0,.6),inset 0 0 0 2px #2b2b33;display:flex;flex-direction:column}
+#cel .fone{position:relative;width:min(360px,100%);height:min(680px,calc(100vh - 16px));height:min(680px,calc(100dvh - 16px));background:#0e0e12;border-radius:38px;padding:10px;box-shadow:0 18px 60px rgba(0,0,0,.6),inset 0 0 0 2px #2b2b33;display:flex;flex-direction:column}
 #cel .tela{position:relative;flex:1;border-radius:30px;overflow:hidden;background:linear-gradient(160deg,#ffcf6b 0%,#f08a4b 45%,#7b3b6e 100%);display:flex;flex-direction:column;color:#1d1418}
-#cel .barra{display:flex;align-items:center;justify-content:space-between;padding:10px 20px 4px;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+#cel .barra{display:flex;align-items:center;justify-content:space-between;padding:10px 54px 4px 20px;font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35)}
 #cel .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#0e0e12;border-radius:14px;z-index:3}
 #cel .corpo{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
-#cel .home{padding:30px 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 10px;align-content:start}
-#cel .ic{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:#fff;font:600 12px Fredoka,sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer;position:relative}
-#cel .ic b{width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+#cel .home{padding:24px 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 4px;align-content:start}
+#cel .ic{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;color:#fff;font:600 11.5px Fredoka,sans-serif;min-width:0;text-shadow:0 1px 2px rgba(0,0,0,.45);cursor:pointer;position:relative}
+#cel .ic b{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:27px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
 #cel .bdg{position:absolute;top:-6px;right:2px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#ff3b30;color:#fff;font:700 12px Fredoka,sans-serif;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
-#cel .relogio{grid-column:1/-1;text-align:center;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);margin-bottom:10px}#cel .relogio div{font-size:58px;font-weight:700;line-height:1}#cel .relogio span{font-size:14px;opacity:.9}
+#cel .relogio{grid-column:1/-1;text-align:center;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);margin-bottom:10px}#cel .relogio div{font-size:52px;font-weight:700;line-height:1}#cel .relogio span{font-size:14px;opacity:.9}
 #cel .app{flex:1;background:#f4f2f5;display:flex;flex-direction:column;min-height:0}
 #cel .topo{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #e6e1e8}
 #cel .topo h3{margin:0;flex:1;font-size:18px;display:flex;align-items:center;gap:8px;min-width:0}#cel .topo h3 span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3978,8 +3984,9 @@ function celUI(){let el=$('cel');if(el)return el;el=document.createElement('div'
 #cel .info{margin:10px 12px;padding:10px 12px;background:#fff8e1;border-radius:12px;font-size:13px;line-height:1.4;color:#6b5320}
 #cel .valor{display:flex;gap:6px;padding:0 12px;flex-wrap:wrap}#cel .valor input{flex:1 1 100%;border:1px solid #ddd5e0;border-radius:12px;padding:12px;font:700 18px Fredoka,sans-serif}
 #cel .valor .r{display:flex;gap:6px;flex:1 1 100%}#cel .valor .r .bt{flex:1}
+@media (max-width:400px){#cel .fone{padding:6px;border-radius:28px}#cel .tela{border-radius:22px}#cel .notch{width:74px;height:20px}#cel .fecha{top:11px;right:12px}}
 #cel .home2{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:120px;height:5px;border-radius:3px;background:rgba(255,255,255,.75);border:0;cursor:pointer;z-index:3}
-#cel .fecha{position:absolute;top:-4px;right:-4px;width:36px;height:36px;border-radius:50%;border:0;background:#ffc94a;color:#2a1a14;font:700 18px Fredoka,sans-serif;z-index:4;box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
+#cel .fecha{position:absolute;top:16px;right:18px;width:32px;height:32px;border-radius:50%;border:0;background:#ffc94a;color:#2a1a14;font:700 18px Fredoka,sans-serif;z-index:4;box-shadow:0 3px 10px rgba(0,0,0,.4);cursor:pointer}
 </style><div class="fone"><button class="fecha" aria-label="fechar">✕</button><div class="tela"><div class="notch"></div><div class="barra"><span class="hr">--:--</span><span>📶 🔋</span></div><div class="corpo"></div><button class="home2" aria-label="tela inicial"></button></div></div>`;
  document.body.appendChild(el);el.querySelector('.fecha').onclick=celFechar;el.querySelector('.home2').onclick=()=>celAbrirApp('home');el.addEventListener('click',e=>{if(e.target===el)celFechar()});return el}
 function celFechar(){const el=$('cel');if(el)el.classList.add('hidden');clearInterval(CEL.timer);CEL.com=null}
@@ -4001,13 +4008,13 @@ async function celMsgs(){const c=celCorpo(),a=document.createElement('div');a.cl
   tx.innerHTML=`<b></b><small></small>`;tx.querySelector('b').textContent=p.nome;tx.querySelector('small').textContent=p.ultima?(p.ultima_de===eu.id?'Você: ':'')+p.ultima:'Toque para conversar';it.appendChild(tx);
   const ld=document.createElement('div');ld.className='lado';ld.innerHTML=(p.ultima_em?celH(celHora(p.ultima_em)):'')+(p.naolidas?`<span class="n">${p.naolidas}</span>`:'');it.appendChild(ld);it.onclick=()=>celChat(p);L.appendChild(it)}}
 async function celChat(p){CEL.app='chat';CEL.com=p;clearInterval(CEL.timer);const c=celCorpo(),a=document.createElement('div');a.className='app';c.appendChild(a);
- const st=Object.assign(document.createElement('span'),{textContent:p.nome});celTopo(a,[celRosto(p,32),st],()=>celAbrirApp('msgs'));
+ const st=Object.assign(document.createElement('span'),{textContent:p.nome}),tp=celTopo(a,[celRosto(p,32),st],()=>celAbrirApp('msgs'));{const rb=document.createElement('button');rb.className='volta';rb.textContent='🚩';rb.title='Denunciar';rb.style.fontSize='18px';rb.onclick=()=>denunciarJogador(p);tp.appendChild(rb)}
  const C=document.createElement('div');C.className='conversa';a.appendChild(C);const D=document.createElement('div');D.className='digita';D.innerHTML='<input maxlength="300" placeholder="Mensagem" enterkeyhint="send"><button aria-label="enviar">➤</button>';a.appendChild(D);
  const inp=D.querySelector('input');let ult=-1,vazio=false;
  const poe=(rows,todos)=>{if(todos)C.innerHTML='';for(const m of rows){if(m.id<=ult)continue;ult=m.id;const b=document.createElement('div');b.className='bal'+(m.de===eu.id?' eu':'');b.textContent=m.texto;const t=document.createElement('time');t.textContent=celHora(m.criado_em);b.appendChild(t);C.appendChild(b)}C.scrollTop=C.scrollHeight};
  const carrega=async todos=>{try{const r=await api.conversa(p.id);if(CEL.com!==p)return;if(todos&&!r.length){vazio=true;C.innerHTML='<div class="vazio">Mande a primeira mensagem para '+celH(p.nome)+' 👋</div>'}else{if(todos||vazio)C.innerHTML='';vazio=false;poe(r)}celAvisos()}catch(e){}};
  await carrega(true);
- const manda=async()=>{const t=inp.value.trim();if(!t)return;inp.value='';try{const m=await api.enviarDm(p.id,t);if(vazio){C.innerHTML='';vazio=false}poe([m]);emitEv('dm',{para:p.id});Som.play('msg',300)}catch(e){toast(e.message,3000);inp.value=t}};
+ const manda=async()=>{const t=inp.value.trim();if(!t)return;inp.value='';try{const m=await api.enviarDm(p.id,t);if(m&&m.bloqueada){toast('🚫 Mensagem bloqueada: conteúdo impróprio. Você ficou silenciado por um tempo.',5000);return}if(vazio){C.innerHTML='';vazio=false}poe([m]);emitEv('dm',{para:p.id});Som.play('msg',300)}catch(e){toast(e.message,3000);inp.value=t}};
  D.querySelector('button').onclick=manda;inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();manda()}};
  CEL.timer=setInterval(()=>{if(CEL.com===p&&!document.hidden)carrega(false)},4000)}
 // ---- 👥 amigos ----
@@ -4062,8 +4069,9 @@ async function celAvisos(){if(!eu)return;try{const r=await api.naoLidas();if(!r)
 setInterval(()=>{if(eu&&!document.hidden)celAvisos()},25000);
 
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261128';
+const NOVID='v20261129';
 const NOV_SLIDES=[
+ {t:'🛡️ Cidade mais segura e 💬 sua opinião',x:'Mensagens com <b>assédio ou conteúdo sexual</b> agora são bloqueadas na hora e quem manda fica <b>silenciado</b>. Viu alguém passando dos limites? Toque nele → <b>🚩 Denunciar</b>. E agora você pode mandar <b>ideias e problemas</b> direto para o administrador em <b>⚙️ → 💬 Ideias e problemas</b>!',d:(g,t)=>{g.textAlign='center';g.font='72px sans-serif';g.fillText('🛡️',110,128+Math.sin(t*3)*5);g.font='46px sans-serif';g.fillText(Math.floor(t/1.2)%2?'💬':'🚩',225,118)}},
  {t:'📱 Celular novo!',x:'Toque no <b>📱</b> do menu ☰: <b>💬 mensagens privadas</b> com seus amigos, <b>👥 amigos</b> (peça amizade tocando num jogador ou procurando pelo nome), <b>🏦 banco</b> e <b>📈 investimento</b>: guarde dinheiro e ele <b>rende 1% por dia</b> (até R$ 100 mil investidos).',d:(g,t)=>{g.textAlign='center';g.font='78px sans-serif';g.fillText('📱',110,130+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['💬','👥','🏦','📈'];g.fillText(L[Math.floor(t/.9)%L.length],225,115)}},
  {t:'🚗 Furacão GT no Passe',x:'O carro exclusivo do <b>Passe Premium</b> chegou: o <b>Furacão GT</b>, com rodas girando, faróis de LED e lanternas que acendem à noite. Libere no <b>nível 20</b> do Passe e pinte da cor que quiser na <b>🔧 Oficina</b>. Ele <b>nunca mais volta</b> depois de 31/12!',d:(g,t)=>{g.save();g.translate(160,130);g.scale(2.2,2.2);try{drawCarStack(g,0,0,'natal',-.6+Math.sin(t*.8)*.5,null,{luz:Math.floor(t)%2===0})}catch(e){}g.restore()}},
  {t:'🚗 Concessionária nova',x:'A <b>Carros do Zé</b> mudou: prédio novo com <b>pátio cheio de carros</b> (veja o preço na plaquinha) e um <b>showroom</b> por dentro, com a Caminhonete do Tonhão, a Ferrarini e a Lambordini em exposição. Entre pela <b>porta de vidro</b>!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏎️':'🚗',110+Math.sin(t*2)*10,125);g.font='44px sans-serif';g.fillText('🔑',225,115+Math.sin(t*3)*6)}},
@@ -4909,7 +4917,7 @@ function renderChat(){
 }
 async function enviar(){
  const t=$('msg').value.trim();if(!t||!eu)return;$('msg').value='';
- try{const r=await api.msg(sala||1,t);onChat(r,false);if(canal&&canal.rt)canal.chat(r)}catch(e){toast(e.message,3000);$('msg').value=t}
+ try{const r=await api.msg(sala||1,t);if(!r){toast('🚫 Mensagem bloqueada: conteúdo impróprio. Você ficou silenciado por um tempo.',5000);return}onChat(r,false);if(canal&&canal.rt)canal.chat(r)}catch(e){toast(e.message,3000);$('msg').value=t}
  if($('chatPainel').classList.contains('on'))$('msg').focus();
 }
 $('send').onclick=enviar;$('send').addEventListener('pointerdown',e=>{if(document.activeElement===$('msg'))e.preventDefault()});
@@ -5542,7 +5550,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124h';
+const VERSAO_JOGO='v20261124i';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -5679,23 +5687,65 @@ function trofeu(c,x,y){const k=(Math.sin(now*4)+1)/2,b=Math.sin(now*3)*1.2;c.sav
 /* ----- formulário genérico ----- */
 function abrirForm(tit,html,depois){$('fTit').textContent=tit;$('fBody').innerHTML=html;$('mForm').classList.remove('hidden');if(depois)depois($('fBody'))}
 const esc=t=>String(t).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+/* ================= 🛡️ MODERAÇÃO: denúncias, feedback e painel do admin ================= */
+const MOTIVOS=[['ofensa','😡 Xingamento ou ofensa'],['sexual','🔞 Assédio ou conteúdo sexual'],['racismo','✊ Racismo ou preconceito'],['golpe','💸 Golpe ou trapaça'],['spam','🤖 Spam / flood'],['outro','❓ Outro motivo']];
+function denunciarJogador(o){if(!o||!o.id)return;confirmar('🚩 Denunciar '+esc(o.nome),'Qual é o problema? O administrador vai ver a denúncia junto com as <b>últimas mensagens</b> dessa pessoa.',null,
+ MOTIVOS.map(([k,t])=>[t,()=>api.denunciar(o.id,t).then(()=>toast('🚩 Denúncia enviada. Obrigado por ajudar a cidade! 🙏',3500)).catch(e=>toast(e.message,3000))]).concat([['Cancelar',()=>{}]]))}
+function abrirFeedback(){if(!eu)return;$('cfg').classList.add('hidden');
+ abrirForm('💬 Ideias e problemas',`<p class="hint" style="margin:0 0 8px">Mande sua <b>ideia</b>, conte um <b>problema</b> ou deixe um elogio. Só o administrador lê.</p>
+ <label class="fl">Tipo</label><select id="fbTipo"><option value="ideia">💡 Ideia</option><option value="bug">🐞 Problema / erro</option><option value="elogio">❤️ Elogio</option><option value="outro">💬 Outro</option></select>
+ <label class="fl">Mensagem</label><textarea id="fbTxt" maxlength="1000" rows="5" style="width:100%;border-radius:12px;padding:10px;font:500 15px Fredoka,sans-serif;resize:vertical" placeholder="Escreva aqui…"></textarea>
+ <button class="btn" id="fbEnv" style="width:100%;margin-top:8px">📨 Enviar</button>`,box=>{$('fbEnv').onclick=()=>{const t=$('fbTxt').value.trim();if(t.length<5){toast('Escreva um pouco mais 🙂');return}
+  acao(async()=>{await api.feedback($('fbTipo').value,t);$('mForm').classList.add('hidden');toast('📨 Recebido! Obrigado pela mensagem 💛',3500)})}})}
+const ADM={den:0,fb:0};
+async function admContagem(){if(!eu||!eu.admin||!ONLINE)return;try{const r=await api.admContagem();ADM.den=r.denuncias|0;ADM.fb=r.feedbacks|0;const b=$('zadm');if(b){let i=b.querySelector('.bdgc');if(!i){i=document.createElement('span');i.className='bdgc';b.appendChild(i)}const n=ADM.den+ADM.fb;i.textContent=n>99?'99+':n;i.style.display=n?'flex':'none'}}catch(e){}}
+setInterval(()=>{if(eu&&eu.admin&&!document.hidden)admContagem()},60000);setTimeout(admContagem,6000);
+const admData=t=>{const d=new Date(t);return isNaN(d)?'':d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})};
+async function admDenuncias(todas){abrirForm('🚨 Denúncias','<div id="admLista" class="hint">Carregando…</div>');let L;try{L=await api.admDenuncias(!!todas)}catch(e){$('admLista').textContent=e.message;return}
+ const box=$('admLista');box.className='';box.innerHTML='';
+ const topo=document.createElement('div');topo.style.cssText='display:flex;gap:6px;margin-bottom:8px';topo.innerHTML=`<button class="btn ghost" style="flex:1">${todas?'Só abertas':'Ver todas'}</button><button class="btn ghost" style="flex:1">⬅️ Painel</button>`;topo.children[0].onclick=()=>admDenuncias(!todas);topo.children[1].onclick=painelAdmin;box.appendChild(topo);
+ if(!L.length){box.insertAdjacentHTML('beforeend','<p class="hint">Nenhuma denúncia aberta. 🎉</p>');return}
+ for(const d of L){const c=document.createElement('div');c.style.cssText='border:1px solid rgba(255,201,74,.3);border-radius:12px;padding:10px;margin-bottom:8px;background:rgba(255,255,255,.04)'+(d.resolvida?';opacity:.55':'');
+  const sil=d.silenciado_ate&&Date.parse(d.silenciado_ate)>Date.now();
+  c.innerHTML=`<div style="display:flex;justify-content:space-between;gap:6px"><b style="color:#ff8a7a">${esc(d.alvo||'?')}</b><small>${admData(d.criado_em)}</small></div>
+  <div style="font-size:13px;margin:4px 0">${esc(d.motivo||'')}${d.auto?'':' · por '+esc(d.autor||'?')}</div>
+  <div style="font-size:12px;opacity:.85">${d.banido?'🚫 Banido':sil?'🔇 Silenciado até '+admData(d.silenciado_ate):''}${d.strikes?' · avisos: '+d.strikes:''}</div>`;
+  const ctx=Array.isArray(d.contexto)?d.contexto:[];if(ctx.length){const q=document.createElement('div');q.style.cssText='margin:6px 0;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,.25);font-size:12.5px;max-height:140px;overflow:auto';
+   for(const m of ctx){const l=document.createElement('div');l.textContent=(m.onde==='privado'?'🔒 ':'💬 ')+m.texto;q.appendChild(l)}c.appendChild(q)}
+  const bt=document.createElement('div');bt.style.cssText='display:flex;gap:5px;flex-wrap:wrap';
+  const ac=(t,f)=>{const b=document.createElement('button');b.className='btn ghost';b.style.cssText='flex:1;padding:7px 6px;font-size:12.5px';b.textContent=t;b.onclick=f;bt.appendChild(b)};
+  const faz=(a,v,txt)=>confirmar('🛡️ '+txt,`${txt} <b>${esc(d.alvo)}</b>?`,()=>acao(async()=>{await api.admin(d.alvo,a,v);await api.admResolver('denuncia',d.id);const al=[...others.values()].find(o=>o.id===d.alvo_id);if(a==='banir'&&al)emitEv('kick',{para:al.id,ban:1});toast('✅ Feito.',2000);admContagem();admDenuncias(todas)}));
+  if(d.alvo){ac('🔇 1 h',()=>faz('silenciar',60,'Silenciar por 1 hora'));ac('🔇 24 h',()=>faz('silenciar',1440,'Silenciar por 24 horas'));ac('🔇 7 dias',()=>faz('silenciar',10080,'Silenciar por 7 dias'));
+   if(!d.banido)ac('🚫 Banir',()=>faz('banir','','Banir para sempre'));if(sil)ac('🔈 Tirar silêncio',()=>faz('dessilenciar','','Tirar o silêncio de'))}
+  if(!d.resolvida)ac('✅ Resolvida',()=>api.admResolver('denuncia',d.id).then(()=>{admContagem();admDenuncias(todas)}).catch(e=>toast(e.message)));
+  c.appendChild(bt);box.appendChild(c)}}
+async function admFeedbacks(){abrirForm('💬 Ideias e problemas','<div id="admLista" class="hint">Carregando…</div>');let L;try{L=await api.admFeedbacks()}catch(e){$('admLista').textContent=e.message;return}
+ const box=$('admLista');box.className='';box.innerHTML='<button class="btn ghost" style="width:100%;margin-bottom:8px">⬅️ Painel</button>';box.firstChild.onclick=painelAdmin;
+ if(!L.length){box.insertAdjacentHTML('beforeend','<p class="hint">Nenhuma mensagem ainda.</p>');return}
+ const IC={ideia:'💡',bug:'🐞',elogio:'❤️',outro:'💬'};
+ for(const f of L){const c=document.createElement('div');c.style.cssText='border:1px solid rgba(255,201,74,.3);border-radius:12px;padding:10px;margin-bottom:8px;background:rgba(255,255,255,.04)'+(f.lido?';opacity:.55':'');
+  c.innerHTML=`<div style="display:flex;justify-content:space-between"><b>${IC[f.tipo]||'💬'} ${esc(f.nome||'?')}</b><small>${admData(f.criado_em)}</small></div><div style="font-size:14px;margin:6px 0;white-space:pre-wrap"></div>`;c.children[1].textContent=f.texto;
+  if(!f.lido){const b=document.createElement('button');b.className='btn ghost';b.style.cssText='width:100%;padding:7px';b.textContent='✅ Marcar como lido';b.onclick=()=>api.admResolver('feedback',f.id).then(()=>{admContagem();admFeedbacks()}).catch(e=>toast(e.message));c.appendChild(b)}
+  box.appendChild(c)}}
+
 /* ----- painel do administrador ----- */
 function painelAdmin(){if(!eu||!eu.admin)return;
  const nomes=[...others.values()].filter(o=>o.seen).map(o=>o.nome);
- abrirForm('🛡️ Painel do Admin',`<label class="fl">Jogador (nome exato)</label><input id="aNome" list="aLista" placeholder="Nome do jogador"><datalist id="aLista">${nomes.map(n=>'<option value="'+esc(n)+'">').join('')}</datalist>
- <label class="fl">Valor (dinheiro, dias de VIP ou nº da casa)</label><input id="aVal" inputmode="numeric" placeholder="ex.: 5000">
+ abrirForm('🛡️ Painel do Admin',`<div class="grid" style="grid-template-columns:1fr 1fr;margin-bottom:8px"><button class="btn" id="aDen" style="background:#d63031;color:#fff">🚨 Denúncias (${ADM.den})</button><button class="btn" id="aFb">💬 Ideias (${ADM.fb})</button></div><label class="fl">Jogador (nome exato)</label><input id="aNome" list="aLista" placeholder="Nome do jogador"><datalist id="aLista">${nomes.map(n=>'<option value="'+esc(n)+'">').join('')}</datalist>
+ <label class="fl">Valor (dinheiro, dias de VIP, nº da casa ou minutos de silêncio)</label><input id="aVal" inputmode="numeric" placeholder="ex.: 5000">
  <div class="fx"><div><label class="fl">Pet</label><select id="aPet">${Object.keys(PETS).map(k=>'<option value="'+k+'">'+PETS[k].ic+' '+PETS[k].nome+'</option>').join('')}</select></div><div><label class="fl">Carro</label><select id="aCar">${Object.keys(CARS_PREMIUM).concat(Object.keys(CARS).filter(k=>!CARS_PREMIUM[k])).filter((v,i,a)=>a.indexOf(v)===i).map(k=>'<option value="'+k+'">'+(CARS[k]||CARS_PREMIUM[k]).nome+'</option>').join('')}</select></div></div>
  <div class="grid"><button class="btn" data-a="dinheiro">💰 Dar dinheiro</button><button class="btn" data-a="tirar">💸 Tirar dinheiro</button><button class="btn" data-a="vip">👑 Dar VIP (dias)</button><button class="btn" data-a="pet">🐾 Dar pet</button>
  <button class="btn" data-a="carro">🚗 Dar carro</button><button class="btn" data-a="casa">🏠 Dar casa (nº)</button><button class="btn ghost" data-a="tirar_casa">🏚️ Tirar casa</button><button class="btn ghost" data-a="expulsar">👢 Expulsar</button>
- <button class="btn ghost" data-a="banir" style="color:#ff6b6b">🚫 Banir</button><button class="btn ghost" data-a="desbanir">✅ Desbanir</button></div><div class="grid" style="grid-template-columns:1fr"><button class="btn" id="aAviso" style="background:#d63031;color:#fff">📢 Aviso para toda a cidade</button></div>`,
- box=>{$('aAviso').onclick=avisoGeral;box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const n=$('aNome').value.trim(),v=$('aVal').value.trim(),a=b.dataset.a;if(!n){toast('Escreva o nome do jogador.');return}
+ <button class="btn ghost" data-a="silenciar">🔇 Silenciar (min)</button><button class="btn ghost" data-a="dessilenciar">🔈 Tirar silêncio</button><button class="btn ghost" data-a="banir" style="color:#ff6b6b">🚫 Banir</button><button class="btn ghost" data-a="desbanir">✅ Desbanir</button></div><div class="grid" style="grid-template-columns:1fr"><button class="btn" id="aAviso" style="background:#d63031;color:#fff">📢 Aviso para toda a cidade</button></div>`,
+ box=>{$('aAviso').onclick=avisoGeral;$('aDen').onclick=()=>admDenuncias(false);$('aFb').onclick=admFeedbacks;admContagem().then(()=>{if($('aDen'))$('aDen').textContent='🚨 Denúncias ('+ADM.den+')';if($('aFb'))$('aFb').textContent='💬 Ideias ('+ADM.fb+')'});box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const n=$('aNome').value.trim(),v=$('aVal').value.trim(),a=b.dataset.a;if(!n){toast('Escreva o nome do jogador.');return}
   const alvo=[...others.values()].find(o=>o.nome.toLowerCase()===n.toLowerCase());
   if(a==='expulsar'){if(!alvo){toast(n+' não está na sua sala agora.');return}emitEv('kick',{para:alvo.id});toast('👢 '+n+' foi expulso(a).');return}
-  const acaoS=a==='tirar'?'dinheiro':a,val=a==='tirar'?-Math.abs(+v||0):a==='pet'?$('aPet').value:a==='carro'?$('aCar').value:v;
+  const acaoS=a==='tirar'?'dinheiro':a,val=a==='tirar'?-Math.abs(+v||0):a==='pet'?$('aPet').value:a==='carro'?$('aCar').value:a==='silenciar'?(+v||60):v;
   if(['dinheiro','tirar','vip','casa'].includes(a)&&!(+v)){toast('Coloque o valor.');return}
-  confirmar('🛡️ Confirmar',`<b>${esc(b.textContent)}</b> para <b>${esc(n)}</b>${val!==''&&a!=='banir'&&a!=='desbanir'&&a!=='tirar_casa'?' ('+esc(val)+')':''}?`,()=>acao(async()=>{const r=await api.admin(n,acaoS,val);toast('✅ Feito: '+b.textContent+' → '+r.nome,3000);
+  confirmar('🛡️ Confirmar',`<b>${esc(b.textContent)}</b> para <b>${esc(n)}</b>${val!==''&&a!=='banir'&&a!=='desbanir'&&a!=='tirar_casa'&&a!=='dessilenciar'?' ('+esc(val)+(a==='silenciar'?' min':'')+')':''}?`,()=>acao(async()=>{const r=await api.admin(n,acaoS,val);toast('✅ Feito: '+b.textContent+' → '+r.nome,3000);
    if(alvo)emitEv('admAviso',{para:alvo.id,t:a,v:val});if(a==='banir'&&alvo)emitEv('kick',{para:alvo.id,ban:1});if(r.id===eu.id){const m=await api.perfil(eu.id);if(m)aplicarEstado(m)}}))})})}
 $('zadm').onclick=painelAdmin;
+$('cfgFb').onclick=abrirFeedback;
 setInterval(()=>{if(eu)$('zadm').classList.toggle('hidden',!eu.admin)},1500);
 function onAdmin(o,p){if(!eu||p.para!==eu.id)return;const pf=perfis.get(o.id);if(!(pf&&pf.admin))return;
  if(p.k==='kick'){confirmar(p.ban?'🚫 Banido':'👢 Expulso',p.ban?'Você foi banido da cidade pelo administrador.':'Você foi expulso da sala pelo administrador.',()=>location.reload(),[['OK',()=>location.reload()]]);try{canal&&sb.removeChannel(canal)}catch(_){}canal=null;setTimeout(()=>location.reload(),6000);return}
@@ -5832,7 +5882,7 @@ function tutoMostra(){const st=TUTO[tutoI];$('tutoTxt').innerHTML=st[1];$('tutoI
  if(st[0]&&FOCUS[st[0]]){follow=null;const f=FOCUS[st[0]];cam.x=T(f[0]);cam.y=T(f[1]);cam.z=Math.min(f[2]*Math.max(.8,cw/700),2.2)}else if(eu){follow=eu}}
 function tutoFim(){$('tuto').classList.add('hidden');if(eu&&eu.tutoPend){eu.tutoPend=false;if(msAtiva())later(.6,()=>{bannerGrande('🎯 SUA PRIMEIRA MISSÃO!','Siga o cartão dourado e a seta. Bônus de R$ 100!');Som.play('clique')})}if(eu)follow=eu;try{localStorage.setItem('cidadeTonhao.tuto','1')}catch(e){}}
 function tutorial(){tutoI=0;$('tuto').classList.remove('hidden');tutoMostra()}
-$('tutoProx').onclick=()=>{if(++tutoI>=TUTO.length)tutoFim();else tutoMostra()};$('tutoPular').onclick=()=>{tutoFim();setTimeout(()=>tourCidade(),900)};
+$('tutoProx').onclick=()=>{if(++tutoI>=TUTO.length)tutoFim();else tutoMostra()};$('tutoPular').onclick=()=>{tutoFim()};
 /* ----- primeira missão: guia quem acabou de chegar até o primeiro dinheiro ----- */
 const MS_META=3;let msTar=0,msBusy=false;try{msTar=+localStorage.getItem('cidadeTonhao.msTar')||0}catch(e){}
 function msAtiva(){return !!eu&&(eu.missao===0||eu.missao===1)}
@@ -5868,7 +5918,7 @@ const TOUR=[[24,22.5,1.35,'🍺 Bar do Tonhão','O coração da cidade: bebida, 
  [44,71,1.1,'🏛️ Prefeitura','No <b>nível 30</b> você pode virar <b>prefeito</b> da cidade!']];
 let tourOn=false;
 function tourCidade(forcar){if(!eu||tourOn)return;const kk='cidadeTonhao.tour.'+eu.id;if(!forcar){try{if(localStorage.getItem(kk))return}catch(e){}}
- tourOn=true;try{localStorage.setItem(kk,'1')}catch(e){}closePlace();$('tuto').classList.add('hidden');eu.path=[];const volta={x:cam.x,y:cam.y,z:cam.z};follow=null;
+ tourOn=true;document.body.classList.add('emTour');try{localStorage.setItem(kk,'1')}catch(e){}closePlace();$('tuto').classList.add('hidden');eu.path=[];const volta={x:cam.x,y:cam.y,z:cam.z};follow=null;
  const el=document.createElement('div');el.id='tour';el.innerHTML=`<style>#tour{position:fixed;inset:0;z-index:70;pointer-events:all;background:linear-gradient(rgba(0,0,0,.35),transparent 18%,transparent 70%,rgba(0,0,0,.55))}#tour .tp{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(43,26,32,.92);border:2px solid #ffc94a;border-radius:14px;padding:6px 14px;color:#ffc94a;font:700 15px Fredoka,sans-serif;white-space:nowrap}#tour .cx{position:absolute;left:12px;right:12px;bottom:calc(22px + env(safe-area-inset-bottom,0px));max-width:480px;margin:0 auto;background:rgba(43,26,32,.94);border:2px solid #ffc94a;border-radius:16px;padding:12px 14px;color:#fff;font:15px/1.4 Fredoka,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.5)}#tour h3{margin:0 0 4px;color:#ffc94a;font-size:19px}#tour .ds{display:flex;gap:4px;justify-content:center;margin-top:8px}#tour .ds i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}#tour .ds i.on{background:#ffc94a}</style><div class="tp">🗺️ Conheça a Cidade do Tonhão</div><div class="cx"><h3></h3><div class="tx"></div><div class="ds"></div></div>`;
  document.body.appendChild(el);let i=-1,t0=0,de=null,ate=null;const MOV=1.6,PARA=3.4;
  const pr=()=>{i++;if(i>=TOUR.length){fim();return}const [x,y,z,ti,tx]=TOUR[i];de={x:cam.x,y:cam.y,z:cam.z};ate={x:T(x),y:T(y),z};t0=performance.now();
@@ -5876,13 +5926,13 @@ function tourCidade(forcar){if(!eu||tourOn)return;const kk='cidadeTonhao.tour.'+
  const ease=u=>u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
  const passo=()=>{if(!tourOn)return;const u=Math.min(1,(performance.now()-t0)/1000/MOV),e=ease(u);if(de&&ate){cam.x=de.x+(ate.x-de.x)*e;cam.y=de.y+(ate.y-de.y)*e;cam.z=de.z+(ate.z-de.z)*e;follow=null}
   if((performance.now()-t0)/1000>MOV+PARA)pr();if(tourOn)requestAnimationFrame(passo)};
- const fim=()=>{tourOn=false;el.remove();cam.z=Math.max(1.3,volta.z);follow=eu;bannerGrande('✅ PRONTO!','Agora é com você. Os lugares também estão no 🗺️ mapa e no 🟢 online → Ir para.')};
+ const fim=()=>{tourOn=false;document.body.classList.remove('emTour');el.remove();cam.z=Math.max(1.3,volta.z);follow=eu;bannerGrande('✅ PRONTO!','Agora é com você. Os lugares também estão no 🗺️ mapa e no 🟢 online → Ir para.')};
  pr();requestAnimationFrame(passo)}
 function msTarefa(){if(!eu||eu.missao!==0)return;msTar++;try{localStorage.setItem('cidadeTonhao.msTar',msTar)}catch(e){}msRender()}
 function msComprou(it){if(eu&&eu.missao===1&&it&&it.fome>0&&!msBusy)msPasso(2)}
 function msPasso(p,pulou){msBusy=true;api.missao(p).then(r=>{if(r&&r.eu)aplicarEstado(r.eu);eu.missao=r&&r.missao!=null?+r.missao:2;
-  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('compra');floatText(eu.x,eu.y-44,'+'+money(r.bonus||100),'#9dff7a');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||100)+'. Agora vá comer alguma coisa!');setTimeout(()=>tourCidade(),3200)}
-  else if(!pulou){closePlace();bannerGrande('🎉 MISSÃO COMPLETA!','Agora é com você! Mais empregos em ☰ → 💼 Empregos')}
+  if(p===1){if(trabalho){api.largar().catch(()=>{});fecharTarefa();fimTurno()}Som.play('compra');floatText(eu.x,eu.y-44,'+'+money(r.bonus||100),'#9dff7a');bannerGrande('🎁 BÔNUS DE BOAS-VINDAS!','Você ganhou '+money(r.bonus||100)+'. Agora vá comer alguma coisa!')}
+  else if(!pulou){closePlace();bannerGrande('🎉 MISSÃO COMPLETA!','Agora é com você! Mais empregos em ☰ → 💼 Empregos');setTimeout(()=>tourCidade(),3500)}
   if(eu.missao>=2)try{localStorage.removeItem('cidadeTonhao.msTar')}catch(e){}})
  .catch(()=>{eu.missao=2}).finally(()=>{msBusy=false;msRender()})}
 $('msIr').onclick=()=>{const a=msAlvo();if(!a||!livre())return;Som.play('clique');irPara(a.x,a.y,()=>abrirLugar(a.b))};

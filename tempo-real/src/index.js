@@ -29,7 +29,7 @@ export default {
       } catch (e) {}
       if (!id) return new Response('login inválido', { status: 401, headers: CORS });
     }
-    const fwd = new Request('https://sala/ws?id=' + encodeURIComponent(id || '') + '&n=' + n, req);
+    const fwd = new Request('https://sala/ws?id=' + encodeURIComponent(id || '') + '&n=' + n + '&k=' + encodeURIComponent(url.searchParams.get('k') || ''), req);
     return env.SALA.get(env.SALA.idFromName('sala-' + n)).fetch(fwd);
   }
 };
@@ -58,7 +58,7 @@ export class Sala {
     // a mesma pessoa conectada de novo: fecha a conexão antiga
     if (id) for (const ws of this.state.getWebSockets()) { try { const a = ws.deserializeAttachment() || {}; if (a.id === id) ws.close(4001, 'conectou de novo'); } catch (e) {} }
     this.state.acceptWebSocket(servidor);
-    servidor.serializeAttachment({ id, ts: Date.now() });
+    servidor.serializeAttachment({ id, ts: Date.now(), k: url.searchParams.get('k') || '' });
     const lista = [...new Set(this.jogadores().map(a => a.id))];
     servidor.send(JSON.stringify({ t: 'oi', eu: id, ids: lista }));
     if (id) this.espalhar({ t: 'entrou', id }, servidor);
@@ -84,9 +84,17 @@ export class Sala {
       return;
     }
     if (d.t === 'chat' && d.r && typeof d.r === 'object') {
-      const r = d.r; r.morador = a.id; // a mensagem já foi gravada no Supabase pelo próprio jogador
-      if (typeof r.texto !== 'string' || r.texto.length > 200) return;
-      this.espalhar({ t: 'chat', r }, ws);
+      // só repassa mensagem que existe no banco (já passou pelo filtro e pelo silêncio) e que é dessa pessoa
+      const cid = parseInt(d.r.id, 10);
+      if (!(cid > 0) || !a.k) return;
+      try {
+        const res = await fetch(this.env.SUPABASE_URL + '/rest/v1/chat?id=eq.' + cid + '&select=id,sala,morador,nome,texto,criado_em', { headers: { apikey: a.k, Authorization: 'Bearer ' + a.k } });
+        if (!res.ok) return;
+        const rows = await res.json();
+        const r = rows && rows[0];
+        if (!r || r.morador !== a.id) return;
+        this.espalhar({ t: 'chat', r }, ws);
+      } catch (e) {}
     }
   }
 
