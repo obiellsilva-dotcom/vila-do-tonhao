@@ -2595,7 +2595,7 @@ function salaTiles(){if(!eu||!eu.rm)return;const R=eu.rm.R;for(let y=R.y0;y<=R.y
 function movLivre(t,r,x,y,ign){const R=eu.rm.R,[w,h]=movTam(t,r),an=MOV[t].anda;if(x<0||y<0||R.x0+x+w-1>R.x1||R.y0+y+h-1>R.y1)return false;
  for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++){const tx=R.x0+x+xx,ty=R.y0+y+yy;if(naEsc(R,tx,ty))return false;if(R.porta&&tx===R.porta[0]&&ty===R.porta[1]-1)return false;if(!an&&Math.floor(eu.x/TILE)===tx&&Math.floor(eu.y/TILE)===ty)return false}
  return !(eu.rm.moveis||[]).some((m,k)=>{if(k===ign||!movAqui(m)||!MOV[m.t])return false;if(an!==!!MOV[m.t].anda)return false;const [w2,h2]=movTam(m.t,m.r|0);return x<m.x+w2&&m.x<x+w&&y<m.y+h2&&m.y<y+h})}
-async function carregaMoveis(){if(!eu||!eu.rm||eu.rm.b.fixos){if(eu&&eu.rm)salaTiles();return}const n=eu.rm.n;try{const c=await api.casa(n);if(eu.rm&&eu.rm.n===n){eu.rm.moveis=(c&&c.moveis)||[];eu.rm.geladeira=(c&&c.geladeira)||{};salaTiles()}}catch(e){}}
+async function carregaMoveis(){if(!eu||!eu.rm||eu.rm.b.fixos){if(eu&&eu.rm)salaTiles();return}const n=eu.rm.n;try{const c=await api.casa(n);if(eu.rm&&eu.rm.n===n){eu.rm.moveis=(c&&c.moveis)||[];eu.rm.geladeira=(c&&c.geladeira)||{};salaTiles();api.jukeDe(n).then(j=>{if(eu.rm&&eu.rm.n===n){JUKE_CASA.set(n,j);tocaJukeAqui()}}).catch(()=>{})}}catch(e){}}
 // mata fechada: árvores de verdade em cima do verde (sprite em cache, sem balanço)
 const MATA=new Map();
 for(let y=-MY;y<H+MY;y++){const row=[];for(let x=-MX;x<W+MX;x++){if(tileAt(x,y)!==G.FOREST)continue;const h=hsh(x,y,31);if(h>.62)continue;row.push({x:(x+.2+hsh(x,y,32)*.6)*TILE,y:(y+.3+hsh(x,y,33)*.6)*TILE,s:1.25+hsh(x,y,34)*.6,c:h<.1?3:h<.3?1:h<.5?2:0,v:Math.floor(hsh(x,y,35)*3)})}if(row.length)MATA.set(y,row)}
@@ -3737,6 +3737,8 @@ const api=ONLINE?(()=>{
   investir:v=>rpc('investir',{p_valor:v}),
   resgatar:v=>rpc('resgatar',{p_valor:v}),
   feedback:(tp,t)=>rpc('enviar_feedback',{p_tipo:tp,p_texto:t}),
+  juke:(n,f)=>rpc('tocar_jukebox',{p_casa:n,p_faixa:f}),
+  async jukeDe(n){const r=await q(sb.from('casas').select('juke').eq('id',n));return r[0]?r[0].juke:null},
   admDenuncias:t=>rpc('admin_denuncias',{p_todas:!!t}),
   admFeedbacks:()=>rpc('admin_feedbacks'),
   admResolver:(tp,id)=>rpc('admin_resolver',{p_tipo:tp,p_id:id}),
@@ -3747,6 +3749,7 @@ const api=ONLINE?(()=>{
   async conta(){return{id:'local',anon:false}},
   async login(){return'local'},
   async feedback(){return{ok:true}},
+  async juke(n,f){return{juke:f?{f,em:new Date().toISOString()}:null}},async jukeDe(){return null},
   // celular no modo de teste (sem internet do jogo): amigos de exemplo e banco local
   async amigos(){return OFFCEL.amigos},async pedirAmizade(){return{pedido:true}},
   async responderAmizade(id,ok){const i=OFFCEL.amigos.findIndex(x=>x.id===id);if(i>=0){if(ok)OFFCEL.amigos[i].status='amigo';else OFFCEL.amigos.splice(i,1)}return{ok:true}},
@@ -4299,11 +4302,27 @@ function abrirLugar(b){
 function closePlace(){$('place').classList.add('hidden');lugarAtual=null}
 $('placeX').onclick=closePlace;
 const EMOTES=['🔥','😎','💸','🍻','👑','😂','🥳','❤️','👋','🤠'];
-const NOMES_MUS=['O Campeão','Charrete','Futilidades Entre Nós'];
+// catálogo de músicas (pasta musicas/). As novas são de Kevin MacLeod (incompetech.com), licença CC BY 4.0 — crédito em privacidade.html
+const MUS_EST={vila:'🎤 Da Vila',brasil:'🇧🇷 Samba e Bossa',sertanejo:'🤠 Sertanejo e Country',festa:'🕺 Festa e Funk',latino:'🌴 Latino e Praia',chill:'😌 Relax'};
+const MUS=[{f:'o-campeao',n:'O Campeão',g:'vila'},{f:'charrete',n:'Charrete',g:'vila'},{f:'futilidades-entre-nos',n:'Futilidades Entre Nós',g:'vila'},{f:'leblon',n:'Leblon',g:'brasil'},{f:'suvaco-do-cristo',n:'Suvaco do Cristo',g:'brasil'},{f:'bossa-antigua',n:'Bossa Antigua',g:'brasil'},{f:'bossabossa',n:'BossaBossa',g:'brasil'},{f:'casa-bossa-nova',n:'Casa Bossa Nova',g:'brasil'},{f:'bama-country',n:'Bama Country',g:'sertanejo'},{f:'guts-and-bourbon',n:'Guts and Bourbon',g:'sertanejo'},{f:'cattails',n:'Cattails',g:'sertanejo'},{f:'enter-the-party',n:'Enter the Party',g:'festa'},{f:'funky-chunk',n:'Funky Chunk',g:'festa'},{f:'disco-con-tutti',n:'Disco con Tutti',g:'festa'},{f:'your-call',n:'Your Call',g:'festa'},{f:'no-frills-cumbia',n:'No Frills Cumbia',g:'latino'},{f:'peppy-pepe',n:'Peppy Pepe',g:'latino'},{f:'beachfront-celebration',n:'Beachfront Celebration',g:'latino'},{f:'backbay-lounge',n:'Backbay Lounge',g:'chill'},{f:'chill-wave',n:'Chill Wave',g:'chill'},{f:'hypnothis',n:'Hypnothis',g:'chill'}];
+const NOMES_MUS=MUS.map(m=>m.n),musIdx=f=>MUS.findIndex(m=>m.f===f);
+function abrirJuke(tit,sub,pick,parar){abrirForm(tit,`<p class="hint" style="margin:0 0 6px">${sub}</p><div id="jkL"></div>`,()=>{const L=$('jkL');
+ for(const [g,nm] of Object.entries(MUS_EST)){const h=document.createElement('div');h.className='fl';h.style.marginTop='10px';h.textContent=nm;L.appendChild(h);const gr=document.createElement('div');gr.className='grid';
+  MUS.forEach((m,i)=>{if(m.g!==g)return;const b=document.createElement('button');b.className='btn ghost';b.textContent='🎵 '+m.n;b.onclick=()=>{$('mForm').classList.add('hidden');pick(i)};gr.appendChild(b)});L.appendChild(gr)}
+ if(parar){const b=document.createElement('button');b.className='btn';b.style.cssText='width:100%;margin-top:12px';b.textContent='⏹️ Desligar a jukebox';b.onclick=()=>{$('mForm').classList.add('hidden');parar()};L.appendChild(b)}})}
+// jukebox das casas: o dono escolhe, fica gravado na casa e todo mundo lá dentro ouve do mesmo ponto
+const JUKE_CASA=new Map();
+const temJuke=()=>!!(eu&&eu.rm&&(eu.rm.moveis||[]).some(m=>m.t==='jukebox'&&!m.g));
+function tocaJukeAqui(){if(!eu||!eu.rm){Som.casaPara();return}const j=JUKE_CASA.get(eu.rm.n),i=j?musIdx(j.f):-1;if(i>=0&&temJuke())Som.casaToca(i,Date.parse(j.em)||Date.now());else Som.casaPara()}
+function aplicaJuke(n,j){JUKE_CASA.set(n,j);if(eu&&eu.rm&&eu.rm.n===n)tocaJukeAqui()}
+function jukeCasa(){if(!eu||!eu.rm)return;const n=eu.rm.n,dono=(casasInfo.get(n)||{}).dono===eu.id;Som.iniciarMusica();
+ if(!dono){const j=JUKE_CASA.get(n),i=j?musIdx(j.f):-1;toast(i>=0?'🎵 Tocando: '+MUS[i].n+' · só o dono troca a música':'🎵 Só o dono da casa escolhe a música.',3000);return}
+ abrirJuke('🎵 Jukebox da casa','Escolha a música. Todo mundo que estiver na sua casa ouve junto!',i=>acao(async()=>{const r=await api.juke(n,MUS[i].f);aplicaJuke(n,r.juke);emitEv('juke',{n,j:r.juke});toast('🎵 Tocando: '+MUS[i].n,2500)}),
+  ()=>acao(async()=>{await api.juke(n,'');aplicaJuke(n,null);emitEv('juke',{n,j:null});toast('⏹️ Jukebox desligada.',2000)}))}
 function confirmar(titulo,texto,sim,ops){$('confT').textContent=titulo;$('confP').innerHTML=texto;const box=$('confOps');box.innerHTML='';
  $('confSim').classList.toggle('hidden',!!ops);(ops||[]).forEach(([t,fn])=>{const b=document.createElement('button');b.className='btn';b.textContent=t;b.onclick=()=>{$('mConf').classList.add('hidden');fn()};box.appendChild(b)});
  $('confSim').onclick=()=>{$('mConf').classList.add('hidden');sim&&sim()};$('confNao').onclick=()=>$('mConf').classList.add('hidden');$('mConf').classList.remove('hidden')}
-function escolherMusica(){Som.iniciarMusica();confirmar('🎵 Jukebox','Escolha a música que vai tocar no bar:',null,NOMES_MUS.map((n,i)=>['🎵 '+n,()=>tocarEscolha(i)]))}
+function escolherMusica(){Som.iniciarMusica();abrirJuke('🎵 Jukebox do bar','Escolha a música que vai tocar no bar (todo mundo da sala ouve):',tocarEscolha)}
 function tocarEscolha(i){if(!(i>=0&&i<Som.FAIXAS.length))return;Som.faixa(i);emitEv('musica',{f:i});toast('🎵 Tocando: '+NOMES_MUS[i],2500);log(`🎵 ${eu.nome} escolheu ${NOMES_MUS[i]}`)}
 const EMO_LIVRE=['😂','😍','👍','👋','😢','😡','🤔','😱','🥰','🙏','💯','🍺'];
 const DANCAS=[['samba','🥁 Samba'],['funk','🔊 Funk'],['forro','🪗 Forró'],['robo','🤖 Robô'],['passinho','👟 Passinho']];
@@ -4541,7 +4560,7 @@ houses.forEach(b=>{if(b.off||b.loja||!b.moveis)return;for(const [x,y] of b.movei
 function entrarSala(b){if(emCasa){emCasa=false;eu.hidden=false;$('work').classList.add('hidden')}joyV.x=joyV.y=0;salaCD=now+1.2;pertoKey='';const R=salaDe(b,0);eu.rm={n:b.n,b,R,andar:0,moveis:b.fixos?b.fixos.map(m=>Object.assign({a:0,r:0},m)):[]};salaTiles();carregaMoveis();eu.path=[];eu.onArrive=null;eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7);eu.dir=1;follow=eu;eu._zoomAntes=cam.z;cam.z=Math.max(cam.z,1.5);cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');closeCard();sendPos(true);
  const i=casasInfo.get(b.n)||{};toast(salaNome(b,i)+' · para sair, ande até a porta.',2500)}
 function salaNome(b,i){i=i||{};if(b.kind==='imob')return'🏘️ Imobiliária do Tonhão';if(b.kind==='show')return'🚗 Showroom Carros do Zé';if(b.apto)return'🏢 Apto '+b.num+' · Bloco '+b.bloco.nome+(i.nome?' ('+i.nome+')':'');return i.nome?'🏠 Casa de '+i.nome:(b.kind==='mansao'?'🏰 Mansão ':'🏠 Casa ')+b.n}
-function sairSala(){if(MOB.ativo)fecharMob();joyV.x=joyV.y=0;salaCD=now+1.5;pertoKey='';const b=eu.rm.b;levantarCasa();eu.rm=null;eu.placing=null;eu.path=[];eu.onArrive=null;eu.x=T(b.front[0]+.5);eu.y=T(b.front[1]+1.1);follow=eu;if(eu._zoomAntes)cam.z=eu._zoomAntes;cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');sendPos(true)}
+function sairSala(){if(MOB.ativo)fecharMob();try{Som.casaPara()}catch(e){}joyV.x=joyV.y=0;salaCD=now+1.5;pertoKey='';const b=eu.rm.b;levantarCasa();eu.rm=null;eu.placing=null;eu.path=[];eu.onArrive=null;eu.x=T(b.front[0]+.5);eu.y=T(b.front[1]+1.1);follow=eu;if(eu._zoomAntes)cam.z=eu._zoomAntes;cam.x=eu.x;cam.y=eu.y;salaFade=1;Som.play('porta');sendPos(true)}
 let salaFade=0,salaCD=0,SALA_ON=false;const SALA_ESC=1.8;
 setInterval(()=>{if(!eu||eu.driving||eu.hidden||now<salaCD)return;if(eu.rm){const R=eu.rm.R;if(eu.x<T(R.x0-1)||eu.x>T(R.x1+2)||eu.y<T(R.y0-1)||eu.y>T(R.y1+2)){if(R.porta){eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7)}else{eu.x=T(R.esc.x0-.5);eu.y=T(R.esc.y0+.5)}eu.path=[]}}if(!eu.rm){const b=casaEm(eu.x,eu.y);if(b&&!b.loja&&!b.off&&houses.includes(b))entrarSala(b)}else{const R=eu.rm.R,tx=Math.floor(eu.x/TILE),ty=Math.floor(eu.y/TILE);if(R.porta&&tx===R.porta[0]&&ty===R.porta[1])sairSala();else if(R.esc&&ty===R.esc.y0&&tx>=R.esc.x0&&tx<=R.esc.x1)trocaAndar()}},120);
 function trocaAndar(){if(MOB.ativo)fecharMob();const a=eu.rm.andar?0:1,R=salaDe(eu.rm.b,a);levantarCasa();eu.rm.andar=a;eu.rm.R=R;eu.rm.subiu=true;eu.path=[];eu.onArrive=null;if(a){eu.x=T(R.esc.x0-.5);eu.y=T(R.esc.y0+.5)}else{eu.x=T(R.esc.x0+.5);eu.y=T(R.esc.y1+1.5)}cam.x=eu.x;cam.y=eu.y;salaTiles();Som.play('porta');sendPos(true);toast(a?'⬆️ Andar de cima':'⬇️ Andar de baixo',1500)}
@@ -4639,7 +4658,7 @@ function usarMovelToque(wx,wy){const R=eu.rm.R,tx=Math.floor(wx/TILE)-R.x0,ty=Ma
  if(!best){toast('Não dá para chegar nesse móvel.',1800);return true}irPara(T(best[0]+.5),T(best[1]+.5),fn);return true}
 function salaOpcoes(){const o=[],dono=(casasInfo.get(eu.rm.n)||{}).dono===eu.id;if(MOB.ativo)return[];
  if(eu.casaAcao){o.push(['🧍 Levantar',levantarCasa]);if(eu.casaAcao==='tv')o.push(['📺 Mudar de canal',()=>say(eu,pick(['📺 Jornal da Vila','📺 Novela das 8','⚽ Futebol!','📺 Desenho animado','🎤 Programa de auditório']),3,true)]);return o}
- const best=movPerto();if(best){const D=MOV[best.t];if(D.deita)o.push(['😴 Deitar',()=>noMovel(best,'cama','💤 Hora de dormir…')]);else if(D.senta)o.push(['🪑 Sentar',()=>noMovel(best,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']))]);else if(D.tv)o.push(['📺 Ver TV',()=>noMovel(best,'tv','📺 Bora ver TV!')]);else if(D.gel)o.push(['🧊 Abrir geladeira',()=>dono?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000)]);else if(D.juke&&typeof Som!=='undefined'&&Som.faixa)o.push(['🎵 Trocar a música',()=>{Som.iniciarMusica&&Som.iniciarMusica();Som.faixa(Math.floor(Math.random()*5))}])}
+ const best=movPerto();if(best){const D=MOV[best.t];if(D.deita)o.push(['😴 Deitar',()=>noMovel(best,'cama','💤 Hora de dormir…')]);else if(D.senta)o.push(['🪑 Sentar',()=>noMovel(best,'sofa',pick(['Ahh, que conforto!','Sentadinho 😌']))]);else if(D.tv)o.push(['📺 Ver TV',()=>noMovel(best,'tv','📺 Bora ver TV!')]);else if(D.gel)o.push(['🧊 Abrir geladeira',()=>dono?abrirGeladeira():toast('Só o dono pode mexer na geladeira.',2000)]);else if(D.juke)o.push(['🎵 Jukebox',jukeCasa])}
  if(eu.rm.n==='imob')o.unshift(['🏘️ Falar com o corretor',abrirImobiliaria]);
  if(eu.rm.n==='show')o.unshift(['🚗 Ver e comprar carros',()=>abrirLugar(conc)]);
  if(dono)o.push(['🛋️ Decorar',abrirMobilia]);return o.slice(0,3)}
@@ -4875,6 +4894,7 @@ function onEv(p){
  if(p.k==='campNao'&&eu&&p.para===eu.id)toast('🚪 '+o.nome+' não abriu a porta.',2500);
  if(p.k==='carona'&&eu&&p.com===eu.id)toast(+p.s?'🚗 '+o.nome+' entrou no seu carro!':o.nome+' desceu do seu carro.',2500);
  if((p.k==='dm'||p.k==='amizade')&&eu&&p.para===eu.id)celAvisos();
+ if(p.k==='juke'&&Number.isFinite(+p.n)){const j=p.j&&typeof p.j.f==='string'&&musIdx(p.j.f)>=0?{f:p.j.f,em:String(p.j.em||'')}:null;aplicaJuke(+p.n,j)}
  if(p.k==='carro'&&CARS[p.c])log(`🚗 ${o.nome} comprou ${art(p.c)==='a'?'uma':'um'} ${CARS[p.c].nome}!`);
  if(p.k==='nivel'&&+p.n>0&&+p.n<200){o.nivel=+p.n;say(o,'🎉 Nível '+o.nivel+'!',4,true);log(`⭐ ${o.nome} chegou ao nível ${o.nivel}!`)}
  if(p.k==='emote'&&(EMO_LIVRE.includes(p.e)||(vipP(o)&&EMOTES.includes(p.e))))say(o,p.e,3.5,true);
@@ -5132,12 +5152,12 @@ const Som=(()=>{
  }
  function loopMus(){musTick();setTimeout(loopMus,60000/PIS[pv].bpm/4)}
  // músicas de verdade (pasta "musicas" ao lado do index.html); se não carregarem, toca a batida sintetizada
- const FAIXAS=['o-campeao','charrete','futilidades-entre-nos'].map(n=>'musicas/'+n+'.mp3');
+ const FAIXAS=MUS.map(m=>'musicas/'+m.f+'.mp3');let casaJ=null; // casaJ = música da jukebox da casa onde estou
  let player=null,fila=[],falhas=0,sintetico=false,jukeG=null,tocando=false;
  // som de proximidade: a música sai da jukebox do bar; perto = alto, longe = some
  let somPerto=0;
  function proximidade(){const ox=T(29.5),oy=T(18.3),o=(typeof eu!=='undefined'&&eu)?eu:cam;const d=Math.hypot(o.x-ox,o.y-oy)/TILE;
-  const alvo=d<=4?1:d>=24?0:Math.pow(1-(d-4)/20,6);somPerto+=(alvo-somPerto)*.25;
+  const alvo=casaJ?1:d<=4?1:d>=24?0:Math.pow(1-(d-4)/20,6);somPerto+=(alvo-somPerto)*.25;
   const vj=Math.max(0,Math.min(1,.64*somPerto*CFG.mus/100));if(jukeG)jukeG.gain.setTargetAtTime(vj,ac.currentTime,.1);else if(player)player.volume=vj;
   if(musG&&ac&&sintetico)musG.gain.setTargetAtTime(musica?.12*somPerto*CFG.mus/100:0,ac.currentTime,.1)}
  setInterval(proximidade,150);
@@ -5158,7 +5178,10 @@ const Som=(()=>{
  function volSfx(){if(sfxG)sfxG.gain.value=CFG.sfx/100}
  // celular: o navegador só libera o som num toque completo (soltar o dedo); tenta de novo a cada toque até tocar
  function destravar(){if(!on)return;init();if(ac&&ac.state!=='running')ac.resume().catch(()=>{});if(!musOn)iniciarMusica();else if(player&&!tocando&&musica&&!document.hidden)player.play().catch(()=>{})}
- function faixa(i){if(!player||!FAIXAS[i])return;fila=[];player.src=FAIXAS[i];tocaMp3()}
+ function faixa(i){if(!player||!FAIXAS[i]||casaJ)return;fila=[];player.src=FAIXAS[i];tocaMp3()}
+ function casaToca(i,em){if(!player)iniciarMusica();if(!player||!FAIXAS[i])return;if(casaJ&&casaJ.i===i&&casaJ.em===em)return;casaJ={i,em};fila=[];player.loop=true;player.src=FAIXAS[i];
+  player.addEventListener('loadedmetadata',()=>{try{const d=player.duration;if(d>0&&isFinite(d))player.currentTime=((Date.now()-em)/1000)%d}catch(e){}},{once:true});somPerto=1;tocaMp3()}
+ function casaPara(){if(!casaJ)return;casaJ=null;somPerto=0;if(player){player.loop=false;proxima()}}
  // Sirene eletrônica (padrão das viaturas): onda quadrada num alto-falante tipo corneta.
  // modo 2 = "lamento" (wail): sobe e desce devagar entre ~650 e 1450 Hz; modo 3 = rápida (yelp): a mesma subida ~3 vezes por segundo.
  const sirenes={};
@@ -5172,7 +5195,7 @@ const Som=(()=>{
   if(m.modo!==modo){m.modo=modo;if(modo===3){m.lfo.type='sawtooth';m.lfo.frequency.setValueAtTime(3.1,t);m.o.frequency.setValueAtTime(1020,t);m.ld.gain.setValueAtTime(420,t)}
    else{m.lfo.type='triangle';m.lfo.frequency.setValueAtTime(.24,t);m.o.frequency.setValueAtTime(1050,t);m.ld.gain.setValueAtTime(400,t)}}
   m.g.gain.setTargetAtTime(modo>=2?.11*vol:0,t,.05)}
- return{destravar,get tocando(){return tocando},faixa,FAIXAS,play,motor,sirene,volSfx,iniciarMusica,toggle,toggleMusica,get on(){return on},get musica(){return musica}};
+ return{destravar,get tocando(){return tocando},get fonte(){return (casaJ?'casa:':'cidade:')+(player?decodeURIComponent(player.src.split('/').pop()):'-')},faixa,casaToca,casaPara,FAIXAS,play,motor,sirene,volSfx,iniciarMusica,toggle,toggleMusica,get on(){return on},get musica(){return musica}};
 })();
 addEventListener('pointerdown',()=>Som.iniciarMusica(),{once:true});
 ['pointerup','touchend','click'].forEach(ev=>addEventListener(ev,()=>{if(!Som.tocando)Som.destravar()},{passive:true}));
@@ -5550,7 +5573,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124i';
+const VERSAO_JOGO='v20261124j';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

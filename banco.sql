@@ -3076,3 +3076,26 @@ revoke execute on function public.enviar_feedback(text, text), public.admin_denu
   public.admin_resolver(text, bigint), public.admin_contagem() from public, anon;
 grant execute on function public.enviar_msg(integer, text), public.enviar_dm(uuid, text), public.denunciar(uuid, text), public.enviar_feedback(text, text),
   public.admin_acao(text, text, text), public.admin_denuncias(boolean), public.admin_feedbacks(), public.admin_resolver(text, bigint), public.admin_contagem() to authenticated;
+
+-- ===================== ETAPA 32: Jukebox das casas =====================
+-- O dono escolhe a música e ela fica tocando na casa (quem entra depois ouve do mesmo ponto).
+alter table public.casas add column if not exists juke jsonb;
+
+create or replace function public.tocar_jukebox(p_casa integer, p_faixa text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; j jsonb;
+begin
+  m := _eu();
+  select * into c from casas where id = p_casa;
+  if not found then raise exception 'Casa não existe.'; end if;
+  if c.dono is distinct from m.id then raise exception 'Só o dono da casa escolhe a música.'; end if;
+  if p_faixa is null or p_faixa = '' then j := null;
+  else
+    if p_faixa !~ '^[a-z0-9-]{2,40}$' then raise exception 'Música inválida.'; end if;
+    j := jsonb_build_object('f', p_faixa, 'em', now());
+  end if;
+  update casas set juke = j where id = p_casa;
+  return json_build_object('juke', j);
+end $$;
+revoke execute on function public.tocar_jukebox(integer, text) from public, anon;
+grant execute on function public.tocar_jukebox(integer, text) to authenticated;
