@@ -14,6 +14,7 @@ Tudo commitado. O dono recebeu o `site.zip` v20261124e (confirmar se subiu). SQL
 - **Pix do passe corrigido:** `comprarPix` agora abre `#mLoja` para mostrar o QR (antes ficava escondido).
 - **Carro do Passe = "Furacão GT" (id `natal`)**: modelo "Volkswagen Golf GTI 2021" de ItsDiyor (Sketchfab, **CC BY 4.0**, crédito em `privacidade.html`), sem logos/placa. `SPR_NATAL`/`SPR_NATAL_M` (máscara de pintura), `RODA_IMG.natal` (4 quadros), `FAROL_IMG.natal` (camadas de luz dianteira/traseira usadas em `farolQuadro`), `spriteCor(...,fiel)` só para ele (vidros/faróis não escurecem). Renderizador em `extras/render-carro.html` + `extras/render-carro-gerar.js` (three.js 0.160 + Playwright, servidor local). Os modelos do autor "Ddiaz Design" são **CC-BY-NC** (não usar).
 - **Mapa e mapinha:** área ampliada (`MAPX0/MAPY0...`, `naSala`, `MAPA_BLOCOS`), mostram condomínio, lagoa e acampamento; nomes Imobiliária e Condomínio no mapa grande.
+- **Dia do jogo = 48 min reais** (`DIA_ESC=.5`, `gmin()`; antes 24 min). Versão v20261124f.
 - Novidades: `NOVID='v20261127'` com slides Furacão GT, Concessionária nova e Passeio.
 - **Próximos passos:** tempo real no Cloudflare (seção 6) e Play Store (seção 7).
 

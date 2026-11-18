@@ -1943,9 +1943,11 @@ const ball={x:T(69),y:T(22),tx:T(69),ty:T(22),z:0};
 
 /* ================= TIME / ECONOMY ================= */
 const SPEED=1;let now=0,gmOff=0;const gmNow=()=>Date.now()/1000*SPEED+gmOff;let gm=gmNow();
-const hour=()=>(gm/60)%24;
-const clockStr=()=>{const m=Math.floor(gm)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
-let caixa=0,fiadoDia=0,lastDay=Math.floor((gm-360)/1440);
+const DIA_ESC=.5; // relógio do dia: 1 = dia de 24 min reais; .5 = dia de 48 min reais (1 hora do jogo = 2 min)
+const gmin=()=>gm*DIA_ESC; // minutos do jogo
+const hour=()=>(gmin()/60)%24;
+const clockStr=()=>{const m=Math.floor(gmin())%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+let caixa=0,fiadoDia=0,lastDay=Math.floor((gmin()-360)/1440);
 const floats=[],timers=[];
 const later=(s,fn)=>timers.push({t:now+s,fn});
 const MENU=[
@@ -2137,7 +2139,7 @@ function tonUpdate(dt){
 /* ================= UPDATE ================= */
 function update(dt){
  now+=dt;gm=gmNow();
- const day=Math.floor((gm-360)/1440);
+ const day=Math.floor((gmin()-360)/1440);
  if(day!==lastDay){lastDay=day;caixa=0;fiadoDia=0;residents.forEach(r=>{r.spent=0;r.beer=false})}
  for(let i=timers.length-1;i>=0;i--)if(now>=timers[i].t){const f=timers[i].fn;timers.splice(i,1);f()}
  for(const r of residents){
@@ -5330,7 +5332,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124e';
+const VERSAO_JOGO='v20261124f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
