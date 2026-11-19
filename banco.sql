@@ -3440,3 +3440,7 @@ begin
   return r;
 end $$;
 grant execute on function public.postar(text, text) to authenticated;
+
+-- ===================== ETAPA 43: compras pelo Google Play (app) =====================
+-- a mesma compra do Google Play nunca é entregue duas vezes
+create unique index if not exists pedidos_gp_unico on public.pedidos(mp_id) where mp_id like 'gp:%';

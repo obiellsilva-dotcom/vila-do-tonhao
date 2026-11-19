@@ -293,7 +293,7 @@ body.joyEsq #zoom{bottom:calc(66px + env(safe-area-inset-bottom,0px))}body.joyEs
 
 
 body.joyEsq #painelEsq{top:150px}
-html.noApp #zloja{display:none!important}
+html.noApp:not(.comPlay) #zloja{display:none!important}
 .psRow{display:grid;grid-template-columns:44px 1fr 1fr;gap:6px;align-items:stretch}.psRow .nv{display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:10px;background:rgba(255,255,255,.06)}.psRow.ok .nv{background:#ffc94a;color:#2a1a14}
 .psP{display:flex;flex-direction:column;gap:4px;padding:7px;border-radius:10px;border:1px solid rgba(255,201,74,.25);background:rgba(255,255,255,.05);font-size:12.5px;line-height:1.25}.psP.prem{border-color:rgba(160,120,255,.5);background:rgba(140,100,255,.12)}.psP button{border:0;border-radius:8px;padding:5px;font:700 12px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}.psP button:disabled{background:rgba(255,255,255,.12);color:#c9b4aa}
 #mPasse .x{position:absolute;top:8px;right:10px;z-index:20;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:22px;line-height:1;border:1.5px solid rgba(255,255,255,.5)}.psBox{position:relative;width:min(520px,100%);padding:0!important;overflow-y:auto;overflow-x:hidden;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);-webkit-overflow-scrolling:touch;background:linear-gradient(#2a1820,#1c1015)!important}
@@ -5745,7 +5745,7 @@ function pintaPasse(){const P=PASSE;if(!P||!P.temporada){$('psTit').textContent=
  $('psNv').textContent=nv;$('psBarra').firstElementChild.style.width=(nv>=20?100:(P.pontos%PASSE_NV)/PASSE_NV*100)+'%';$('psNivel').textContent=nv>=20?'🏆 Nível máximo!':`${P.pontos%PASSE_NV}/${PASSE_NV} pontos para o nível ${nv+1}`;
  $('psSub').textContent='Ganhe pontos trabalhando: tarefas que demoram mais dão mais pontos (de 2 a 15), e cada pagamento da patrulha dá 15. 👑 VIP ganha +50%.';
  const cb=$('psComprar');cb.innerHTML='';
- if(!P.premium&&!NO_APP){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · ✨ brilho de Natal · 9 roupas · 💰 R$ 26 mil do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
+ if(!P.premium&&(!NO_APP||PLAY.svc)){const b=document.createElement('button');b.className='psBuy';b.innerHTML=`👑 Liberar Premium · ${reais(PRODUTOS.passe_T1.preco)}<small>🚗 carro exclusivo · 🎅 gorro brilhante · ✨ brilho de Natal · 9 roupas · 💰 R$ 26 mil do jogo</small>`;b.onclick=()=>{$('mPasse').classList.add('hidden');comprarPix('passe_T1')};cb.appendChild(b)}
  else if(P.premium)cb.innerHTML='<div class="psSub" style="color:#c9a8ff;text-align:center">👑 Você tem o Passe Premium desta temporada.</div>';
  const L=$('psLista');L.innerHTML='';const by={};for(const x of P.premios)by[x.nivel+x.trilha]=x.premio;
  for(let n=1;n<=20;n++){const col=document.createElement('div');col.className='psCol'+(n<=nv?' ok':'');col.innerHTML=`<div class="lv">${n}</div>`;
@@ -5764,7 +5764,7 @@ async function presenteDoMes(){acao(async()=>{const i=await api.vipInfo();if(!i.
 function irParaCasa(){if(!eu)return;if(!souVip()){toast('🏠 Ir para casa num toque é do VIP 👑');return}if(trabalho){toast('Termine o trabalho primeiro.');return}if(!eu.casa_id){toast('Você ainda não tem casa. Fale com o corretor na Imobiliária!');return}
  const h=eu.casa_id>1000?{front:[27,-10]}:houses[eu.casa_id-1];if(!h)return;if(eu.driving)estacionarAqui();eu.rm=null;eu.path=[];eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE;follow=eu;cam.x=eu.x;cam.y=eu.y;sendPos(true);Som.play('clique');toast('🏠 Bem-vindo(a) em casa!',2000)}
 let precosOk=false;
-function abrirLoja(){if(!eu||NO_APP)return;if(ONLINE&&!precosOk)sb.from('produtos').select('id,preco').then(({data})=>{if(!data)return;precosOk=true;for(const r of data)if(PRODUTOS[r.id])PRODUTOS[r.id].preco=Number(r.preco);if(!$('mLoja').classList.contains('hidden')&&!$('lojaItens').classList.contains('hidden'))pintaLoja()});closePlace();$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');pintaLoja();$('mLoja').classList.remove('hidden')}
+function abrirLoja(){if(!eu||(NO_APP&&!PLAY.svc))return;if(NO_APP){$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');closePlace();pintaLoja();$('mLoja').classList.remove('hidden');return}if(ONLINE&&!precosOk)sb.from('produtos').select('id,preco').then(({data})=>{if(!data)return;precosOk=true;for(const r of data)if(PRODUTOS[r.id])PRODUTOS[r.id].preco=Number(r.preco);if(!$('mLoja').classList.contains('hidden')&&!$('lojaItens').classList.contains('hidden'))pintaLoja()});closePlace();$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');pintaLoja();$('mLoja').classList.remove('hidden')}
 function pintaLoja(){const t=$('lojaTabs');t.innerHTML='';TABS.forEach(([k,n])=>{const b=document.createElement('button');b.className=k===lojaTab?'on':'';b.textContent=n;b.onclick=()=>{lojaTab=k;pintaLoja()};t.appendChild(b)});
  const box=$('lojaItens');box.innerHTML='';
  const card=(o)=>{const d=document.createElement('div');d.className='lcard'+(o.full?' full':'');d.innerHTML=`<div class="foto"></div><div class="info"><b></b><small></small><div class="preco"></div></div>`;const f=d.querySelector('.foto');
@@ -5781,7 +5781,7 @@ function pintaLoja(){const t=$('lojaTabs');t.innerHTML='';TABS.forEach(([k,n])=>
  if(lojaTab==='roupas'){box.insertAdjacentHTML('beforeend',`<div class="full" style="font-size:13.5px;color:var(--muted)">As roupas com 👑 vêm junto com o VIP. As roupas normais você compra com dinheiro do jogo na <b>Loja de Roupas</b> da cidade ou no 👕 Guarda-roupa.</div>`);
   card({full:1,ic:'👑',nome:'Roupas VIP',desc:'Bomber dourada, puffer neon, sobretudo de veludo, smoking com capa, vestido de lantejoulas, tênis e boné neon e cores exclusivas.',label:'Ver planos VIP',acao:()=>{lojaTab='vip';pintaLoja()}});
   card({full:1,ic:'👕',nome:'Guarda-roupa',desc:'Troque de roupa e experimente tudo o que você já tem.',label:'Abrir guarda-roupa',acao:()=>{$('mLoja').classList.add('hidden');try{abrirGuarda()}catch(e){}}});return}
- for(const [id,P] of Object.entries(PRODUTOS)){if(P.tab!==lojaTab)continue;
+ for(const [id,P] of Object.entries(PRODUTOS)){if(P.tab!==lojaTab||(NO_APP&&P.semPlay))continue;
   if(P.pet){const pt=PETS[P.pet],tem=(eu.pets||[]).includes(P.pet),usando=eu.pet===P.pet;
    card({ic:pt.ic,nome:pt.nome,desc:tem?(usando?'Andando com você agora.':'Já é seu.'):'Te segue pela cidade. Todo mundo vê.',preco:tem?'':reais(P.preco),selo:tem?'✅ Seu':'',label:tem?(usando?'Guardar':'Passear'):'Comprar',acao:tem?()=>usarPet(usando?null:P.pet):()=>comprarPix(id)});continue}
   if(P.carro){const c=CARS_PREMIUM[P.carro],tem=eu.carros.includes(P.carro);card({draw:carro(P.carro),nome:c.nome,desc:tem?'Já é seu. Pegue na concessionária ou tocando em você.':P.desc,preco:tem?'':reais(P.preco),selo:tem?'✅ Seu':'',label:tem?'✅ Na garagem':'Comprar',off:tem,acao:tem?()=>{}:()=>comprarPix(id)});continue}
@@ -5790,7 +5790,7 @@ function pintaLoja(){const t=$('lojaTabs');t.innerHTML='';TABS.forEach(([k,n])=>
   card({ic:P.ic,nome:P.nome,desc:P.desc,preco:reais(P.preco),selo:P.dias===90?'Mais vantajoso':'',label:'Comprar',acao:()=>comprarPix(id)})}
  if(lojaTab==='carros')card({draw:carro('neon'),nome:'Lambordini',desc:'Vem junto com o VIP enquanto ele estiver ativo.',preco:'',label:'Ver VIP',acao:()=>{lojaTab='vip';pintaLoja()}})}
 function usarPet(p){acao(async()=>{const r=await api.usarPet(p);eu.pet=r.pet||null;emitEv('perfil',{});pintaLoja();toast(p?PETS[p].ic+' '+PETS[p].nome+' está com você!':'🐾 Pet guardado.',2500)})}
-function comprarPix(id){if(NO_APP)return;const P=PRODUTOS[id],nome=P.nome||(P.din?money(P.din)+' do jogo':P.pet?PETS[P.pet].nome:CARS_PREMIUM[P.carro].nome);
+function comprarPix(id){if(NO_APP){comprarPlay(id);return}const P=PRODUTOS[id],nome=P.nome||(P.din?money(P.din)+' do jogo':P.pet?PETS[P.pet].nome:CARS_PREMIUM[P.carro].nome);
  confirmar('💎 Comprar com Pix',`Comprar <b>${nome}</b> por <b>${reais(P.preco)}</b>?`,()=>acao(async()=>{
   const r=await api.pix(id);closePlace();document.querySelectorAll('.modal:not(.hidden)').forEach(m=>{if(m.id!=='mLoja')m.classList.add('hidden')});$('mLoja').classList.remove('hidden');$('lojaItens').classList.add('hidden');$('lojaTabs').classList.add('hidden');$('lojaPix').classList.remove('hidden');
   $('pixTit').textContent=nome+' · '+reais(P.preco);$('pixQr').src='data:image/png;base64,'+r.qr_base64;$('pixCod').value=r.qr;$('pixStatus').textContent='⏳ Aguardando pagamento… pague no app do banco.';
@@ -5800,6 +5800,22 @@ function comprarPix(id){if(NO_APP)return;const P=PRODUTOS[id],nome=P.nome||(P.di
 $('pixCopiar').onclick=()=>copy($('pixCod').value,'Código Pix copiado! Cole no app do banco.');
 $('pixVoltar').onclick=()=>{clearInterval(pixTimer);abrirLoja()};
 $('zloja').onclick=abrirLoja;
+// ===== Google Play (compras dentro do app da Play Store) =====
+const PLAY={svc:null};const skuDe=id=>id.toLowerCase();
+async function iniciarPlay(){if(!NO_APP||!('getDigitalGoodsService' in window))return;try{const svc=await window.getDigitalGoodsService('https://play.google.com/billing');if(!svc)return;
+ const ids=Object.keys(PRODUTOS),det=await svc.getDetails(ids.map(skuDe));for(const d of det){const id=ids.find(k=>skuDe(k)===d.itemId);if(id&&d.price){PRODUTOS[id].preco=Number(d.price.value);PRODUTOS[id].play=1}}
+ for(const id of ids)if(!PRODUTOS[id].play)PRODUTOS[id].semPlay=1;PLAY.svc=svc;document.documentElement.classList.add('comPlay');
+ // compras que ficaram sem entregar (o app fechou no meio)
+ try{for(const c of await svc.listPurchases())entregaPlay(c.itemId,c.purchaseToken,true)}catch(e){}}catch(e){console.warn('play',e)}}
+async function entregaPlay(sku,token,quieto){const {data,error}=await sb.functions.invoke('play',{body:{sku,token}});let erro=data&&data.erro;if(error){try{erro=(await error.context.json()).erro}catch(_){erro=error.message}}
+ if(erro){if(!quieto)throw new Error(erro);return false}
+ if(data.consumir&&PLAY.svc){try{await PLAY.svc.consume(token)}catch(e){}}
+ const m=await api.perfil(eu.id);if(m){aplicarEstado(m);eu.vip_ate=m.vip_ate;eu.pets=m.pets||[];eu.pet=m.pet}emitEv('perfil',{});return true}
+function comprarPlay(id){const P=PRODUTOS[id];if(!PLAY.svc||P.semPlay){toast('Esse item ainda não está à venda no app.',3000);return}const nome=P.nome||(P.din?money(P.din)+' do jogo':P.pet?PETS[P.pet].nome:CARS_PREMIUM[P.carro].nome);
+ acao(async()=>{let r;try{const req=new PaymentRequest([{supportedMethods:'https://play.google.com/billing',data:{sku:skuDe(id)}}],{total:{label:nome,amount:{currency:'BRL',value:'0'}}});r=await req.show()}catch(e){if(e&&e.name==='AbortError')return;throw new Error('Não consegui abrir o pagamento do Google.')}
+  const token=r.details&&r.details.purchaseToken;try{await r.complete('success')}catch(e){}if(!token)throw new Error('Pagamento não concluído.');
+  toast('⏳ Confirmando com o Google…',2500);await entregaPlay(skuDe(id),token);Som.play('nivel');toast('🎉 '+nome+' liberado! Obrigado por apoiar a cidade!',6000);pintaLoja()})}
+setTimeout(()=>{if(eu)iniciarPlay();else{const t=setInterval(()=>{if(eu){clearInterval(t);iniciarPlay()}},2000)}},1500);
 function abrirPerfil(){
  if(!eu)return;closeCard();closePlace();
  pintarFoto($('pfFoto'),eu.foto);$('pfFoto').classList.toggle('vipf',vipP(eu));$('pfNome').value=eu.nome;$('pfFrase').value=eu.frase||'';$('pfRel').value=eu.relacionamento||'Prefiro não dizer';
@@ -5889,7 +5905,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261125c';
+const VERSAO_JOGO='v20261125d';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
