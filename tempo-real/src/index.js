@@ -9,9 +9,57 @@ const SALAS = 60;
 let cacheSalas = null, cacheEm = 0; // contagem de todas as salas, guardada por 3 s
 const ultimoAviso = new Map(); // evita repetir o mesmo aviso do banco em menos de 1 s
 
+// confere o login no Supabase e devolve o id do jogador (ou null)
+async function quemE(req, env, url) {
+  const tk = (req.headers.get('Authorization') || '').replace(/^Bearer /, '') || url.searchParams.get('token');
+  const k = req.headers.get('apikey') || url.searchParams.get('k') || '';
+  if (!tk) return null;
+  try { const r = await fetch(env.SUPABASE_URL + '/auth/v1/user', { headers: { Authorization: 'Bearer ' + tk, apikey: k } }); if (r.ok) { const u = await r.json(); return u && u.id || null; } } catch (e) {}
+  return null;
+}
+const CORS_FOTO = { ...CORS, 'Access-Control-Allow-Methods': 'GET,POST,DELETE,OPTIONS', 'Access-Control-Allow-Headers': 'Authorization,apikey,Content-Type' };
+
+// fotos dos jogadores no R2 do Cloudflare (não cobra pelo tráfego): enviar, mostrar e apagar
+async function fotos(req, env, url) {
+  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_FOTO });
+  if (!env.FOTOS) return new Response('fotos desligadas', { status: 503, headers: CORS_FOTO });
+  const j = (o, st) => new Response(JSON.stringify(o), { status: st || 200, headers: { ...CORS_FOTO, 'Content-Type': 'application/json' } });
+  if (url.pathname.startsWith('/f/') && req.method === 'GET') {
+    const key = decodeURIComponent(url.pathname.slice(3));
+    if (!/^[0-9a-f-]{36}\/(perfil|post)-[0-9]+\.jpg$/.test(key)) return new Response('não encontrado', { status: 404, headers: CORS });
+    const cache = caches.default, hit = await cache.match(req); if (hit) return hit;
+    const o = await env.FOTOS.get(key); if (!o) return new Response('não encontrado', { status: 404, headers: CORS });
+    const r = new Response(o.body, { headers: { ...CORS, 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=31536000, immutable' } });
+    try { await cache.put(req, r.clone()); } catch (e) {}
+    return r;
+  }
+  const id = await quemE(req, env, url);
+  if (!id) return j({ erro: 'Entre na sua conta.' }, 401);
+  if (url.pathname === '/foto' && req.method === 'POST') {
+    const tipo = url.searchParams.get('tipo') === 'perfil' ? 'perfil' : 'post';
+    const b = await req.arrayBuffer();
+    const u8 = new Uint8Array(b);
+    if (b.byteLength < 200 || b.byteLength > 700000 || u8[0] !== 0xFF || u8[1] !== 0xD8) return j({ erro: 'Foto inválida (até 700 KB, JPG).' }, 400);
+    const lista = await env.FOTOS.list({ prefix: id + '/', limit: 500 });
+    if (lista.objects.length >= 300) return j({ erro: 'Você já tem fotos demais. Apague algumas.' }, 400);
+    if (tipo === 'perfil') for (const o of lista.objects) if (o.key.startsWith(id + '/perfil-')) await env.FOTOS.delete(o.key);
+    const key = id + '/' + tipo + '-' + Date.now() + '.jpg';
+    await env.FOTOS.put(key, b, { httpMetadata: { contentType: 'image/jpeg' } });
+    return j({ url: url.origin + '/f/' + key });
+  }
+  if (url.pathname === '/foto' && req.method === 'DELETE') {
+    const key = url.searchParams.get('key') || '';
+    if (url.searchParams.get('todas') === '1') { const l = await env.FOTOS.list({ prefix: id + '/', limit: 1000 }); for (const o of l.objects) await env.FOTOS.delete(o.key); return j({ ok: true }); }
+    if (!key.startsWith(id + '/')) return j({ erro: 'Essa foto não é sua.' }, 403);
+    await env.FOTOS.delete(key); return j({ ok: true });
+  }
+  return j({ erro: '?' }, 404);
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.pathname === '/foto' || url.pathname.startsWith('/f/')) return fotos(req, env, url);
     const m = url.pathname.match(/^\/sala\/(\d{1,2})$/);
     if (url.pathname === '/' ) return new Response('Cidade do Tonhão: servidor ao vivo OK', { headers: CORS });
     // quantos jogadores tem em cada sala (o jogo usa para entrar direto numa sala com vaga)
