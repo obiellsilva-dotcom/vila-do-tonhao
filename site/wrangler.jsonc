@@ -1,0 +1,6 @@
+// Site da Cidade do Tonhão (arquivos estáticos). O Cloudflare publica sozinho quando o ramo main muda nesta pasta.
+{
+  "name": "viladotonhao",
+  "compatibility_date": "2025-09-01",
+  "assets": { "directory": "./public" }
+}
