@@ -1,4 +1,4 @@
-# Cidade do Tonhão — passagem para um chat novo (atualizado em 18/11/2026, fim da sessão)
+# Cidade do Tonhão — passagem para um chat novo (atualizado em 19/11/2026)
 
 > **Cole este arquivo no começo do chat novo** e anexe o `pacote-novo-chat.zip` (ou, se não der, os arquivos soltos listados na seção 2).
 > Pedido ao assistente: o dono **não é programador**, usa **só o celular** e tem **pouco limite de uso**. Responda em **português do Brasil, simples, passo a passo e curto**. Edite pontos específicos, não reescreva arquivos inteiros. Antes de mandar `site.zip`, mande **foto + link de teste** para ele aprovar. Pesquise na internet quando tiver dúvida (ele pede).
@@ -6,30 +6,32 @@
 ---
 
 
-## 0. ÚLTIMA SESSÃO (18/11/2026) — versão `v20261124e`, ramo `ccr-fe2fa98f-j3vukg`
-Tudo commitado. O dono recebeu o `site.zip` v20261124e (confirmar se subiu). SQL: **todas as etapas até a 29 rodadas** (29 = `carro_pronto=true` do passe T1).
-- **Concessionária:** prédio fechado (vidro escuro, telhado, porta dupla, marquise) desenhado em `concIso`/`concFachada`; pátio de asfalto; carros do pátio em `CONC.fora`. Casa 59 removida (sem dono, conferido).
-- **Showroom em outra dimensão:** `SALAS.show` (x-19..-7, y80..86), objeto `SHOW`, carros em `CONC.dentro` (coordenadas da sala), `showItens` (discos, carros, letreiro, vendedor), botões "🚗 Entrar no showroom" e "🚗 Ver e comprar carros".
-- **Tour pela cidade** (`tourCidade`, 11 paradas) testado: funciona e devolve a câmera.
-- **Pix do passe corrigido:** `comprarPix` agora abre `#mLoja` para mostrar o QR (antes ficava escondido).
-- **Carro do Passe = "Furacão GT" (id `natal`)**: modelo "Volkswagen Golf GTI 2021" de ItsDiyor (Sketchfab, **CC BY 4.0**, crédito em `privacidade.html`), sem logos/placa. `SPR_NATAL`/`SPR_NATAL_M` (máscara de pintura), `RODA_IMG.natal` (4 quadros), `FAROL_IMG.natal` (camadas de luz dianteira/traseira usadas em `farolQuadro`), `spriteCor(...,fiel)` só para ele (vidros/faróis não escurecem). Renderizador em `extras/render-carro.html` + `extras/render-carro-gerar.js` (three.js 0.160 + Playwright, servidor local). Os modelos do autor "Ddiaz Design" são **CC-BY-NC** (não usar).
-- **Mapa e mapinha:** área ampliada (`MAPX0/MAPY0...`, `naSala`, `MAPA_BLOCOS`), mostram condomínio, lagoa e acampamento; nomes Imobiliária e Condomínio no mapa grande.
-- **Dia do jogo = 48 min reais** (`DIA_ESC=.5`, `gmin()`; antes 24 min). Versão v20261124f.
-- **Tempo real no Cloudflare (v20261124g, ainda não subido):** Worker `vila-tempo-real` no ar em `https://vila-tempo-real.obiellsilva.workers.dev` (deploy automático pelo GitHub, ramo **main**, pasta `/tempo-real`). Jogo usa `rtCanal`/`conectarRT` (WebSocket com o token do Supabase); posições, avisos, chat e presença vão pelo Cloudflare; casas/vagas continuam no Supabase (`dbCanal`). Se o Cloudflare falhar, `RT_OFF=true` e volta ao Supabase sozinho. Testado com servidor local (2 jogadores, posição, chat, saída, queda). **Depois de subir: acompanhar o Usage do Supabase (Realtime Messages) cair.**
-- **📱 Celular (v20261124h, ainda não subido; SQL etapa 30 PENDENTE):** botão `#zcel` no menu, `abrirCelular`/`CEL`/`celChat`/`celAmigos`/`celBanco`/`celInvest`, aviso `celAvisos` a cada 25 s + evento `dm`/`amizade`. Banco: tabelas `amizades`, `mensagens`; colunas `invest_valor/invest_em/invest_bloq_ate/invest_ganho`; funções `pedir_amizade`, `responder_amizade`, `desfazer_amizade`, `meus_amigos`, `buscar_moradores`, `enviar_dm` (só amigos, 300 letras, guarda 200 por conversa), `conversas`, `conversa`, `nao_lidas`, `banco_info`, `investir`, `resgatar` (1%/dia sobre até R$ 100 mil, 24 h preso), internas `_sao_amigos`, `_render`, `_banco`. Testado em PostgreSQL local. Sem transferência entre jogadores (evita venda de dinheiro do jogo).
-- **🛡️ Moderação (v20261124i; SQL etapa 31 PENDENTE; servidor tempo-real precisa ir para o ramo main):** `_norm`/`_grave`/`_moderar` (grave = bloqueia + silencia 10 min/1 h/24 h + denúncia automática), `silenciado_ate`, admin `silenciar`/`dessilenciar`, `admin_denuncias`/`admin_feedbacks`/`admin_resolver`/`admin_contagem`, `enviar_feedback`; denúncia com motivo e últimas mensagens (`denunciarJogador`), 🚩 na conversa do celular, ⚙️ → 💬 Ideias e problemas, painel do admin com 🚨 Denúncias e 💬 Ideias. Worker: só repassa chat que existe no banco (confere pelo REST). Tour agora só depois de COMPLETAR ou PULAR a missão (some a missão/menu durante o tour). Celular ajustado para telas pequenas.
-- **🎵 Jukebox (v20261124j; SQL etapa 32 PENDENTE junto com a 31):** catálogo `MUS` (3 da Vila + 18 de Kevin MacLeod, CC BY, crédito em privacidade.html; mp3 mono 56 kbps em `musicas/`), `abrirJuke` por estilo; jukebox da casa grava em `casas.juke` (`tocar_jukebox`, só o dono), toca sincronizada para quem está dentro (`Som.casaToca/casaPara`, `JUKE_CASA`, evento `juke`).
-- **🎵 Músicas (v20261124k):** catálogo = 3 da Vila + 6 sertanejo do Pixabay (`MUS`, crédito em privacidade.html); as 18 do Kevin MacLeod foram removidas a pedido (só brasileiras).
-- **⚡ Desempenho (v20261124k):** corte do que está fora da tela no laço de desenho (`CULL`, itens podem ter `cb:[x0,y0,x1,y1,altura]` ou `nc:1` para nunca cortar); `quadro` faz no máximo 1 tratamento pesado por quadro (`QBUD`); pintura de carro só no ângulo visível (`spriteCor` devolve objeto `tint`, `tintQuadro`); fotos grandes abertas em segundo plano (`pronta(img)` com `img.decode()`). Medido com CPU 4x mais lenta: 6,5 → 10,7 fps, pior travada 6,4 s → 1,2 s. Ferramentas de medição em scratchpad (perf/conta/trava).
-- **🛋️ Móveis novos (v20261124l, SQL etapa 33):** 50 móveis em `MOV` (bloco "móveis novos (leva 2)"), abas banho/lazer/efeito/luxo; efeitos animados por `D.fx(c,P,alpha)` (P = ponto já girado); `vip:1` = só VIP (cliente + `movel_vip` no servidor); `preco_movel` atualizado.
-- **Móveis funcionais (v20261124m, SQL etapa 34):** `agua:z` (banheira, piscina, hidro) → "🏊 Entrar na água" (`noMovel(...,'agua')`, `aguaPorCima`); vitrola `juke:1` toca como jukebox (`temJuke` usa `MOV[t].juke`); `liga:1` → ligar/desligar pelo dono (`ligarMovel`, função `ligar_movel`, campo `off` no móvel).
-- **Sentar e moto (v20261124o):** pose sentada em 3/4 usa as duas coxas abertas (antes só em `sv34`); no perfil a perna de trás aparece. Água com **lugares fixos** (`lugares` no MOV, estilo Habbo; cheio = aviso). Moto: `pilotoMoto` (tamanho normal PS, no banco, vista certa pelo ângulo, carenagem redesenhada por cima das pernas, `MOTO_HOP`), pintura fiel (sem peças pretas).
-- **Água e moto (v20261124p):** na água o boneco afunda (hop negativo só com `aguaZ(p)`), é cortado na linha da água (clip no item do jogador), sem mancha por cima (só ondinha); lugares fixos em duplas: `lugares:[x,y,vx,vy]` (vx,vy = para onde o corpo vira, girado junto com o móvel; sv/back/dir calculados como no sofá). Moto: pose `moto` (pernas dos dois lados, joelho dobrado no perfil, braços `arms`), `MOTO_HOP=5`, `MOTO_CLIP=8`. Sentado 3/4: duas pernas lado a lado.
-- **🏎️ Carros novos (v20261124t, SQL etapa 35):** **Porshe GT** (Porsche CC-BY de Batman KNIGHTs) no lugar do Fusca Dourado (id `fusca_ouro`, Pix R$ 19,90, som da Ferrarini) e **Fiestta** (Ford Fiesta Mk5 CC-BY de romanian_guy_0069) no lugar da Kombi (id `kombi`, som do Sedã). Sprites `SPR_PANTERA`/`SPR_ROLE` (+`_M`), `RODA_IMG`, `FAROL_IMG`, `FAROL_POS`, `CAR_ESC` 1.338. Renderizador genérico: `extras/render-carro2.html` (`?car=porsche|fiesta`). Amarock (ex-Amarok) = R$ 123.000. **Nomes parecidos com os reais (pedido do dono):** Fuska, Fiestta, Opalla, Amarock, Jipe Renegado, Rovver, Porshe GT, Ferrarini, Lambordini. `NOVID='v20261201'` (slide dos carros).
-- **Online fantasma (v20261124u):** servidor `tempo-real` tira quem fica 75 s sem ping (alarme a cada 30 s, `setWebSocketAutoResponse` para o ping, `ultimoSinal`); o jogo não reconecta com a aba escondida (volta pelo `vigiaSala`). Precisa copiar `tempo-real/` para o ramo main (deploy automático).
-- **PENDENTE DE SUBIR:** site v20261124u + SQL etapas 31 a 35.
-- Novidades antigas: `NOVID='v20261127'` com slides Furacão GT, Concessionária nova e Passeio.
-- **Próximos passos:** tempo real no Cloudflare (seção 6) e Play Store (seção 7).
+## 0. ÚLTIMA SESSÃO (18–19/11/2026) — versão `v20261124u`, ramo `ccr-fe2fa98f-j3vukg` (tudo commitado)
+
+### ⚠️ O QUE ESTÁ PENDENTE AGORA (confirmar com o dono no começo do chat)
+1. **Site:** o dono estava subindo o `site.zip` **v20261124t** (deu um aviso de "arquivo maior que 25 MiB" — é o próprio .zip de 30 MB; o painel extrai os 26 arquivos e segue). **Perguntar se o deploy terminou** e se o jogo mostra a tela de novidades com o Porshe GT. Se o Cloudflare recusar de vez: comprimir as 3 músicas da Vila (`charrete`, `o-campeao`, `futilidades-entre-nos`, hoje 256 kbps estéreo) para mono 64 kbps com ffmpeg (`-ac 1 -ar 44100 -b:a 64k`) → zip cai para ~18 MB. **Só fazer se ele disser "pode"** (ele interrompeu da primeira vez).
+2. **SQL etapas 31 a 35** (4 partes em `entrega/sql-parte1..4.sql`; parte 4 = etapas 34 e 35). Confirmar se ele rodou as 4 no Supabase.
+3. **Servidor tempo-real (online fantasma):** a correção está em `tempo-real/src/index.js` no ramo de trabalho. **Pedi permissão para copiar a pasta `tempo-real/` para o ramo `main`** (o Cloudflare faz deploy automático do main) — **aguardando o "pode"**. Nunca mexer no main sem permissão explícita.
+4. **Site v20261124u** (só a mudança "não reconectar com a aba escondida") vai no próximo "vamos subir".
+
+### Feito nesta sessão (por versão)
+- **Concessionária fechada + showroom** em outra dimensão (`concIso`/`concFachada`, `SALAS.show`, `SHOW`, `showItens`, `VENDEDOR`, `CONC.fora/dentro`).
+- **Tour pela cidade** (`tourCidade`), só depois de terminar ou pular a missão.
+- **Pix do passe corrigido** (`comprarPix` abre `#mLoja`).
+- **Furacão GT** (id `natal`, carro do passe): Golf GTI 2021 de ItsDiyor (CC BY). `SPR_NATAL(_M)`, `RODA_IMG.natal`, `FAROL_IMG.natal`, `FAROL_POS.natal`, `CAR_ESC` 1.338.
+- **Mapa/minimapa** ampliados (`MAPX0`, `MAPY0`, `naSala`, `MAPA_BLOCOS`) com condomínio e imobiliária.
+- **Dia do jogo = 48 min reais** (`DIA_ESC=.5`, `gmin()`).
+- **Tempo real no Cloudflare FEITO e no ar:** Worker `vila-tempo-real` (`https://vila-tempo-real.obiellsilva.workers.dev`, deploy automático do ramo **main**, pasta `/tempo-real`). Cliente: `RT_URL`, `rtCanal`, `conectarRT` (fallback Supabase com `RT_OFF`), `dbCanal` (casas/vagas no Supabase), `tirarCanal`. Chat repassado só se existir no banco (confere `chat?id=eq.` no Supabase).
+- **📱 Celular** (`#zcel`, `abrirCelular`, `CEL`, `celChat`, `celAmigos`, `celBanco`, `celInvest`, `celAvisos`, `CEL_AMIGOS`): mensagens privadas, amigos, banco, investimento 1%/dia até R$ 100 mil (SQL etapa 30).
+- **🛡️ Moderação** (etapa 31): filtro grave bloqueia + silencia (10 min/1 h/24 h) + denúncia automática; `denunciarJogador`, `abrirFeedback` (⚙️ → 💬 Ideias e problemas), painel admin (`admDenuncias`, `admFeedbacks`, `admContagem`, silenciar/dessilenciar). HUDs menores no celular.
+- **🎵 Jukebox** (etapa 32): `MUS` = 3 da Vila + 6 do Pixabay (só brasileiras; crédito em privacidade.html), `abrirJuke`, jukebox da casa sincronizada (`JUKE_CASA`, `Som.casaToca/casaPara`).
+- **⚡ Desempenho:** `CULL` (corte fora da tela; itens com `cb:[...]` ou `nc:1`), `QBUD`, `pronta(img)` com `decode()`, pintura por ângulo (`spriteCor` → `tintQuadro`). 6,5 → 10,7 fps em CPU ×4.
+- **🛋️ 50 móveis novos** (etapa 33, abas banho/lazer/efeito/luxo, `fx`, `vip:1`) e **funcionais** (etapa 34): água (banheira/piscina/hidro com `lugares` fixos em dupla, um virado para o outro; boneco afunda e é cortado na linha d'água), vitrola toca, `liga:1` liga/desliga (`ligar_movel`), alturas de assento `alt`.
+- **Pose sentada** com as duas pernas certas (3/4 e perfil); **moto** com piloto em tamanho normal e pose de moto (`pilotoMoto`, `MOTO_HOP`, `MOTO_CLIP`).
+- **🏎️ Carros novos (v20261124t, etapa 35):** **Porshe GT** (modelo "PORSHE" de Batman KNIGHTs, CC BY) no lugar do Fusca Dourado (id `fusca_ouro`, Pix **R$ 19,90**, som/motor da Ferrarini) e **Fiestta** (Ford Fiesta Mk5 de romanian_guy_0069, CC BY) no lugar da Kombi (id `kombi`, som do Sedã). Sem placas/logos, vidros escuros. `SPR_PANTERA(_M)`, `SPR_ROLE(_M)`, `RODA_IMG`, `FAROL_IMG`, `FAROL_POS`, `CAR_ESC` 1.338, pintura fiel. Renderizador: `extras/render-carro2.html` (three.js, `?car=porsche|fiesta`, regras `CFGS` de esconder/cobrir/luzes).
+- **Nomes dos carros (o dono quer "quase parecido com os reais", NÃO nomes inventados):** Fuska, Fiestta, Opalla, Amarock (**R$ 123.000**), Jipe Renegado, Rovver, Sedã, Porshe GT, Ferrarini, Lambordini, Furacão GT, Caminhonete do Tonhão; NPC "Zé da Kombi".
+- **Online fantasma (v20261124u):** servidor tira quem fica **75 s sem ping** (alarme a cada 30 s, `setWebSocketAutoResponse` para o ping grátis, `ultimoSinal`, `abertas()`); testado com `wrangler dev` (2 clientes). Cliente não reconecta com a aba escondida (volta pelo `vigiaSala`).
+- Novidades: `NOVID='v20261201'` (slides: Carros novos, Móveis+jukebox, Moderação, Celular, ...).
 
 ## 1. O que é o jogo
 Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométrica 2.5D**) de uma cidadezinha brasileira com o **Bar do Tonhão**. Personagens customizáveis, empregos com minijogos, fome/sede, XP e nível (até 50), casas e apartamentos (comprar/alugar), carros 3D (fotos de 32 ângulos), chat por salas (50 por sala, até 60 salas), sinuca, VIP, loja Pix, pets, perfil social, passe de temporada, prefeito.
@@ -39,26 +41,25 @@ Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométr
 |---|---|
 | **Site** | https://viladotonhao.com.br — Cloudflare Workers (arquivos estáticos) |
 | **Subir o site** | Cloudflare → Workers & Pages → `viladotonhao` → **New deployment** → enviar `site.zip` |
-| **O que vai no `site.zip`** | `index.html`, `privacidade.html`, `excluir-conta.html`, `manifest.webmanifest`, pasta `icones/`, pasta `.well-known/` (assetlinks do app), pasta `musicas/` (3 mp3), pasta `sons/` (8 mp3 de motor). **Sempre subir o zip**, o index sozinho não leva sons/ícones/páginas |
+| **O que vai no `site.zip`** | `index.html`, `privacidade.html`, `excluir-conta.html`, `manifest.webmanifest`, pasta `icones/`, pasta `.well-known/` (assetlinks do app), pasta `musicas/` (9 mp3: 3 da Vila + 6 do Pixabay; `festa-boa` e `forro-do-dragao` NÃO vão), pasta `sons/` (8 mp3 de motor). **Sempre subir o zip**, o index sozinho não leva sons/ícones/páginas |
 | **Banco** | Supabase, projeto ref `fyviodritpungccrohvd`, plano **Free** |
 | **SQL** | `banco.sql` = banco **completo** (pode rodar de novo sem perder dados). `novidades.sql` = só a última etapa. Pelo celular o editor trava com arquivo grande: **dividir em partes de ~6,5 mil letras** (ver `sql-celular/`) |
 | **Pagamento** | Mercado Pago (API de Orders, Pix), Edge Function `pix` no Supabase (arquivo `pix-funcao.ts`). Preço vem da tabela `produtos`. O webhook não confia no aviso: confere no Mercado Pago |
 | **Repositório** | GitHub `obiellsilva-dotcom/vila-do-tonhao`, ramo atual **`ccr-fe2fa98f-j3vukg`** (tudo commitado) |
-| **Link de teste** | https://claude.ai/artifact/RFsiyLQ5LoK1cGEiWNE72V (cópia offline, dá o Furacão GT ao entrar). Antigo: C4QSmTKE8EojyVzA72WX4d (conta antiga; cópia offline com nível 30, R$ 300 mil, VIP, todos os carros, botão "🧪 Carros"). **Na conta nova crie outro**: copie o index trocando `const ONLINE=!!(` por `const ONLINE=false&&!!(` e inserindo antes de `window.__dbg={` o bloco "trapaça" (ver seção 9) |
+| **Link de teste** | https://claude.ai/artifact/RFsiyLQ5LoK1cGEiWNE72V (cópia offline v20261124t: começa com Porshe GT e Fiestta na garagem e R$ 200 mil). Para refazer: copie o index trocando `const ONLINE=!!(` por `const ONLINE=false&&!!(`, inserindo antes de `window.__dbg={` o bloco `window.__t={MOV,noMovel,others,...}` (ver seção 9) e trocando em `criar` `{dinheiro:100,carros:[],` pelos carros que quiser testar |
 | **E-mails** | Conta Google Play Console: **obiellsilva@gmail.com** (conta de desenvolvedor pessoal, criada em 17/11/2026, em análise). Admin do jogo = coluna `moradores.admin` (marcada direto no banco) |
 
 ### Arquivos para anexar no chat novo
-`LEIA-PRIMEIRO.md` (este), `index.html`, `banco.sql`, `novidades.sql`, `pix-funcao.ts`, `GUIA-PLAY-STORE.md`, pasta `tempo-real/` (servidor Cloudflare), `CONTEXTO.md` (histórico antigo, opcional). Tudo isso está no `pacote-novo-chat.zip`.
+O jeito mais fácil: no chat novo o assistente já consegue abrir o repositório do GitHub (ramo `ccr-fe2fa98f-j3vukg`). Se precisar anexar: `LEIA-PRIMEIRO.md` (este), `COMECE-AQUI.md`, `index.html`, `banco.sql`, `novidades.sql`, `pix-funcao.ts`, `GUIA-PLAY-STORE.md`, pasta `tempo-real/` (servidor Cloudflare), `CONTEXTO.md` (histórico antigo, opcional). Tudo isso está no `pacote-novo-chat.zip`.
 
 **NÃO mande para ninguém**: `cidade-do-tonhao.keystore` e `senha-da-chave.txt` (chave do app Android). Guarde em 2 lugares (Drive + pendrive). Sem ela não dá para atualizar o app nunca mais.
 
-## 3. Situação AGORA (18/11/2026)
-- **Versão do jogo:** no ar `v20261123c`; em andamento `v20261124a` (seção 0) (trocar a cada versão nova: o jogo avisa "🆕 Atualização").
-- **Banco:** o dono rodou **todas as etapas até a 28** (a 28 em 4 partes). Nada pendente de SQL.
-- **Site:** confirmar se ele subiu o `site.zip` **v20261123b** (a última). Se não, mandar subir.
-- **⚠️ Supabase estourou o plano grátis:** *Realtime Messages* 2,33 mi de 2 mi (117%) no ciclo 13/11–13/12. **Restrição a partir de 16/12/2026** se continuar acima. Já cortado na v20261123b (posição a cada ~0,5 s, parado a cada 15 s, nada com aba escondida; aluguel sem gravação à toa). **Solução definitiva = mover o tempo real para o Cloudflare (seção 6).**
-- **Cloudflare:** o dono **ativou (ou está ativando) o plano Workers Paid (US$ 5/mês)** para usar Durable Objects.
-- **Play Store:** conta de desenvolvedor criada, **aguardando aprovação do Google** (não deixa criar app até aprovar). App já gerado e assinado.
+## 3. Situação AGORA (19/11/2026)
+- **Versão do jogo:** última pronta `v20261124u`. No ar: provavelmente `v20261124t` (confirmar). Trocar `VERSAO_JOGO` a cada versão (o jogo avisa "🆕 Atualização").
+- **Banco:** etapas até a 30 rodadas; **31 a 35 enviadas, confirmar se rodou** (seção 0).
+- **Supabase:** o tempo real saiu do Supabase (agora no Cloudflare), o que resolve o estouro de *Realtime Messages* do plano grátis. Acompanhar o Usage.
+- **Cloudflare:** plano Workers Paid (US$ 5/mês) ativo; Worker `vila-tempo-real` no ar. Limite de **25 MiB por arquivo** (vale também no plano pago).
+- **Play Store:** conta de desenvolvedor criada, aguardando aprovação do Google (seção 7).
 
 ## 4. Tudo que o jogo tem (resumo por área)
 **Visual / tela**
@@ -66,8 +67,8 @@ Jogo online de navegador (um único `index.html`, canvas 2D em visão **isométr
 - Topo: ⭐ nível, 💰 dinheiro (curto: "R$ 300 mil", "R$ 1,25 mi"), relógio, 🏆 ranking (`#rankTop`); embaixo **🟢 N online** (`#irBtn`, abre painel "Ir para" com moradores, busca, lugares) e 🐟 peixes, fome/sede só abaixo de 50%. Minimapa à direita.
 - Menu **☰ no canto direito acima do joystick** (abre para cima): Loja VIP 💎, Empregos 💼, Meu carro 🚗, Mochila 🎒, Perfil e fotos 👤, Passe 🎟️, Configurações ⚙️.
 - ⚙️: volume, gráfico (Leve/Médio/Alto), **joystick esquerda/direita** (`CFG.joy`), 📊 medidor de desempenho (`CFG.perf`), 🎁 Presente do mês, 🏠 Ir para casa, 🛡️ Admin (só admin), 📄 Privacidade, 🗑️ Excluir conta, tutorial, conta.
-- Tela de novidades 1 vez por pessoa (`NOVID='v20261125'`, `NOV_SLIDES`, coluna `moradores.novidades`).
-- Relógio do jogo: `SPEED=1` → 1 hora do jogo = 1 minuto real (dia = 24 min).
+- Tela de novidades 1 vez por pessoa (`NOVID='v20261201'`, `NOV_SLIDES`, coluna `moradores.novidades`).
+- Relógio do jogo: dia = 48 min reais (`DIA_ESC=.5`, `gmin()`).
 - Desempenho: `imageSmoothingQuality='low'`, chão em blocos de 256, faróis em 320 px.
 
 **Personagem / roupas**
@@ -110,13 +111,8 @@ Funções que o jogo chama: `criar_morador`, `comecar_trabalho`, `tarefa_feita`,
 Internas (não chamáveis): `_eu`, `_estado`, `_entregar` (só a Edge Function pix), `_dar_premio`, `_passe_pontos`, `_pontos_tarefa`, `_temporada_atual`, `_vagar_apto`, `_confere_roupas`, `_gastar_fome`, `_adm`.
 Tabelas novas da etapa 28: `passe_temporadas`, `passe_premios`, `passe_jogador`, `vip_mensal`, `vip_presentes`; colunas `moradores.rastro`, `moradores.tarefas_seq`, `passe_temporadas.carro_pronto`.
 
-## 6. PRÓXIMO PASSO 1 — Tempo real no Cloudflare (economizar o Supabase)
-**Por quê:** Supabase Pro custa US$ 25/mês (5 mi mensagens, cada entrega conta). Cloudflare Workers Paid custa US$ 5/mês e as mensagens que o servidor manda para os jogadores **são grátis** (só conta o que o jogador envia, dividido por 20).
-**Já feito:** servidor escrito em `tempo-real/` (`wrangler.toml` + `src/index.js`): Worker `vila-tempo-real` com Durable Object `Sala` (uma por sala 1–60), WebSocket com hibernação, confere o login no Supabase (`/auth/v1/user` com o token), repassa `pos`, `ev` e `chat`, presença (`oi`/`entrou`/`saiu`), sala cheia com 50, rota `?contar=1`.
-**Falta fazer:**
-1. O dono colocar no ar **pelo GitHub** (ele não consegue copiar código pelo celular e **recusou dar token da API**): Cloudflare → Workers & Pages → Create → **Import a repository** → GitHub `vila-do-tonhao`, branch `ccr-e8b9720b-5amd2g`, **Root directory `tempo-real`**, deploy command `npx wrangler deploy`. Ele manda o endereço `vila-tempo-real.XXX.workers.dev`.
-2. **Ligar o jogo ao servidor** (no `index.html`): criar `CONF.realtimeUrl`; em `conectar()` usar WebSocket `wss://…/sala/N?token=<access_token>&k=<anon key>` em vez de `sb.channel`; trocar `canal.send({type:'broadcast',event,payload})` por `ws.send(JSON.stringify({t:event,p:payload}))`; `presenceState()` vira a lista de ids recebida em `oi`/`entrou`/`saiu`; depois de `api.msg()` mandar `{t:'chat',r:row}`; receber `chat` → `onChat`. Manter fallback para o Supabase se o WebSocket falhar. Os avisos de `casas`/`vagas` (postgres_changes) podem continuar no Supabase (são poucos) ou virar `ev`. Espiar a sala sem login: conectar sem token (só recebe).
-3. Testar com 2 abas, subir `site.zip`, acompanhar o Usage do Supabase.
+## 6. Tempo real no Cloudflare — FEITO
+Worker `vila-tempo-real` (pasta `tempo-real/`, `wrangler.toml` + `src/index.js`), Durable Object `Sala` (1 por sala, 1–60, máx. 50), WebSocket com hibernação, login conferido no Supabase (`/auth/v1/user`), repassa `pos`/`ev`/`chat`, presença `oi`/`entrou`/`saiu`, `?contar=1`, conexões sem sinal há 75 s caem (código 4002), mesma pessoa conectando de novo derruba a antiga (4001). **Deploy = automático pelo ramo `main` do GitHub** (o dono recusou dar token da API). Para mudar o servidor: editar no ramo de trabalho e, **com permissão do dono**, copiar só a pasta `tempo-real/` para o `main`. Testar local: `npx wrangler@4 dev --local` com um worker de teste que manda `/ws?id=` direto para a `Sala`.
 
 ## 7. PRÓXIMO PASSO 2 — Lançar na Play Store
 **Já feito:** app TWA em `app-android/` (Bubblewrap; pacote **`br.com.viladotonhao.app`**, versão 1.0.0, targetSdk 35, abre `/?app=1` em tela cheia). `.aab` e `.apk` assinados (o dono tem). Chave: `cidade-do-tonhao.keystore`, alias `tonhao`, SHA-256 **C0:AF:D0:CF:99:83:65:6D:15:A9:B2:9C:81:3D:69:5F:BA:A6:AE:D4:E3:05:C3:EA:2D:48:C9:A5:1E:68:96:AE** (já no `/.well-known/assetlinks.json`, que abre no site ✔). Política de privacidade e exclusão de conta no ar. Imagens da loja prontas (ícone 512, destaque 1024×500, 4 prints). Passo a passo completo em `GUIA-PLAY-STORE.md`.
@@ -130,7 +126,8 @@ Tabelas novas da etapa 28: `passe_temporadas`, `passe_premios`, `passe_jogador`,
 **Recompilar o app** (se precisar mudar versão): Android SDK em `/opt/android-sdk` (instalar de novo no ambiente novo), `cd app-android && ./gradlew bundleRelease`, assinar com `jarsigner` usando a keystore. Maven Central pode dar 429: usar o espelho `https://maven-central.storage-download.googleapis.com/maven2/`. Aumentar `versionCode` a cada envio.
 
 ## 8. Pendências / ideias anotadas
-- **Carro exclusivo do passe** (nível 20 premium): o dono vai mandar o modelo. Ao chegar: sprite com id `natal`, `CARS_PREMIUM.natal`, e `update passe_temporadas set carro_pronto = true where id = 'T1';`.
+- Conferir se `passe_temporadas.carro_pronto` está `true` para o T1 (Furacão GT já existe no cliente).
+- Piscina/hidro/banheira, moto e pose sentada: o dono aprovou, mas cobra detalhes — conferir em vários ângulos se mexer.
 - Equilibrar **dinheiro por emprego** (hoje garçom ~R$ 64/min e servidor público ~R$ 12/min) — o dono ainda não decidiu.
 - **Missões diárias** (pontos extras do passe 1×/dia) — sugerido.
 - Desempenho: luz da noite mais leve e prédios/muros pré-desenhados (o dono reclamou de travadas; medir com o 📊).
@@ -156,3 +153,7 @@ Tabelas novas da etapa 28: `passe_temporadas`, `passe_premios`, `passe_jogador`,
 - Ele **recusou** dar o token da API do Cloudflare ao assistente: usar o caminho pelo GitHub.
 - **Não colocar limite de ganho por hora** nas tarefas.
 - **Só gerar/mandar `site.zip`, `index.html` e SQL quando o dono disser "vamos subir".** Até lá, ir juntando as mudanças (commitar no GitHub normalmente) e, na hora, mandar tudo de uma vez com a lista do que mudou e o SQL pendente.
+- **Nomes de carros:** parecidos com os reais (Fuska, Opalla, Amarock...). Ele achou "feios" os nomes inventados (Besouro, Brutona...).
+- **Músicas:** só brasileiras.
+- Ele testa pelo celular: sempre atualizar o **link de teste** (Artifact) antes de pedir para subir.
+- **Não mexer no ramo `main`** sem ele dizer "pode" naquela hora.
