@@ -3165,3 +3165,26 @@ update public.loja set nome = 'Rovver'    where id = 'esportivo'   and tipo = 'c
 update public.produtos set nome = 'Porshe GT', preco = 19.90 where id = 'carro_fusca_ouro';
 update public.produtos set nome = 'Ferrarini'    where id = 'carro_gto';
 update public.produtos set nome = 'Lambordini'  where id = 'carro_neon';
+
+-- ===================== ETAPA 37: Estilo da casa (cor das paredes, piso e janelas) =====================
+-- p = cor da parede (0 a 11, R$ 300), c = piso (0 a 13, R$ 600; 12 e 13 só VIP), j = janela (0 a 6, R$ 400)
+alter table public.casas add column if not exists estilo jsonb not null default '{}'::jsonb;
+
+create or replace function public.estilo_casa(p_casa integer, p_tipo text, p_v integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; c public.casas; pr integer; mx integer;
+begin
+  m := _eu();
+  select * into c from casas where id = p_casa and dono = m.id for update;
+  if c.id is null then raise exception 'Essa casa não é sua.'; end if;
+  pr := case p_tipo when 'p' then 300 when 'c' then 600 when 'j' then 400 else null end;
+  mx := case p_tipo when 'p' then 11 when 'c' then 13 when 'j' then 6 else null end;
+  if pr is null or p_v is null or p_v < 0 or p_v > mx then raise exception 'Opção inválida.'; end if;
+  if p_tipo = 'c' and p_v >= 12 and not (m.vip_ate is not null and m.vip_ate > now()) then raise exception 'Esse piso é só para VIP.'; end if;
+  if m.dinheiro < pr then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', pr; end if;
+  update moradores set dinheiro = dinheiro - pr where id = m.id;
+  update casas set estilo = coalesce(estilo, '{}'::jsonb) || jsonb_build_object(p_tipo, p_v) where id = c.id;
+  return json_build_object('estilo', (select estilo from casas where id = c.id), 'eu', _estado(m.id));
+end $$;
+revoke execute on function public.estilo_casa(integer, text, integer) from public, anon;
+grant execute on function public.estilo_casa(integer, text, integer) to authenticated;
