@@ -215,6 +215,39 @@ body:has(#zoom:not(.min)) #joy{display:none!important}
 .cfoto{width:30px;height:30px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);vertical-align:middle;margin-right:6px}
 #cardBio{color:var(--ink);font-size:13px}
 .perfil-top{display:flex;gap:14px;align-items:center}.perfil-top>div:last-child{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}
+.pv{width:min(520px,100%)!important;padding-top:0!important}
+.pvTopo{display:flex;gap:14px;align-items:flex-end;margin:0 -16px;padding:18px 16px 12px;background:linear-gradient(160deg,#5a3442,#3a2229 70%);border-radius:20px 20px 0 0}
+.pvPalco{flex:none;width:120px;height:144px;border-radius:16px;background:radial-gradient(ellipse at 50% 90%,rgba(0,0,0,.3) 0 20%,transparent 21%),linear-gradient(#7fb6d9,#bfe0ef 62%,#8fc27a 63%,#76ad62);border:2px solid rgba(255,201,74,.5);overflow:hidden}.pvPalco canvas{width:100%;height:100%;display:block}
+.pvId{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px;padding-bottom:4px}.pvNome{font:700 22px Fredoka,sans-serif;color:#fff;line-height:1.1;overflow-wrap:anywhere}
+.pvNivel{display:flex;gap:6px;flex-wrap:wrap}.pvNivel span{background:rgba(255,201,74,.18);color:var(--gold);border-radius:999px;padding:2px 9px;font:600 12px Fredoka,sans-serif}.pvNivel span.vip{background:rgba(111,168,255,.22);color:#cfe2ff}
+.pvFrase{font-style:italic;color:#f3e6d8;font-size:14px;overflow-wrap:anywhere}.pvStatus{font-size:12.5px;color:var(--muted)}
+.pvNums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.pvNums div{background:rgba(255,255,255,.06);border-radius:12px;padding:8px 4px;text-align:center;font-size:12px;color:var(--muted)}.pvNums b{display:block;font:700 18px Fredoka,sans-serif;color:#fff}
+.pvAcoes{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pvAcoes .btn{min-height:42px;margin:0;width:100%}.pvAcoes .btn.larga{grid-column:1/-1}
+.pvSec{margin-top:14px}.pvSec h4{margin:0 0 8px;font:600 15px Fredoka,sans-serif;color:var(--gold)}
+.pvEmb{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}.pvEmb div{background:rgba(255,255,255,.06);border:1px solid rgba(255,201,74,.25);border-radius:12px;padding:8px 4px;text-align:center;font-size:10.5px;color:var(--muted);line-height:1.15}.pvEmb div i{display:block;font-style:normal;font-size:26px;margin-bottom:3px}.pvEmb div.off{opacity:.35;filter:grayscale(1)}
+.pvSobre{display:flex;flex-wrap:wrap;gap:6px}.pvSobre span{background:rgba(255,255,255,.07);border-radius:999px;padding:5px 11px;font-size:13px}
+.pvCarros{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.pvCarros div{flex:none;width:120px;background:rgba(255,255,255,.06);border-radius:12px;text-align:center;font-size:12px;padding-bottom:6px}.pvCarros canvas{width:120px;height:72px;display:block}
+.pvFotos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.pvFotos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;cursor:pointer}.pvFotos small{grid-column:1/-1;opacity:.7}
+.pvMais{display:flex;gap:8px;justify-content:center;margin-top:14px}.pvMais .btn{font-size:12.5px;min-height:34px}
+@media (max-width:600px){.pvTopo{margin:0 -14px;padding:14px 14px 12px;border-radius:0}.pvPalco{width:104px;height:126px}}
+.jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.jcard{display:flex;align-items:center;gap:10px;text-align:left;background:rgba(255,255,255,.06);border:1px solid rgba(255,201,74,.25);border-radius:14px;padding:10px;color:inherit;font:inherit;cursor:pointer;min-height:64px}
+.jcard .ji{font-size:28px;width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(255,201,74,.14);border-radius:12px}
+.jcard .jt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.jcard b{font-size:15px}.jcard small{font-size:12px;color:var(--muted)}.jcard .jg{color:#bfe8b0}
+.jcard .jb{flex:none;font:700 13px Fredoka,sans-serif;color:var(--gold)}.jcard.off{opacity:.55}.jcard.off .jg{color:var(--muted)}.jcard.on{border-color:#5dd16a;background:rgba(93,209,106,.12)}
+.lAbas{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:2px 0 10px;scrollbar-width:none;touch-action:pan-x;position:sticky;top:-16px;z-index:2;background:inherit}.lAbas::-webkit-scrollbar{display:none}
+.lAbas button{flex:none;min-height:38px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,201,74,.3);background:rgba(255,255,255,.06);color:inherit;font:600 14px Fredoka,sans-serif;white-space:nowrap;cursor:pointer}.lAbas button.on{background:var(--gold);color:#2b1a20;border-color:var(--gold)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.lgrid .full{grid-column:1/-1}
+.lcard{display:flex;flex-direction:column;background:rgba(255,255,255,.06);border:1px solid rgba(255,201,74,.22);border-radius:16px;overflow:hidden;position:relative}
+.lcard .foto{aspect-ratio:5/3;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 70%,rgba(255,201,74,.22),rgba(0,0,0,.18) 70%);font-size:52px}.lcard .foto canvas{width:100%;height:100%;display:block}
+.lcard .info{padding:8px 10px 10px;display:flex;flex-direction:column;gap:4px;flex:1}.lcard b{font-size:15px;line-height:1.15}.lcard small{color:var(--muted);font-size:12px;line-height:1.3;flex:1}
+.lcard .preco{font:700 18px Fredoka,sans-serif;color:var(--gold)}.lcard .btn{width:100%;min-height:40px;margin-top:4px}
+.lcard .selo{position:absolute;top:8px;left:8px;background:#5dd16a;color:#10301a;font:700 11px Fredoka,sans-serif;padding:3px 8px;border-radius:999px}
+.vipHero{grid-column:1/-1;border-radius:18px;padding:14px;background:linear-gradient(135deg,#2d4f8f,#3a2229 75%);border:1px solid #6fa8ff;display:grid;grid-template-columns:1fr;gap:10px}
+.vipHero ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:13px}.vipHero li{display:flex;gap:6px;align-items:flex-start}
+@media (max-width:600px){.modal{align-items:flex-end;padding:0}.modal>.box{width:100%!important;max-width:100%!important;max-height:calc(100dvh - 30px);border-radius:22px 22px 0 0;padding:14px 14px calc(16px + env(safe-area-inset-bottom,0px));animation:sobe .22s ease}.modal>.box::before{content:'';display:block;width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:-4px auto 10px}.lAbas{top:-14px}.lgrid{grid-template-columns:1fr 1fr}.vipHero ul{grid-template-columns:1fr}}
+@keyframes sobe{from{transform:translateY(40px);opacity:.5}}
+.x{width:40px;height:40px;font-size:26px!important;top:4px!important;right:4px!important;z-index:3}
 .litem{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,201,74,.25);border-radius:14px;padding:10px}.litem .ic{font-size:30px;width:40px;text-align:center}.litem .tx{flex:1;min-width:0}.litem b{display:block}.litem small{color:var(--muted)}
 .foto-g.vipf{border:4px solid #ffd700;box-shadow:0 0 14px #ffd54a,0 0 4px #fff inset}
 #emoBox{display:block;position:absolute;bottom:52px;left:0;width:min(330px,calc(100vw - 20px));background:var(--panel);border:1px solid var(--gold);border-radius:14px;padding:8px}#emoBox.hidden{display:none}#emoBox .etabs{display:flex;gap:4px;margin-bottom:6px}#emoBox .etabs button{flex:1;font:600 13px Fredoka,sans-serif;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:5px;cursor:pointer}#emoBox .etabs button.on{background:var(--gold);color:#3a1d10}#emoBox .egrid{display:flex;flex-wrap:wrap;gap:4px}#emoBox .egrid button{font-size:22px;background:none;border:none;cursor:pointer;padding:2px 3px}#emoBox .egrid button.txt{font:600 13px Fredoka,sans-serif;color:#fff;background:rgba(255,255,255,.1);border-radius:9px;padding:6px 9px}#emoBox .egrid button.vip{opacity:.45}#emoBox .egrid button.vip.ok{opacity:1}
@@ -293,7 +326,7 @@ html.noApp #zloja{display:none!important}
   <div class="row"><button id="irBtn" class="pill hidden" aria-label="pessoas online">🟢 1 online</button><div class="pill hidden" id="peixeP">🐟 0</div><div class="pill hidden" id="fomeP">🍗 100%</div><div class="pill hidden" id="sedeP">💧 100%</div><div class="pill hidden" id="gasP">⛽ 100%</div><div class="pill small" id="barstat">🍺 Caixa do bar hoje: R$ 0</div></div>
 </div>
 
-<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zcel" class="hidden" data-l="Celular" aria-label="celular">📱</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" style="display:none" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Perfil e fotos" aria-label="meu perfil">👤</button><button id="zin" style="display:none" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" style="display:none" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b;display:none">🛡️</button><button id="zpasse" class="hidden" data-l="Passe da Temporada" aria-label="passe da temporada">🎟️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
+<div id="zoom" class="min"><button id="zmenu" data-l="Menu" aria-label="menu">☰</button><button id="zloja" class="hidden" data-l="Loja VIP" aria-label="loja" style="background:linear-gradient(135deg,#ffd700,#f39c12);color:#3a1d10">💎</button><button id="zcel" class="hidden" data-l="Celular" aria-label="celular">📱</button><button id="zjobs" class="hidden" data-l="Empregos" aria-label="empregos">💼</button><button id="zcarro" class="hidden" data-l="Meu carro" aria-label="meu carro">🚗</button><button id="zmochila" class="hidden" data-l="Mochila" aria-label="mochila">🎒</button><button id="zdanca" style="display:none" aria-label="danças">💃</button><button id="zfotos" style="display:none" class="hidden" data-l="Fotos e seguidores" aria-label="fotos">📷</button><button id="zperfil" class="hidden" data-l="Meu perfil" aria-label="meu perfil">👤</button><button id="zin" style="display:none" data-l="Aproximar" aria-label="aproximar">+</button><button id="zout" style="display:none" data-l="Afastar" aria-label="afastar">−</button><button style="display:none" id="zsom" aria-label="som">🔊</button><button style="display:none" id="zmus" aria-label="música">🎵</button><button id="zadm" class="hidden" data-l="Painel do Admin" aria-label="admin" style="color:#ff6b6b;display:none">🛡️</button><button id="zpasse" class="hidden" data-l="Passe da Temporada" aria-label="passe da temporada">🎟️</button><button id="zcfg" data-l="Configurações" aria-label="configurações">⚙️</button></div>
 <div id="cfg" class="hidden"><div class="cfgbox"><button class="x" id="cfgX">×</button><h3>⚙️ Configurações</h3>
 <label>🎵 Volume da música <b id="cfgMusV"></b><input type="range" id="cfgMus" min="0" max="100"></label>
 <label>🔊 Volume dos efeitos <b id="cfgSfxV"></b><input type="range" id="cfgSfx" min="0" max="100"></label>
@@ -375,11 +408,11 @@ html.noApp #zloja{display:none!important}
   <div id="mcTabs" class="grTabs"></div>
   <div id="mcCorpo"></div>
 </div></div>
-<div id="mLoja" class="modal hidden"><div class="box" style="width:min(440px,100%)">
+<div id="mLoja" class="modal hidden"><div class="box" style="width:min(560px,100%)">
   <button class="x" data-close="mLoja">×</button>
-  <h2>💎 Loja da Cidade</h2><p class="sub">Itens especiais pagos com Pix. Liberam na hora em que o pagamento cai.</p>
-  <div id="lojaTabs" style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"></div>
-  <div id="lojaItens" style="display:flex;flex-direction:column;gap:8px"></div>
+  <h2>💎 Loja da Cidade</h2><p class="sub">Pague com Pix e o item chega na hora.</p>
+  <div id="lojaTabs" class="lAbas"></div>
+  <div id="lojaItens" class="lgrid"></div>
   <div id="lojaPix" class="hidden" style="text-align:center">
     <p id="pixTit" style="font-weight:600;margin:4px 0"></p>
     <img id="pixQr" alt="QR Code Pix" style="width:200px;height:200px;background:#fff;border-radius:12px;padding:6px">
@@ -435,6 +468,19 @@ html.noApp #zloja{display:none!important}
       <div style="display:flex;gap:8px"><button class="btn ghost" id="soVoltar">⬅️ Voltar</button><button class="btn ghost" id="soApagar">🗑️ Apagar</button></div></div>
   </div>
 </div>
+<div id="mPerfilV" class="modal hidden"><div class="box pv">
+  <button class="x" data-close="mPerfilV">×</button>
+  <div class="pvTopo"><div class="pvPalco"><canvas id="pvAv" width="200" height="240"></canvas></div>
+   <div class="pvId"><div class="pvNome" id="pvNome"></div><div class="pvNivel" id="pvNivel"></div><div class="pvFrase" id="pvFrase"></div><div class="pvStatus" id="pvStatus"></div></div></div>
+  <div class="pvNums" id="pvNums"></div>
+  <div class="pvAcoes" id="pvAcoes"></div>
+  <div class="pvSec"><h4>🏅 Emblemas</h4><div class="pvEmb" id="pvEmb"></div></div>
+  <div class="pvSec" id="pvSobreS"><h4>💬 Sobre</h4><div class="pvSobre" id="pvSobre"></div></div>
+  <div class="pvSec" id="pvCarrosS"><h4>🚗 Garagem</h4><div class="pvCarros" id="pvCarros"></div></div>
+  <div class="pvSec"><h4>📷 Fotos</h4><div class="pvFotos" id="pvFotos"></div></div>
+  <div class="pvMais" id="pvMais"></div>
+</div></div>
+
 <div id="mPerfil" class="modal hidden">
   <div class="box">
     <button class="x" data-close="mPerfil">×</button>
@@ -4808,7 +4854,7 @@ function salaItens(list,R){if(R===SALAS.imob)corretorItem(list,R);if(R===SALAS.s
  if(R.esc){const E=R.esc,X0=T(E.x0),X1=T(E.x1+1);if(!R.cima){const n=8,st=T(E.y1-E.y0+1)/n;for(let k=0;k<n;k++){const y1=T(E.y1+1)-k*st,y0=y1-st,zh=(k+1)*7;list.push({x:(X0+X1)/2,y:y1,k:X0+y0-8,cam:1,f:()=>{isoBox(ctx,X0,y0,X1,y1,0,zh,k%2?'#b8b8b8':'#c9c9c9');isoBox(ctx,X1-3,y0,X1,y1,zh,zh+16,'#7a7a7a')}})}
   list.push({x:X0,y:T(E.y0),k:-1e9+1,cam:1,f:()=>{const a=isoP(X0+32,T(E.y0)+10);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.strokeStyle='#2a1a14';ctx.lineWidth=3;ctx.strokeText('⬆️ subir',a[0],a[1]-72);ctx.fillText('⬆️ subir',a[0],a[1]-72);ctx.textAlign='left'}})}
  else for(const [ax,ay,bx,by] of [[X0,T(E.y1+1),X1,T(E.y1+1)+3],[X1,T(E.y0+1),X1+3,T(E.y1+1)]])list.push({x:(ax+bx)/2,y:(ay+by)/2,k:ax+ay+10,cam:1,f:()=>{isoBox(ctx,ax,ay,bx,by,0,26,'#8a8f96');isoBox(ctx,ax-1,ay-1,bx+1,by+1,26,29,'#5a4030')}})}
- (eu.rm.moveis||[]).forEach((m,k)=>{if(!movAqui(m)||!MOV[m.t]||(MOB.modo==='mover'&&MOB.i===k))return;const [w,h]=movTam(m.t,m.r|0),[ex,ey]=encosto(m.t,m.r|0,m.x,m.y),X=T(R.x0+m.x)+ex,Y=T(R.y0+m.y)+ey;const sen=MOV[m.t].senta||MOV[m.t].agua;list.push({x:X+w*16,y:Y+h*16,k:MOV[m.t].anda&&m.t!=='porta'&&!(ex||ey)?-1e8:MOV[m.t].agua?X+Y-8:X+Y+(w+h)*16,cam:1,f:()=>{if(m.t==='parede'||m.t==='porta'){desenhaParede(m,X,Y,atrasDaParede(m,X,Y)?.28:null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f');return}desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,sen?'tras':null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f')}});if(sen)list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*32+(MOV[m.t].agua?44:-4),cam:1,f:()=>desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,'frente')})});
+ (eu.rm.moveis||[]).forEach((m,k)=>{if(!movAqui(m)||!MOV[m.t]||(MOB.modo==='mover'&&MOB.i===k))return;const [w,h]=movTam(m.t,m.r|0),[ex,ey]=encosto(m.t,m.r|0,m.x,m.y),X=T(R.x0+m.x)+ex,Y=T(R.y0+m.y)+ey;const sen=MOV[m.t].senta||MOV[m.t].agua;list.push({x:X+w*16,y:Y+h*16,k:MOV[m.t].anda&&m.t!=='porta'&&!(ex||ey)?-1e8:MOV[m.t].anda&&(ex===18||ey===18)?X-ex+Y-ey+40:MOV[m.t].agua?X+Y-8:X+Y+(w+h)*16,cam:1,f:()=>{if(m.t==='parede'||m.t==='porta'){desenhaParede(m,X,Y,atrasDaParede(m,X,Y)?.28:null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f');return}desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,sen?'tras':null);if(MOB.modo==='sel'&&MOB.i===k)movMoldura(X,Y,w,h,'#ffd23f')}});const paredeFrente=[...Array(w).keys()].some(a=>paredeAt(m.x+a,m.y+h,0))||[...Array(h).keys()].some(b=>paredeAt(m.x+w,m.y+b,1));if(sen)list.push({x:X+w*16,y:Y+h*16,k:paredeFrente&&!MOV[m.t].agua?X+Y+(w+h)*16+14:X+Y+(w+h)*32+(MOV[m.t].agua?44:-4),cam:1,f:()=>desenhaMovel(ctx,m.t,X,Y,m.r|0,m,null,'frente')})});
  if(MOB.modo==='novo'||MOB.modo==='mover'){const [w,h]=movTam(MOB.t,MOB.r),[ex,ey]=encosto(MOB.t,MOB.r,MOB.x,MOB.y),X=T(R.x0+MOB.x),Y=T(R.y0+MOB.y),ok=movLivre(MOB.t,MOB.r,MOB.x,MOB.y,MOB.modo==='mover'?MOB.i:-1);list.push({x:X+w*16,y:Y+h*16,k:X+Y+(w+h)*16+5,cam:1,f:()=>{movMoldura(X,Y,w,h,ok?'#5dff7a':'#ff5a5a');desenhaMovel(ctx,MOB.t,X+ex,Y+ey,MOB.r,null,.72)}})}
  {const i=casasInfo.get(eu.rm.n)||{},tt=salaNome(eu.rm.b,i);list.push({x:X0,y:Y0,k:-1e9,cam:1,f:()=>{const a=isoP((X0+X1)/2,Y0);ctx.font='700 11px Fredoka,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#2a1a14';ctx.strokeText(tt,a[0],a[1]-H-10);ctx.fillStyle='#fff';ctx.fillText(tt,a[0],a[1]-H-10);ctx.textAlign='left'}})}}
 function ligarMovel(m){if(!eu||!eu.rm)return;const i=eu.rm.moveis.indexOf(m);if(i<0)return;acao(async()=>{const r=await api.ligarMovel(eu.rm.n,i);mobOk(r);Som.play('clique')})}
@@ -4842,9 +4888,9 @@ function salaOpcoes(){const o=[],dono=(casasInfo.get(eu.rm.n)||{}).dono===eu.id;
 function mobUI(){let el=$('mobUI');if(el)return el;el=document.createElement('div');el.id='mobUI';el.innerHTML=`<style>
 #mobBar{position:fixed;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));z-index:60;background:rgba(30,16,22,.95);border:1px solid rgba(255,201,74,.45);border-radius:16px;padding:8px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px);box-shadow:0 6px 24px rgba(0,0,0,.45);color:#fff;font:600 13px Fredoka,sans-serif}
 #mobBar b{color:#ffd23f;margin-right:4px}#mobBar button{background:#ffc94a;color:#2a1a14;border:0;border-radius:12px;padding:8px 11px;font:700 13px Fredoka,sans-serif}#mobBar button.g{background:rgba(255,255,255,.12);color:#fff}#mobBar button.r{background:#e05a4e;color:#fff}
-#mobSheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:linear-gradient(#3a2129,#24141a);border-top:2px solid #ffc94a;border-radius:20px 20px 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));max-height:62vh;display:flex;flex-direction:column;color:#fff;font-family:Fredoka,sans-serif;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+#mobSheet{position:fixed;left:0;right:0;margin:0 auto;max-width:760px;bottom:0;z-index:61;background:linear-gradient(#3a2129,#24141a);border-top:2px solid #ffc94a;border-radius:20px 20px 0 0;padding:12px 12px calc(12px + env(safe-area-inset-bottom,0px));max-height:62vh;display:flex;flex-direction:column;color:#fff;font-family:Fredoka,sans-serif;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
 #mobSheet .hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}#mobSheet .hd h3{margin:0;flex:1;font-size:18px;color:#ffd23f}#mobSheet .hd button{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:10px;padding:6px 10px;font:700 14px Fredoka,sans-serif}
-#mobTabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}#mobTabs button{flex:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:6px 12px;font:600 13px Fredoka,sans-serif}#mobTabs button.on{background:#ffc94a;color:#2a1a14;border-color:#ffc94a}
+#mobTabs{flex:none;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 8px;scrollbar-width:none;touch-action:pan-x;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}#mobTabs::-webkit-scrollbar{display:none}#mobTabs button{min-height:36px;white-space:nowrap;line-height:1.1;scroll-snap-align:start}#mobTabs button{flex:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:6px 12px;font:600 13px Fredoka,sans-serif}#mobTabs button.on{background:#ffc94a;color:#2a1a14;border-color:#ffc94a}
 #mobGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;overflow-y:auto;padding:4px 2px}
 .mobCard{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:6px;text-align:center;color:#fff;font:600 12px Fredoka,sans-serif}.mobCard canvas{width:92px;height:70px;display:block;margin:0 auto}.mobCard .pr{color:#9dff7a;font-weight:700}.mobCard.sem{opacity:.45}
 </style><div id="mobBar" class="hidden"></div><div id="mobSheet" class="hidden"><div class="hd"><h3>🛋️ Decorar a casa</h3><button id="mobFecha">✔ Pronto</button></div><div id="mobTabs"></div><div id="mobGrid"></div></div>`;document.body.appendChild(el);
@@ -5634,7 +5680,7 @@ const PRODUTOS={
  vip30:{tab:'vip',ic:'👑',nome:'VIP 30 dias',desc:'Coroa azul, roupas e cores exclusivas, Lambordini, emotes, fome mais lenta, música da jukebox, 🎁 presente do mês, 🏠 ir para casa num toque e +50% de pontos no passe.',preco:15.99},
  pet_cachorro:{tab:'pets',pet:'cachorro',preco:3.90},pet_gato:{tab:'pets',pet:'gato',preco:3.90},pet_galinha:{tab:'pets',pet:'galinha',preco:3.90},pet_capivara:{tab:'pets',pet:'capivara',preco:3.90},pet_papagaio:{tab:'pets',pet:'papagaio',preco:3.90},
  carro_fusca_ouro:{tab:'carros',carro:'fusca_ouro',ic:'🏎️',preco:19.90,desc:'Esportivo de motor central, prata e pintável na oficina. Só existe na loja.'},carro_kombi_tonhao:{tab:'carros',carro:'kombi_tonhao',ic:'🛻',preco:7.90,desc:'Caminhonete 4x4 do Tonhão, com caçamba. Só existe na loja.'},carro_gto:{tab:'carros',carro:'gto',ic:'🏎️',preco:19.90,desc:'Superesportivo vermelho. Só existe na loja.'}};
-const TABS=[['vip','👑 VIP'],['roupas','👕 Roupas'],['pets','🐾 Pets'],['carros','🚗 Carros']];let lojaTab='vip',pixTimer=null;
+const TABS=[['vip','👑 VIP'],['carros','🚗 Carros'],['pets','🐾 Pets'],['roupas','👕 Roupas']];let lojaTab='vip',pixTimer=null;
 const reais=v=>'R$ '+v.toFixed(2).replace('.',',');
 /* ----- Passe da Temporada e VIP turbinado (prêmios só visuais ou dinheiro do jogo) ----- */
 // pontos do passe por tarefa: conforme o tempo que cada emprego leva (medido em 18/11/2026; ~15 pontos por minuto em qualquer emprego)
@@ -5689,20 +5735,28 @@ function irParaCasa(){if(!eu)return;if(!souVip()){toast('🏠 Ir para casa num t
  const h=eu.casa_id>1000?{front:[27,-10]}:houses[eu.casa_id-1];if(!h)return;if(eu.driving)estacionarAqui();eu.rm=null;eu.path=[];eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE;follow=eu;cam.x=eu.x;cam.y=eu.y;sendPos(true);Som.play('clique');toast('🏠 Bem-vindo(a) em casa!',2000)}
 let precosOk=false;
 function abrirLoja(){if(!eu||NO_APP)return;if(ONLINE&&!precosOk)sb.from('produtos').select('id,preco').then(({data})=>{if(!data)return;precosOk=true;for(const r of data)if(PRODUTOS[r.id])PRODUTOS[r.id].preco=Number(r.preco);if(!$('mLoja').classList.contains('hidden')&&!$('lojaItens').classList.contains('hidden'))pintaLoja()});closePlace();$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');pintaLoja();$('mLoja').classList.remove('hidden')}
-function pintaLoja(){const t=$('lojaTabs');t.innerHTML='';TABS.forEach(([k,n])=>{const b=document.createElement('button');b.className='btn'+(k===lojaTab?'':' ghost');b.textContent=n;b.onclick=()=>{lojaTab=k;pintaLoja()};t.appendChild(b)});
+function pintaLoja(){const t=$('lojaTabs');t.innerHTML='';TABS.forEach(([k,n])=>{const b=document.createElement('button');b.className=k===lojaTab?'on':'';b.textContent=n;b.onclick=()=>{lojaTab=k;pintaLoja()};t.appendChild(b)});
  const box=$('lojaItens');box.innerHTML='';
- const item=(ic,nome,desc,acao,label,off)=>{const d=document.createElement('div');d.className='litem';d.innerHTML=`<div class="ic">${ic}</div><div class="tx"><b></b><small></small></div>`;d.querySelector('b').textContent=nome;d.querySelector('small').textContent=desc;
-  const b=document.createElement('button');b.className='btn'+(off?' ghost':'');b.textContent=label;b.disabled=!!off;b.onclick=acao;d.appendChild(b);box.appendChild(d)};
- if(lojaTab==='roupas'){item('👕','Roupas e cores exclusivas','Todas as roupas e cores marcadas com 👑 no provador. Vêm junto com o VIP.',()=>{lojaTab='vip';pintaLoja()},'Ver VIP');return}
- if(lojaTab==='vip'){const d=document.createElement('div');d.className='litem';d.style.cssText='flex-direction:column;align-items:stretch;background:linear-gradient(135deg,rgba(60,120,216,.35),rgba(43,26,32,.6));border-color:#6fa8ff';
-  d.innerHTML='<b style="font-size:16px">👑 O que o VIP ganha</b><div style="display:flex;gap:8px;align-items:center"><canvas width="150" height="100" style="width:120px;height:80px;flex:none"></canvas><div style="font-size:12.5px;line-height:1.45">🏎️ <b>Lambordini liberada</b> enquanto for VIP<br>👑 Coroa azul e faixa de diamantes no chat<br>👕 Roupas, tênis, bonés e cores exclusivas<br>🎁 Presente novo todo mês<br>🏠 Ir para casa num toque<br>🎟️ +50% de pontos no passe</div></div>';
-  box.appendChild(d);try{const g=d.querySelector('canvas').getContext('2d');g.translate(75,66);g.scale(1.25,1.25);drawCarStack(g,0,0,'neon',-.6,null,{})}catch(e){}}
+ const card=(o)=>{const d=document.createElement('div');d.className='lcard'+(o.full?' full':'');d.innerHTML=`<div class="foto"></div><div class="info"><b></b><small></small><div class="preco"></div></div>`;const f=d.querySelector('.foto');
+  if(o.draw){const cv=document.createElement('canvas');cv.width=320;cv.height=192;f.appendChild(cv);const g=cv.getContext('2d'),pinta=()=>{g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,320,192);try{o.draw(g)}catch(e){}};pinta();[300,900,2000,4000].forEach(ms=>setTimeout(pinta,ms))}else f.textContent=o.ic||'';
+  d.querySelector('b').textContent=o.nome;d.querySelector('small').textContent=o.desc||'';d.querySelector('.preco').textContent=o.preco||'';if(o.selo)d.insertAdjacentHTML('beforeend',`<div class="selo">${o.selo}</div>`);
+  const b=document.createElement('button');b.className='btn'+(o.off?' ghost':'');b.textContent=o.label;b.disabled=!!o.off;b.onclick=o.acao;d.querySelector('.info').appendChild(b);box.appendChild(d);return d};
+ const carro=(k)=>g=>{g.translate(160,132);g.scale(1.9,1.9);drawCarStack(g,0,0,k,-.6,null,{})};
+ if(lojaTab==='vip'){const h=document.createElement('div');h.className='vipHero';
+  h.innerHTML=`<div style="display:flex;align-items:center;gap:10px"><canvas width="240" height="140" style="width:150px;height:88px;flex:none"></canvas><div><b style="font-size:18px;color:#cfe2ff">👑 Seja VIP</b><div style="font-size:12.5px;color:#cfe2ff;opacity:.85">Só visual e conforto. Não dá vantagem no ranking.</div></div></div>
+  <ul><li>🏎️<span><b>Lambordini</b> liberada</span></li><li>👑<span>Coroa azul no nome</span></li><li>👕<span>Roupas e cores exclusivas</span></li><li>🎁<span>Presente novo todo mês</span></li><li>🏠<span>Ir para casa num toque</span></li><li>🎟️<span>+50% de pontos no passe</span></li><li>✨<span>Brilho dourado no chão</span></li><li>🟫<span>Pisos de mármore e dourado</span></li></ul>`;
+  box.appendChild(h);{const g=h.querySelector('canvas').getContext('2d'),pinta=()=>{g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,240,140);try{g.translate(120,104);g.scale(1.7,1.7);drawCarStack(g,0,0,'neon',-.6,null,{})}catch(e){}};pinta();[300,900,2000].forEach(ms=>setTimeout(pinta,ms))}
+  if(souVip())h.insertAdjacentHTML('beforeend',`<div style="background:rgba(93,209,106,.18);border-radius:12px;padding:8px;font-size:13px">✅ Você é VIP até <b>${new Date(eu.vip_ate).toLocaleDateString('pt-BR')}</b>. Comprar de novo soma os dias.</div>`)}
+ if(lojaTab==='roupas'){box.insertAdjacentHTML('beforeend',`<div class="full" style="font-size:13.5px;color:var(--muted)">As roupas com 👑 vêm junto com o VIP. As roupas normais você compra com dinheiro do jogo na <b>Loja de Roupas</b> da cidade ou no 👕 Guarda-roupa.</div>`);
+  card({full:1,ic:'👑',nome:'Roupas VIP',desc:'Bomber dourada, puffer neon, sobretudo de veludo, smoking com capa, vestido de lantejoulas, tênis e boné neon e cores exclusivas.',label:'Ver planos VIP',acao:()=>{lojaTab='vip';pintaLoja()}});
+  card({full:1,ic:'👕',nome:'Guarda-roupa',desc:'Troque de roupa e experimente tudo o que você já tem.',label:'Abrir guarda-roupa',acao:()=>{$('mLoja').classList.add('hidden');try{abrirGuarda()}catch(e){}}});return}
  for(const [id,P] of Object.entries(PRODUTOS)){if(P.tab!==lojaTab)continue;
   if(P.pet){const pt=PETS[P.pet],tem=(eu.pets||[]).includes(P.pet),usando=eu.pet===P.pet;
-   item(pt.ic,pt.nome,tem?(usando?'Andando com você agora.':'Já é seu.'):'Te segue pela cidade. Todo mundo vê.',tem?()=>usarPet(usando?null:P.pet):()=>comprarPix(id),tem?(usando?'Guardar':'Usar'):reais(P.preco));continue}
-  if(P.carro){const c=CARS_PREMIUM[P.carro],tem=eu.carros.includes(P.carro);item(P.ic,c.nome,tem?'Já é seu. Use pela concessionária ou tocando em você.':P.desc,tem?()=>{}:()=>comprarPix(id),tem?'✅ Seu':reais(P.preco),tem);continue}
-  if(P.passe){item(P.ic,P.nome,P.desc,()=>{$('mLoja').classList.add('hidden');abrirPasse()},'Ver passe');continue}
-  item(P.ic,P.nome,(souVip()?'✅ Você é VIP até '+new Date(eu.vip_ate).toLocaleDateString('pt-BR')+`. Comprar de novo soma +${P.dias||30} dias. `:'')+P.desc,()=>comprarPix(id),reais(P.preco))}}
+   card({ic:pt.ic,nome:pt.nome,desc:tem?(usando?'Andando com você agora.':'Já é seu.'):'Te segue pela cidade. Todo mundo vê.',preco:tem?'':reais(P.preco),selo:tem?'✅ Seu':'',label:tem?(usando?'Guardar':'Passear'):'Comprar',acao:tem?()=>usarPet(usando?null:P.pet):()=>comprarPix(id)});continue}
+  if(P.carro){const c=CARS_PREMIUM[P.carro],tem=eu.carros.includes(P.carro);card({draw:carro(P.carro),nome:c.nome,desc:tem?'Já é seu. Pegue na concessionária ou tocando em você.':P.desc,preco:tem?'':reais(P.preco),selo:tem?'✅ Seu':'',label:tem?'✅ Na garagem':'Comprar',off:tem,acao:tem?()=>{}:()=>comprarPix(id)});continue}
+  if(P.passe){card({ic:P.ic,nome:P.nome,desc:P.desc,preco:reais(P.preco),label:'Ver passe',acao:()=>{$('mLoja').classList.add('hidden');abrirPasse()}});continue}
+  card({ic:P.ic,nome:P.nome,desc:P.desc,preco:reais(P.preco),selo:P.dias===90?'Mais vantajoso':'',label:'Comprar',acao:()=>comprarPix(id)})}
+ if(lojaTab==='carros')card({draw:carro('neon'),nome:'Lambordini',desc:'Vem junto com o VIP enquanto ele estiver ativo.',preco:'',label:'Ver VIP',acao:()=>{lojaTab='vip';pintaLoja()}})}
 function usarPet(p){acao(async()=>{const r=await api.usarPet(p);eu.pet=r.pet||null;emitEv('perfil',{});pintaLoja();toast(p?PETS[p].ic+' '+PETS[p].nome+' está com você!':'🐾 Pet guardado.',2500)})}
 function comprarPix(id){if(NO_APP)return;const P=PRODUTOS[id],nome=P.nome||(P.pet?PETS[P.pet].nome:CARS_PREMIUM[P.carro].nome);
  confirmar('💎 Comprar com Pix',`Comprar <b>${nome}</b> por <b>${reais(P.preco)}</b>?`,()=>acao(async()=>{
@@ -5729,7 +5783,7 @@ async function prepararFoto(file){
   return await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Não consegui preparar a foto.')),'image/jpeg',.85));
  }finally{URL.revokeObjectURL(url)}
 }
-$('zperfil').onclick=abrirPerfil;
+$('zperfil').onclick=()=>verPerfil(eu);
 $('pfSocial').onclick=()=>abrirSocial(eu);
 $('pfTrocar').onclick=()=>$('pfArquivo').click();
 $('pfArquivo').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;
@@ -5769,7 +5823,37 @@ $('soArquivo').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.v
 $('soCancelar').onclick=()=>{soBlob=null;$('soNovo').classList.add('hidden')};
 $('soPublicar').onclick=()=>{if(!soBlob)return;acao(async()=>{const p=await api.postar(soBlob,$('soLeg').value);soBlob=null;$('soNovo').classList.add('hidden');soDados.posts.unshift(p);pintaSocial();toast('📷 Foto publicada!')})};
 $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
-$('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
+// ===== Perfil (cartão do jogador): mostra como os outros veem você; editar fica num botão =====
+function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=eu;closeCard();closePlace();
+ const av=$('pvAv'),g=av.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,200,240);try{drawPerson(g,100,236,r.v,{s:5,cara:true})}catch(e){}
+ $('pvNome').textContent=(vipP(r)?'👑 ':'')+r.nome;
+ $('pvNivel').innerHTML=(r.nivel?`<span>⭐ Nível ${r.nivel}</span>`:'')+(vipP(r)?'<span class="vip">👑 VIP</span>':'')+(me?'<span>Você</span>':'');
+ $('pvFrase').textContent=r.frase?'“'+r.frase+'”':(me?'Toque em ✏️ Editar perfil e escreva seu status.':'');
+ $('pvStatus').textContent=(()=>{try{return statusOf(r)}catch(e){return''}})();
+ const carros=me?(eu.carros||[]):(carOf(r)?[carOf(r)]:[]);
+ const nums=(f,se,sg)=>{$('pvNums').innerHTML=`<div><b>${f}</b>fotos</div><div><b>${se}</b>seguidores</div><div><b>${sg}</b>seguindo</div>`};nums('–','–','–');
+ const A=$('pvAcoes');A.innerHTML='';const bt=(t,fn,cl)=>{const b=document.createElement('button');b.className='btn '+(cl||'');b.textContent=t;b.onclick=fn;A.appendChild(b);return b};
+ const fecha=()=>$('mPerfilV').classList.add('hidden'),comSel=f=>()=>{selected=r;try{refreshCard()}catch(e){}f()};
+ if(me){bt('✏️ Editar perfil',()=>{fecha();abrirPerfil()});bt('👕 Guarda-roupa',()=>{fecha();abrirGuarda()},'ghost');if(ONLINE)bt('📷 Postar foto',()=>{fecha();abrirSocial(eu).then(()=>$('soPostar').click())},'ghost larga')}
+ else if(r.isPlayer){const st=ONLINE&&r.remote?CEL_AMIGOS.get(r.id):null;
+  if(r.remote&&ONLINE){if(st==='amigo')bt('💬 Mensagem',comSel(()=>{fecha();$('cardDm').onclick()}));else bt(st==='enviado'?'⏳ Pedido enviado':st==='recebido'?'✅ Aceitar amizade':'➕ Adicionar amigo',comSel(()=>{$('cardAmigo').onclick();setTimeout(()=>verPerfil(r),700)}))}
+  if(ONLINE)bt('➕ Seguir',()=>acao(async()=>{const d=await api.social(r.id),x=await api.seguir(r.id,!d.eu);toast(x.seguindo?'Agora você segue '+r.nome+'!':'Você deixou de seguir.');verPerfil(r)}),'ghost').id='pvSeguir';
+  bt(follow===r?'✋ Parar de acompanhar':'🎥 Acompanhar',()=>{follow=follow===r?null:r;fecha()},'ghost');
+  if(r.remote&&eu)bt('🤗 Interagir',()=>{fecha();openCard(r)},'ghost')}
+ const nv=r.nivel|0,E=[[vipP(r),'👑','VIP'],[nv>=10,'🥉','Nível 10'],[nv>=20,'🥈','Nível 20'],[nv>=30,'🥇','Nível 30'],[nv>=50,'🏆','Nível 50'],[!!r.casa_id,'🏠','Tem casa'],[carros.length>0,'🚗','Motorista'],[carros.length>=3,'🏁','Colecionador'],[!!r.pet,'🐾','Tem pet'],[!!r.time_coracao,'⚽','Torcedor']];
+ const em=me?E:E.filter(e=>e[0]);$('pvEmb').innerHTML=em.map(([ok,i,n])=>`<div class="${ok?'':'off'}"><i>${i}</i>${n}</div>`).join('')||'<small style="opacity:.7">Ainda sem emblemas.</small>';
+ const sb=[];if(r.relacionamento&&r.relacionamento!=='Prefiro não dizer')sb.push('💞 '+r.relacionamento);if(r.time_coracao)sb.push('⚽ '+r.time_coracao);if(r.insta)sb.push('📷 @'+r.insta);if(r.pet&&PETS[r.pet])sb.push(PETS[r.pet].ic+' '+PETS[r.pet].nome);
+ $('pvSobre').innerHTML=sb.map(t=>`<span>${esc(t)}</span>`).join('');$('pvSobreS').classList.toggle('hidden',!sb.length);
+ const G=$('pvCarros');G.innerHTML='';$('pvCarrosS').classList.toggle('hidden',!carros.length);
+ carros.forEach(k=>{const d=document.createElement('div'),c=document.createElement('canvas');c.width=240;c.height=144;d.appendChild(c);d.insertAdjacentHTML('beforeend',`<div>${esc((CARS[k]||CARS_PREMIUM[k]||{nome:k}).nome)}</div>`);G.appendChild(d);
+  const pinta=()=>{const x=c.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,240,144);try{x.translate(120,100);x.scale(1.45,1.45);drawCarStack(x,0,0,k,-.6,null,{})}catch(e){}};pinta();[400,1500].forEach(ms=>setTimeout(pinta,ms))});
+ const F=$('pvFotos');F.innerHTML=ONLINE&&r.isPlayer?'<small>⏳ Carregando…</small>':'<small>As fotos aparecem quando você está online.</small>';
+ if(ONLINE&&r.isPlayer)api.social(r.id).then(d=>{nums(d.posts.length,d.seguidores,d.seguindo);const sg=$('pvSeguir');if(sg)sg.textContent=d.eu?'✔️ Seguindo':'➕ Seguir';F.innerHTML='';if(!d.posts.length){F.innerHTML='<small>Nenhuma foto ainda.</small>';return}
+  d.posts.slice(0,9).forEach(p=>{const i=document.createElement('img');i.src=p.url;i.alt='';i.loading='lazy';i.onclick=()=>{fecha();abrirSocial(r).then(()=>verPost(p))};F.appendChild(i)});if(d.posts.length>9){const b=document.createElement('button');b.className='btn ghost';b.style.gridColumn='1/-1';b.textContent='Ver todas as '+d.posts.length+' fotos';b.onclick=()=>{fecha();abrirSocial(r)};F.appendChild(b)}}).catch(()=>{F.innerHTML='<small>Não consegui carregar as fotos.</small>'});
+ const M=$('pvMais');M.innerHTML='';if(!me&&r.remote&&ONLINE){const a=document.createElement('button');a.className='btn ghost';a.textContent=BLOQ.has(r.id)?'🔈 Desbloquear':'🔇 Bloquear';a.onclick=comSel(()=>{fecha();$('cardBloq').onclick()});const d=document.createElement('button');d.className='btn ghost';d.textContent='🚩 Denunciar';d.onclick=()=>{fecha();denunciarJogador(r)};M.append(a,d)}
+ $('mPerfilV').classList.remove('hidden')}
+
+$('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
 const VERSAO_JOGO='v20261124v';
@@ -5788,10 +5872,17 @@ function irAoLugar(k){const f=FOCUS[k];if(!f)return;follow=null;cam.x=T(f[0]);ca
  if(k==='roupas'&&eu&&livre()){eu.path=pathTo(eu,T(lojaRoupa.dx+.5),T(lojaRoupa.y+2.5));follow=eu;return}
  const b=k==='bar'||k==='lagoa'?null:SHOPS[k];if(eu&&livre()){const tx=k==='lagoa'?LAGOA.x:b?(b.front[0]+.5)*TILE:T(23.9),ty=k==='lagoa'?LAGOA.y:b?(b.front[1]+.5)*TILE:T(27.2);eu.path=pathTo(eu,tx,ty);eu.onArrive=()=>abrirLugar(k==='lagoa'?FEATURES[0]:b||{kind:'bar'});follow=eu}
  toast('📍 Indo até lá! Ao chegar, toque em "Trabalhar".',3500)}
-$('zjobs').onclick=()=>{if(!eu)return;const lista=Object.entries(JOBS).sort((a,b)=>a[1].nivel_min-b[1].nivel_min);
- confirmar('💼 Empregos da cidade','Toque em um emprego para ir até lá. Cada tarefa paga dinheiro e XP na hora.<br><small>🔒 = libera em um nível maior</small>',null,
-  lista.filter(([k])=>k!=='prefeito'||PREF_ID===eu.id).map(([k,J])=>{const lug=k==='bar'?'bar':k==='pescador'?'lagoa':k==='policia'?'delegacia':(JOB_LUGAR[k]||k);const ok=eu.nivel>=J.nivel_min;
-   return[(ok?'💼 ':'🔒 ')+J.nome+(ok?'':' (nível '+J.nivel_min+')')+' · '+(PLACE_NAMES[lug]||lug),()=>ok?irAoLugar(lug):toast('Esse emprego libera no nível '+J.nivel_min+'. Continue trabalhando!',3000)]}))};
+// painel padrão (lista de cartões) usado por empregos e outros
+function painelLista(titulo,sub){let m=$('mLista');if(!m){m=document.createElement('div');m.id='mLista';m.className='modal hidden';m.innerHTML='<div class="box" style="width:min(560px,100%)"><button class="x" data-fecha>×</button><h2></h2><p class="sub"></p><div class="jgrid"></div></div>';document.body.appendChild(m);m.querySelector('[data-fecha]').onclick=()=>m.classList.add('hidden');m.onclick=e=>{if(e.target===m)m.classList.add('hidden')}}
+ m.querySelector('h2').textContent=titulo;m.querySelector('.sub').innerHTML=sub||'';const g=m.querySelector('.jgrid');g.innerHTML='';m.classList.remove('hidden');return g}
+const JOB_IC={bar:'🍺',mercadinho:'🛒',posto:'⛽',padaria:'🥖',pescador:'🎣',barbearia:'💈',lixeiro:'♻️',prefeitura:'🗂️',oficina:'🔧',policia:'🚓',banco:'🏦',concessionaria:'🚗',fabrica:'🧊',enfermeiro:'🩺',gerente:'💼',delegado:'🕵️',medico:'⚕️',prefeito:'🏛️'};
+$('zjobs').onclick=()=>{if(!eu)return;const lista=Object.entries(JOBS).filter(([k])=>k!=='prefeito'||PREF_ID===eu.id).sort((a,b)=>a[1].nivel_min-b[1].nivel_min);
+ const g=painelLista('💼 Empregos','Toque num emprego liberado para ir até lá. Cada tarefa paga na hora.');
+ for(const [k,J] of lista){const lug=k==='bar'?'bar':k==='pescador'?'lagoa':k==='policia'?'delegacia':(JOB_LUGAR[k]||k),ok=eu.nivel>=J.nivel_min,atual=trabalho&&trabalho.job===k;
+  const d=document.createElement('button');d.className='jcard'+(ok?'':' off')+(atual?' on':'');
+  const ganho=k==='pescador'?'vende os peixes':k==='policia'?'R$ 50 a cada ronda':money(Math.round(J.salario/6*(1+.06*Math.max(0,eu.nivel-J.nivel_min))))+' por tarefa';
+  d.innerHTML=`<span class="ji">${JOB_IC[k]||'💼'}</span><span class="jt"><b>${esc(J.nome)}</b><small>📍 ${esc(PLACE_NAMES[lug]||lug)}</small><small class="jg">${ok?'💰 '+ganho+' · ⭐ '+Math.round(J.xp/5)+' XP':'🔒 Libera no nível '+J.nivel_min}</small></span><span class="jb">${atual?'Agora':ok?'Ir ›':'🔒'}</span>`;
+  d.onclick=()=>{if(!ok){toast('Esse emprego libera no nível '+J.nivel_min+'. Continue trabalhando!',3000);return}$('mLista').classList.add('hidden');irAoLugar(lug)};g.appendChild(d)}};
 async function boasVindas(){if(eu)return;$('join').classList.add('hidden');const el=document.createElement('div');el.id='boasvindas';
  el.innerHTML='<div class="bvL"><div class="bvT">🟢 Online agora</div><div id="bvLista">Carregando…</div></div><div class="bvR"><div style="font-size:40px">🍺</div><b style="font-size:18px">Cidade do Tonhão</b><div class="bvS">Crie seu personagem, trabalhe, faça amigos e curta o bar!</div><button class="btn big" id="bvCriar">✨ Criar minha conta</button><button class="btn ghost" id="bvEntrar">Já tenho conta</button><div class="bvS" id="bvTot"></div></div>';
  document.body.appendChild(el);
