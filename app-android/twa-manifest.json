@@ -20,7 +20,7 @@
     "path": "../vila-do-tonhao.keystore",
     "alias": "tonhao"
   },
-  "appVersionCode": 1,
+  "appVersionCode": 2,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "fallbackType": "customtabs",
