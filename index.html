@@ -4945,7 +4945,7 @@ async function conectarRT(){let tk=null;try{const {data}=await sb.auth.getSessio
   const cheia=await new Promise(res=>{let done=false;const fim=v=>{if(!done){done=true;res(v)}};
    c=rtCanal(n,tk,{fim,pos:p=>{if(ativo)onPos(p)},ev:p=>{if(ativo)onEv(p)},pres:()=>{if(ativo)syncPresence()},
     chat:r=>{if(!ativo||!r||typeof r.texto!=='string')return;const o=others.get(r.morador);if(o&&o.nome&&o.nome!=='…')r.nome=o.nome;r.sala=n;onChat(r,false)},
-    caiu:cod=>{if(canal!==c)return;canal=null;if(cod===4001){toast('📱 Você abriu o jogo em outra aba ou aparelho.',5000);return}setTimeout(()=>{if(!canal&&eu)conectar()},2500)}})});
+    caiu:cod=>{if(canal!==c)return;canal=null;if(cod===4001){toast('📱 Você abriu o jogo em outra aba ou aparelho.',5000);return}if(document.hidden)return;setTimeout(()=>{if(!canal&&eu&&!document.hidden)conectar()},2500)}})});
   if(cheia===null){c.close();return false}
   if(cheia){c.close();continue}
   ativo=true;canal=c;sala=n;dbCanal();
@@ -5712,7 +5712,7 @@ $('soTrocaFoto').onclick=()=>$('pfArquivo').click();
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)abrirSocial(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261124t';
+const VERSAO_JOGO='v20261124u';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
