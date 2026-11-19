@@ -24,8 +24,8 @@ def twaManifest = [
     applicationId: 'br.com.viladotonhao.app',
     hostName: 'viladotonhao.com.br', // The domain being opened in the TWA.
     launchUrl: '/?app=1', // The start path for the TWA. Must be relative to the domain.
-    name: 'Cidade do Tonhão', // The application name.
-    launcherName: 'Cidade do Tonhão', // The name shown on the Android Launcher.
+    name: 'Vila do Tonhão', // The application name.
+    launcherName: 'Vila do Tonhão', // The name shown on the Android Launcher.
     themeColor: '#2B1A20', // The color used for the status bar.
     themeColorDark: '#2B1A20', // The color used for the dark status bar.
     navigationColor: '#2B1A20', // The color used for the navigation bar.
