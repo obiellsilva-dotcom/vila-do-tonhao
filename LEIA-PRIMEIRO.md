@@ -6,7 +6,17 @@
 ---
 
 
-## 0. ÚLTIMA SESSÃO (18–19/11/2026) — versão `v20261124u`, ramo `ccr-fe2fa98f-j3vukg` (tudo commitado)
+## 00. SESSÃO DE 19/11/2026 (tarde) — versão `v20261125a` NO AR, ramo de trabalho `claude/new-session-ylq39m`
+- **SITE AGORA SOBE SOZINHO:** o Worker `viladotonhao` está ligado ao GitHub (ramo `main`, pasta `site/`, arquivos em `site/public/`). "Vamos subir" = copiar `index.html` (e páginas) do ramo de trabalho para `site/public/` no `main` e dar push (com o "pode" do dono). Não precisa mais de `site.zip`.
+- **Servidor tempo-real** (pasta `tempo-real/` no main): `/salas` (contagem das 60 salas, o jogo entra direto numa com vaga), `/glob` (avisos de casa/vaga vindos do banco por `pg_net`, etapa 38), fotos no **R2** (bucket `vila-fotos`: `POST /foto`, `GET /f/<uid>/<perfil|post>-N.jpg`, `DELETE /foto`).
+- **SQL etapas 36 a 42** (`entrega/sql-parte1..5.sql`): partes 1–4 confirmadas no banco; a 5 (fotos no R2) confirmar. Se a 5 não rodou, o jogo volta sozinho para o Supabase nas fotos.
+- **Feito:** luzes dos móveis à noite + Luz de teto (36); cor da parede/piso/janela (37, `estilo_casa`); móveis encostam na parede construída; painéis no celular (bottom sheet), loja com fotos dos carros e aba 💰 Dinheiro, perfil novo (`verPerfil`, cartão do jogador), empregos em cartões, Imobiliária em lista (`imobLista`), abas do Decorar consertadas.
+- **Economia (39):** casas 30k/45k/75k/mansão 350k; kitnet 15k (aluguel 1.500/sem), 2 quartos 25k (2.500/sem); **Hillux** (ex-Caminhonete do Tonhão) R$ 15,90; pacotes de dinheiro 10k R$ 9,90 / 20k R$ 18,90 / 50k R$ 44,90 / 100k R$ 84,90, limite R$ 100 mil por semana (`_limite_dinheiro`). O dono mudou de ideia e AGORA aceita vender dinheiro do jogo.
+- **Apartamentos sem limite (40):** `_garante_aptos` cria blocos E, F, G... (ímpar = kitnet, par = 2 quartos) nos mesmos prédios; cliente `aptoVirtual`.
+- **Títulos (41):** `TITULOS`/`RAR` no cliente, `meus_titulos`, `usar_titulo`, `resgatar_codigo`; código dos testadores **`PIONEIRO-VILA`** (vale até 28/02/2027, tabela `codigos`).
+- **Falta / ideias:** título de vitórias na sinuca (não há contador); trocar as fotos antigas do Supabase; Play Store (seção 7); dono pensa em app "de verdade" — recomendado manter o TWA.
+
+## 0. SESSÃO ANTERIOR (18–19/11/2026) — versão `v20261124u`, ramo `ccr-fe2fa98f-j3vukg` (tudo commitado)
 
 ### ⚠️ O QUE ESTÁ PENDENTE AGORA (confirmar com o dono no começo do chat)
 1. **Site:** o dono estava subindo o `site.zip` **v20261124t** (deu um aviso de "arquivo maior que 25 MiB" — é o próprio .zip de 30 MB; o painel extrai os 26 arquivos e segue). **Perguntar se o deploy terminou** e se o jogo mostra a tela de novidades com o Porshe GT. Se o Cloudflare recusar de vez: comprimir as 3 músicas da Vila (`charrete`, `o-campeao`, `futilidades-entre-nos`, hoje 256 kbps estéreo) para mono 64 kbps com ffmpeg (`-ac 1 -ar 44100 -b:a 64k`) → zip cai para ~18 MB. **Só fazer se ele disser "pode"** (ele interrompeu da primeira vez).
