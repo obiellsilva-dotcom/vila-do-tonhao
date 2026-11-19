@@ -3837,7 +3837,10 @@ const api=ONLINE?(()=>{
   perfis:ids=>{const C='id,admin,nome,visual,vip_ate,rastro,pet,carro,carro_cores,carro_mods,casa_id,nivel,foto,frase,relacionamento,time_coracao,insta';return q(sb.from('moradores').select(C+',titulo').in('id',ids)).catch(()=>q(sb.from('moradores').select(C).in('id',ids)))},
   meusTitulos:()=>rpc('meus_titulos',{}),usarTitulo:t=>rpc('usar_titulo',{p_titulo:t}),resgatarCodigo:c=>rpc('resgatar_codigo',{p_codigo:c}),
   atualizarPerfil:(f,r,t,i)=>rpc('atualizar_perfil',{p_frase:f,p_relacionamento:r,p_time:t,p_insta:i}),
-  async enviarFoto(blob){const {data:u}=await sb.auth.getUser();const path=u.user.id+'/perfil.jpg';
+  // fotos no Cloudflare (R2); se não der, usa o Supabase como antes
+  async fotoCF(blob,tipo){try{const {data}=await sb.auth.getSession(),tk=data&&data.session&&data.session.access_token;if(!tk)return null;const r=await fetch(RT_URL.replace(/^ws/,'http')+'/foto?tipo='+tipo,{method:'POST',headers:{Authorization:'Bearer '+tk,apikey:CONF.supabaseAnonKey||'','Content-Type':'image/jpeg'},body:blob});const j=await r.json().catch(()=>({}));if(r.ok&&j.url)return j.url;if(r.status===400||r.status===401)throw new Error(j.erro||'Não consegui enviar a foto.');return null}catch(e){if(/inválida|demais|conta/.test(e.message))throw e;return null}},
+  async fotoCFApagar(q){try{const {data}=await sb.auth.getSession(),tk=data&&data.session&&data.session.access_token;if(tk)await fetch(RT_URL.replace(/^ws/,'http')+'/foto?'+q,{method:'DELETE',headers:{Authorization:'Bearer '+tk,apikey:CONF.supabaseAnonKey||''}})}catch(e){}},
+  async enviarFoto(blob){const cf=await api.fotoCF(blob,'perfil');if(cf)return rpc('definir_foto',{p_foto:cf});const {data:u}=await sb.auth.getUser();const path=u.user.id+'/perfil.jpg';
    const {error}=await sb.storage.from('fotos').upload(path,blob,{upsert:true,contentType:'image/jpeg',cacheControl:'60'});if(error)throw new Error('Não consegui enviar a foto: '+error.message);
    const {data}=sb.storage.from('fotos').getPublicUrl(path);return rpc('definir_foto',{p_foto:data.publicUrl+'?v='+Date.now()})},
   removerFoto:()=>rpc('definir_foto',{p_foto:null}),
@@ -3845,10 +3848,10 @@ const api=ONLINE?(()=>{
   async social(id){const [a,b,c,d]=await Promise.all([sb.from('seguidores').select('*',{count:'exact',head:true}).eq('seguido',id),sb.from('seguidores').select('*',{count:'exact',head:true}).eq('seguidor',id),
    eu&&eu.id!==id?sb.from('seguidores').select('seguido').eq('seguidor',eu.id).eq('seguido',id):Promise.resolve({data:[]}),sb.from('posts').select('*').eq('autor',id).order('criado_em',{ascending:false}).limit(60)]);
    return{seguidores:a.count||0,seguindo:b.count||0,eu:!!(c.data&&c.data.length),posts:d.data||[]}},
-  async postar(blob,leg){const {data:u}=await sb.auth.getUser();const path=u.user.id+'/post-'+Date.now()+'.jpg';
+  async postar(blob,leg){const cf=await api.fotoCF(blob,'post');if(cf)return rpc('postar',{p_url:cf,p_legenda:leg});const {data:u}=await sb.auth.getUser();const path=u.user.id+'/post-'+Date.now()+'.jpg';
    const {error}=await sb.storage.from('fotos').upload(path,blob,{contentType:'image/jpeg',cacheControl:'3600'});if(error)throw new Error('Não consegui enviar a foto: '+error.message);
    const {data}=sb.storage.from('fotos').getPublicUrl(path);return rpc('postar',{p_url:data.publicUrl,p_legenda:leg})},
-  async apagarPost(p){await rpc('apagar_post',{p_id:p.id});const m=p.url.match(/fotos\/(.+)$/);if(m)await sb.storage.from('fotos').remove([m[1]])},
+  async apagarPost(p){await rpc('apagar_post',{p_id:p.id});const f=p.url.match(/\/f\/(.+)$/);if(f){await api.fotoCFApagar('key='+encodeURIComponent(f[1]));return}const m=p.url.match(/fotos\/(.+)$/);if(m)await sb.storage.from('fotos').remove([m[1]])},
   sinuca:n=>rpc('sinuca',{p_bolas:n}),
   async catalogo(){return{trabalhos:await q(sb.from('trabalhos').select('*')),loja:await q(sb.from('loja').select('*'))}},
   async casas(){return(await q(sb.from('casas').select('id,dono,aberta,moradores(nome)'))).map(c=>({id:c.id,dono:c.dono,aberta:c.aberta,nome:c.moradores?c.moradores.nome:null}))},
@@ -3877,7 +3880,7 @@ const api=ONLINE?(()=>{
   erroTarefa:()=>rpc('erro_tarefa'),sinucaDupla:v=>rpc('sinuca_dupla',{p_venceu:!!v}),
   usarRastro:r=>rpc('usar_rastro',{p_rastro:r}),
   meuPasse:()=>rpc('meu_passe'),resgatarPasse:(n,t)=>rpc('resgatar_passe',{p_nivel:n,p_trilha:t}),presenteVip:()=>rpc('presente_vip'),vipInfo:()=>rpc('vip_info'),
-  excluirConta:async()=>{try{const id=eu&&eu.id;if(id){const l=await sb.storage.from('fotos').list(id,{limit:1000});if(l&&l.data&&l.data.length)await sb.storage.from('fotos').remove(l.data.map(f=>id+'/'+f.name))}}catch(e){}
+  excluirConta:async()=>{try{await api.fotoCFApagar('todas=1')}catch(e){}try{const id=eu&&eu.id;if(id){const l=await sb.storage.from('fotos').list(id,{limit:1000});if(l&&l.data&&l.data.length)await sb.storage.from('fotos').remove(l.data.map(f=>id+'/'+f.name))}}catch(e){}
    await rpc('excluir_conta');try{await sb.auth.signOut()}catch(e){}},
   missao:p=>rpc('missao_passo',{p_passo:p}),
   abastecer:g=>rpc('abastecer',{p_nivel:g}),

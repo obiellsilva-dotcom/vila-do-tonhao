@@ -1,4 +1,4 @@
--- ETAPAS 36 a 41: Luz de teto, estilo da casa, avisos pelo Cloudflare, economia (casas, Hillux, pacotes), apartamentos sem limite e títulos. Pode rodar de novo sem perder nada.
+-- ETAPAS 36 a 42: Luz de teto, estilo da casa, avisos pelo Cloudflare, economia (casas, Hillux, pacotes), apartamentos sem limite , títulos e fotos no Cloudflare. Pode rodar de novo sem perder nada.
 create or replace function public.preco_movel(p_tipo text) returns integer
 language sql immutable as $$
   select case p_tipo
@@ -263,3 +263,37 @@ begin
   return json_build_object('titulo', c.titulo);
 end $$;
 grant execute on function public.resgatar_codigo(text) to authenticated;
+
+-- ===================== ETAPA 42: fotos no Cloudflare (R2) =====================
+-- Aceita fotos guardadas no servidor da cidade no Cloudflare (as antigas no Supabase continuam valendo).
+create or replace function public.definir_foto(p_foto text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores;
+begin
+  m := _eu();
+  if p_foto is not null and (char_length(p_foto) > 400 or (
+       p_foto !~ ('^https://[a-z0-9.-]+/storage/v1/object/public/fotos/' || m.id::text || '/[A-Za-z0-9._-]+(\?v=[0-9]+)?$')
+   and p_foto !~ ('^https://vila-tempo-real\.obiellsilva\.workers\.dev/f/' || m.id::text || '/perfil-[0-9]+\.jpg$'))) then
+    raise exception 'Foto inválida.';
+  end if;
+  update moradores set foto = p_foto where id = m.id;
+  return _estado(m.id);
+end $$;
+
+create or replace function public.postar(p_url text, p_legenda text) returns public.posts
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; l text := nullif(btrim(coalesce(p_legenda,'')), ''); r public.posts;
+begin
+  m := _eu();
+  if m.banido then raise exception 'Você foi banido.'; end if;
+  if char_length(p_url) > 400 or (
+       p_url !~ ('^https://[a-z0-9.-]+/storage/v1/object/public/fotos/' || m.id::text || '/post-[0-9]+\.jpg$')
+   and p_url !~ ('^https://vila-tempo-real\.obiellsilva\.workers\.dev/f/' || m.id::text || '/post-[0-9]+\.jpg$')) then
+    raise exception 'Foto inválida.'; end if;
+  if char_length(l) > 120 then raise exception 'A legenda pode ter até 120 letras.'; end if;
+  if (select count(*) from posts where autor = m.id and criado_em > now() - interval '1 day') >= 10 then
+    raise exception 'Limite de 10 fotos por dia. Volte amanhã!'; end if;
+  insert into posts(autor, url, legenda) values (m.id, p_url, limpar_texto(l)) returning * into r;
+  return r;
+end $$;
+grant execute on function public.postar(text, text) to authenticated;
