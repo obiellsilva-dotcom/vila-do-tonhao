@@ -5,15 +5,40 @@
 // Mensagens que o servidor manda para os jogadores não são cobradas pelo Cloudflare.
 
 const CORS = { 'Access-Control-Allow-Origin': '*' };
+const SALAS = 60;
+let cacheSalas = null, cacheEm = 0; // contagem de todas as salas, guardada por 3 s
+const ultimoAviso = new Map(); // evita repetir o mesmo aviso do banco em menos de 1 s
 
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     const m = url.pathname.match(/^\/sala\/(\d{1,2})$/);
     if (url.pathname === '/' ) return new Response('Cidade do Tonhão: servidor ao vivo OK', { headers: CORS });
+    // quantos jogadores tem em cada sala (o jogo usa para entrar direto numa sala com vaga)
+    if (url.pathname === '/salas') {
+      if (!cacheSalas || Date.now() - cacheEm > 3000) {
+        const ns = Array.from({ length: SALAS }, (_, i) => i + 1);
+        const r = await Promise.all(ns.map(n => env.SALA.get(env.SALA.idFromName('sala-' + n)).fetch(new Request('https://sala/contar')).then(x => x.json()).then(j => j.n | 0).catch(() => 0)));
+        cacheSalas = JSON.stringify({ max: +(env.MAX_SALA || 50), salas: r }); cacheEm = Date.now();
+      }
+      return new Response(cacheSalas, { headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
+    // aviso do banco (casa comprada, porta aberta, vaga ocupada): o Supabase chama aqui e todas as salas ficam sabendo.
+    // Só passa a tabela e o número; o jogo confere no banco o que mudou (ninguém consegue mentir por aqui).
+    if (url.pathname === '/glob' && req.method === 'POST') {
+      let b = {}; try { b = await req.json(); } catch (e) {}
+      const tb = b.tb === 'casas' || b.tb === 'vagas' ? b.tb : null, id = parseInt(b.id, 10);
+      if (!tb || !(id > 0) || id > 100000) return new Response('?', { status: 400, headers: CORS });
+      const k = tb + id, t = ultimoAviso.get(k) || 0;
+      if (Date.now() - t < 1000) return new Response('ok', { headers: CORS });
+      ultimoAviso.set(k, Date.now()); if (ultimoAviso.size > 2000) ultimoAviso.clear();
+      const corpo = JSON.stringify({ t: 'db', tb, id });
+      await Promise.all(Array.from({ length: SALAS }, (_, i) => env.SALA.get(env.SALA.idFromName('sala-' + (i + 1))).fetch(new Request('https://sala/aviso', { method: 'POST', body: corpo })).catch(() => {})));
+      return new Response('ok', { headers: CORS });
+    }
     if (!m) return new Response('não encontrado', { status: 404, headers: CORS });
     const n = +m[1];
-    if (n < 1 || n > 60) return new Response('sala inválida', { status: 400, headers: CORS });
+    if (n < 1 || n > SALAS) return new Response('sala inválida', { status: 400, headers: CORS });
     if (url.searchParams.get('contar') === '1') {
       const r = await env.SALA.get(env.SALA.idFromName('sala-' + n)).fetch(new Request('https://sala/contar'));
       return new Response(await r.text(), { headers: { ...CORS, 'Content-Type': 'application/json' } });
@@ -71,6 +96,7 @@ export class Sala {
   async fetch(req) {
     const url = new URL(req.url);
     if (url.pathname === '/contar') return new Response(JSON.stringify({ n: new Set(this.jogadores().map(a => a.id)).size }));
+    if (url.pathname === '/aviso') { if (this.abertas().length) this.espalhar(await req.text()); return new Response('ok'); }
     const id = url.searchParams.get('id') || null;
     const max = +(this.env.MAX_SALA || 50);
     const ids = new Set(this.jogadores().map(a => a.id));
