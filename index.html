@@ -341,7 +341,7 @@ html.noApp #zloja{display:none!important}
 <div id="cfgVip" class="hint" style="border:1px solid #d4af37;border-radius:12px;padding:10px"></div>
 <div style="display:flex;gap:6px"><button class="btn ghost" id="cfgPresente" style="flex:1">🎁 Presente do mês</button><button class="btn ghost" id="cfgCasa" style="flex:1">🏠 Ir para casa</button></div>
 <div style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn ghost" href="privacidade.html" target="_blank" rel="noopener" style="flex:1;text-align:center;text-decoration:none">📄 Privacidade</a><button class="btn ghost" id="cfgExcluir" style="flex:1;color:#ff7b7b">🗑️ Excluir minha conta</button></div>
-<div style="display:flex;gap:6px"><button class="btn ghost" id="cfgFb" style="flex:1">💬 Ideias e problemas</button><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
+<div style="display:flex;gap:6px"><button class="btn ghost" id="cfgFb" style="flex:1">💬 Ideias e problemas</button><button class="btn ghost" id="cfgTeste" style="flex:1">🧪 Testar o app</button><button class="btn ghost" id="cfgTuto" style="flex:1">📖 Ver tutorial</button><button class="btn ghost" id="cfgConta" style="flex:1">🔐 Minha conta</button></div></div></div>
 <div id="mIr" class="modal hidden"><div class="box" style="width:min(400px,100%)"><button class="x" data-close="mIr">×</button><h2>🔍 Ir para...</h2>
 <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px"><div class="pill" id="pop">👥 0 moradores</div><div class="pill hidden" id="salaPill"></div></div>
 <div style="display:flex;gap:6px;margin-bottom:8px"><input id="q" placeholder="procure um morador" autocomplete="off" style="flex:1;min-width:0"><button id="go" class="btn">ir</button></div>
@@ -5889,7 +5889,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261125b';
+const VERSAO_JOGO='v20261125c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -6068,6 +6068,15 @@ function abrirFeedback(){if(!eu)return;$('cfg').classList.add('hidden');
  <label class="fl">Mensagem</label><textarea id="fbTxt" maxlength="1000" rows="5" style="width:100%;border-radius:12px;padding:10px;font:500 15px Fredoka,sans-serif;resize:vertical" placeholder="Escreva aqui…"></textarea>
  <button class="btn" id="fbEnv" style="width:100%;margin-top:8px">📨 Enviar</button>`,box=>{$('fbEnv').onclick=()=>{const t=$('fbTxt').value.trim();if(t.length<5){toast('Escreva um pouco mais 🙂');return}
   acao(async()=>{await api.feedback($('fbTipo').value,t);$('mForm').classList.add('hidden');toast('📨 Recebido! Obrigado pela mensagem 💛',3500)})}})}
+// convite para testar o app da Play Store (aparece 1 vez para quem joga pelo site)
+function conviteTeste(forcar){if(!eu||NO_APP||!ONLINE)return;let ja=0;try{ja=+localStorage.getItem('vilaConviteTeste')||0}catch(e){}if(ja&&!forcar)return;try{localStorage.setItem('vilaConviteTeste','1')}catch(e){}
+ abrirForm('📱 Teste o app da Vila!',`<p class="hint" style="margin:0 0 8px">O jogo vai chegar na <b>Play Store</b>! Procuramos testadores com celular <b>Android</b>.<br>Quem testar ganha o título exclusivo <b style="color:#ffd23f">🧪 Pioneiro</b>, que nunca mais vai ser dado.</p>
+ <p class="hint" style="margin:0 0 8px">Você precisa deixar o app instalado por <b>14 dias</b>. Mande o seu <b>Gmail</b> (o da Play Store):</p>
+ <input id="ctMail" type="email" maxlength="80" placeholder="seuemail@gmail.com" style="width:100%">
+ <button class="btn" id="ctEnv" style="width:100%;margin-top:8px">🧪 Quero testar</button>`,()=>{$('ctEnv').onclick=()=>{const m=$('ctMail').value.trim().toLowerCase();if(!/^[^\s@]+@(gmail|googlemail)\.com$/.test(m)){toast('Coloque um e-mail do Gmail 🙂',3000);return}
+  acao(async()=>{await api.feedback('outro','TESTADOR PLAY STORE: '+m);$('mForm').classList.add('hidden');toast('🧪 Recebido! Você vai receber o link para instalar.',4500)})}})}
+setTimeout(()=>{try{conviteTeste()}catch(e){}},45000);
+setTimeout(()=>{const b=$('cfgTeste');if(b){if(NO_APP)b.remove();else b.onclick=()=>{$('cfg').classList.add('hidden');conviteTeste(true)}}},0);
 const ADM={den:0,fb:0};
 async function admContagem(){if(!eu||!eu.admin||!ONLINE)return;try{const r=await api.admContagem();ADM.den=r.denuncias|0;ADM.fb=r.feedbacks|0;const b=$('zadm');if(b){let i=b.querySelector('.bdgc');if(!i){i=document.createElement('span');i.className='bdgc';b.appendChild(i)}const n=ADM.den+ADM.fb;i.textContent=n>99?'99+':n;i.style.display=n?'flex':'none'}}catch(e){}}
 setInterval(()=>{if(eu&&eu.admin&&!document.hidden)admContagem()},60000);setTimeout(admContagem,6000);
