@@ -42,6 +42,21 @@ public class LauncherActivity
         }
     }
 
+    // Sempre abre pelo Chrome quando ele existe: o pagamento do Google Play só funciona no Chrome
+    // (no Samsung Internet e outros a loja não carrega).
+    private static final String[] CHROMES = {"com.android.chrome", "com.chrome.beta", "com.chrome.dev", "com.chrome.canary"};
+
+    @Override
+    protected com.google.androidbrowserhelper.trusted.TwaLauncher createTwaLauncher() {
+        for (String pkg : CHROMES) {
+            try {
+                android.content.pm.ApplicationInfo ai = getPackageManager().getApplicationInfo(pkg, 0);
+                if (ai.enabled) return new com.google.androidbrowserhelper.trusted.TwaLauncher(this, pkg);
+            } catch (Exception e) { /* não instalado */ }
+        }
+        return super.createTwaLauncher();
+    }
+
     @Override
     protected Uri getLaunchingUrl() {
         // Get the original launch Url.

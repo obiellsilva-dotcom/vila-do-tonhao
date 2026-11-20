@@ -30,6 +30,13 @@
 
     
 
+    <queries>
+        <package android:name="com.android.chrome" />
+        <package android:name="com.chrome.beta" />
+        <package android:name="com.chrome.dev" />
+        <package android:name="com.chrome.canary" />
+    </queries>
+
     <application
         android:name="Application"
         android:allowBackup="true"
