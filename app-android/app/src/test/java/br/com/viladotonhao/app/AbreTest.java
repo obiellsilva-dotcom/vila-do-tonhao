@@ -39,8 +39,16 @@ public class AbreTest {
         // vai para o fundo e volta
         Robolectric.buildActivity(MainActivity.class).setup().pause().resume().destroy();
     }
-    @Test @Config(sdk = 34) public void abreAndroid14() { abreEm(); }
-    @Test @Config(sdk = 30) public void abreAndroid11() { abreEm(); }
-    @Test @Config(sdk = 28) public void abreAndroid9() { abreEm(); }
-    @Test @Config(sdk = 24) public void abreAndroid7() { abreEm(); }
+    @Test @Config(sdk = 24) public void android7_0() { abreEm(); }
+    @Test @Config(sdk = 25) public void android7_1() { abreEm(); }
+    @Test @Config(sdk = 26) public void android8_0() { abreEm(); }
+    @Test @Config(sdk = 27) public void android8_1() { abreEm(); }
+    @Test @Config(sdk = 28) public void android9() { abreEm(); }
+    @Test @Config(sdk = 29) public void android10() { abreEm(); }
+    @Test @Config(sdk = 30) public void android11() { abreEm(); }
+    @Test @Config(sdk = 31) public void android12() { abreEm(); }
+    @Test @Config(sdk = 32) public void android12L() { abreEm(); }
+    @Test @Config(sdk = 33) public void android13() { abreEm(); }
+    @Test @Config(sdk = 34) public void android14() { abreEm(); }
+    @Test @Config(sdk = 35) public void android15() { abreEm(); }
 }
