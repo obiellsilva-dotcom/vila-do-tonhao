@@ -59,8 +59,8 @@ android {
         applicationId "br.com.viladotonhao.app"
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 20
-        versionName "2.0.2"
+        versionCode 21
+        versionName "2.0.3"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -149,7 +149,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
         }
     }
     compileOptions {
