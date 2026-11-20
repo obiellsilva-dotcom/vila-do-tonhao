@@ -5764,7 +5764,7 @@ async function presenteDoMes(){acao(async()=>{const i=await api.vipInfo();if(!i.
 function irParaCasa(){if(!eu)return;if(!souVip()){toast('🏠 Ir para casa num toque é do VIP 👑');return}if(trabalho){toast('Termine o trabalho primeiro.');return}if(!eu.casa_id){toast('Você ainda não tem casa. Fale com o corretor na Imobiliária!');return}
  const h=eu.casa_id>1000?{front:[27,-10]}:houses[eu.casa_id-1];if(!h)return;if(eu.driving)estacionarAqui();eu.rm=null;eu.path=[];eu.x=(h.front[0]+.5)*TILE;eu.y=(h.front[1]+.5)*TILE;follow=eu;cam.x=eu.x;cam.y=eu.y;sendPos(true);Som.play('clique');toast('🏠 Bem-vindo(a) em casa!',2000)}
 let precosOk=false;
-function abrirLoja(){if(!eu||(NO_APP&&!PLAY.svc))return;if(NO_APP){$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');closePlace();pintaLoja();$('mLoja').classList.remove('hidden');return}if(ONLINE&&!precosOk)sb.from('produtos').select('id,preco').then(({data})=>{if(!data)return;precosOk=true;for(const r of data)if(PRODUTOS[r.id])PRODUTOS[r.id].preco=Number(r.preco);if(!$('mLoja').classList.contains('hidden')&&!$('lojaItens').classList.contains('hidden'))pintaLoja()});closePlace();$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');pintaLoja();$('mLoja').classList.remove('hidden')}
+function abrirLoja(){if(!eu||(NO_APP&&!PLAY.svc))return;if(NO_APP){{const sb2=document.querySelector('#mLoja .sub');if(sb2)sb2.textContent='Pagamento seguro pelo Google Play. O item chega na hora.'}$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');closePlace();pintaLoja();$('mLoja').classList.remove('hidden');return}if(ONLINE&&!precosOk)sb.from('produtos').select('id,preco').then(({data})=>{if(!data)return;precosOk=true;for(const r of data)if(PRODUTOS[r.id])PRODUTOS[r.id].preco=Number(r.preco);if(!$('mLoja').classList.contains('hidden')&&!$('lojaItens').classList.contains('hidden'))pintaLoja()});closePlace();$('lojaPix').classList.add('hidden');$('lojaItens').classList.remove('hidden');$('lojaTabs').classList.remove('hidden');pintaLoja();$('mLoja').classList.remove('hidden')}
 function pintaLoja(){const t=$('lojaTabs');t.innerHTML='';TABS.forEach(([k,n])=>{const b=document.createElement('button');b.className=k===lojaTab?'on':'';b.textContent=n;b.onclick=()=>{lojaTab=k;pintaLoja()};t.appendChild(b)});
  const box=$('lojaItens');box.innerHTML='';
  const card=(o)=>{const d=document.createElement('div');d.className='lcard'+(o.full?' full':'');d.innerHTML=`<div class="foto"></div><div class="info"><b></b><small></small><div class="preco"></div></div>`;const f=d.querySelector('.foto');
@@ -5802,7 +5802,16 @@ $('pixVoltar').onclick=()=>{clearInterval(pixTimer);abrirLoja()};
 $('zloja').onclick=abrirLoja;
 // ===== Google Play (compras dentro do app da Play Store) =====
 const PLAY={svc:null};const skuDe=id=>id.toLowerCase();
-const PLAY_DIAG=[];async function iniciarPlay(){PLAY_DIAG.push('app:'+NO_APP,'dgs:'+('getDigitalGoodsService' in window),'ref:'+(document.referrer||'-'),'ua:'+navigator.userAgent.slice(-60));if(!NO_APP||!('getDigitalGoodsService' in window))return;try{const svc=await window.getDigitalGoodsService('https://play.google.com/billing');PLAY_DIAG.push('svc:'+!!svc);if(!svc)return;
+const PLAY_DIAG=[];
+// app nativo (versão 2.0+): a loja fala direto com o Google Play pelo window.AndroidPlay
+function iniciarPlayNativo(){const A=window.AndroidPlay,ids=Object.keys(PRODUTOS);PLAY_DIAG.push('nativo:'+(A.versao?A.versao():'?'));
+ window.__playDetalhes=(lista,info)=>{PLAY_DIAG.push('itens:'+lista.length+' '+info);for(const d of lista){const id=ids.find(k=>skuDe(k)===d.id);if(id){PRODUTOS[id].preco=Number(d.preco);PRODUTOS[id].play=1}}
+  for(const id of ids)if(!PRODUTOS[id].play)PRODUTOS[id].semPlay=1;if(lista.length){PLAY.svc={nativo:1};document.documentElement.classList.add('comPlay')}try{A.pendentes()}catch(e){}};
+ window.__playComprou=(sku,token,quieto)=>{entregaPlay(sku,token,quieto).then(ok=>{if(ok&&!quieto){const id=ids.find(k=>skuDe(k)===sku),P=PRODUTOS[id]||{};Som.play('nivel');toast('🎉 Compra liberada! Obrigado por apoiar a cidade!',6000);if(!$('mLoja').classList.contains('hidden'))pintaLoja()}}).catch(e=>toast(e.message,5000))};
+ window.__playErro=m=>{PLAY_DIAG.push('erro:'+m);if(!/^billing:|^detalhes:/.test(m))toast('⚠️ '+m,4000)};
+ window.__playCancelou=()=>{};
+ A.detalhes(JSON.stringify(ids.map(skuDe)))}
+async function iniciarPlay(){if(window.AndroidPlay&&NO_APP){iniciarPlayNativo();return}PLAY_DIAG.push('app:'+NO_APP,'dgs:'+('getDigitalGoodsService' in window),'ref:'+(document.referrer||'-'),'ua:'+navigator.userAgent.slice(-60));if(!NO_APP||!('getDigitalGoodsService' in window))return;try{const svc=await window.getDigitalGoodsService('https://play.google.com/billing');PLAY_DIAG.push('svc:'+!!svc);if(!svc)return;
  const ids=Object.keys(PRODUTOS),det=await svc.getDetails(ids.map(skuDe));for(const d of det){const id=ids.find(k=>skuDe(k)===d.itemId);if(id&&d.price){PRODUTOS[id].preco=Number(d.price.value);PRODUTOS[id].play=1}}
  for(const id of ids)if(!PRODUTOS[id].play)PRODUTOS[id].semPlay=1;PLAY.svc=svc;document.documentElement.classList.add('comPlay');
  // compras que ficaram sem entregar (o app fechou no meio)
@@ -5810,9 +5819,10 @@ const PLAY_DIAG=[];async function iniciarPlay(){PLAY_DIAG.push('app:'+NO_APP,'dg
 function diagPlay(){confirmar('🔧 Diagnóstico da loja','<div style="font-size:12px;word-break:break-all;text-align:left">'+PLAY_DIAG.map(esc).join('<br>')+'</div>')}
 async function entregaPlay(sku,token,quieto){const {data,error}=await sb.functions.invoke('swift-api',{body:{sku,token}});let erro=data&&data.erro;if(error){try{erro=(await error.context.json()).erro}catch(_){erro=error.message}}
  if(erro){if(!quieto)throw new Error(erro);return false}
- if(data.consumir&&PLAY.svc){try{await PLAY.svc.consume(token)}catch(e){}}
+ if(data.consumir&&PLAY.svc){try{if(PLAY.svc.nativo)window.AndroidPlay.consumir(token);else await PLAY.svc.consume(token)}catch(e){}}
  const m=await api.perfil(eu.id);if(m){aplicarEstado(m);eu.vip_ate=m.vip_ate;eu.pets=m.pets||[];eu.pet=m.pet}emitEv('perfil',{});return true}
 function comprarPlay(id){const P=PRODUTOS[id];if(!PLAY.svc||P.semPlay){toast('Esse item ainda não está à venda no app.',3000);return}const nome=P.nome||(P.din?money(P.din)+' do jogo':P.pet?PETS[P.pet].nome:CARS_PREMIUM[P.carro].nome);
+ if(PLAY.svc.nativo){toast('⏳ Abrindo o Google Play…',2000);window.AndroidPlay.comprar(skuDe(id),eu.id||'');return}
  acao(async()=>{let r;try{const req=new PaymentRequest([{supportedMethods:'https://play.google.com/billing',data:{sku:skuDe(id)}}],{total:{label:nome,amount:{currency:'BRL',value:'0'}}});r=await req.show()}catch(e){if(e&&e.name==='AbortError')return;throw new Error('Não consegui abrir o pagamento do Google.')}
   const token=r.details&&r.details.purchaseToken;try{await r.complete('success')}catch(e){}if(!token)throw new Error('Pagamento não concluído.');
   toast('⏳ Confirmando com o Google…',2500);await entregaPlay(skuDe(id),token);Som.play('nivel');toast('🎉 '+nome+' liberado! Obrigado por apoiar a cidade!',6000);pintaLoja()})}
@@ -5906,7 +5916,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261125f';
+const VERSAO_JOGO='v20261125g';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

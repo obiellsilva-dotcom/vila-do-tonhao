@@ -51,14 +51,15 @@ def twaManifest = [
 ]
 
 android {
+    buildFeatures { buildConfig true }
     compileSdkVersion 36
     namespace "br.com.viladotonhao.app"
     defaultConfig {
         applicationId "br.com.viladotonhao.app"
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 5
-        versionName "1.2.0"
+        versionCode 6
+        versionName "2.0.0"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -203,7 +204,6 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     
-        implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.6.2'
-    implementation 'com.google.androidbrowserhelper:billing:1.2.0'
+    implementation 'com.android.billingclient:billing:7.1.1'
     
 }
