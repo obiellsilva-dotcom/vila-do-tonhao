@@ -5802,11 +5802,12 @@ $('pixVoltar').onclick=()=>{clearInterval(pixTimer);abrirLoja()};
 $('zloja').onclick=abrirLoja;
 // ===== Google Play (compras dentro do app da Play Store) =====
 const PLAY={svc:null};const skuDe=id=>id.toLowerCase();
-async function iniciarPlay(){if(!NO_APP||!('getDigitalGoodsService' in window))return;try{const svc=await window.getDigitalGoodsService('https://play.google.com/billing');if(!svc)return;
+const PLAY_DIAG=[];async function iniciarPlay(){PLAY_DIAG.push('app:'+NO_APP,'dgs:'+('getDigitalGoodsService' in window),'ref:'+(document.referrer||'-'),'ua:'+navigator.userAgent.slice(-60));if(!NO_APP||!('getDigitalGoodsService' in window))return;try{const svc=await window.getDigitalGoodsService('https://play.google.com/billing');PLAY_DIAG.push('svc:'+!!svc);if(!svc)return;
  const ids=Object.keys(PRODUTOS),det=await svc.getDetails(ids.map(skuDe));for(const d of det){const id=ids.find(k=>skuDe(k)===d.itemId);if(id&&d.price){PRODUTOS[id].preco=Number(d.price.value);PRODUTOS[id].play=1}}
  for(const id of ids)if(!PRODUTOS[id].play)PRODUTOS[id].semPlay=1;PLAY.svc=svc;document.documentElement.classList.add('comPlay');
  // compras que ficaram sem entregar (o app fechou no meio)
- try{for(const c of await svc.listPurchases())entregaPlay(c.itemId,c.purchaseToken,true)}catch(e){}}catch(e){console.warn('play',e)}}
+ try{for(const c of await svc.listPurchases())entregaPlay(c.itemId,c.purchaseToken,true)}catch(e){}PLAY_DIAG.push('itens:'+det.length)}catch(e){PLAY_DIAG.push('erro:'+(e&&e.message||e))}}
+function diagPlay(){confirmar('🔧 Diagnóstico da loja','<div style="font-size:12px;word-break:break-all;text-align:left">'+PLAY_DIAG.map(esc).join('<br>')+'</div>')}
 async function entregaPlay(sku,token,quieto){const {data,error}=await sb.functions.invoke('swift-api',{body:{sku,token}});let erro=data&&data.erro;if(error){try{erro=(await error.context.json()).erro}catch(_){erro=error.message}}
  if(erro){if(!quieto)throw new Error(erro);return false}
  if(data.consumir&&PLAY.svc){try{await PLAY.svc.consume(token)}catch(e){}}
@@ -5905,7 +5906,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261125e';
+const VERSAO_JOGO='v20261125f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -6092,7 +6093,7 @@ function conviteTeste(forcar){if(!eu||NO_APP||!ONLINE)return;let ja=0;try{ja=+lo
  <button class="btn" id="ctEnv" style="width:100%;margin-top:8px">🧪 Quero testar</button>`,()=>{$('ctEnv').onclick=()=>{const m=$('ctMail').value.trim().toLowerCase();if(!/^[^\s@]+@(gmail|googlemail)\.com$/.test(m)){toast('Coloque um e-mail do Gmail 🙂',3000);return}
   acao(async()=>{await api.feedback('outro','TESTADOR PLAY STORE: '+m);$('mForm').classList.add('hidden');toast('🧪 Recebido! Você vai receber o link para instalar.',4500)})}})}
 setTimeout(()=>{try{conviteTeste()}catch(e){}},45000);
-setTimeout(()=>{const b=$('cfgTeste');if(b){if(NO_APP)b.remove();else b.onclick=()=>{$('cfg').classList.add('hidden');conviteTeste(true)}}},0);
+setTimeout(()=>{const b=$('cfgTeste');if(b){if(NO_APP){b.textContent='🔧 Diagnóstico';b.onclick=()=>{$('cfg').classList.add('hidden');diagPlay()};return}else b.onclick=()=>{$('cfg').classList.add('hidden');conviteTeste(true)}}},0);
 const ADM={den:0,fb:0};
 async function admContagem(){if(!eu||!eu.admin||!ONLINE)return;try{const r=await api.admContagem();ADM.den=r.denuncias|0;ADM.fb=r.feedbacks|0;const b=$('zadm');if(b){let i=b.querySelector('.bdgc');if(!i){i=document.createElement('span');i.className='bdgc';b.appendChild(i)}const n=ADM.den+ADM.fb;i.textContent=n>99?'99+':n;i.style.display=n?'flex':'none'}}catch(e){}}
 setInterval(()=>{if(eu&&eu.admin&&!document.hidden)admContagem()},60000);setTimeout(admContagem,6000);
