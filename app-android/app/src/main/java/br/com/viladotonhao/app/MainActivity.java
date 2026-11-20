@@ -212,10 +212,11 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
                     List<QueryProductDetailsParams.Product> lista = new ArrayList<>();
                     for (int i = 0; i < a.length(); i++)
                         lista.add(QueryProductDetailsParams.Product.newBuilder().setProductId(a.getString(i)).setProductType(BillingClient.ProductType.INAPP).build());
-                    billing.queryProductDetailsAsync(QueryProductDetailsParams.newBuilder().setProductList(lista).build(), (r, ds) -> {
+                    billing.queryProductDetailsAsync(QueryProductDetailsParams.newBuilder().setProductList(lista).build(), (r, res) -> {
                         JSONArray out = new JSONArray();
                         try {
-                                                        if (ds != null) for (ProductDetails d : ds) {
+                                                        List<ProductDetails> ds = res == null ? null : res.getProductDetailsList();
+                            if (ds != null) for (ProductDetails d : ds) {
                                 produtos.put(d.getProductId(), d);
                                 ProductDetails.OneTimePurchaseOfferDetails o = d.getOneTimePurchaseOfferDetails();
                                 if (o == null) continue;
