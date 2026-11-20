@@ -52,7 +52,7 @@ def twaManifest = [
 
 android {
     buildFeatures { buildConfig true }
-    testOptions { unitTests { includeAndroidResources = true } }
+    testOptions { unitTests { includeAndroidResources = true; all { maxHeapSize = "3g"; forkEvery = 1 } } }
     compileSdkVersion 36
     namespace "br.com.viladotonhao.app"
     defaultConfig {
