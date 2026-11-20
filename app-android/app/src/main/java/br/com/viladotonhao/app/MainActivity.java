@@ -61,11 +61,11 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
         Window w = getWindow();
         w.setStatusBarColor(Color.parseColor("#2B1A20"));
         w.setNavigationBarColor(Color.parseColor("#2B1A20"));
-        telaCheia();
 
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#2B1A20"));
         setContentView(web);
+        telaCheia();
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -76,8 +76,10 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
         s.setUseWideViewPort(true);
         s.setTextZoom(100);
         s.setUserAgentString(s.getUserAgentString() + " VilaDoTonhaoApp/" + BuildConfig.VERSION_NAME);
-        CookieManager.getInstance().setAcceptCookie(true);
-        CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
+        try {
+            CookieManager.getInstance().setAcceptCookie(true);
+            CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
+        } catch (Throwable e) { }
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -101,11 +103,13 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
         });
         web.addJavascriptInterface(new Ponte(), "AndroidPlay");
 
-        billing = BillingClient.newBuilder(this)
-                .setListener(this)
-                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
-                .build();
-        conectarBilling(null);
+        try {
+            billing = BillingClient.newBuilder(this)
+                    .setListener(this)
+                    .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                    .build();
+            conectarBilling(null);
+        } catch (Throwable e) { billing = null; }
 
         Uri link = getIntent() != null ? getIntent().getData() : null;
         if (savedInstanceState != null) web.restoreState(savedInstanceState);
@@ -113,6 +117,7 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
     }
 
     private void telaCheia() {
+      try {
         if (Build.VERSION.SDK_INT >= 30) {
             WindowInsetsController c = getWindow().getInsetsController();
             if (c != null) {
@@ -124,6 +129,7 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
+      } catch (Throwable e) { }
     }
 
     @Override
@@ -164,6 +170,7 @@ public class MainActivity extends Activity implements PurchasesUpdatedListener {
 
     // ---------- Google Play Billing ----------
     private void conectarBilling(Runnable depois) {
+        if (billing == null) { js("window.__playErro&&window.__playErro('billing indisponível')"); return; }
         if (billing.isReady()) { if (depois != null) depois.run(); return; }
         billing.startConnection(new BillingClientStateListener() {
             @Override public void onBillingSetupFinished(BillingResult r) {

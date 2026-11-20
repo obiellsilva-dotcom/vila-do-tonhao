@@ -52,6 +52,7 @@ def twaManifest = [
 
 android {
     buildFeatures { buildConfig true }
+    testOptions { unitTests { includeAndroidResources = true } }
     compileSdkVersion 36
     namespace "br.com.viladotonhao.app"
     defaultConfig {
@@ -205,5 +206,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     
     implementation 'com.android.billingclient:billing:8.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
     
 }
