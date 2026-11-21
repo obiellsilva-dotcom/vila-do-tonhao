@@ -4041,7 +4041,7 @@ const livre=()=>eu&&!emCasa&&!sinucaAberta&&(!trabalho||trabalho.job==='policia'
 function aplicarEstado(e){
  if(!e||!eu)return;
  eu.vip_ate=e.vip_ate||null;eu.pets=e.pets||[];eu.pet=e.pet||null;eu.rastro=e.rastro||null;(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()?['neon']:[]).forEach(c=>{if(CARS_PREMIUM[c])CARS[c]=CARS_PREMIUM[c]});if(!souVip()&&ehVip(eu.v))eu.v=semVip(eu.v);
- Object.assign(eu,{dinheiro:e.dinheiro,xp:e.xp,nivel:e.nivel,fome:+e.fome,sede:e.sede!=null?+e.sede:100,gas:e.gasolina!=null?+e.gasolina:(eu.gas??100),peixes:e.peixes,carros:(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()&&!(e.carros||[]).includes('neon')?['neon']:[]),carro:e.carro,casa_id:e.casa_id,mortes:e.mortes||0,foto:e.foto||null,frase:e.frase||null,relacionamento:e.relacionamento||null,time_coracao:e.time_coracao||null,insta:e.insta||null,titulo:e.titulo||null});
+ Object.assign(eu,{dinheiro:e.dinheiro,xp:e.xp,nivel:e.nivel,fome:+e.fome,sede:e.sede!=null?+e.sede:100,gas:e.gasolina!=null?+e.gasolina:(eu.gas??100),peixes:e.peixes,carros:(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()&&!(e.carros||[]).includes('neon')?['neon']:[]),carro:(()=>{const cs=(e.carros||[]).concat(e.vip_ate&&Date.parse(e.vip_ate)>Date.now()?['neon']:[]);if(eu.carro&&cs.includes(eu.carro)&&(eu.driving||!e.carro||!cs.includes(e.carro)))return eu.carro;return e.carro&&cs.includes(e.carro)?e.carro:(eu.carro&&cs.includes(eu.carro)?eu.carro:(cs[0]||null))})(),casa_id:e.casa_id,mortes:e.mortes||0,foto:e.foto||null,frase:e.frase||null,relacionamento:e.relacionamento||null,time_coracao:e.time_coracao||null,insta:e.insta||null,titulo:('titulo' in e)?(e.titulo||null):(eu.titulo||null)});
  refreshHud();
 }
 function tratar(r){if(!r)return r;if(r.bonus_hora)toast('⏰ +50 XP por 1 hora jogando!',4000);if(r.eu)aplicarEstado(r.eu);if(r.subiu>0)subiuNivel(r.premio);if(r.morreu)morreu();return r}
@@ -4429,7 +4429,7 @@ async function estacionar(v,depois,excl){
 function pegarCarro(){
  if(!eu||!eu.carros.length||!livre())return;
  if(entrarNoParado())return;
- if(!eu.carro||!eu.carros.includes(eu.carro))eu.carro=eu.carros[0];
+ if(!eu.carro||!eu.carros.includes(eu.carro))eu.carro=eu.carros[0];try{if(eu.carro&&ONLINE)api.usarCarro(eu.carro).catch(()=>{})}catch(_){}
  const v=eu.parked&&VAGAS.find(x=>x.id===eu.parked);
  const sobe=(x,y)=>{Som.play('buzina');eu.x=x;eu.y=y;eu.path=[];eu.driving=true;sendPos(true);refreshCard()};
  if(v){
@@ -5916,7 +5916,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261125g';
+const VERSAO_JOGO='v20261126a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
