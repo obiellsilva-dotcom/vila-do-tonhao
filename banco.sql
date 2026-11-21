@@ -3444,3 +3444,48 @@ grant execute on function public.postar(text, text) to authenticated;
 -- ===================== ETAPA 43: compras pelo Google Play (app) =====================
 -- a mesma compra do Google Play nunca é entregue duas vezes
 create unique index if not exists pedidos_gp_unico on public.pedidos(mp_id) where mp_id like 'gp:%';
+
+-- ===================== ETAPA 44: admin pode definir o nível de um jogador =====================
+create or replace function public.admin_acao(p_nome text, p_acao text, p_valor text) returns json
+language plpgsql security definer set search_path = public as $$
+declare a public.moradores; n integer; c public.casas;
+begin
+  perform _adm();
+  a := _alvo(p_nome);
+  if p_acao = 'dinheiro' then
+    n := p_valor::integer;
+    update moradores set dinheiro = greatest(0, dinheiro + n) where id = a.id;
+  elsif p_acao = 'vip' then
+    n := greatest(1, p_valor::integer);
+    update moradores set vip_ate = greatest(coalesce(vip_ate, now()), now()) + make_interval(days => n) where id = a.id;
+  elsif p_acao = 'pet' then
+    if p_valor not in ('cachorro','gato','galinha','capivara','papagaio') then raise exception 'Pet inválido.'; end if;
+    update moradores set pets = (select array_agg(distinct x) from unnest(array_append(pets, p_valor)) x), pet = p_valor where id = a.id;
+  elsif p_acao = 'carro' then
+    update moradores set carros = (select array_agg(distinct x) from unnest(array_append(carros, p_valor)) x), carro = p_valor where id = a.id;
+  elsif p_acao = 'casa' then
+    select * into c from casas where id = p_valor::integer for update;
+    if not found then raise exception 'Casa não existe.'; end if;
+    update vagas set morador = null, carro = null, desde = null where casa in (select id from casas where dono = a.id);
+    update casas set dono = null, comprada_em = null, aberta = false where dono = a.id;
+    update casas set dono = a.id, comprada_em = now(), aberta = false where id = c.id;
+    update moradores set casa_id = c.id where id = a.id;
+  elsif p_acao = 'tirar_casa' then
+    update casas set dono = null, comprada_em = null, aberta = false where dono = a.id;
+    update moradores set casa_id = null where id = a.id;
+  elsif p_acao = 'nivel' then
+    n := greatest(1, least(50, p_valor::integer));
+    update moradores set nivel = n, xp = xp_do_nivel(n) where id = a.id;
+  elsif p_acao = 'silenciar' then
+    n := greatest(1, least(43200, coalesce(nullif(p_valor, '')::integer, 60)));
+    update moradores set silenciado_ate = now() + make_interval(mins => n) where id = a.id;
+  elsif p_acao = 'dessilenciar' then
+    update moradores set silenciado_ate = null, strikes = 0 where id = a.id;
+  elsif p_acao = 'banir' then
+    update moradores set banido = true where id = a.id;
+  elsif p_acao = 'desbanir' then
+    update moradores set banido = false where id = a.id;
+  else raise exception 'Ação desconhecida.'; end if;
+  return json_build_object('ok', true, 'id', a.id, 'nome', a.nome);
+end $$;
+
