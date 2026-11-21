@@ -5916,7 +5916,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261126a';
+const VERSAO_JOGO='v20261126b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
@@ -6139,16 +6139,16 @@ async function admFeedbacks(){abrirForm('💬 Ideias e problemas','<div id="admL
 function painelAdmin(){if(!eu||!eu.admin)return;
  const nomes=[...others.values()].filter(o=>o.seen).map(o=>o.nome);
  abrirForm('🛡️ Painel do Admin',`<div class="grid" style="grid-template-columns:1fr 1fr;margin-bottom:8px"><button class="btn" id="aDen" style="background:#d63031;color:#fff">🚨 Denúncias (${ADM.den})</button><button class="btn" id="aFb">💬 Ideias (${ADM.fb})</button></div><label class="fl">Jogador (nome exato)</label><input id="aNome" list="aLista" placeholder="Nome do jogador"><datalist id="aLista">${nomes.map(n=>'<option value="'+esc(n)+'">').join('')}</datalist>
- <label class="fl">Valor (dinheiro, dias de VIP, nº da casa ou minutos de silêncio)</label><input id="aVal" inputmode="numeric" placeholder="ex.: 5000">
+ <label class="fl">Valor (dinheiro, dias de VIP, nível, nº da casa ou minutos de silêncio)</label><input id="aVal" inputmode="numeric" placeholder="ex.: 5000">
  <div class="fx"><div><label class="fl">Pet</label><select id="aPet">${Object.keys(PETS).map(k=>'<option value="'+k+'">'+PETS[k].ic+' '+PETS[k].nome+'</option>').join('')}</select></div><div><label class="fl">Carro</label><select id="aCar">${Object.keys(CARS_PREMIUM).concat(Object.keys(CARS).filter(k=>!CARS_PREMIUM[k])).filter((v,i,a)=>a.indexOf(v)===i).map(k=>'<option value="'+k+'">'+(CARS[k]||CARS_PREMIUM[k]).nome+'</option>').join('')}</select></div></div>
- <div class="grid"><button class="btn" data-a="dinheiro">💰 Dar dinheiro</button><button class="btn" data-a="tirar">💸 Tirar dinheiro</button><button class="btn" data-a="vip">👑 Dar VIP (dias)</button><button class="btn" data-a="pet">🐾 Dar pet</button>
+ <div class="grid"><button class="btn" data-a="dinheiro">💰 Dar dinheiro</button><button class="btn" data-a="tirar">💸 Tirar dinheiro</button><button class="btn" data-a="vip">👑 Dar VIP (dias)</button><button class="btn" data-a="nivel">⭐ Definir nível</button><button class="btn" data-a="pet">🐾 Dar pet</button>
  <button class="btn" data-a="carro">🚗 Dar carro</button><button class="btn" data-a="casa">🏠 Dar casa (nº)</button><button class="btn ghost" data-a="tirar_casa">🏚️ Tirar casa</button><button class="btn ghost" data-a="expulsar">👢 Expulsar</button>
  <button class="btn ghost" data-a="silenciar">🔇 Silenciar (min)</button><button class="btn ghost" data-a="dessilenciar">🔈 Tirar silêncio</button><button class="btn ghost" data-a="banir" style="color:#ff6b6b">🚫 Banir</button><button class="btn ghost" data-a="desbanir">✅ Desbanir</button></div><div class="grid" style="grid-template-columns:1fr"><button class="btn" id="aAviso" style="background:#d63031;color:#fff">📢 Aviso para toda a cidade</button></div>`,
  box=>{$('aAviso').onclick=avisoGeral;$('aDen').onclick=()=>admDenuncias(false);$('aFb').onclick=admFeedbacks;admContagem().then(()=>{if($('aDen'))$('aDen').textContent='🚨 Denúncias ('+ADM.den+')';if($('aFb'))$('aFb').textContent='💬 Ideias ('+ADM.fb+')'});box.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const n=$('aNome').value.trim(),v=$('aVal').value.trim(),a=b.dataset.a;if(!n){toast('Escreva o nome do jogador.');return}
   const alvo=[...others.values()].find(o=>o.nome.toLowerCase()===n.toLowerCase());
   if(a==='expulsar'){if(!alvo){toast(n+' não está na sua sala agora.');return}emitEv('kick',{para:alvo.id});toast('👢 '+n+' foi expulso(a).');return}
   const acaoS=a==='tirar'?'dinheiro':a,val=a==='tirar'?-Math.abs(+v||0):a==='pet'?$('aPet').value:a==='carro'?$('aCar').value:a==='silenciar'?(+v||60):v;
-  if(['dinheiro','tirar','vip','casa'].includes(a)&&!(+v)){toast('Coloque o valor.');return}
+  if(['dinheiro','tirar','vip','casa','nivel'].includes(a)&&!(+v)){toast('Coloque o valor.');return}if(a==='nivel'&&(+v<1||+v>50)){toast('O nível vai de 1 a 50.');return}
   confirmar('🛡️ Confirmar',`<b>${esc(b.textContent)}</b> para <b>${esc(n)}</b>${val!==''&&a!=='banir'&&a!=='desbanir'&&a!=='tirar_casa'&&a!=='dessilenciar'?' ('+esc(val)+(a==='silenciar'?' min':'')+')':''}?`,()=>acao(async()=>{const r=await api.admin(n,acaoS,val);toast('✅ Feito: '+b.textContent+' → '+r.nome,3000);
    if(alvo)emitEv('admAviso',{para:alvo.id,t:a,v:val});if(a==='banir'&&alvo)emitEv('kick',{para:alvo.id,ban:1});if(r.id===eu.id){const m=await api.perfil(eu.id);if(m)aplicarEstado(m)}}))})})}
 $('zadm').onclick=painelAdmin;
@@ -6157,7 +6157,7 @@ setInterval(()=>{if(eu)$('zadm').classList.toggle('hidden',!eu.admin)},1500);
 function onAdmin(o,p){if(!eu||p.para!==eu.id)return;const pf=perfis.get(o.id);if(!(pf&&pf.admin))return;
  if(p.k==='kick'){confirmar(p.ban?'🚫 Banido':'👢 Expulso',p.ban?'Você foi banido da cidade pelo administrador.':'Você foi expulso da sala pelo administrador.',()=>location.reload(),[['OK',()=>location.reload()]]);try{canal&&sb.removeChannel(canal)}catch(_){}canal=null;setTimeout(()=>location.reload(),6000);return}
  if(p.k==='admAviso'){api.perfil(eu.id).then(m=>{if(m){aplicarEstado(m);eu.pets=m.pets||[];eu.pet=m.pet;eu.carros=m.carros||eu.carros;eu.vip_ate=m.vip_ate;eu.casa_id=m.casa_id;refreshHud()}}).catch(()=>{});
-  const T={dinheiro:'💰 O admin te deu '+money(+p.v||0)+'!',tirar:'💸 O admin tirou '+money(Math.abs(+p.v||0))+'.',vip:'👑 Você ganhou '+p.v+' dias de VIP!',pet:'🐾 Você ganhou um pet!',carro:'🚗 Você ganhou um carro!',casa:'🏠 Você ganhou a casa '+p.v+'!',tirar_casa:'🏚️ Sua casa foi retirada.'}[p.t];if(T)bannerGrande('🎁 PRESENTE DO ADMIN',T)}}
+  const T={dinheiro:'💰 O admin te deu '+money(+p.v||0)+'!',tirar:'💸 O admin tirou '+money(Math.abs(+p.v||0))+'.',vip:'👑 Você ganhou '+p.v+' dias de VIP!',pet:'🐾 Você ganhou um pet!',carro:'🚗 Você ganhou um carro!',casa:'🏠 Você ganhou a casa '+p.v+'!',tirar_casa:'🏚️ Sua casa foi retirada.',nivel:'⭐ Agora você é nível '+p.v+'!'}[p.t];if(T)bannerGrande('🎁 PRESENTE DO ADMIN',T)}}
 /* ----- venda de carros ----- */
 function venderLoja(c){const n=CARS[c].nome,v=Math.floor((CARS[c].preco||0)/2);confirmar('💸 Vender '+n,`A concessionária paga <b>${money(v)}</b> pelo seu ${esc(n)} (metade do preço). Vender?`,()=>acao(async()=>{const r=tratar(await api.venderLoja(c));eu.carros=eu.carros.filter(x=>x!==c);if(eu.carro===c){eu.carro=eu.carros[0]||null;if(eu.driving)eu.driving=false}if(eu.parkLoc&&eu.parkLoc.c===c){parados.delete(eu.id);eu.parkLoc=null;emitEv('unpark',{})}Som.play('moeda');toast('💸 Vendido por '+money(r.recebido)+'!',3000);sendPos(true);abrirLugar(lugarAtual)}))}
 function venderJogador(c0){if(!eu.carros.length){toast('Você não tem carro para vender.');return}const nomes=[...others.values()].filter(o=>o.seen).map(o=>o.nome);
