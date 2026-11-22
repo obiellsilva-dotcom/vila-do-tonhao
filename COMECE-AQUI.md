@@ -1,33 +1,34 @@
-# Como abrir um chat novo — Cidade do Tonhão
+# Como abrir um chat novo — Vila do Tonhão (outra conta do Claude)
 
-## Passo a passo (pelo celular)
-1. Abra o **Claude Code** e comece uma sessão nova com o repositório **`obiellsilva-dotcom/vila-do-tonhao`**.
-2. Se der para escolher o ramo, escolha **`ccr-fe2fa98f-j3vukg`** (é onde está tudo).
-3. Cole a mensagem abaixo como primeira mensagem.
-4. Se o chat novo não conseguir abrir o GitHub, anexe o **`pacote-novo-chat.zip`**.
+## Antes de tudo (uma vez só, na conta nova)
+1. Entre no **claude.ai** com a conta nova.
+2. Ligue o **GitHub** nessa conta: claude.ai → Configurações → **Conectores / GitHub** → conectar com o **mesmo GitHub** de sempre (`obiellsilva-dotcom`).
+   - Se pedir, instale o **app do Claude no GitHub** e dê acesso ao repositório **vila-do-tonhao**.
+3. Abra o **Claude Code** (claude.ai/code) e comece uma sessão nova escolhendo o repositório **`obiellsilva-dotcom/vila-do-tonhao`**.
+   - Se der para escolher o ramo, escolha **`claude/new-session-ylq39m`**.
 
-## Mensagem para colar no chat novo
+> Se não der para ligar o GitHub, anexe o arquivo **`pacote-novo-chat.zip`** no chat (tem tudo dentro).
+
+## Mensagem para colar como primeira mensagem
 ```
-Olá! Sou o dono do jogo Cidade do Tonhão. Não sou programador, uso só o celular e tenho pouco limite de uso.
+Olá! Sou o dono do jogo Vila do Tonhão. Não sou programador, uso só o celular e tenho pouco limite de uso.
 Responda em português simples, curto e passo a passo.
 
-1. Busque o ramo ccr-fe2fa98f-j3vukg do repositório (git fetch origin ccr-fe2fa98f-j3vukg e git checkout ccr-fe2fa98f-j3vukg) e continue trabalhando nele.
-2. Leia o arquivo LEIA-PRIMEIRO.md inteiro, principalmente a seção 0 ("O que está pendente agora") e a seção 10 ("Regras do dono").
-3. Depois me pergunte só o que estiver pendente (se eu já subi o site e rodei o SQL) e me diga qual é o próximo passo.
+1. Busque o ramo claude/new-session-ylq39m do repositório (git fetch origin claude/new-session-ylq39m) e trabalhe a partir dele.
+2. Leia o arquivo LEIA-PRIMEIRO.md inteiro, principalmente a seção 0 (como trabalhar), a 3 (situação agora) e a 10 (minhas regras).
+3. Depois me pergunte só o que estiver pendente e me diga qual é o próximo passo.
 
 Regras importantes:
-- Só me mande site.zip, index.html e SQL quando eu disser "vamos subir".
-- Antes de eu subir, me mande foto e link de teste.
+- Teste tudo antes de me entregar (app, jogo e SQL).
+- Só publique no site quando eu disser "vamos subir". Antes, me mande foto e link de teste.
 - Não mexa no ramo main sem eu dizer "pode".
-- Nunca peça nem compartilhe a chave do app (cidade-do-tonhao.keystore e senha-da-chave.txt).
+- Para subir o site use ferramentas/subir-site.sh (é automático, eu não preciso mandar arquivo).
+- Só me peça a chave do app quando for gerar uma versão nova do app.
 ```
 
-## O que ficou pendente (resumo)
-- Confirmar se o **site v20261124t** subiu no Cloudflare (o aviso de "25 MiB" é do próprio .zip e pode ser ignorado se o deploy terminar).
-- Confirmar se rodou o **SQL das partes 1 a 4** (etapas 31 a 35) no Supabase.
-- Liberar a cópia da pasta **`tempo-real`** para o ramo **main** (conserta o número de jogadores online contando fantasmas).
-- Subir a **v20261124u** no próximo "vamos subir".
-- Depois: **Play Store** (seção 7 do LEIA-PRIMEIRO.md) e as ideias da seção 8.
+## Quando for preciso gerar app novo (raro)
+Anexe no chat **`vila-do-tonhao.keystore`** e diga a **senha** (está no `senha-da-chave.txt`). Só nessa hora.
 
-## Guarde em lugar seguro (NÃO mande para ninguém, nem para o Claude)
-`cidade-do-tonhao.keystore` e `senha-da-chave.txt`. Sem eles não dá para atualizar o app na Play Store.
+## Guarde em lugar seguro (Drive + pendrive)
+- `vila-do-tonhao.keystore` e `senha-da-chave.txt` (sem eles não dá para atualizar o app nunca mais).
+- O arquivo `.json` da conta de serviço do Google **não precisa guardar**: ele já está salvo no Supabase.
