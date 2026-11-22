@@ -3582,6 +3582,7 @@ function drawCena(){
   const L=[[FOGUEIRA.x,FOGUEIRA.y,120,.95,0,-8],[T(23.9),T(33.9),70,.8,0,-28]];lamps.forEach(l=>L.push([l.x,l.y,80,.9,5,-30]));LMOV.forEach(l=>L.push([l[0],l[1],l[2],l[3],0,-l[4]*.45]));BULBS.forEach(b=>L.push([b[0],b[1],34,.55]));barLights.forEach(([x,y])=>L.push([T(x),T(y),80,.95]));
   windows.forEach(w=>{if(winOn(w)&&w.b!==minhaC)L.push([w.x+w.w/2,w.y+w.h/2,30,.5,0,0,T(w.b.y+w.b.h)])});L.push([T(29)+16,T(17.6)+12,50,.85]);
   for(const pl of [eu,...others.values()]){if(pl&&!pl.hidden&&carOf(pl)==='viatura'&&(pl===eu?eu.giro:pl.giro))L.push([pl.x,pl.y,110,.95,0,-22])}
+  for(const pc of parados.values())if(pc.c==='viatura'&&pc.giro)L.push([pc.x,pc.y,110,.95,0,-22]);
   for(const pl of [eu,...others.values()]){if(!pl||pl.hidden||!carOf(pl)||!pl._mov)continue;const a2=pl._mov.ang,cs=Math.cos(a2),sn=Math.sin(a2);
    for(const k of [1,2,3])L.push([pl.x+cs*(30+k*26)*CK,pl.y+sn*(30+k*26)*SY*CK-6,26+k*14,.75-k*.12]);L.push([pl.x-cs*34*CK,pl.y-sn*34*SY*CK-6,18,.35])}
   for(const [x,y,rad,i,ox,oy,wb] of L){let [sx,sy]=wb!=null?wallScr(x,y,wb):toScreen(x,y);sx+=(ox||0)*cam.z;sy+=(oy||0)*cam.z;const R=rad*cam.z;if(sx<-R||sy<-R||sx>cw+R||sy>ch+R)continue;const ld=dpr*.5,g=lctx.createRadialGradient(sx*ld,sy*ld,0,sx*ld,sy*ld,R*ld);g.addColorStop(0,`rgba(0,0,0,${i})`);g.addColorStop(1,'rgba(0,0,0,0)');lctx.fillStyle=g;lctx.fillRect((sx-R)*ld,(sy-R)*ld,R*2*ld,R*2*ld)}
@@ -5951,7 +5952,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261126c';
+const VERSAO_JOGO='v20261126d';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
