@@ -1088,7 +1088,36 @@ function drawPerson(c,x,y,v,o={}){
   const o2=Object.assign({},o);if(o.walk!=null)o2.walk=fr*Math.PI/5+.01;drawPersonReal(g,W/2,H-8*s0,v,o2);sp={cv:cv2,W,H,oy:H-8*s0};
   if(PCACHE.size>700)PCACHE.delete(PCACHE.keys().next().value);PCACHE.set(key,sp)}
  c.drawImage(sp.cv,x-sp.W/2,y-sp.oy,sp.W,sp.H)}
-function drawPersonReal(c,x,y,v,o={}){if(o.policia){const v2=Object.assign({},v);drawPersonReal0(c,x,y,v2,o);const s=o.s||1,d=o.dir||1,hy=y-(o.sit?39:46)*s;c.save();c.fillStyle='#1d2b4a';c.beginPath();c.ellipse(x,hy+2*s,6.2*s,2.6*s,0,Math.PI,0);c.fill();c.fillRect(x-6.2*s,hy+1.5*s,12.4*s,1.6*s);c.fillRect(x+(d>0?2:-9)*s,hy+2.4*s,7*s,1.3*s);c.fillStyle='#f1c40f';c.beginPath();c.arc(x,hy-.6*s,1.2*s,0,7);c.fill();c.beginPath();c.arc(x+d*2.6*s,y-(o.sit?24:30)*s,1.3*s,0,7);c.fill();c.restore();return}return drawPersonReal0(c,x,y,v,o)}
+function drawPersonReal(c,x,y,v,o={}){if(o.policia){const v2=Object.assign({},v,{chapeu:0,extra:0,estampa:0});drawPersonReal0(c,x,y,v2,o);boina(c,x,y,o);return}return drawPersonReal0(c,x,y,v,o)}
+// ===== uniforme da polícia: colete balístico preto com faixa POLÍCIA, cinto de guarnição e boina =====
+function colete(c,P,bw,by,bh,back,lado,dir){c.save();c.clip(P);
+ const x0=-bw/2-1,x1=bw/2+1,y0=by+1.6,y1=by+bh-1.4;
+ const g=c.createLinearGradient(x0,0,x1,0);g.addColorStop(0,'#16181c');g.addColorStop(.5,'#2a2d33');g.addColorStop(1,'#121317');c.fillStyle=g;c.fillRect(x0,y0,x1-x0,y1-y0);
+ // gola em V (a camisa aparece no peito) e cavas
+ if(!back&&!lado){c.fillStyle='#7f8891';c.beginPath();c.moveTo(-2.2,y0-.1);c.lineTo(0,y0+2.6);c.lineTo(2.2,y0-.1);c.closePath();c.fill()}
+ // costuras e bolsos (velcro)
+ c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=.35;c.strokeRect(x0+1.2,y0+.8,x1-x0-2.4,y1-y0-1.6);
+ if(!back){c.fillStyle='#1d1f24';for(const k of lado?[0]:[-1,1]){c.fillRect(k*2.5-1.6+(lado?dir*.6:0),y1-4.2,3.2,2.6);c.fillStyle='#2f3238';c.fillRect(k*2.5-1.6+(lado?dir*.6:0),y1-4.2,3.2,.5);c.fillStyle='#1d1f24'}}
+ // faixa POLÍCIA (refletiva)
+ const fy=back?y0+2.2:y0+3.4,fh=back?2.4:1.7;c.fillStyle='#e9eef2';c.fillRect(x0+1.4,fy,x1-x0-2.8,fh);
+ c.fillStyle='#14161a';c.font='700 '+(back?2.1:1.45)+'px Fredoka, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText('POLÍCIA',lado?dir*.4:0,fy+fh/2+.1);
+ // distintivo dourado no peito
+ if(!back&&!lado){c.fillStyle='#f1c40f';c.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?.45:1;c.lineTo(-2.6+Math.cos(a)*r,fy-1.3+Math.sin(a)*r)}c.fill()}
+ c.restore();
+ // cinto de guarnição
+ c.save();c.clip(P);c.fillStyle='#0d0e11';c.fillRect(x0,y1-.2,x1-x0,1.8);if(!back){c.fillStyle='#b9c0c8';c.fillRect(-.8+(lado?dir*.8:0),y1+.1,1.6,1.1)}c.restore()}
+function boina(c,x,y,o){const s=o.s||1,d=o.dir||1,hy=y-(o.sit?39:46)*s,back=!!o.back,lado=!!(o.perfil||o.lado);c.save();c.translate(x,hy+2.4*s);c.scale(s,s);
+ const lad=back?-d:d,ab=lado?.8:1; // lado para onde a boina cai
+ const g=c.createLinearGradient(0,-5,0,2);g.addColorStop(0,'#2c3038');g.addColorStop(1,'#0c0d10');c.fillStyle=g;
+ // corpo: achatado e caído para um lado (passa da cabeça)
+ c.beginPath();c.moveTo(-lad*6.4*ab,.9);c.bezierCurveTo(-lad*6.8*ab,-1.9,-lad*3.4,-4.1,lad*1.2,-4.3);c.bezierCurveTo(lad*6.2,-4.5,lad*10.6*ab,-2.4,lad*10.4*ab,.4);c.bezierCurveTo(lad*10.2*ab,2,lad*8.2*ab,2.5,lad*6*ab,1.6);c.closePath();c.fill();
+ // brilho suave no topo
+ c.fillStyle='rgba(255,255,255,.07)';c.beginPath();c.ellipse(lad*1.4,-3,4.6,1,lad*.05,0,7);c.fill();
+ // carneira fina
+ c.fillStyle='#07080a';c.beginPath();c.moveTo(-6.3,.4);c.quadraticCurveTo(0,1.9,6.3,.4);c.lineTo(6.2,1.3);c.quadraticCurveTo(0,2.8,-6.2,1.3);c.closePath();c.fill();
+ // brasão dourado do lado de cima (oposto à queda)
+ if(!back){const bx=lado?-lad*1.2:-lad*3.6;c.fillStyle='#d4a017';c.beginPath();c.ellipse(bx,-1.4,1.2,1.45,0,0,7);c.fill();c.fillStyle='#f6d860';c.beginPath();c.ellipse(bx-.2,-1.7,.5,.6,0,0,7);c.fill()}
+ c.restore()}
 // ===== estampas da roupa (desenhadas por cima do tronco, presas ao CORPO) =====
 function estampa(c,P,e,shirt,bw,by,bh,back,lado,dir){if(!e)return;
  const lum=(()=>{const h=shirt.replace('#','');const n=parseInt(h.length===3?h.replace(/./g,'$&$&'):h,16);return((n>>16)*.3+((n>>8)&255)*.59+(n&255)*.11)})();
@@ -1132,19 +1161,19 @@ function estampa(c,P,e,shirt,bw,by,bh,back,lado,dir){if(!e)return;
  c.restore()}
 function drawPersonReal0(c,x,y,v,o={}){
  const dir=o.dir||1,s=o.s||1,sit=!!o.sit,ph=o.walk,back=!!o.back,fem=v.sexo===1;
- const roupaR=o.suit?'terno':o.tonhao?'polo':o.regata?'regata':estilo('roupa',v),roupa=ESTILO_BASE[roupaR]||roupaR,baixoR=o.suit?'preta':estilo('calca',v),baixo=ESTILO_BASE[baixoR]||baixoR,calcR=o.suit?'social':estilo('calcado',v),calc=ESTILO_BASE[calcR]||calcR,ex2R=estilo('extra',v),ex2=ESTILO_BASE[ex2R]||ex2R;
- const CC=o.suit?null:corOpc(v.corCalca),SC=o.suit?null:(calcR==='tenisOuro'?'#d4af37':calcR==='tenisNeon'?'#13d6b4':corOpc(v.corCalcado));
+ const roupaR=o.policia?'social':o.suit?'terno':o.tonhao?'polo':o.regata?'regata':estilo('roupa',v),roupa=ESTILO_BASE[roupaR]||roupaR,baixoR=o.policia?'cargo':o.suit?'preta':estilo('calca',v),baixo=ESTILO_BASE[baixoR]||baixoR,calcR=o.policia?'coturno':o.suit?'social':estilo('calcado',v),calc=ESTILO_BASE[calcR]||calcR,ex2R=estilo('extra',v),ex2=ESTILO_BASE[ex2R]||ex2R;
+ const CC=o.policia?'#5b626c':o.suit?null:corOpc(v.corCalca),SC=o.policia?'#141418':o.suit?null:(calcR==='tenisOuro'?'#d4af37':calcR==='tenisNeon'?'#13d6b4':corOpc(v.corCalcado));
  const BX=o.perfil||o.lado?.8:o.c34?.9:(!o.cara&&!o.back&&!o.sit&&o.walk!=null)?.93:1;c.save();c.translate(x,y);if(o.bebado)c.rotate(Math.sin(now*2.2+x*.01)*.08*o.bebado);c.scale(s*BX,s);
  if(o.ring){c.strokeStyle='#ffc94a';c.lineWidth=2;c.beginPath();c.ellipse(0,0,12,4.5,0,0,Math.PI*2);c.stroke()}
  {const sw0=o.belly?11:8.5;c.save();c.scale(1,.32);const g=c.createRadialGradient(1.5,0,0,1.5,0,sw0);g.addColorStop(0,'rgba(0,0,0,.34)');g.addColorStop(.7,'rgba(0,0,0,.16)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;circ(c,1.5,0,sw0);c.restore()}
  const skin=PELE[v.pele],skinD=shade(skin,-22);
- const shirt=o.policia?'#25406e':o.tonhao?'#3f9a4a':roupaR==='camisaJeans'?'#4a6fa5':roupaR==='jaquetaJeans'?'#5b7fb5':roupaR==='banda'?'#1d1d22':roupaR==='couro'?'#2a2220':roupaR==='ternoBranco'?'#f2f2f2':roupaR==='bomberOuro'?'#c9a227':roupaR==='moletomNeon'?'#13d6b4':roupaR==='veludo'?'#5b1f86':roupaR==='smoking'?'#2a2a33':roupaR==='lantejoula'?'#b0124f':corRoupa(v.camisa),shirtD=shade(shirt,-28),shirtL=shade(shirt,22);
+ const shirt=o.policia?'#7f8891':o.tonhao?'#3f9a4a':roupaR==='camisaJeans'?'#4a6fa5':roupaR==='jaquetaJeans'?'#5b7fb5':roupaR==='banda'?'#1d1d22':roupaR==='couro'?'#2a2220':roupaR==='ternoBranco'?'#f2f2f2':roupaR==='bomberOuro'?'#c9a227':roupaR==='moletomNeon'?'#13d6b4':roupaR==='veludo'?'#5b1f86':roupaR==='smoking'?'#2a2a33':roupaR==='lantejoula'?'#b0124f':corRoupa(v.camisa),shirtD=shade(shirt,-28),shirtL=shade(shirt,22);
  const PANT={jeans:'#2d4a7a',preta:'#26262b',marrom:'#6b4a2e',bege:'#c7b48a',verde:'#2f5d43',bermudaJeans:'#3f5f8f',bermudaCaqui:'#b59d70',moletomCalca:'#6b6b72',legging:'#1d1d22',saiaJeans:'#3f5f8f',saiaRodada:CAMISA[((v.camisa%10)+4)%10],shortJeans:'#5577aa',branca:'#ece8df',saiaPreta:'#222226',saiaLonga:CAMISA[((v.camisa%10)+2)%10],baggy:'#6f8fbf',wide:'#3b3b40',barrel:'#4d6a96',flare:'#35558a',jogger:'#2f3036',cargoLarga:'#5c6146',skinny:'#1f2f4f',pantalona:'#efe6d6',alfaiataria:'#2a2d36',bermudaCargo:'#7a7550',tactel:CAMISA[((v.camisa%10)+3)%10],saiaMidi:CAMISA[((v.camisa%10)+7)%10],saiaLapis:'#24242a',saiaMaxi:'#4a6c9c',saiaTenis:'#f2f2f2',saiaMiniJeans:'#5a7db0',saiaEnvelope:CAMISA[((v.camisa%10)+1)%10],saiaTule:'#f4b6c8',saiaMiniCouro:'#1e1c1e',shortSaia:CAMISA[((v.camisa%10)+6)%10]};
  // modelagem da calça: largura no quadril, no joelho e no tornozelo (x largura da perna) + detalhes
  const FITS={legging:[.95,.9,.82],skinny:[1,.92,.82],jeans:[1.14,1.1,1.08,'vinco'],preta:[1.14,1.1,1.08,'vinco'],marrom:[1.14,1.1,1.08,'vinco'],bege:[1.14,1.1,1.08,'vinco'],verde:[1.14,1.1,1.08,'vinco'],branca:[1.14,1.1,1.1,'vinco'],moletomCalca:[1.28,1.22,.92,'punho'],jogger:[1.28,1.22,.92,'punho'],cargo:[1.42,1.42,1.36,'cargo'],cargoLarga:[1.48,1.48,1.42,'cargo'],baggy:[1.5,1.52,1.58,'dobras'],wide:[1.36,1.5,1.92,'vinco'],pantalona:[1.4,1.56,2,'vinco'],alfaiataria:[1.2,1.18,1.16,'vinco'],barrel:[1.42,1.7,1.04,'dobras'],flare:[1.04,.98,1.8,'vinco'],bermudaJeans:[1.3,1.3,1.3],bermudaCaqui:[1.3,1.3,1.3],bermudaCargo:[1.45,1.45,1.45,'cargo'],tactel:[1.4,1.4,1.4],shortJeans:[1.15,1.15,1.15]};
  const FIT=FITS[baixoR]||FITS[baixo]||[1,.95,.86],cobre=FIT[2]>=1.3;
  const macacao=roupa==='macacao',vest=roupa==='vestido'||roupa==='vestidoLongo'||roupa==='tubinho';
- const pants=o.policia?'#1d2433':o.tonhao?'#2d4a7a':o.suit?'#2a2f3a':CC||(baixoR==='cargo'?'#6b6b4a':PANT[baixo])||'#2d4a7a',pantsD=shade(pants,-25);
+ const pants=o.policia?'#5b626c':o.tonhao?'#2d4a7a':o.suit?'#2a2f3a':CC||(baixoR==='cargo'?'#6b6b4a':PANT[baixo])||'#2d4a7a',pantsD=shade(pants,-25);
  const saia=!macacao&&(vest||baixo.startsWith('saia')),saiaLonga=roupa==='vestidoLongo'||baixo==='saiaLonga';
  const pernaCor=k=>{if(saia)return skin;return pants};
  const corte=macacao||vest?0:baixo==='shortJeans'?4.5:baixo==='tactel'?5.5:(baixo==='bermudaJeans'||baixo==='bermudaCaqui'||baixo==='bermudaCargo')?7.5:0;
@@ -1403,6 +1432,7 @@ if(!o.tonhao&&!macacao&&!vest){c.lineCap='round';c.strokeStyle='rgba(0,0,0,.16)'
  if(baixoR==='cargo'&&!saia&&!sit){c.fillStyle=shade(pants,-20);for(const k of [-1,1])c.fillRect(k*2.6-1.6,-11,3.2,2.6)}
  {c.save();c.clip(CORPO);if(roupa==='xadrez'){c.strokeStyle=shirtD;c.lineWidth=1;for(let i=-bw/2+2;i<bw/2;i+=3.2){c.beginPath();c.moveTo(i,by+1);c.lineTo(i,by+bh-1);c.stroke()}for(let j=by+3;j<by+bh;j+=3.2){c.beginPath();c.moveTo(-bw/2+1,j);c.lineTo(bw/2-1,j);c.stroke()}}c.restore()}
  if(!o.tonhao&&!o.policia&&!o.suit)estampa(c,CORPO,v.estampa||0,shirt,bw,by,bh,back,!!(o.perfil||o.lado),dir);
+ if(o.policia)colete(c,CORPO,bw,by,bh,back,!!(o.perfil||o.lado),dir);
  if(macacao){c.fillStyle=pants;rr(c,-bw/2+1.2,by+6,bw-2.4,bh-5,2);c.fill();c.fillRect(-bw/2+1.6,by,1.6,7);c.fillRect(bw/2-3.2,by,1.6,7);c.fillStyle='#f3c13a';circ(c,-bw/2+2.4,by+6.5,.7);circ(c,bw/2-2.4,by+6.5,.7)}
  else if(false){c.save();c.clip(CORPO);c.fillStyle=pants;c.beginPath();c.moveTo(-bw/2,by+bh-1.7);c.quadraticCurveTo(0,by+bh-.9,bw/2,by+bh-1.7);c.lineTo(bw/2,by+bh+2);c.lineTo(-bw/2,by+bh+2);c.fill();c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.moveTo(-bw/2,by+bh-1.7);c.quadraticCurveTo(0,by+bh-.9,bw/2,by+bh-1.7);c.lineTo(bw/2,by+bh-1.4);c.quadraticCurveTo(0,by+bh-.6,-bw/2,by+bh-1.4);c.fill();c.restore()}
  else if(false){c.fillStyle=shade(pants,-35);c.fillRect(-bw/2+.6,by+bh-2.2,bw-1.2,1.6)}
@@ -3520,7 +3550,7 @@ function drawCena(){
  for(const r of residents){if(r.hidden||!vis(r.x,r.y))continue;list.push({x:r.x,y:r.y,f:()=>drawResident(r)})}
  for(const p of plist)if(vis(p.x,p.y))list.push({x:p.x,y:p.y,k:p.x+p.y+((p===eu?eu.deitado:p.deitado)?70:(p.sit&&(p===eu?eu.mz:p.mz))?30:0),f:()=>{const zw=aguaZ(p);if(zw!=null){ctx.beginPath();ctx.rect(p.x-300,p.y-zw-600,600,600);ctx.clip()}drawPlayer(p)}});
  for(const v of VAGAS){const i=vagasInfo.get(v.id);if(!i||!i.ativo||!CAR_COLOR[i.carro]||!vis(v.x,v.y))continue;if(eu&&i.morador===eu.id&&eu.driving)continue;list.push({x:v.x,y:v.y,f:()=>{const dono=eu&&i.morador===eu.id?eu:others.get(i.morador)||perfis.get(i.morador);CAR_COR_ATUAL=corCarroDe(dono,i.carro)||(dono&&dono.carro_cores&&dono.carro_cores[i.carro])||null;CAR_MOD_ATUAL=modsDe(dono,i.carro);drawCarShape(ctx,v.x,v.y,i.carro,1,0.83,null);CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null}})}
- for(const [pid,pc] of parados){if(!vis(pc.x,pc.y)||!CARS[pc.c])continue;const dono=pid===(eu&&eu.id)?eu:others.get(pid);if(dono&&dono.driving)continue;list.push({x:pc.x,y:pc.y,f:()=>{CAR_COR_ATUAL=pc.cor;CAR_MOD_ATUAL=modsDe(dono,pc.c);drawCarStack(ctx,pc.x,pc.y,pc.c,pc.ang,null,{freio:0});CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null}})}
+ for(const [pid,pc] of parados){if(!vis(pc.x,pc.y)||!(CARS[pc.c]||pc.c==='viatura'||pc.c==='duster'))continue;const dono=pid===(eu&&eu.id)?eu:others.get(pid);if(dono&&dono.driving)continue;list.push({x:pc.x,y:pc.y,f:()=>{CAR_COR_ATUAL=pc.cor;CAR_MOD_ATUAL=modsDe(dono,pc.c);drawCarStack(ctx,pc.x,pc.y,pc.c,pc.ang,null,{freio:0,luz:pc.giro?1:0,giro:pc.giro|0});CAR_COR_ATUAL=null;CAR_MOD_ATUAL=null}})}
  for(const a of animais)if(vis(a.x,a.y))list.push({x:a.x,y:a.y,f:()=>drawAnimal(ctx,a)});
  for(const f of FRUTAS)if(vis(f.x,f.y))list.push({x:f.x,y:f.y,f:()=>drawFruteira(ctx,f)});
  if(vis(T(131.5),T(32))){list.push({x:T(131.5),y:T(32.4),k:T(128)+T(30.6),cam:1,f:()=>deckMirante(ctx)});for(const bx of [129.2,131.4])list.push({x:T(bx),y:T(31.6),k:T(bx)+T(31.6)+6,cam:1,f:()=>bancoIso(ctx,T(bx),T(31.1))});list.push({x:T(134),y:T(31.8),k:T(134)+T(31.8)+6,cam:1,f:()=>lunetaIso(ctx,T(134),T(31.8))})}
@@ -4672,9 +4702,12 @@ const RUA={
 $('workVeic').onclick=()=>{if(!trabalho)return;
  // policial e prefeito: descer e voltar para a viatura/Duster sem largar o turno (bom para abordagens)
  if(trabalho.job==='policia'||trabalho.job==='prefeito'){const pol=trabalho.job==='policia';eu.path=[];
+  const vp=trabalho.vp;
+  if(trabalho.ape&&vp&&Math.hypot(eu.x-vp.x,eu.y-vp.y)>T(2.4)){irPara(vp.x,vp.y,()=>{if(trabalho&&trabalho.ape)$('workVeic').onclick()});toast(pol?'🚶 Indo até a viatura…':'🚶 Indo até a Duster…',1800);return}
   if(!pol&&!trabalho.duster){trabalho.duster=true;trabalho.ape=false}else trabalho.ape=!trabalho.ape;
-  if(!trabalho.ape){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null;Som.play('porta');toast(pol?'🚓 De volta à viatura!':'🚙 De volta à Duster!',2000)}
-  else{const [px,py]=calcadaPerto(eu.x,eu.y);eu.x=px;eu.y=py;Som.play('porta');if(pol&&(eu.giro||eu.sirM))viatSet(0,0);toast('🚶 A pé! Toque no botão de novo para voltar ao veículo.',2500)}
+  if(!trabalho.ape){if(vp){eu.x=vp.x;eu.y=vp.y;eu._mov={ang:vp.ang};parados.delete('v'+eu.id);trabalho.vp=null;emitEv('vtrOff',{})}else{const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null}Som.play('porta');toast(pol?'🚓 De volta à viatura!':'🚙 De volta à Duster!',2000)}
+  else{const c=pol?'viatura':'duster',ang=eu._mov?eu._mov.ang:0,g=pol?(eu.gM|0):0;trabalho.vp={x:eu.x,y:eu.y,c,ang};parados.set('v'+eu.id,{x:eu.x,y:eu.y,c,ang,giro:g,cor:null,nome:eu.nome});emitEv('vtr',{x:Math.round(eu.x),y:Math.round(eu.y),c,a:+ang.toFixed(2),g});
+   const [px,py]=calcadaPerto(eu.x,eu.y);eu.x=px;eu.y=py;Som.play('porta');if(pol&&eu.sirM)viatSet(null,0);toast(pol?'🚶 A pé! A viatura fica aqui. Toque no botão para voltar a ela.':'🚶 A pé! A Duster fica aqui.',2800)}
   $('workVeic').textContent=trabalho.ape?(pol?'🚓 Voltar à viatura':'🚙 Voltar à Duster'):(pol?'🚶 Descer da viatura':'🚶 Descer da Duster');sendPos(true);return}
  if(!VEIC_JOB[trabalho.job])return;trabalho.veic=!trabalho.veic;eu.path=[];
  if(trabalho.veic){const t=nearestCarTile(eu.x,eu.y,8);if(t){eu.x=(t[0]+.5)*TILE;eu.y=(t[1]+.5)*TILE+9}eu._mov=null;Som.play('buzina');toast('🚚 Veículo do trabalho! Toque na rua para dirigir.',2500)}
@@ -4750,7 +4783,7 @@ function viatPinta(){const p=$('viatPainel');p.querySelectorAll('[data-g]').forE
 function viatSet(g,sm){if(g!=null)eu.gM=g;if(sm!=null)eu.sirM=sm;eu.giro=(eu.gM|0)>0;viatPinta();sendPos(true)}
 $('workGiro').onclick=()=>{$('viatPainel').classList.toggle('hidden');viatPinta()};
 $('viatPainel').onclick=e=>{const t=e.target;if(t.dataset.g!=null)viatSet(+t.dataset.g,null);else if(t.dataset.s!=null)viatSet(null,+t.dataset.s)};
-function fimTurno(){eu.giro=false;eu.sirM=0;eu.gM=0;$('viatPainel').classList.add('hidden');clearInterval(giroT);$('workGiro').classList.add('hidden');$('workGiro').textContent='🚨 Luzes e sirene ▾';
+function fimTurno(){if(eu&&parados.has('v'+eu.id)){parados.delete('v'+eu.id);emitEv('vtrOff',{})}if(trabalho)trabalho.vp=null;eu.giro=false;eu.sirM=0;eu.gM=0;$('viatPainel').classList.add('hidden');clearInterval(giroT);$('workGiro').classList.add('hidden');$('workGiro').textContent='🚨 Luzes e sirene ▾';
  if(trabalho&&trabalho.job==='bar'){eu.x=T(22.5);eu.y=T(20.9)}
  trabalho=null;fecharTarefa();eu.hidden=false;eu.apron=false;eu.beer=false;eu.fish=false;eu.path=[];$('work').classList.add('hidden');sendPos(true);
 }
@@ -5132,7 +5165,7 @@ setInterval(async()=>{if(!ONLINE||!eu||!canal)return;try{const st=canal.state,eu
 function syncPresence(){
  const chP=canal||espiaCh;if(!chP)return;const ids=Object.keys(chP.presenceState()).filter(id=>!eu||id!==eu.id);
  for(const id of ids)if(!others.has(id))others.set(id,{id,nome:'…',nivel:1,v:visFromName(id),x:0,y:0,tx:null,ty:null,dir:1,ph:0,moving:false,hidden:true,seen:false,isPlayer:true,remote:true,bub:null,blinkT:2,driving:null,beer:false,work:0,novo:true});
- for(const [id,o] of others)if(!ids.includes(id)){if(selected===o)closeCard();if(follow===o)follow=eu;others.delete(id)}
+ for(const [id,o] of others)if(!ids.includes(id)){if(selected===o)closeCard();if(follow===o)follow=eu;others.delete(id);parados.delete('v'+id)}
  const falta=ids.filter(id=>!perfis.has(id));
  if(falta.length)api.perfis(falta).then(rows=>rows.forEach(p=>{perfis.set(p.id,p);aplicarRemoto(p)})).catch(()=>{});
  ids.forEach(id=>{const p=perfis.get(id);if(p)aplicarRemoto(p)});
@@ -5162,6 +5195,8 @@ function onEv(p){
  if(p.k==='casa'&&houses[p.n-1])log(`🏠 ${o.nome} comprou a casa ${+p.n}!`);
  if(p.k==='park'&&CARS[p.c])parados.set(o.id,{x:+p.x,y:+p.y,c:p.c,ang:+p.a||0,cor:corCarroDe(o,p.c),nome:o.nome});
  if(p.k==='unpark')parados.delete(o.id);
+ if(p.k==='vtr'&&(p.c==='viatura'||p.c==='duster'))parados.set('v'+o.id,{x:+p.x,y:+p.y,c:p.c,ang:+p.a||0,giro:+p.g||0,cor:null,nome:o.nome});
+ if(p.k==='vtrOff')parados.delete('v'+o.id);
  if(p.k==='apto'&&aptoVirtual(p.n))casasInfo.set(+p.n,+p.v?{dono:o.id,nome:o.nome}:{dono:null});
  if(p.k==='campainha'&&eu&&p.para===eu.id&&aptoVirtual(p.ap)){const ap=aptoVirtual(p.ap);Som.play('moeda');confirmar('🔔 Campainha!',`<b>${o.nome}</b> está tocando a campainha do seu apartamento (${ap.num}, Bloco ${ap.bloco.nome}). Deixa entrar?`,null,[['✅ Deixar entrar',()=>emitEv('campOk',{para:o.id,ap:ap.n})],['❌ Não',()=>emitEv('campNao',{para:o.id})]])}
  if(p.k==='campOk'&&eu&&p.para===eu.id&&aptoVirtual(p.ap)){const ap=aptoVirtual(p.ap);INTER_OK.add(ap.n);toast('🔓 '+o.nome+' abriu a porta!',2500);if(!carOf(eu)&&!trabalho)entrarSala(ap)}
@@ -5916,7 +5951,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261126b';
+const VERSAO_JOGO='v20261126c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
