@@ -32,7 +32,7 @@
 | **Pagamento site** | Mercado Pago (Pix), função `pix`. Preço vem da tabela `produtos`. |
 
 ## 3. Situação AGORA (22/11/2026)
-- **Site no ar:** `v20261126f`. **Jogo e site estão em dia**, nada pendente para subir.
+- **Site no ar:** `v20261127a`. **Jogo e site estão em dia**, nada pendente para subir.
 - **Banco:** etapas até a 43 confirmadas. **Etapa 44** (admin "Definir nível", `entrega/sql-parte7.sql`) enviada — **perguntar se o dono rodou**.
 - **Play Store:** teste fechado aprovado e funcionando, compras testadas e funcionando. **Falta juntar 12 testadores por 14 dias seguidos** → depois pedir acesso à produção. Testador entra assim: manda Gmail → dono põe na lista "Testadores da Vila" → manda o link `https://play.google.com/apps/testing/br.com.viladotonhao.app` + código **`PIONEIRO-VILA`** (título 🧪 Pioneiro, vale até 28/02/2027).
 - **Supabase:** estourou "Realtime Messages" entre 14 e 18/11 (3,4 mi de 2 mi). Desde 19/11 ~zero (tempo real foi para o Cloudflare). Aviso: restrição em **16/12** se continuar acima. Recomendado ao dono: abrir chamado no suporte do Supabase ou assinar Pro por 1 mês antes de 16/12. **Perguntar o que ele fez.**
