@@ -5127,7 +5127,9 @@ async function conectarRT(){let tk=null;try{const {data}=await sb.auth.getSessio
 async function conectar(){
  if(!ONLINE){refreshHud();return}
  if(espiaCh){const e=espiaCh;espiaCh=null;others.clear();tirarCanal(e);await new Promise(r=>setTimeout(r,400))}
- if(!RT_OFF){if(await conectarRT())return;RT_OFF=true;console.warn('Tempo real do Cloudflare falhou: usando o Supabase')}
+ // Sem volta automática para o Supabase (gastava a cota de Realtime): se o Cloudflare falhar, tenta de novo nele.
+ if(!RT_OFF){if(conectando)return;conectando=true;let ok=false;try{ok=await conectarRT()}catch(_){}conectando=false;if(ok){falhasRT=0;return}
+  falhasRT++;if(falhasRT===2)toast('Reconectando ao servidor…',3000);const t=Math.min(30000,3000*falhasRT);setTimeout(()=>{if(!canal&&eu)conectar()},t);return}
  for(const c of sb.getChannels())if(/^realtime:sala-/.test(c.topic)){try{await sb.removeChannel(c)}catch(_){}}
  for(let n=1;n<=60;n++){
   let ativo=false;
@@ -5151,9 +5153,9 @@ async function conectar(){
  }
  toast('Todas as salas estão cheias! Tente daqui a pouco.',5000);
 }
-let espiaCh=null;
+let espiaCh=null,conectando=false,falhasRT=0;
 function espiar(){if(eu||!ONLINE||canal||espiaCh)return;
- if(!RT_OFF){const c=rtCanal(1,null,{fim:v=>{if(v===null&&espiaCh===c){espiaCh=null;RT_OFF=true;espiar()}},pos:p=>{if(espiaCh===c&&!canal)onPos(p)},pres:()=>{if(espiaCh===c&&!canal)syncPresence()}});espiaCh=c;return}
+ if(!RT_OFF){const c=rtCanal(1,null,{fim:v=>{if(v===null&&espiaCh===c){espiaCh=null;c.close();setTimeout(espiar,10000)}},caiu:()=>{if(espiaCh===c){espiaCh=null;setTimeout(espiar,5000)}},pos:p=>{if(espiaCh===c&&!canal)onPos(p)},pres:()=>{if(espiaCh===c&&!canal)syncPresence()}});espiaCh=c;return}
  const ch=sb.channel('sala-1',{config:{broadcast:{self:false}}});espiaCh=ch;
  ch.on('presence',{event:'sync'},()=>{if(espiaCh===ch&&!canal)syncPresence()}).on('broadcast',{event:'pos'},({payload})=>{if(espiaCh===ch&&!canal)onPos(payload)}).subscribe()}
 setTimeout(espiar,800);
@@ -5952,7 +5954,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261126f';
+const VERSAO_JOGO='v20261127a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
