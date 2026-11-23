@@ -68,7 +68,7 @@ O dono guarda a chave. **Só peça para ele anexar a chave quando for gerar uma 
 1. Juntar 12+ testadores por 14 dias → Play Console → **Produção → Solicitar acesso** → revisão.
 2. Enviar o app 2.0.4 (ícone novo) quando juntar outra mudança de app.
 3. Resolver o aviso do Supabase antes de 16/12.
-4. Passar para o Cloudflare o último uso de tempo real do Supabase (tela de entrada, função `espiar`).
+4. ~~Último uso de tempo real do Supabase~~ FEITO (v20261127a): a tela de entrada já usava o Cloudflare; foi removida a volta automática para o Supabase quando o Cloudflare falha — agora o jogo tenta de novo no Cloudflare (3s, 6s, 9s… até 30s). O código do Supabase só roda com `CONF.semCloudflare`.
 5. Ideias anotadas: missões diárias; equilíbrio de salário por emprego; interiores de todas as lojas; título de vitórias na sinuca (precisa contador); próxima temporada do passe (T2).
 
 ## 9. Como testar (ambiente do assistente)
