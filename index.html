@@ -4575,24 +4575,24 @@ const ONLINE=!!(CONF.supabaseUrl&&CONF.supabaseAnonKey&&!/COLE_/.test(CONF.supab
 const MAX_SALA=CONF.maxPorSala||50;
 // valores de exibição; no modo online eles são lidos do servidor (que é quem manda)
 const JOBS={
- bar:{nome:'Garçom do Tonhão',salario:52,duracao:40,nivel_min:1,xp:15,fome:8},
- mercadinho:{nome:'Repositor',salario:58,duracao:45,nivel_min:1,xp:18,fome:9},
- posto:{nome:'Frentista',salario:58,duracao:40,nivel_min:3,xp:18,fome:8},
- padaria:{nome:'Padeiro',salario:63,duracao:50,nivel_min:5,xp:21,fome:9},
+ bar:{nome:'Garçom do Tonhão',salario:68,duracao:40,nivel_min:1,xp:15,fome:8},
+ mercadinho:{nome:'Repositor',salario:75,duracao:45,nivel_min:1,xp:18,fome:9},
+ posto:{nome:'Frentista',salario:75,duracao:40,nivel_min:3,xp:18,fome:8},
+ padaria:{nome:'Padeiro',salario:82,duracao:50,nivel_min:5,xp:21,fome:9},
  pescador:{nome:'Pescador',salario:0,duracao:45,nivel_min:4,xp:18,fome:8},
- barbearia:{nome:'Barbeiro',salario:69,duracao:50,nivel_min:7,xp:22,fome:10},
- lixeiro:{nome:'Lixeiro(a)',salario:75,duracao:60,nivel_min:6,xp:25,fome:12},
- prefeitura:{nome:'Servidor público',salario:81,duracao:60,nivel_min:10,xp:27,fome:10},
- oficina:{nome:'Mecânico',salario:92,duracao:60,nivel_min:12,xp:30,fome:12},
- policia:{nome:'Policial',salario:109,duracao:60,nivel_min:23,xp:33,fome:12},
- banco:{nome:'Caixa do banco',salario:104,duracao:75,nivel_min:15,xp:38,fome:12},
- concessionaria:{nome:'Vendedor de carros',salario:115,duracao:90,nivel_min:18,xp:45,fome:14},
- fabrica:{nome:'Operário da fábrica',salario:127,duracao:90,nivel_min:20,xp:48,fome:15},
- enfermeiro:{nome:'Enfermeiro(a)',salario:144,duracao:90,nivel_min:21,xp:50,fome:14},
- gerente:{nome:'Gerente do banco',salario:161,duracao:100,nivel_min:25,xp:56,fome:15},
- delegado:{nome:'Delegado(a)',salario:178,duracao:100,nivel_min:27,xp:62,fome:16},
- medico:{nome:'Médico(a)',salario:201,duracao:110,nivel_min:29,xp:70,fome:16},
- prefeito:{nome:'Prefeito(a)',salario:230,duracao:120,nivel_min:30,xp:78,fome:16}};
+ barbearia:{nome:'Barbeiro',salario:90,duracao:50,nivel_min:7,xp:22,fome:10},
+ lixeiro:{nome:'Lixeiro(a)',salario:98,duracao:60,nivel_min:6,xp:25,fome:12},
+ prefeitura:{nome:'Servidor público',salario:105,duracao:60,nivel_min:10,xp:27,fome:10},
+ oficina:{nome:'Mecânico',salario:120,duracao:60,nivel_min:12,xp:30,fome:12},
+ policia:{nome:'Policial',salario:142,duracao:60,nivel_min:23,xp:33,fome:12},
+ banco:{nome:'Caixa do banco',salario:135,duracao:75,nivel_min:15,xp:38,fome:12},
+ concessionaria:{nome:'Vendedor de carros',salario:150,duracao:90,nivel_min:18,xp:45,fome:14},
+ fabrica:{nome:'Operário da fábrica',salario:165,duracao:90,nivel_min:20,xp:48,fome:15},
+ enfermeiro:{nome:'Enfermeiro(a)',salario:187,duracao:90,nivel_min:21,xp:50,fome:14},
+ gerente:{nome:'Gerente do banco',salario:209,duracao:100,nivel_min:25,xp:56,fome:15},
+ delegado:{nome:'Delegado(a)',salario:231,duracao:100,nivel_min:27,xp:62,fome:16},
+ medico:{nome:'Médico(a)',salario:261,duracao:110,nivel_min:29,xp:70,fome:16},
+ prefeito:{nome:'Prefeito(a)',salario:299,duracao:120,nivel_min:30,xp:78,fome:16}};
 const JOB_LUGAR={lixeiro:'prefeitura',pescador:'lagoa',policia:'delegacia',enfermeiro:'hospital',medico:'hospital',gerente:'banco',delegado:'delegacia',prefeito:'prefeitura'};
 const lugarDoJob=j=>JOB_LUGAR[j]||j;
 const LOJA={
@@ -4612,7 +4612,7 @@ const CARS_PREMIUM={natal:{nome:'Furacão GT',preco:0,nivel_min:1,premium:true},
 const CAR_COLOR={sedan:'#8e1b3a',jipe:'#3d5a2a',esportivo:'#e01b24',moto:'#c0392b',fusca:'#3c78d8',kombi:'#f3c13a',opala:'#2d2d34',caminhonete:'#aeb3b8',viatura:'#f4f4f4',duster:'#f4f4f4',sw4:'#1d1e22',frontier:'#e67e22',caminhao:'#f4f4f4',lixo:'#2f8f46',natal:'#1f4fa8'};
 Object.assign(CAR_COLOR,{fusca_ouro:'#c9ccd1',kombi_tonhao:'#e67e22',neon:'#f1b20f'});
 const PLACE_TITLE={lanchonete:'🍔 Lanchonete',butique:'🛍️ Loja de Roupas da Vila',roupas:'👕 Loja de Roupas',bar:'🍺 Bar do Tonhão',mercadinho:'🛒 Mercadinho',padaria:'🥖 Padaria',barbearia:'💈 Barbearia',banco:'🏦 Banco',igreja:'⛪ Capela',concessionaria:'🚗 Carros do Zé',oficina:'🔧 Oficina',posto:'⛽ Posto',fabrica:'🏭 Fábrica de Gelo',prefeitura:'🏛️ Prefeitura',delegacia:'🚓 Delegacia',hospital:'🏥 Hospital',lagoa:'🎣 Lagoa da Cachoeira',mirante:'⛰️ Mirante',acampamento:'⛺ Acampamento'};
-const PRECO_PEIXE=32,MANSAO_NIVEL=10;
+const PRECO_PEIXE=42,MANSAO_NIVEL=10;
 const NIVEL_MAX=50;
 const LV={de(xp){let n=Math.max(1,Math.floor((1+Math.sqrt(1+4*Math.max(xp,0)/25))/2));while(25*(n+1)*n<=xp)n++;while(n>1&&25*n*(n-1)>xp)n--;return Math.min(n,NIVEL_MAX)},base:n=>25*n*(n-1)};
 const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
@@ -4809,8 +4809,8 @@ const api=ONLINE?(()=>{
   async excluirConta(){L.me=null;lsave();try{localStorage.removeItem(LKEY)}catch(e){}},
   async erroTarefa(){const m=lme();if(!m.trabalho||m.trabalho==='pescador')return{multa:0,eu:lest()};const multa=Math.min(25,m.dinheiro);m.dinheiro-=multa;lsave();return{multa,eu:lest()}},
   async sinucaDupla(v){const m=lme();if(m.sinuca_em&&Date.now()-m.sinuca_em<90e3)fail('XP da sinuca só a cada 90 s.');const g=v?30:10,antes=m.nivel;m.xp+=g;const novo=LV.de(m.xp);let premio=0;for(let q=antes+1;q<=novo;q++)premio+=50*q;m.nivel=novo;m.dinheiro+=premio;m.sinuca_em=Date.now();lsave();return{xp_ganho:g,subiu:novo-antes,premio,eu:lest()}},
-  async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=58+premio;
-   passeLocal(m,15);const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:58,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
+  async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=75+premio;
+   passeLocal(m,15);const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:75,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
   async cidade(){return null},
   async hortas(){const H=L.hortas||{};return{agora:new Date().toISOString(),h:Object.entries(H).flatMap(([c,o])=>Object.entries(o).map(([sl,r])=>({casa:+c,slot:+sl,planta:r.planta,em:r.em})))}},
   async plantar(c,sl,pl){const m=lme(),p=HORTA_PL[pl];if(!L.casas||!L.casas[c])fail('Só o dono da casa mexe na horta.');if(!p)fail('Semente inválida.');L.hortas=L.hortas||{};const o=L.hortas[c]=L.hortas[c]||{};if(o[sl])fail('Esse canteiro já está plantado.');if(m.dinheiro<p.semente)fail('Dinheiro insuficiente para a semente.');m.dinheiro-=p.semente;o[sl]={planta:pl,em:new Date().toISOString()};lsave();return{ok:true,eu:lest()}},

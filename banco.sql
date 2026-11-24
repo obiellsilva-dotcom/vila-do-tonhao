@@ -4060,3 +4060,47 @@ grant execute on function public.votar(uuid) to authenticated;
 create or replace function public.assumir_prefeitura() returns json
 language plpgsql security definer set search_path = public as $$
 begin raise exception 'Agora o prefeito é escolhido na eleição: candidatura na sexta, votação no sábado.'; end $$;
+
+-- ===== ETAPA 51: salários +30% (roda uma vez só) e peixe +30% (R$ 32 -> R$ 42) =====
+do $$ begin
+  if not exists (select 1 from ajustes where id = 'salarios_30') then
+    update trabalhos set salario = round(salario * 1.3);
+    insert into ajustes(id) values ('salarios_30');
+  end if;
+end $$;
+create or replace function public.vender_peixes() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; ganho integer;
+begin
+  m := _eu();
+  if m.peixes < 1 then raise exception 'Você não tem peixe para vender.'; end if;
+  ganho := m.peixes * 42;
+  update moradores set dinheiro = dinheiro + ganho, peixes = 0 where id = m.id;
+  return json_build_object('ganho', ganho, 'vendidos', m.peixes, 'eu', _estado(m.id));
+end $$;
+
+-- ronda da polícia +30% (R$ 58 -> R$ 75)
+create or replace function public.ronda_policia() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; novo_xp integer; novo_nivel integer; premio integer := 0; morreu boolean; cansado boolean := false;
+begin
+  m := _eu();
+  if m.trabalho is distinct from 'policia' then raise exception 'Você não está de patrulha.'; end if;
+  if m.tarefa_em is not null and now() - m.tarefa_em < interval '85 seconds' then
+    raise exception 'O próximo pagamento da patrulha ainda não chegou.';
+  end if;
+  novo_xp := m.xp + 20;
+  novo_nivel := nivel_de(novo_xp);
+  if novo_nivel > m.nivel then
+    select coalesce(sum(50 * g), 0) into premio from generate_series(m.nivel + 1, novo_nivel) g;
+  end if;
+  update moradores set dinheiro = dinheiro + 75 + premio, xp = novo_xp, nivel = novo_nivel, tarefa_em = now() where id = m.id;
+  perform _passe_pontos(m.id, 15);
+  morreu := _gastar_fome(m.id, 1);
+  if morreu or (select fome from moradores where id = m.id) < 10 then
+    cansado := true;
+    update moradores set trabalho = null, trabalho_inicio = null, turnos = turnos + 1 where id = m.id;
+  end if;
+  return json_build_object('pago', 75, 'xp_ganho', 20, 'subiu', novo_nivel - m.nivel, 'premio', premio,
+    'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
+end $$;
