@@ -4679,6 +4679,7 @@ const api=ONLINE?(()=>{
   propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
   responder:(id,ok)=>rpc('responder_proposta',{p_id:id,p_aceitar:ok}),
   assumirPref:()=>rpc('assumir_prefeitura'),
+   eleicao:()=>rpc('eleicao'),candidatar:m=>rpc('candidatar',{p_msg:m}),votar:id=>rpc('votar',{p_cand:id}),
    deixarPref:()=>rpc('deixar_prefeitura'),
    vistoNovidades:v=>ONLINE?rpc('visto_novidades',{p_v:v}):Promise.resolve(null),
    minhaNovidade:async()=>{if(!ONLINE)return null;const r=await q(sb.from('moradores').select('novidades').eq('id',eu.id));return r[0]?r[0].novidades:null},
@@ -4793,7 +4794,12 @@ const api=ONLINE?(()=>{
   async comprarCarro(c){const m=lme(),it=CARS[c];if(m.nivel<it.nivel_min)fail(`Esse carro libera no nível ${it.nivel_min}.`);if(m.carros.includes(c))fail('Você já tem esse carro.');if(m.dinheiro<it.preco)fail('Dinheiro insuficiente para esse carro.');m.dinheiro-=it.preco;m.carros.push(c);m.carro=c;lsave();return{carro:c,eu:lest()}},
   async usarCarro(c){lme().carro=c;if(L.vaga&&c)L.vaga.carro=c;lsave();return{carro:c}},
   async estacionar(v,c){const vg=VAGAS.find(x=>x.id===v);if(!vg)fail('Essa vaga não existe.');if(vg.casa&&lme().casa_id!==vg.casa)fail('Essa garagem é de outra pessoa.');L.vaga={id:v,carro:c};lsave();return{vaga:v}},
-  async assumirPref(){if(lme().nivel<30)fail('A prefeitura libera no nível 30.');return{}},async deixarPref(){return{}},async vistoNovidades(){return null},async minhaNovidade(){return null},
+  async assumirPref(){if(lme().nivel<30)fail('A prefeitura libera no nível 30.');return{}},
+  async eleicao(){const m=lme(),d=new Date().getDay(),E=L.ele=L.ele||{c:[{id:'b1',nome:'Dona Cida',nivel:24,foto:null,msg:'Vou colocar mais bancos na praça e festa todo sábado!'},{id:'b2',nome:'Zé do Fusca',nivel:31,foto:null,msg:'Asfalto novo e gasolina mais barata pra todo mundo.'}]};
+   const fase=E.fase||(d===5?'candidatura':d===6?'votacao':'fechada'),tn=fase==='votacao'?1:fase==='segundo'?2:0,souc=E.c.some(c=>c.id==='local'),mot=!tn?'A votação é no sábado.':souc?'Candidato não vota.':m.nivel<5?'Para votar precisa ser nível 5.':null;
+   return{fase,turno:tn,candidatos:E.c,sou_candidato:souc,pode_votar:!mot,motivo:mot,meu_voto:E.voto||null,pode_candidatar:fase==='candidatura'&&m.nivel>=20&&!souc,resultado:E.res||null}},
+  async candidatar(t){const m=lme(),r=await this.eleicao();if(r.fase!=='candidatura')fail('A candidatura é só na sexta-feira.');if(m.nivel<20)fail('Para se candidatar precisa ser nível 20.');if(String(t||'').trim().length<3)fail('Escreva sua mensagem para os eleitores.');L.ele.c=L.ele.c.filter(c=>c.id!=='local').concat([{id:'local',nome:m.nome,nivel:m.nivel,foto:m.foto||null,msg:String(t).trim().slice(0,160)}]);lsave();return this.eleicao()},
+  async votar(id){const r=await this.eleicao();if(!r.turno)fail('A votação é no sábado.');if(!r.pode_votar)fail(r.motivo);if(r.meu_voto)fail('Você já votou.');L.ele.voto=id;lsave();return this.eleicao()},async deixarPref(){return{}},async vistoNovidades(){return null},async minhaNovidade(){return null},
    async sairVaga(){L.vaga=null;lsave()},
    async casa(n){L.cm=L.cm||{};return L.cm[n]||{moveis:[],geladeira:{}}},
    async meusTitulos(){const m=lme(),t=new Set(m.titulos||[]);t.add('morador');if((m.carros||[]).length)t.add('motorista');if((m.nivel|0)>=20)t.add('veterano');return{titulos:[...t],titulo:m.titulo||null,tarefas:m.tarefas_total|0,ganho:0}},
@@ -5356,7 +5362,7 @@ function abrirLugar(b){
   Object.entries(CARS).filter(([,c])=>!c.premium).forEach(([id,c])=>{const tem=eu.carros.includes(id),trava=eu.nivel<c.nivel_min;
    botao(box,tem?`✅ ${c.nome} (já é seu)`:trava?`🔒 ${c.nome}: libera no nível ${c.nivel_min}`:`🚗 ${c.nome}: ${money(c.preco)}`,()=>comprarCarro(id),{off:tem||trava||eu.dinheiro<c.preco,confirma:true})});
   if(eu.carros.length){eu.carros.filter(c=>CARS[c]&&!CARS[c].premium).forEach(c=>botao(box,`💸 Vender ${CARS[c].nome} para a loja: ${money(Math.floor(CARS[c].preco/2))}`,()=>venderLoja(c),{ghost:true}));botao(box,'🤝 Vender um carro para outro jogador',()=>venderJogador(),{ghost:true})}}}
- if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏛️ Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(souP)botao(box,'🚪 Deixar o cargo de prefeito',()=>confirmar('🚪 Deixar a prefeitura?','Outra pessoa do nível 30+ poderá assumir.',()=>acao(async()=>{await api.deixarPref();if(trabalho&&trabalho.job==='prefeito')fimTurno();emitEv('prefeito',{});carregaPref();closePlace();toast('Você deixou a prefeitura.',2500)})),{ghost:true});else if(!PREF_ID)botao(box,eu.nivel>=30?'🏛️ Assumir a prefeitura':'🔒 Prefeitura: libera no nível 30',()=>{if(eu.nivel<30)return;acao(async()=>{await api.assumirPref();emitEv('prefeito',{});carregaPref();closePlace();toast('🏛️ Você agora é o prefeito da cidade!',3500)})},{off:eu.nivel<30});if(!sub)sub='A partir do nível 30, quem chegar primeiro assume a prefeitura 🏛️. Quem tem o maior nível da cidade ganha um 🏆 brilhando no nome.'}
+ if(k==='prefeitura'){const souP=PREF_ID===eu.id;botao(box,souP?'🏛️ Você é o prefeito da cidade!':'🏛️ Prefeito: '+(PREF_NOME||'ninguém ainda'),()=>{},{off:true});if(souP)botao(box,'🚪 Deixar o cargo de prefeito',()=>confirmar('🚪 Deixar a prefeitura?','A cidade fica sem prefeito até a próxima eleição.',()=>acao(async()=>{await api.deixarPref();if(trabalho&&trabalho.job==='prefeito')fimTurno();emitEv('prefeito',{});carregaPref();closePlace();toast('Você deixou a prefeitura.',2500)})),{ghost:true});botao(box,'🗳️ Eleição do prefeito',()=>acao(async()=>{abrirEleicao(await api.eleicao(),false)}));if(!sub)sub='🗳️ Toda semana tem eleição: <b>sexta</b> candidatura (nível 20+), <b>sábado</b> votação (nível 5+). Se empatar, <b>domingo</b> tem 2º turno.'}
  Object.entries(JOBS).filter(([j])=>lugarDoJob(j)===k&&(j!=='prefeito'||PREF_ID===eu.id)).forEach(([j,J])=>{
   if(!sub)sub='Precisando de gente para trabalhar!';
   if(eu.nivel<J.nivel_min)botao(boxJob,`🔒 ${J.nome}: libera no nível ${J.nivel_min}`,()=>{},{off:true});
@@ -6932,6 +6938,31 @@ function carregaPref(){api.cidade().then(r=>{if(!r)return;const novo=r.prefeito|
  if(mudou&&eu){const sou=novo===eu.id;bannerGrande('🏛️ NOVO PREFEITO!',sou?'🏛️ Você assumiu a Vila do Tonhão':'🏛️ '+nome+' assumiu a cidade');log('🏛️ '+nome+' é o novo prefeito!')}}).catch(()=>{})}
 setInterval(carregaPref,20000);setTimeout(carregaPref,1500);
 function bannerGrande(t1,t2){const el=document.createElement('div');el.className='bannerPref';el.innerHTML='<div class="bp1">'+t1+'</div>'+(t2?'<div class="bp2">'+t2+'</div>':'');document.body.appendChild(el);try{Som.play('nivel')}catch(_){}setTimeout(()=>el.classList.add('sai'),3600);setTimeout(()=>el.remove(),4300)}
+/* ----- eleição do prefeito ----- */
+let ELE_ABERTA=false;
+function abrirEleicao(r,forcado){if(!r)return;let m=$('mEle');if(!m){m=document.createElement('div');m.id='mEle';m.className='modal';m.style.zIndex=60;document.body.appendChild(m)}
+ const tn=r.turno,cs=r.candidatos||[],vot=tn&&r.pode_votar&&!r.meu_voto;ELE_ABERTA=true;
+ const tit=r.fase==='candidatura'?'🗳️ Candidatura para prefeito':tn===2?'🗳️ 2º turno: escolha o prefeito':tn===1?'🗳️ Eleição: escolha o prefeito':'🗳️ Eleição do prefeito';
+ let sub=r.fase==='candidatura'?'Hoje (sexta) é dia de se candidatar. A votação é amanhã, sábado.':vot?'Escolha um candidato e vote. Os votos são secretos e o resultado sai no fim do dia.':tn&&r.meu_voto?'✅ Você já votou. O resultado sai no fim do dia.':tn?(r.motivo||''):'Candidatura na sexta, votação no sábado. Se empatar, 2º turno no domingo.';
+ let h='<div class="box" style="width:min(420px,100%);max-height:88dvh;overflow:auto"><h3 style="margin:0 0 4px">'+tit+'</h3><p style="margin:0 0 10px;opacity:.85;font-size:14px">'+sub+'</p>';
+ if(r.fase==='candidatura'&&r.pode_candidatar)h+='<div style="background:rgba(255,201,74,.12);border:2px solid var(--gold);border-radius:14px;padding:10px;margin-bottom:10px"><b>Quer ser prefeito?</b><textarea id="eleMsg" maxlength="160" rows="3" placeholder="Sua mensagem para os eleitores (o que você vai fazer pela cidade?)" style="width:100%;margin:6px 0;border-radius:10px;padding:8px;font:inherit"></textarea><button class="btn" id="eleCand">🏛️ Me candidatar</button><div style="font-size:12px;opacity:.75;margin-top:4px">Sua foto e seu nível do perfil aparecem para os eleitores. Candidato não vota.</div></div>';
+ else if(r.fase==='candidatura'&&!r.sou_candidato&&eu&&eu.nivel<20)h+='<p style="font-size:13px;opacity:.8">🔒 Para se candidatar precisa ser nível 20.</p>';
+ if(cs.length){h+='<div style="font-weight:700;margin:4px 0 6px">'+(r.fase==='candidatura'?'Candidatos até agora':'Candidatos')+'</div>';
+  cs.forEach((c,i)=>{const meu=r.meu_voto===c.id;h+='<div style="display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.06);border:2px solid '+(meu?'#7be07b':'rgba(255,255,255,.12)')+';border-radius:14px;padding:8px;margin-bottom:8px"><div class="foto-g" data-f="'+i+'" style="width:58px;height:58px;font-size:28px">🙂</div><div style="flex:1;min-width:0"><b>'+esc(c.nome)+'</b> <small style="opacity:.75">nível '+(c.nivel|0)+'</small><div style="font-size:13px;opacity:.9;word-wrap:break-word">“'+esc(c.msg||'')+'”</div></div>'+(vot?'<button class="btn" data-v="'+i+'" style="flex:none;padding:8px 12px">Votar</button>':meu?'<span style="flex:none">✅</span>':'')+'</div>'})}
+ else h+='<p style="opacity:.8">Ainda não tem candidatos.</p>';
+ const res=r.resultado;if(!tn&&res&&res.votos&&(res.vencedor||res.empatados))h+='<div style="margin-top:8px;font-weight:700">📊 Último resultado'+(res.turno===2?' (2º turno)':'')+'</div>'+res.votos.map(v=>'<div style="display:flex;justify-content:space-between;font-size:14px;padding:2px 0"><span>'+esc(v.nome)+(res.vencedor_nome===v.nome?' 🏛️':'')+'</span><b>'+v.votos+' voto'+(v.votos===1?'':'s')+'</b></div>').join('')+(res.empatados&&!res.vencedor?'<div style="font-size:13px;opacity:.8">Empate! 2º turno no domingo.</div>':'');
+ if(!vot||!forcado)h+='<button class="btn ghost" id="eleFecha" style="margin-top:8px;width:100%">Fechar</button>';
+ m.innerHTML=h+'</div>';m.classList.remove('hidden');
+ m.querySelectorAll('[data-f]').forEach(el=>{const c=cs[+el.dataset.f];if(c&&c.foto)pintarFoto(el,c.foto)});
+ const fecha=()=>{m.classList.add('hidden');ELE_ABERTA=false};if($('eleFecha'))$('eleFecha').onclick=fecha;
+ m.onclick=e=>{if(e.target===m&&!(vot&&forcado))fecha()};
+ m.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const c=cs[+b.dataset.v];$('mConf').style.zIndex=70;confirmar('🗳️ Votar em '+c.nome+'?','O voto é secreto e não dá para mudar depois.',()=>acao(async()=>{const r2=await api.votar(c.id);toast('✅ Voto registrado! O resultado sai no fim do dia.',3500);fecha();if(!forcado)abrirEleicao(r2,false)}))});
+ if($('eleCand'))$('eleCand').onclick=()=>acao(async()=>{const r2=await api.candidatar($('eleMsg').value);emitEv('perfil',{});toast('🏛️ Você é candidato! A votação é amanhã.',3500);abrirEleicao(r2,false)})}
+function checaEleicao(){if(!eu||ELE_ABERTA)return;api.eleicao().then(r=>{if(!r||ELE_ABERTA)return;
+ const res=r.resultado;if(res&&res.votos&&(res.vencedor||res.empatados)){const k='cidadeTonhao.eleRes.'+res.semana+'.'+res.turno;let v=null;try{v=localStorage.getItem(k)}catch(_){}
+  if(!v){try{localStorage.setItem(k,1)}catch(_){}if(res.vencedor)bannerGrande('🗳️ RESULTADO DA ELEIÇÃO','🏛️ '+esc(res.vencedor_nome||'')+' é o novo prefeito!');else bannerGrande('🗳️ DEU EMPATE!','2º turno hoje (domingo). Vote de novo!');carregaPref()}}
+ if(r.turno&&r.pode_votar&&!r.meu_voto&&(r.candidatos||[]).length)abrirEleicao(r,true)}).catch(()=>{})}
+setInterval(checaEleicao,120000);setTimeout(checaEleicao,7000);
 let TOP_ID=null;function carregaTop(){api.ranking().then(r=>{TOP_ID=r&&r[0]?r[0].id:null;if(TOP_ID==='local'&&eu)TOP_ID=eu.id}).catch(()=>{})}setInterval(carregaTop,120000);setTimeout(carregaTop,4000);
 
 // ===== Títulos (aparecem em cima do nome; cada raridade tem uma cor/efeito) =====

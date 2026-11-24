@@ -3941,3 +3941,122 @@ end $$;
 -- ===== ETAPA 49: comércios mais caros (quem já é dono continua) =====
 update public.comercios set preco_ponto = 300000, nivel_min = 20, despesa = 8000 where id = 1;
 update public.comercios set preco_ponto = 350000, nivel_min = 25, despesa = 10000 where id = 2;
+
+-- ===== ETAPA 50: eleição do prefeito (sexta candidatura, sábado votação, domingo 2º turno se empatar) =====
+create table if not exists public.eleicao_cand (
+  semana date not null, morador uuid not null references public.moradores(id) on delete cascade,
+  msg text not null default '', criado timestamptz not null default now(), primary key (semana, morador));
+create table if not exists public.eleicao_votos (
+  semana date not null, turno integer not null, eleitor uuid not null references public.moradores(id) on delete cascade,
+  cand uuid not null, votado timestamptz not null default now(), primary key (semana, turno, eleitor));
+create table if not exists public.eleicao_res (
+  semana date not null, turno integer not null, vencedor uuid, empatados uuid[], votos json, apurado timestamptz not null default now(),
+  primary key (semana, turno));
+alter table public.eleicao_cand enable row level security;
+alter table public.eleicao_votos enable row level security;
+alter table public.eleicao_res enable row level security;
+revoke all on public.eleicao_cand, public.eleicao_votos, public.eleicao_res from anon, authenticated;
+
+-- dia de hoje no horário de Brasília
+create or replace function public._hoje_br() returns date language sql stable as $$ select (now() at time zone 'America/Sao_Paulo')::date $$;
+
+-- apura o que já fechou (roda sozinho quando alguém abre a eleição; não precisa de agendador)
+create or replace function public._eleicao_apura() returns void
+language plpgsql security definer set search_path = public as $$
+declare h date := _hoje_br(); s date; mx integer; emp uuid[]; w uuid; v json; r record;
+begin
+  s := h - ((extract(dow from h)::int + 2) % 7);           -- sexta-feira desta semana (ou a última)
+  if h < s + 2 then s := s - 7; end if;                    -- antes de domingo: a última apuração possível é da semana passada
+  -- 1º turno (fecha no domingo 00h)
+  if not exists (select 1 from eleicao_res where semana = s and turno = 1) then
+    select coalesce(json_agg(json_build_object('id', c.morador, 'votos', coalesce(n.q, 0)) order by coalesce(n.q,0) desc, c.criado), '[]'),
+           max(coalesce(n.q, 0)) into v, mx
+      from eleicao_cand c left join (select cand, count(*) q from eleicao_votos where semana = s and turno = 1 group by cand) n on n.cand = c.morador
+     where c.semana = s;
+    if coalesce(mx, 0) = 0 then                            -- ninguém se candidatou ou ninguém votou: prefeito atual continua
+      insert into eleicao_res(semana, turno, vencedor, votos) values (s, 1, null, v) on conflict do nothing;
+    else
+      select array_agg(c.morador order by c.criado) into emp from eleicao_cand c
+       where c.semana = s and (select count(*) from eleicao_votos where semana = s and turno = 1 and cand = c.morador) = mx;
+      if array_length(emp, 1) = 1 then
+        insert into eleicao_res(semana, turno, vencedor, votos) values (s, 1, emp[1], v) on conflict do nothing;
+        update cidade set prefeito = emp[1], desde = now() where id = 1;
+      else
+        insert into eleicao_res(semana, turno, vencedor, empatados, votos) values (s, 1, null, emp, v) on conflict do nothing;
+      end if;
+    end if;
+  end if;
+  -- 2º turno (domingo; fecha na segunda 00h). Empate de novo: ganha quem se candidatou primeiro.
+  select * into r from eleicao_res where semana = s and turno = 1;
+  if r.empatados is not null and h >= s + 3 and not exists (select 1 from eleicao_res where semana = s and turno = 2) then
+    select json_agg(json_build_object('id', c.morador, 'votos', coalesce(n.q, 0)) order by coalesce(n.q,0) desc, c.criado),
+           (array_agg(c.morador order by coalesce(n.q,0) desc, c.criado))[1] into v, w
+      from eleicao_cand c left join (select cand, count(*) q from eleicao_votos where semana = s and turno = 2 group by cand) n on n.cand = c.morador
+     where c.semana = s and c.morador = any(r.empatados);
+    insert into eleicao_res(semana, turno, vencedor, votos) values (s, 2, w, v) on conflict do nothing;
+    update cidade set prefeito = w, desde = now() where id = 1;
+  end if;
+end $$;
+revoke execute on function public._eleicao_apura() from anon, authenticated, public;
+
+-- situação da eleição para o jogo (votos ficam escondidos até a apuração)
+create or replace function public.eleicao() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; h date := _hoje_br(); d int; s date; fase text := 'fechada'; tn int := 0; r1 public.eleicao_res;
+  cands json; ult json; voto uuid; souc boolean; pode boolean; motivo text;
+begin
+  m := _eu(); perform _eleicao_apura();
+  d := extract(dow from h)::int; s := h - ((d + 2) % 7);
+  select * into r1 from eleicao_res where semana = s and turno = 1;
+  if d = 5 then fase := 'candidatura';
+  elsif d = 6 then fase := 'votacao'; tn := 1;
+  elsif d = 0 and r1.empatados is not null then fase := 'segundo'; tn := 2; end if;
+  select coalesce(json_agg(json_build_object('id', c.morador, 'nome', mo.nome, 'nivel', mo.nivel, 'foto', mo.foto, 'vis', mo.visual, 'msg', c.msg) order by c.criado), '[]')
+    into cands from eleicao_cand c join moradores mo on mo.id = c.morador
+   where c.semana = s and not coalesce(mo.banido, false) and (tn <> 2 or c.morador = any(r1.empatados));
+  souc := exists (select 1 from eleicao_cand where semana = s and morador = m.id);
+  select cand into voto from eleicao_votos where semana = s and eleicao_votos.turno = tn and eleitor = m.id;
+  motivo := case when tn = 0 then 'A votação é no sábado.' when souc then 'Candidato não vota.' when m.nivel < 5 then 'Para votar precisa ser nível 5.' end;
+  pode := motivo is null;
+  select json_build_object('semana', x.semana, 'turno', x.turno, 'vencedor', x.vencedor, 'vencedor_nome', (select nome from moradores where id = x.vencedor),
+         'empatados', x.empatados,
+         'votos', (select json_agg(json_build_object('nome', mo.nome, 'votos', (e->>'votos')::int)) from json_array_elements(x.votos) e join moradores mo on mo.id = (e->>'id')::uuid))
+    into ult from eleicao_res x order by x.semana desc, x.turno desc limit 1;
+  return json_build_object('fase', fase, 'turno', tn, 'semana', s, 'candidatos', cands, 'sou_candidato', souc, 'pode_votar', pode,
+    'motivo', motivo, 'meu_voto', voto, 'pode_candidatar', fase = 'candidatura' and m.nivel >= 20 and not souc, 'resultado', ult);
+end $$;
+grant execute on function public.eleicao() to authenticated;
+
+create or replace function public.candidatar(p_msg text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; h date := _hoje_br();
+begin
+  m := _eu();
+  if extract(dow from h) <> 5 then raise exception 'A candidatura é só na sexta-feira.'; end if;
+  if m.nivel < 20 then raise exception 'Para se candidatar precisa ser nível 20.'; end if;
+  if char_length(coalesce(trim(p_msg), '')) < 3 then raise exception 'Escreva sua mensagem para os eleitores.'; end if;
+  insert into eleicao_cand(semana, morador, msg) values (h, m.id, left(trim(p_msg), 160))
+  on conflict (semana, morador) do update set msg = excluded.msg;
+  delete from eleicao_votos where semana = h and eleitor = m.id;
+  return eleicao();
+end $$;
+grant execute on function public.candidatar(text) to authenticated;
+
+create or replace function public.votar(p_cand uuid) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; e json;
+begin
+  m := _eu(); e := eleicao();
+  if (e->>'turno')::int = 0 then raise exception 'A votação é no sábado.'; end if;
+  if not (e->>'pode_votar')::boolean then raise exception '%', e->>'motivo'; end if;
+  if e->>'meu_voto' is not null then raise exception 'Você já votou.'; end if;
+  if not exists (select 1 from json_array_elements(e->'candidatos') c where (c->>'id')::uuid = p_cand) then raise exception 'Esse candidato não está na eleição.'; end if;
+  insert into eleicao_votos(semana, turno, eleitor, cand) values ((e->>'semana')::date, (e->>'turno')::int, m.id, p_cand);
+  return eleicao();
+end $$;
+grant execute on function public.votar(uuid) to authenticated;
+
+-- prefeito agora só pela eleição
+create or replace function public.assumir_prefeitura() returns json
+language plpgsql security definer set search_path = public as $$
+begin raise exception 'Agora o prefeito é escolhido na eleição: candidatura na sexta, votação no sábado.'; end $$;
