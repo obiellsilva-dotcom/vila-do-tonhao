@@ -1667,10 +1667,12 @@ function loteItens(list){for(const L of LOTES){const cx=T(L.x+L.w/2),cy=T(L.y+L.
  const {x,y,w,fy,gx,dx,g}=L,cor=g?'#efe8da':(L.b.wall?shade(L.b.wall,-6):'#e9e1d0'),alto=g,X=T;
  list.push({x:X(x),y:X(y),k:-1e8+3,g:1,f:()=>loteChao(L)});
  const seg=(x0,y0,x1,y1)=>list.push({x:(x0+x1)/2,y:y1,k:(x0+x1)/2+y1-3,cam:1,f:()=>loteGrade(x0,y0,x1,y1,alto,cor)});
- const yb=X(y)+14,yf=X(fy)+14;
- for(let xx=x;xx<x+w;xx++){if(xx>=L.b.x&&xx<L.b.x+L.b.w&&y>=L.b.y)continue;seg(X(xx),yb,X(xx+1),yb+3)}
- for(let yy=y;yy<=fy;yy++){seg(X(x)+14,X(yy),X(x)+17,X(yy+1));seg(X(x+w)-17,X(yy),X(x+w)-14,X(yy+1))}
- for(let xx=x;xx<x+w;xx++){if(xx===dx||xx===gx||xx===gx+1)continue;seg(X(xx),yf,X(xx+1),yf+3)}
+ const yb=X(y)+14,yf=X(fy)+14,vE=false,vD=false;
+ // cada lote tem o seu muro; muro da frente e do fundo terminam no muro do lado (antes passavam por cima do muro do vizinho)
+ const xe=vE?X(x)-1.5:X(x)+14,xd=vD?X(x+w)+1.5:X(x+w)-14,cl=(a,c)=>[Math.max(a,xe),Math.min(c,xd)];
+ for(let xx=x;xx<x+w;xx++){if(xx>=L.b.x&&xx<L.b.x+L.b.w&&y>=L.b.y)continue;const [a,c]=cl(X(xx),X(xx+1));if(c>a)seg(a,yb,c,yb+3)}
+ for(let yy=y;yy<=fy;yy++){if(!vE)seg(X(x)+14,X(yy)+(yy===y?14:0),X(x)+17,X(yy+1)-(yy===fy?14:0));else seg(X(x)-1.5,X(yy)+(yy===y?14:0),X(x)+1.5,X(yy+1)-(yy===fy?14:0));if(!vD)seg(X(x+w)-17,X(yy)+(yy===y?14:0),X(x+w)-14,X(yy+1)-(yy===fy?14:0))}
+ for(let xx=x;xx<x+w;xx++){if(xx===dx||xx===gx||xx===gx+1)continue;const [a,c]=cl(X(xx),X(xx+1));if(c>a)seg(a,yf,c,yf+3)}
  const pa=loteAberto(L,X(dx+.5),X(fy+.5),T(1.6)),ca=Math.max(loteAberto(L,X(gx+1),X(fy+.5),T(2.2)),eu&&eu.driving&&podeEntrar(L.b)&&Math.hypot(eu.x-X(gx+1),eu.y-X(fy+.5))<T(3.4)?1:0);
  L._pa=(L._pa||0)+((pa)-(L._pa||0))*.15;L._ca=(L._ca||0)+((ca)-(L._ca||0))*.12;
  list.push({x:X(dx+.5),y:yf+3,k:X(dx+.5)+yf+1,cam:1,f:()=>lotePortao(X(dx)+1,X(dx+1)-1,yf+1.5,L._pa,false)});
