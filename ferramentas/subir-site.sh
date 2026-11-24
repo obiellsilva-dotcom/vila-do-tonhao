@@ -11,11 +11,11 @@ git diff --quiet && git diff --cached --quiet || { echo "Há mudanças sem commi
 # confere se o JavaScript não tem erro de sintaxe
 node -e "const s=require('fs').readFileSync('index.html','utf8');const re=/<script>([\s\S]*?)<\/script>/g;let m,n=0;while((m=re.exec(s))){try{new Function(m[1])}catch(e){console.log('ERRO JS:',e.message);n++}}process.exit(n?1:0)"
 TMP=$(mktemp -d); for f in index.html privacidade.html excluir-conta.html manifest.webmanifest; do cp "$f" "$TMP/"; done
-cp .well-known/assetlinks.json "$TMP/assetlinks.json"; mkdir -p "$TMP/icones"; cp icones/* "$TMP/icones/"
+cp .well-known/assetlinks.json "$TMP/assetlinks.json"; mkdir -p "$TMP/icones"; cp icones/* "$TMP/icones/"; [ -d novidades ] && cp -r novidades "$TMP/novidades"
 git fetch -q origin main
 git checkout -q -B main origin/main
 for f in index.html privacidade.html excluir-conta.html manifest.webmanifest; do cp "$TMP/$f" site/public/; done
-cp "$TMP/assetlinks.json" site/public/.well-known/assetlinks.json; cp "$TMP/icones/"* site/public/icones/
+cp "$TMP/assetlinks.json" site/public/.well-known/assetlinks.json; cp "$TMP/icones/"* site/public/icones/; [ -d "$TMP/novidades" ] && mkdir -p site/public/novidades && cp -r "$TMP/novidades/"* site/public/novidades/
 git add site
 if git diff --cached --quiet; then echo "Nada mudou no site."; else git commit -qm "Site $V"; git push -q origin main; echo "Enviado ao main."; fi
 git checkout -q "$RAMO"

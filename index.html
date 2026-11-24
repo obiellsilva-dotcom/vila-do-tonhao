@@ -2616,6 +2616,7 @@ const casaTipoV=b=>b.preco>=200000?'g':b.preco>=40000?'m':'p';
 const casaModelo=b=>{const t=casaTipoV(b);return[t,((b.n*5+(b.y%3))%3+3)%3]};
 // hortinha
 const HORTA_PL={alface:{nome:'Alface',e:'🥬',semente:5,horas:2,colhe:3},tomate:{nome:'Tomate',e:'🍅',semente:8,horas:4,colhe:4},cenoura:{nome:'Cenoura',e:'🥕',semente:10,horas:6,colhe:4},morango:{nome:'Morango',e:'🍓',semente:20,horas:8,colhe:5},milho:{nome:'Milho',e:'🌽',semente:15,horas:10,colhe:3}};
+const HORTA_VENDA={alface:4,tomate:4,cenoura:5,morango:7,milho:9}; // preço de cada legume no mercadinho
 const HORTA=new Map();let hortaEm=0,hortaDt=0;
 const hortaSlots=b=>b.preco>=200000?4:3;
 const hortaDe=(n,s)=>{const h=HORTA.get(n);return h&&h[s]||null};
@@ -4681,7 +4682,7 @@ const api=ONLINE?(()=>{
    cidade:()=>ONLINE?q(sb.from('cidade').select('prefeito,desde,moradores(nome)').eq('id',1).maybeSingle()):Promise.resolve(null),
   guardar:i=>rpc('guardar_item',{p_item:i}),
   usar:i=>rpc('usar_item',{p_item:i}),
-  venderPeixes:()=>rpc('vender_peixes'),
+  venderPeixes:()=>rpc('vender_peixes'),venderHorta:()=>rpc('vender_horta'),
   comerFruta:a=>rpc('comer_fruta',{p_arvore:a}),
   comprarCarro:c=>rpc('comprar_carro',{p_carro:c}),
   corCarro:(c,cor)=>rpc('cor_carro',{p_carro:c,p_cor:cor}),
@@ -4780,6 +4781,7 @@ const api=ONLINE?(()=>{
   async salvarGas(g){const m=lme();m.gasolina=g;lsave()},
   async usar(i){const m=lme(),it=LOJA[i];m.mochila=m.mochila||{};if(!(m.mochila[i]>0))fail('Você não tem isso na mochila.');m.mochila[i]--;if(!m.mochila[i])delete m.mochila[i];m.fome=Math.min(100,m.fome+(it.fome||0));m.sede=Math.min(100,m.sede+(it.sede||0));lsave();return{item:i,mochila:m.mochila,eu:lest()}},
   async comprar(i){const m=lme(),it=LOJA[i];if(m.dinheiro<it.preco)fail('Dinheiro insuficiente. Vai trabalhar! 😅');const morreu=lfome(m,0);m.dinheiro-=it.preco;m.fome=Math.min(100,m.fome+it.fome);m.sede=Math.min(100,m.sede+(it.sede||0));lsave();return{item:i,preco:it.preco,morreu,eu:lest()}},
+  async venderHorta(){const m=lme();m.mochila=m.mochila||{};let ganho=0,vendidos=0;for(const [k,p] of Object.entries(HORTA_VENDA)){const q=m.mochila['h_'+k]||0;if(q){ganho+=q*p;vendidos+=q;delete m.mochila['h_'+k]}}if(!vendidos)fail('Você não tem legumes da horta na mochila.');m.dinheiro+=ganho;lsave();return{ganho,vendidos,mochila:m.mochila,eu:lest()}},
   async venderPeixes(){const m=lme();if(m.peixes<1)fail('Você não tem peixe para vender.');const ganho=m.peixes*PRECO_PEIXE,vendidos=m.peixes;m.dinheiro+=ganho;m.peixes=0;lsave();return{ganho,vendidos,eu:lest()}},
   async comerFruta(a){const m=lme();L.frutas=L.frutas||{};const ult=Math.max(0,...Object.values(L.frutas));if(Date.now()-ult<20e3)fail('Calma, ainda está mastigando a última fruta.');
    const falta=180-(Date.now()-(L.frutas[a]||0))/1000;if(falta>0)fail(`Essa árvore ainda não tem fruta madura (faltam ${Math.ceil(falta)} s).`);lfome(m,0);L.frutas[a]=Date.now();m.fome=Math.min(100,m.fome+10);lsave();return{arvore:a,espera:180,eu:lest()}},
@@ -5051,17 +5053,18 @@ async function celAvisos(){if(!eu)return;try{const r=await api.naoLidas();if(!r)
 setInterval(()=>{if(eu&&!document.hidden)celAvisos()},25000);
 
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261128';
+const NOVID='v20261128b'; // mudou: todo mundo vê de novo (agora com vídeos)
 const novEmo=(g,t,a,b)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText(a,110,128+Math.sin(t*2.2)*6);if(b){g.font='44px sans-serif';const L=b.split(' ');g.fillText(L[Math.floor(t/1.1)%L.length],220,122+Math.cos(t*2)*5)}};
+const NOV_VID='novidades/v20261128/';
 const NOV_SLIDES=[
- {t:'🏛️ A cidade ficou mais bonita',x:'A <b>igreja</b> ganhou torres com sinos, a <b>prefeitura</b> tem colunas e relógio, a <b>delegacia</b>, o <b>hospital</b> (com heliponto!) e o <b>banco</b> foram refeitos. De noite as janelas acendem.',d:(g,t)=>novEmo(g,t,'🏛️','⛪ 🚓 🏥 🏦')},
- {t:'🚪 Agora dá para entrar nos prédios',x:'Delegacia, prefeitura, hospital, banco e igreja têm <b>interior</b>. Os <b>empregos</b> agora são pegos no <b>balcão lá dentro</b>. Suba a escada: na delegacia ficam as <b>celas</b>, no hospital os <b>quartos</b> e na prefeitura o <b>gabinete</b>.',d:(g,t)=>novEmo(g,t,'🚪','💼 👮 🩺 🙏')},
- {t:'🏠 Casas com lote, garagem e portão',x:'Cada casa agora tem <b>lote murado</b>, <b>portão que abre</b> quando você chega e <b>garagem</b> para guardar o carro dentro. São 9 modelos de casa. <b>Atenção:</b> algumas casas <b>mudaram de lugar</b> — quem tem casa continua dono dela, é só procurar no mapa (ou na 🏘️ Imobiliária).',d:(g,t)=>novEmo(g,t,'🏡','🚗 🔑 🚪')},
- {t:'🏰 Bairro Nobre',x:'As <b>mansões</b> ganharam terrenos grandes, com <b>piscina</b>, estradinha e garagem. Quatro delas ficam no novo <b>Bairro Nobre</b>, no alto da cidade, subindo a avenida.',d:(g,t)=>novEmo(g,t,'🏰','🏊 🌳 🚙')},
- {t:'🌱 Hortinha no quintal',x:'Plante <b>alface, tomate, cenoura, morango e milho</b> nos canteiros do seu quintal. A planta cresce <b>mesmo com você fora do jogo</b>. Na hora da colheita vai tudo para a <b>🎒 mochila</b>. Fique no quintal, perto dos canteiros, e toque em <b>🌱 Minha horta</b>.',d:(g,t)=>novEmo(g,t,'🌱','🥬 🍅 🥕 🍓 🌽')},
- {t:'🏪 Invista num comércio',x:'Compre a <b>🍔 Lanchonete</b> ou a <b>🛍️ Loja de Roupas da Vila</b> (perto da praça) e coloque o <b>nome que quiser</b> na fachada. Compre mercadoria, escolha o preço e ganhe dinheiro: os moradores compram <b>mesmo com você offline</b>. Passe lá para recolher o caixa!',d:(g,t)=>novEmo(g,t,'🏪','🍔 🛍️ 💰')},
- {t:'👕 Roupas que só existem lá',x:'A Loja de Roupas da Vila vende <b>6 roupas exclusivas</b>: jaqueta universitária, camisa anos 70, kimono florido, poncho gaúcho, camisa com suspensório e jaqueta bomber. Toda semana o fornecedor traz <b>2 modelos</b>; os que saem de linha <b>ficam raros</b>!',d:(g,t)=>novEmo(g,t,'👕','🧥 👘 🎽')},
- {t:'✨ Mais novidades',x:'A <b>👕 Loja de Roupas</b> oficial tem prédio novo e uma loja grande por dentro. Os <b>prédios do condomínio</b> agora têm sacada, portaria e caixa d’água. E o emprego de <b>🚗 Vendedor de carros</b> foi consertado: pegue na concessionária!',d:(g,t)=>novEmo(g,t,'✨','👗 🏢 🚗')}
+ {v:'predios',t:'🏛️ Novas estruturas',x:'A <b>igreja</b>, a <b>prefeitura</b>, a <b>delegacia</b>, o <b>hospital</b> e o <b>banco</b> foram reformados. Passe na frente e veja como ficaram! De noite as janelas acendem.',d:(g,t)=>novEmo(g,t,'🏛️','⛪ 🚓 🏥 🏦')},
+ {v:'interiores',t:'🚪 Agora dá para entrar nos prédios',x:'Delegacia, prefeitura, hospital, banco e igreja têm <b>interior</b>. Os <b>empregos</b> são pegos no <b>balcão lá dentro</b>. Suba a escada: na delegacia ficam as <b>celas</b>, no hospital os <b>quartos</b> e na prefeitura o <b>gabinete</b>.',d:(g,t)=>novEmo(g,t,'🚪','💼 👮 🩺 🙏')},
+ {v:'casa',t:'🏡 Casas com lote próprio',x:'Cada casa agora tem <b>lote murado</b>, <b>portão que abre</b> quando você chega e <b>garagem</b> para guardar o carro dentro. <b>Atenção:</b> algumas casas <b>mudaram de lugar</b> — quem tem casa continua dono dela, é só procurar no mapa ou na 🏘️ Imobiliária.',d:(g,t)=>novEmo(g,t,'🏡','🚗 🔑 🚪')},
+ {v:'nobre',t:'🏰 Bairro Nobre',x:'As <b>mansões</b> ganharam terrenos grandes, com <b>piscina</b> e garagem para 2 carros. Quatro delas ficam no novo <b>Bairro Nobre</b>, no alto da cidade: é só subir a avenida.',d:(g,t)=>novEmo(g,t,'🏰','🏊 🌳 🚙')},
+ {v:'horta',t:'🌱 Plante, colha e venda',x:'Plante <b>alface, tomate, cenoura, morango e milho</b> nos canteiros do quintal. A planta cresce <b>mesmo com você fora do jogo</b>. Colha (vai para a 🎒 mochila) e <b>venda no mercadinho</b> — ou coma quando der fome!',d:(g,t)=>novEmo(g,t,'🌱','🥬 🍅 🥕 🍓 🌽')},
+ {v:'comercio',t:'🏪 Invista num comércio',x:'Compre a <b>🍔 Lanchonete</b> ou a <b>🛍️ Loja de Roupas da Vila</b> (perto da praça) e coloque o <b>nome que quiser</b> na fachada. Compre mercadoria, escolha o preço e ganhe dinheiro: os moradores compram <b>mesmo com você offline</b>.',d:(g,t)=>novEmo(g,t,'🏪','🍔 🛍️ 💰')},
+ {v:'roupas',t:'👕 Roupas exclusivas',x:'A Loja de Roupas da Vila vende <b>6 roupas que não existem em outro lugar</b>: jaqueta universitária, camisa anos 70, kimono florido, poncho gaúcho, camisa com suspensório e jaqueta bomber. Os modelos que saem de linha <b>ficam raros</b>!',d:(g,t)=>novEmo(g,t,'👕','🧥 👘 🎽')},
+ {v:'mais',t:'✨ E tem mais',x:'A <b>👗 Loja de Roupas</b> oficial tem prédio novo e loja grande por dentro, os <b>🏢 prédios do condomínio</b> foram refeitos e o emprego de <b>🚗 Vendedor de carros</b> foi consertado: pegue na concessionária!',d:(g,t)=>novEmo(g,t,'✨','👗 🏢 🚗')}
 ];
 let novAnim=null,NOV_OFF=null;
 async function mostrarNovidades(){if(!eu||document.getElementById('novid'))return;const kk='cidadeTonhao.novid.'+NOVID+'.'+eu.id;try{if(localStorage.getItem(kk))return}catch(_){}
@@ -5069,12 +5072,12 @@ async function mostrarNovidades(){if(!eu||document.getElementById('novid'))retur
  if(!(eu.xp>0)){marca();return}
  try{if(await api.minhaNovidade()===NOVID){try{localStorage.setItem(kk,'1')}catch(_){}return}}catch(_){}
  let i=0,t0=performance.now(),auto=performance.now();const el=document.createElement('div');el.id='novid';
- el.innerHTML=`<style>#novid{position:fixed;inset:0;z-index:80;background:rgba(10,5,8,.78);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Fredoka,sans-serif}#novid .bx{width:min(420px,100%);background:linear-gradient(#3a2129,#24141a);border:2px solid #ffc94a;border-radius:20px;padding:14px;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.6)}#novid .tag{color:#ffd23f;font-weight:700;font-size:13px;letter-spacing:.5px}#novid h3{margin:4px 0 8px;font-size:20px}#novid canvas{width:100%;height:auto;border-radius:14px;background:radial-gradient(circle at 50% 40%,#4a3040,#1c1016)}#novid p{font-size:14px;line-height:1.4;min-height:84px;margin:8px 0}#novid .ds{display:flex;gap:5px;justify-content:center;margin:6px 0}#novid .ds i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}#novid .ds i.on{background:#ffd23f}#novid .bt{display:flex;gap:8px}#novid button{flex:1;border:0;border-radius:12px;padding:10px;font:700 14px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}#novid button.g{flex:.5;background:rgba(255,255,255,.12);color:#fff}</style><div class="bx"><div class="tag">🆕 NOVIDADES DA ATUALIZAÇÃO</div><h3></h3><canvas width="320" height="200"></canvas><p></p><div class="ds"></div><div class="bt"><button class="g" data-a="v">◀</button><button data-a="p"></button></div></div>`;
- document.body.appendChild(el);const cv2=el.querySelector('canvas'),g=cv2.getContext('2d');
- const pinta=()=>{const S=NOV_SLIDES[i];el.querySelector('h3').textContent=S.t;el.querySelector('p').innerHTML=S.x;el.querySelector('.ds').innerHTML=NOV_SLIDES.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');el.querySelector('[data-a=p]').textContent=i<NOV_SLIDES.length-1?'▶ Próximo':'✔ Bora jogar!';t0=performance.now();auto=performance.now()};
- const fecha=()=>{cancelAnimationFrame(novAnim);el.remove();marca()};
+ el.innerHTML=`<style>#novid{position:fixed;inset:0;z-index:80;background:rgba(10,5,8,.78);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Fredoka,sans-serif}#novid .bx{width:min(560px,100%);max-height:96vh;overflow:auto;background:linear-gradient(#3a2129,#24141a);border:2px solid #ffc94a;border-radius:20px;padding:14px;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.6)}#novid .tag{color:#ffd23f;font-weight:700;font-size:13px;letter-spacing:.5px}#novid h3{margin:4px 0 8px;font-size:20px}#novid canvas{width:100%;height:auto;border-radius:14px;background:radial-gradient(circle at 50% 40%,#4a3040,#1c1016)}#novid .vd{position:relative;width:100%;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#120a0e;box-shadow:0 4px 18px rgba(0,0,0,.5)}#novid video{width:100%;height:100%;object-fit:cover;display:block}#novid .vd canvas{position:absolute;inset:0;width:100%;height:100%}#novid h3{font-size:22px}#novid p{font-size:15px;min-height:70px}#novid p{font-size:14px;line-height:1.4;min-height:84px;margin:8px 0}#novid .ds{display:flex;gap:5px;justify-content:center;margin:6px 0}#novid .ds i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}#novid .ds i.on{background:#ffd23f}#novid .bt{display:flex;gap:8px}#novid button{flex:1;border:0;border-radius:12px;padding:10px;font:700 14px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}#novid button.g{flex:.5;background:rgba(255,255,255,.12);color:#fff}</style><div class="bx"><div class="tag">🆕 NOVIDADES DA ATUALIZAÇÃO</div><h3></h3><div class="vd"><video muted playsinline preload="auto"></video><canvas width="320" height="200" style="display:none"></canvas></div><p></p><div class="ds"></div><div class="bt"><button class="g" data-a="v">◀</button><button data-a="p"></button></div></div>`;
+ document.body.appendChild(el);const cv2=el.querySelector('canvas'),g=cv2.getContext('2d'),vd=el.querySelector('video');let semVideo=false,proxT=0;vd.onerror=()=>{semVideo=true;vd.style.display='none';cv2.style.display='block'};vd.onended=()=>{clearTimeout(proxT);if(i<NOV_SLIDES.length-1)proxT=setTimeout(()=>{if(el.isConnected){i++;pinta()}},1200);else{vd.currentTime=0;vd.play().catch(()=>{})}};
+ const pinta=()=>{const S=NOV_SLIDES[i];el.querySelector('h3').textContent=S.t;el.querySelector('p').innerHTML=S.x;el.querySelector('.ds').innerHTML=NOV_SLIDES.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');el.querySelector('[data-a=p]').textContent=i<NOV_SLIDES.length-1?'▶ Próximo':'✔ Bora jogar!';t0=performance.now();auto=performance.now();clearTimeout(proxT);if(!semVideo&&S.v){vd.poster=NOV_VID+S.v+'.jpg';vd.innerHTML=`<source src="${NOV_VID+S.v}.mp4" type="video/mp4"><source src="${NOV_VID+S.v}.webm" type="video/webm">`;const ul=vd.querySelector('source:last-child');ul.onerror=()=>vd.onerror();vd.load();vd.play().catch(()=>{})}};
+ const fecha=()=>{cancelAnimationFrame(novAnim);clearTimeout(proxT);try{vd.pause()}catch(_){}el.remove();marca()};
  el.querySelector('[data-a=p]').onclick=()=>{if(i<NOV_SLIDES.length-1){i++;pinta()}else fecha()};el.querySelector('[data-a=v]').onclick=()=>{if(i>0){i--;pinta()}};
- const loop=()=>{if(!el.isConnected)return;const t=(performance.now()-t0)/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,320,200);try{NOV_SLIDES[i].d(g,t)}catch(e){}if(performance.now()-auto>9000&&i<NOV_SLIDES.length-1){i++;pinta()}novAnim=requestAnimationFrame(loop)};pinta();loop()}
+ const loop=()=>{if(!el.isConnected)return;const t=(performance.now()-t0)/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,320,200);if(semVideo){try{NOV_SLIDES[i].d(g,t)}catch(e){}if(performance.now()-auto>9000&&i<NOV_SLIDES.length-1){i++;pinta()}}novAnim=requestAnimationFrame(loop)};pinta();loop()}
 async function aplicarPerfil(m,anunciar){
  const novo=!eu;if(novo)setTimeout(()=>mostrarNovidades(),3500);
  if(novo)eu=makePlayer(m.id,m.nome,decode(m.visual)||randomVis());
@@ -5318,7 +5321,7 @@ function abrirHorta(b,escolher){if(!eu)return;closeCard();lugarAtual=b;const box
   botao(box,'⬅️ Voltar',()=>abrirHorta(b),{ghost:true});$('placeName').textContent='🌱 Escolha a semente';$('placeSub').textContent='Canteiro '+(escolher+1)+' · a planta cresce mesmo com você fora do jogo.';$('place').classList.remove('hidden');return}
  for(let s=0;s<hortaSlots(b);s++){const r=hortaDe(b.n,s),e=hortaEst(r),p=r&&HORTA_PL[r.planta];
   if(!r)comLinha(box,`🟫 <b>Canteiro ${s+1}</b><br><span style="opacity:.75">vazio</span>`,[['🌱 Plantar',()=>abrirHorta(b,s)]]);
-  else if(e===3)comLinha(box,`${p.e} <b>${p.nome}</b><br><span style="color:#7dff9a">pronto para colher!</span>`,[['🧺 Colher',()=>acao(async()=>{const x=tratar(await api.colher(b.n,s));Som.play('moeda');toast(`🧺 Colheu ${x.qtd} ${p.nome.toLowerCase()}! Está na 🎒 mochila.`,3500);await hortaCarregar(true);atual()})]]);
+  else if(e===3)comLinha(box,`${p.e} <b>${p.nome}</b><br><span style="color:#7dff9a">pronto para colher!</span>`,[['🧺 Colher',()=>acao(async()=>{const x=tratar(await api.colher(b.n,s));if(x.mochila)eu.mochila=x.mochila;Som.play('moeda');toast(`🧺 Colheu ${x.qtd} ${p.nome.toLowerCase()}! Está na 🎒 mochila.`,3500);await hortaCarregar(true);atual()})]]);
   else comLinha(box,`${p.e} <b>${p.nome}</b><br><span style="opacity:.8">crescendo · ${Math.round(hortaProg(r)*100)}% · falta ${hortaTempo(r)}</span>`,[])}
  const d=document.createElement('div');d.style.cssText='font-size:11.5px;opacity:.7;margin:8px 2px';d.textContent='O que você colhe vai para a mochila: dá para comer em qualquer lugar. Todo mundo vê sua horta crescendo no quintal!';box.appendChild(d);
  $('placeName').textContent='🌱 Minha horta';$('placeSub').textContent='Casa '+b.n+' · '+hortaSlots(b)+' canteiros no quintal da frente';$('place').classList.remove('hidden')}
@@ -5343,6 +5346,7 @@ function abrirLugar(b){
   const d=document.createElement('div');d.style.cssText='font-size:11px;opacity:.7;text-align:center;margin-top:4px';d.textContent='Toque para consumir agora · 🎒 guarda na mochila';box.appendChild(d)}
  if(k==='posto'&&eu.carros.length&&!b.bomba){sub='Para abastecer, pare o carro embaixo da cobertura, numa bomba ⛽.'}
  if(k==='posto'&&eu.carros.length&&b.bomba){const g=Math.round(eu.gas??100),c=Math.max(2,Math.ceil(precoTanque(eu.carro||eu.carros[0])*(100-g)/100));sub='Tanque com '+g+'% de gasolina.';botao(box,g>=99?'⛽ Tanque cheio':`⛽ Encher o tanque: ${money(c)}`,()=>acao(async()=>{const r=tratar(await api.abastecer(eu.gas??100));eu.gas=100;Som.play('compra');floatText(eu.x,eu.y-30,'-'+money(r.custo)+' ⛽','#ff9a8a');toast('⛽ Tanque cheio!',2500);closePlace()}),{off:g>=99||eu.dinheiro<c})}
+ {const hv=Object.entries(HORTA_VENDA).reduce((a,[h,p])=>{const q=(eu.mochila||{})['h_'+h]||0;return[a[0]+q,a[1]+q*p]},[0,0]);if(k==='mercadinho'&&hv[0]>0)botao(boxPrin.querySelector('#ptabs')?box:boxPrin,`🥬 Vender a colheita da horta (${hv[0]}): ${money(hv[1])}`,venderHorta)}
  if(k==='mercadinho'&&eu.peixes>0)botao(boxPrin.querySelector('#ptabs')?box:boxPrin,`🐟 Vender ${eu.peixes} peixe${eu.peixes>1?'s':''}: ${money(eu.peixes*PRECO_PEIXE)}`,venderPeixes);
  if(k==='concessionaria'){sub='Compre seu carro na vitrine ou trabalhe de vendedor(a).';
   botao(box,'🚗 Ver e comprar carros (vitrine)',()=>{closePlace();abrirVitrine()});if(false){
@@ -5429,6 +5433,7 @@ function comprarItem(id,ok){const it0=LOJA[id];if(it0&&!ok){confirmar((ICON[id]|
  if(it.local==='bar')say(tonhao,pick(TON),2.6);say(eu,(ICON[id]||'')+' '+cap(it.nome)+'!',3,true);log(`${eu.nome} pediu ${it.nome}`);
  if(id==='rodada')rodada(eu.nome);emitEv('item',{item:id});if(lugarAtual&&!r.morreu)abrirLugar(lugarAtual)})}
 function rodada(nome){let n=0;residents.forEach(r=>{if(r.place==='bar'&&r.state==='stay'){r.beer=true;if(n++<3)later(.4+n*.7,()=>say(r,`Valeu, ${nome}! 🍻`,3,true))}})}
+function venderHorta(){acao(async()=>{const r=tratar(await api.venderHorta());if(r.mochila)eu.mochila=r.mochila;Som.play('moeda');floatText(eu.x,eu.y-30,'+'+money(r.ganho),'#9dff7a');toast(`🥬 Vendeu ${r.vendidos} legumes da horta por ${money(r.ganho)}!`);if(lugarAtual)abrirLugar(lugarAtual)})}
 function venderPeixes(){acao(async()=>{const r=tratar(await api.venderPeixes());Som.play('moeda');floatText(eu.x,eu.y-30,'+'+money(r.ganho),'#9dff7a');toast(`🐟 Vendeu ${r.vendidos} peixe${r.vendidos>1?'s':''} por ${money(r.ganho)}!`);if(lugarAtual)abrirLugar(lugarAtual)})}
 function comerFruta(f){acao(async()=>{
  try{tratar(await api.comerFruta(f.id));Som.play('comer');frutaCD[f.id]=Date.now()+180e3;floatText(f.x,f.y-40,'+10 🍗','#9dff7a');say(eu,f.tipo==='manga'?'🥭 Que manga doce!':'🍐 Goiaba madurinha!',3,true)}
@@ -6413,7 +6418,7 @@ function pertoOpcoes(){
  if(perto((lojaRoupa.front[0]+.5)*TILE,(lojaRoupa.front[1]+.5)*TILE,T(1.8)))o.push([PUB_ENTRA.roupas,()=>entrarSala(PUBB.roupas)]);
  
  {const ml=loteEm(eu.x,eu.y);if(ml&&(casasInfo.get(ml.n)||{}).dono===eu.id&&!casaEm(eu.x,eu.y)&&ml.lote&&ml.lote.beds.some(([a,c])=>Math.hypot(eu.x-T(a+.5),eu.y-T(c+.5))<T(1.8)))o.push(['🌱 Minha horta',()=>{hortaCarregar(true);abrirHorta(ml)}])}
- {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push(['🌱 Minha horta',()=>{hortaCarregar(true);abrirHorta(mc)}]);o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
+ {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;if(!o.some(x=>/Minha horta/.test(x[0])))o.push(['🌱 Minha horta',()=>{hortaCarregar(true);abrirHorta(mc)}]);o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  if(perto((imob.front[0]+.5)*TILE,(imob.front[1]+.5)*TILE,T(1.7)))o.push(['🏘️ Entrar na Imobiliária',()=>entrarSala(IMOB)]);
  if(perto((conc.front[0]+.5)*TILE,(conc.front[1]+.5)*TILE,T(1.8)))o.unshift(['🚗 Entrar no showroom',()=>entrarSala(SHOW)]);
  for(const bl of BLOCOS)if(perto((bl.front[0]+.5)*TILE,(bl.front[1]+.5)*TILE,T(1.7))){o.push(['🏢 Bloco '+bl.nome+': apartamentos',()=>abrirBloco(bl)]);break}
@@ -6792,7 +6797,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261128a';
+const VERSAO_JOGO='v20261128b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

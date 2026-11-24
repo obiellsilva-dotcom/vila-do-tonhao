@@ -3830,3 +3830,19 @@ begin
   return json_build_object('item', k, 'qtd', n - q, 'mochila', (select mochila from moradores where id = m.id), 'eu', _estado(m.id));
 end $$;
 grant execute on function public.colher(integer, integer) to authenticated;
+
+-- ===================== ETAPA 47: vender a colheita da horta no mercadinho =====================
+create or replace function public.vender_horta() returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; k text; q integer; pr integer; tot integer := 0; n integer := 0; mo jsonb;
+begin
+  m := _eu(); mo := coalesce(m.mochila, '{}'::jsonb);
+  for k, pr in select * from (values ('h_alface',4),('h_tomate',4),('h_cenoura',5),('h_morango',7),('h_milho',9)) v(i, p) loop
+    q := coalesce((mo->>k)::integer, 0);
+    if q > 0 then tot := tot + q * pr; n := n + q; mo := mo - k; end if;
+  end loop;
+  if n = 0 then raise exception 'Você não tem legumes da horta na mochila.'; end if;
+  update moradores set mochila = mo, dinheiro = dinheiro + tot where id = m.id;
+  return json_build_object('ganho', tot, 'vendidos', n, 'mochila', mo, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.vender_horta() to authenticated;
