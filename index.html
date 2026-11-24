@@ -5252,8 +5252,8 @@ async function comCarregar(forca){if(!eu||(!forca&&Date.now()-comEm<180000))retu
 setInterval(()=>{if(eu&&!document.hidden)comCarregar()},5000);
 // modo sem banco (teste): simula a mesma conta do banco no aparelho
 const comLocal={
- base(){if(!L.com){const col=comColecao();L.com=[{id:1,tipo:'lanchonete',preco_ponto:120000,nivel_min:15,despesa:4000,dono:null,itens:[]},
-   {id:2,tipo:'butique',preco_ponto:150000,nivel_min:20,despesa:5000,dono:'demo',dono_nome:'Maria',nome:'Loja da Maria',caixa:0,vendas:0,atrasos:0,atualizado:Date.now(),pago_ate:new Date().toISOString(),itens:[{item:col[0],qtd:12,preco:900,sobra:0},{item:col[1],qtd:6,preco:1200,sobra:0}]}];lsave()}return L.com},
+ base(){if(!L.com){const col=comColecao();L.com=[{id:1,tipo:'lanchonete',preco_ponto:300000,nivel_min:20,despesa:8000,dono:null,itens:[]},
+   {id:2,tipo:'butique',preco_ponto:350000,nivel_min:25,despesa:10000,dono:'demo',dono_nome:'Maria',nome:'Loja da Maria',caixa:0,vendas:0,atrasos:0,atualizado:Date.now(),pago_ate:new Date().toISOString(),itens:[{item:col[0],qtd:12,preco:900,sobra:0},{item:col[1],qtd:6,preco:1200,sobra:0}]}];lsave()}return L.com},
  conta(c){if(!c.dono)return;const h=Math.min(72,Math.max(0,(Date.now()-(c.atualizado||Date.now()))/36e5));let tot=0;
   for(const i of c.itens){const k=COM_CAT[c.tipo][i.item];if(!k||i.qtd<1)continue;const v=(i.sobra||0)+k.taxa*Math.max(.1,Math.min(1.5,2-i.preco/k.ref))*h,n=Math.min(i.qtd,Math.floor(v));i.qtd-=n;i.sobra=n===i.qtd+n?0:v-n;tot+=n*i.preco;c.vendas=(c.vendas||0)+n}
   c.caixa=(c.caixa||0)+tot;c.atualizado=Date.now()},

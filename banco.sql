@@ -3527,7 +3527,7 @@ alter table public.comercio_itens enable row level security;
 revoke all on public.comercios, public.comercio_catalogo, public.comercio_itens from anon, authenticated;
 
 insert into public.comercios(id, tipo, preco_ponto, nivel_min, despesa) values
-  (1, 'lanchonete', 120000, 15, 4000), (2, 'butique', 150000, 20, 5000)
+  (1, 'lanchonete', 300000, 20, 8000), (2, 'butique', 350000, 25, 10000)
 on conflict (id) do update set tipo = excluded.tipo, preco_ponto = excluded.preco_ponto, nivel_min = excluded.nivel_min, despesa = excluded.despesa;
 
 insert into public.comercio_catalogo(tipo, item, nome, custo, ref, pmin, pmax, taxa, fome, sede, roupa, maxq) values
@@ -3937,3 +3937,7 @@ begin
     'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
 end $$;
 
+
+-- ===== ETAPA 49: comércios mais caros (quem já é dono continua) =====
+update public.comercios set preco_ponto = 300000, nivel_min = 20, despesa = 8000 where id = 1;
+update public.comercios set preco_ponto = 350000, nivel_min = 25, despesa = 10000 where id = 2;
