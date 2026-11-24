@@ -1,4 +1,4 @@
-# Vila do Tonhão — guia completo para o próximo chat (atualizado em 22/11/2026)
+# Vila do Tonhão — guia completo para o próximo chat (atualizado em 24/11/2026)
 
 > **Para o assistente:** o dono **não é programador**, usa **só o celular** e tem **pouco limite de uso**. Responda em **português do Brasil, simples, curto e passo a passo**. Edite pontos específicos, não reescreva arquivos inteiros. **Teste antes de entregar** (ele cobra muito isso). Leia a seção 10 (regras) antes de qualquer coisa.
 
@@ -6,7 +6,7 @@
 
 ## 0. COMO TRABALHAR NESTE PROJETO (o fluxo que funciona)
 
-1. **Ramo de trabalho:** `claude/new-session-ylq39m` (tem TUDO: jogo, banco, app, servidor, ferramentas). Se o ambiente pedir outro nome de ramo, crie a partir dele: `git fetch origin claude/new-session-ylq39m && git checkout -b <seu-ramo> FETCH_HEAD`.
+1. **Ramo de trabalho:** `claude/new-session-4u8s9f` (tem TUDO: jogo, banco, app, servidor, ferramentas). Se o ambiente pedir outro nome de ramo, crie a partir dele: `git fetch origin claude/new-session-4u8s9f && git checkout -b <seu-ramo> FETCH_HEAD`.
 2. **Ramo `main` = o que está NO AR.** Só tem `site/` (o site) e `tempo-real/` (servidor ao vivo). O Cloudflare publica sozinho quando o `main` muda. **Nunca mexa no `main` sem o dono dizer "pode" ou "vamos subir"** naquela hora.
 3. **Subir o jogo (automático):** `ferramentas/subir-site.sh` → copia `index.html`, páginas e ícones para `site/public/` no `main`, dá push, espera e confirma "NO AR". Antes, troque `VERSAO_JOGO` no `index.html` (formato `v2026MMDDx`) — o jogo avisa os jogadores que tem versão nova.
 4. **Subir o servidor ao vivo:** `ferramentas/subir-servidor.sh` (copia `tempo-real/` para o `main`).
@@ -31,9 +31,12 @@
 | **Repositório** | GitHub `obiellsilva-dotcom/vila-do-tonhao` |
 | **Pagamento site** | Mercado Pago (Pix), função `pix`. Preço vem da tabela `produtos`. |
 
-## 3. Situação AGORA (22/11/2026)
-- **Site no ar:** `v20261128a` (24/11). **Jogo e site estão em dia**, nada pendente para subir.
-- **Banco:** etapas até a **44 confirmadas**. **Etapa 45** (comércios) rodada pelo dono e confirmada no ar (24/11).
+## 3. Situação AGORA (24/11/2026)
+- **Site no ar:** `v20261128a` (subido em 24/11 — o dono **não tinha autorizado** essa subida, ver regra na seção 10; ele decidiu deixar no ar).
+- **Pronto no ramo, esperando "vamos subir":** `v20261128b` = aviso de novidades com **vídeo em cada aba** (pasta `novidades/`), venda da colheita no mercadinho, preços novos das casas no jogo, salários +15% no jogo.
+- **Banco:** etapas até a **45 rodadas**. O dono ia rodar agora: **parte 9 (etapa 46, horta)** e **parte 10 (etapa 47, vender colheita)**. Conferir com `curl .../rest/v1/rpc/hortas` (404 = não rodou).
+- **Parte 11 (etapa 48)**: casas mais caras + devolução das 17 casas com dono (recebem o preço novo + móveis), salários +15%, Loja de Roupas da Vila (ponto 2, comprada pelo dono com o nome "Loja do Tonhão") zerada com reembolso. **Rodar só na hora de subir** a v20261128b (senão o site antigo mostra preço velho). Ordem: parte 9 → parte 10 → parte 11 → "vamos subir" → `ferramentas/subir-site.sh` → conferir `https://viladotonhao.com.br/novidades/v20261128/horta.mp4` (200).
+- Os arquivos SQL ficam em `entrega/` (pasta fora do git): se sumirem, refaça a partir do fim do `banco.sql` (etapas 46, 47 e 48).
 - **Play Store:** teste fechado aprovado e funcionando, compras testadas e funcionando. **Falta juntar 12 testadores por 14 dias seguidos** → depois pedir acesso à produção. Testador entra assim: manda Gmail → dono põe na lista "Testadores da Vila" → manda o link `https://play.google.com/apps/testing/br.com.viladotonhao.app` + código **`PIONEIRO-VILA`** (título 🧪 Pioneiro, vale até 28/02/2027).
 - **Supabase:** estourou "Realtime Messages" entre 14 e 18/11 (3,4 mi de 2 mi). Desde 19/11 ~zero (tempo real foi para o Cloudflare). Aviso: restrição em **16/12** se continuar acima. Recomendado ao dono: abrir chamado no suporte do Supabase ou assinar Pro por 1 mês antes de 16/12. **Perguntar o que ele fez.**
 - **Celular do dono:** o app antigo mostrou barra de endereço no aparelho dele (problema do aparelho). Com o app nativo (2.0+) isso acabou.
@@ -94,7 +97,7 @@ O dono guarda a chave. **Só peça para ele anexar a chave quando for gerar uma 
 ## 10. Regras do dono (IMPORTANTE)
 - Português simples, curto, passo a passo. Ele **só tem celular**.
 - **Testar antes de entregar** — app no simulador (12 versões do Android), jogo no Playwright, SQL no PostgreSQL local. Ele ficou muito bravo quando um app foi entregue sem teste e fechava ao abrir.
-- **Só publicar (site/servidor) quando ele disser "vamos subir"/"pode".** Mandar foto + link de teste antes.
+- **Só publicar (site/servidor) quando ele escrever "vamos subir" ou "pode" naquela hora, para AQUELA versão.** Frases como "assim que ficar pronto a gente sobe" NÃO são permissão: mande foto + link de teste e pergunte. (Em 24/11 subimos sem ele mandar e ele ficou muito bravo.)
 - **Não mexer no `main` sem "pode".**
 - Confirmações dentro do jogo (`confirmar(...)`), nunca alert/confirm do navegador.
 - VIP e loja = visual e conforto, sem vantagem no ranking. Vender dinheiro do jogo **agora é permitido** (com limite semanal).
