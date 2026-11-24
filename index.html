@@ -2503,6 +2503,10 @@ function n3Kit(g,S,L,Tp){
    K.poly([[x0,y1,z],[cx,y1,z+r],[cx,y0,z+r],[x0,y0,z]],shade(col,10));K.poly([[cx,y1,z+r],[x1,y1,z],[x1,y0,z],[cx,y0,z+r]],shade(col,-24));
    K.cam();g.strokeStyle='rgba(60,20,10,.22)';g.lineWidth=.7;for(let t=1;t<6;t++){const u=t/6;for(const [xa,xb] of [[x0,cx],[x1,cx]]){const xx=xa+(xb-xa)*u,zz=z+r*u,p=P(xx,y1,zz),q=P(xx,y0,zz);g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke()}}
    K.linha([cx,y1,z+r],[cx,y0,z+r],shade(col,-45),2);if(parede)K.poly([[x0,y1,z],[x1,y1,z],[cx,y1,z+r]],parede)},
+  // telhado de duas águas com a cumeeira paralela à frente
+  telhadoX(x0,x1,y0,y1,z,r,col,parede){const ym=(y0+y1)/2;if(parede)K.poly([[x1,y1,z],[x1,y0,z],[x1,ym,z+r]],parede);K.poly([[x0,y1,z],[x1,y1,z],[x1,ym,z+r],[x0,ym,z+r]],shade(col,4));
+   K.cam();g.strokeStyle='rgba(60,20,10,.2)';g.lineWidth=.7;for(let t=1;t<4;t++){const u=t/4,p=P(x0,y1-(y1-ym)*u,z+r*u),q=P(x1,y1-(y1-ym)*u,z+r*u);g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke()}
+   K.box(x0,y1-1,x1,y1,z-2,z,shade(col,-30));K.linha([x0,ym,z+r],[x1,ym,z+r],shade(col,-40),1.6)},
   // telhado de quatro águas (cumeeira paralela à frente)
   telhado4(x0,x1,y0,y1,z,r,col){const ym=(y0+y1)/2,a=(y1-y0)/2;
    K.poly([[x0,y1,z],[x1,y1,z],[x1-a,ym,z+r],[x0+a,ym,z+r]],shade(col,4));K.poly([[x1,y1,z],[x1,y0,z],[x1-a,ym,z+r]],shade(col,-26));
@@ -2544,8 +2548,127 @@ function n3Escada(K,x0,x1,yA,yB,hT,n,col){ // degraus subindo de yB (rua) até y
 function n3Mesa(K,x,y,sol){for(const [ox,oy] of [[-10,-2],[10,-2]])K.box(x+ox-3,y+oy-3,x+ox+3,y+oy+3,0,8,'#c0392b');K.box(x-1,y-1,x+1,y+1,0,13,'#555');K.disco(x,y,13,7.5,'#d9d4c8');K.disco(x,y,13.6,7,'#ffffff');K.box(x-3,y+7,x+3,y+13,0,8,'#c0392b');
  if(sol){K.box(x-.7,y-.7,x+.7,y+.7,13,33,'#ddd');const Rr=14,ap=[x,y,40],pts=[];for(let i=0;i<8;i++){const a=i/8*Math.PI*2;pts.push([x+Math.cos(a)*Rr,y+Math.sin(a)*Rr,31])}
   const tri=[];for(let i=0;i<8;i++){const p=pts[i],q=pts[(i+1)%8];tri.push({p,q,i,d:(p[0]+q[0])/2+(p[1]+q[1])/2})}tri.sort((a,b)=>a.d-b.d).forEach(t=>K.poly([t.p,t.q,ap],t.i%2?'#ffffff':'#e63946'))}}
-const N3K={};
+// ===== CASAS: 3 modelos por tipo (pequena, média, mansão), com quintal na frente, muro, portão e hortinha =====
+const CASA_MOD={p:['Térrea com varanda','Colonial','Chalé'],m:['Sobrado com sacada','Moderna de laje','Casa com garagem'],g:['Mansão clássica','Mansão moderna','Casarão de fazenda']};
+const casaTipoV=b=>b.preco>=200000?'g':b.preco>=40000?'m':'p';
+const casaModelo=b=>{const t=casaTipoV(b);return[t,((b.n*5+(b.y%3))%3+3)%3]};
+// hortinha
+const HORTA_PL={alface:{nome:'Alface',e:'🥬',semente:5,horas:2,colhe:3},tomate:{nome:'Tomate',e:'🍅',semente:8,horas:4,colhe:4},cenoura:{nome:'Cenoura',e:'🥕',semente:10,horas:6,colhe:4},morango:{nome:'Morango',e:'🍓',semente:20,horas:8,colhe:5},milho:{nome:'Milho',e:'🌽',semente:15,horas:10,colhe:3}};
+const HORTA=new Map();let hortaEm=0,hortaDt=0;
+const hortaSlots=b=>b.preco>=200000?4:3;
+const hortaDe=(n,s)=>{const h=HORTA.get(n);return h&&h[s]||null};
+const hortaProg=r=>{if(!r)return 0;const p=HORTA_PL[r.planta];return p?Math.min(1,(Date.now()+hortaDt-Date.parse(r.em))/(p.horas*36e5)):0};
+const hortaEst=r=>r?Math.min(3,Math.floor(hortaProg(r)*3+.0001)):-1; // 0,1,2 crescendo, 3 pronta
+async function hortaCarregar(forca){if(!eu||(!forca&&Date.now()-hortaEm<90000))return;hortaEm=Date.now();try{const r=await api.hortas();if(!r)return;if(r.agora)hortaDt=Date.parse(r.agora)-Date.now();HORTA.clear();for(const h of r.h||[]){const o=HORTA.get(h.casa)||{};o[h.slot]={planta:h.planta,em:h.em};HORTA.set(h.casa,o)}}catch(e){}}
+setInterval(()=>{if(eu&&!document.hidden)hortaCarregar()},6000);
+function n3Canteiros(K,x0,y0,n){const b=K.b,w=13,gap=4;for(let s=0;s<n;s++){const cx0=x0+s*(w+gap),r=hortaDe(b.n,s),e=hortaEst(r),pl=r&&r.planta;
+  K.box(cx0,y0,cx0+w,y0+9,0,3,'#7a4a2a');K.box(cx0+1,y0+1,cx0+w-1,y0+8,3,3.6,'#5a3a22');
+  if(e<0)continue;K.cam();const g=K.g;
+  for(let i=0;i<3;i++){const q=K.P(cx0+2.5+i*4,y0+4.5,4),hh=[2,4,6.5,7.5][e];
+   g.fillStyle=pl==='milho'?'#7fae3a':pl==='cenoura'?'#4caf50':'#3f9a4a';
+   if(pl==='milho'&&e>=1){g.fillRect(q[0]-.7,q[1]-hh*1.6,1.4,hh*1.6);g.beginPath();g.ellipse(q[0]-1.6,q[1]-hh,2.2,.8,-.6,0,7);g.ellipse(q[0]+1.6,q[1]-hh*1.2,2.2,.8,.6,0,7);g.fill();if(e===3){g.fillStyle='#ffd23f';g.beginPath();g.ellipse(q[0]+1.2,q[1]-hh*.9,1,2,0,0,7);g.fill()}continue}
+   if(pl==='cenoura'){for(let k=-1;k<=1;k++){g.beginPath();g.ellipse(q[0]+k*1,q[1]-hh*.6,.6,hh*.6,k*.4,0,7);g.fill()}if(e===3){g.fillStyle='#ff8c1a';g.beginPath();g.moveTo(q[0]-1.3,q[1]);g.lineTo(q[0]+1.3,q[1]);g.lineTo(q[0],q[1]+2.4);g.fill()}continue}
+   g.beginPath();g.ellipse(q[0],q[1]-hh*.5,hh*.45+.6,hh*.45,0,0,7);g.fill();g.fillStyle='rgba(255,255,255,.18)';g.beginPath();g.ellipse(q[0]-.5,q[1]-hh*.65,hh*.2,hh*.15,0,0,7);g.fill();
+   if(e===3){const cor=pl==='tomate'?'#e53935':pl==='morango'?'#d81b60':null;if(cor){g.fillStyle=cor;for(const [ox,oy] of [[-1.4,-2],[1.3,-3],[0,-4.4]]){g.beginPath();g.arc(q[0]+ox,q[1]+oy,1.15,0,7);g.fill()}}else{g.fillStyle='#8bc34a';g.beginPath();g.ellipse(q[0],q[1]-3,3.4,2.6,0,0,7);g.fill()}}}
+  if(e===3){const q=K.P(cx0+w/2,y0+4.5,14);g.fillStyle='#ffd23f';g.font='700 7px Fredoka, sans-serif';g.textAlign='center';g.fillText('✔',q[0],q[1]);g.textAlign='left'}}}
+function n3Casa(K){const b=K.b,{X0,X1,Y0,Y1}=K,[t,m]=casaModelo(b),wl=b.wall||'#e8e3d3',rf=b.roof||'#8e5a3c',dx=T(b.front[0]+.5),BR='#fbf7ee',VE='#4f8f46',G2c='#7fbf5a';
+ const jan=(F,a,z,w,h,o)=>F.jan(a,z,w,h,Object.assign({moldura:BR},o||{}));
+ const porta=(F,a,z0,w,h,cor)=>{cor=cor||'#6b3f22';F.rect(a-w/2-2,z0,a+w/2+2,z0+h+2,BR);F.rect(a-w/2,z0,a+w/2,z0+h,cor);F.rect(a-w/2+2,z0+h*.55,a+w/2-2,z0+h-3,shade(cor,18));F.circ(a+w/2-3,z0+h*.45,1.1,'#e9c46a')};
+ const vaso=(x,y)=>{K.box(x-3,y-3,x+3,y+3,0,6,'#a0522d');const q=K.P(x,y,11);K.cam();K.g.fillStyle=VE;K.g.beginPath();K.g.arc(q[0],q[1],4.2,0,7);K.g.fill();K.g.fillStyle='#ff5c8a';K.g.beginPath();K.g.arc(q[0]+1.5,q[1]-1.5,1.3,0,7);K.g.fill()};
+ // muro da frente com portão (baixo com grade, madeira, ou alto com portão de garagem)
+ const muro=(tipo,cor,gx0,gx1)=>{const y=Y1-4,segs=[[X0+2,dx-11],[dx+11,X1-2]];
+  for(let [a0,a1] of segs){if(gx0!=null){if(a0<gx1&&a1>gx0){if(a0<gx0)segOne(a0,gx0);if(a1>gx1)segOne(gx1,a1);continue}}segOne(a0,a1)}
+  function segOne(a0,a1){if(a1-a0<2)return;if(tipo==='cerca'){for(let a=a0;a<=a1;a+=4)K.box(a-.8,y,a+.8,y+2,0,13,'#f4efe2');K.box(a0,y,a1,y+2,8,9.5,'#f4efe2');K.box(a0,y,a1,y+2,3,4.5,'#f4efe2')}
+   else if(tipo==='alto'){K.box(a0,y,a1,y+3,0,24,cor);K.box(a0-.5,y-.5,a1+.5,y+3.5,24,26,shade(cor,-20))}
+   else{K.box(a0,y,a1,y+3,0,10,cor);K.box(a0-.5,y-.5,a1+.5,y+3.5,10,11.5,shade(cor,-20));const Fg=K.face({y:y+3});for(let a=a0+2;a<a1-1;a+=3.2)Fg.rect(a,11.5,a+.8,21,'#2f343b');Fg.rect(a0,20.5,a1,21.8,'#2f343b')}}
+  for(const ox of [-11,11])K.box(dx+ox-2,y-.5,dx+ox+2,y+3.5,0,tipo==='alto'?28:tipo==='cerca'?15:24,tipo==='cerca'?'#f4efe2':shade(cor,-10));
+  const Fp=K.face({y:y+2});if(tipo==='cerca'){for(let a=dx-9;a<=dx+9;a+=3)Fp.rect(a,0,a+1.2,13,'#e9dcc0');Fp.rect(dx-9,6,dx+9,7.4,'#e9dcc0')}else{const ht=tipo==='alto'?24:20;for(let a=dx-9;a<=dx+9;a+=2.4)Fp.rect(a,1,a+.7,ht,'#2f343b');Fp.rect(dx-9,1,dx+9,2.4,'#2f343b');Fp.rect(dx-9,ht-1.2,dx+9,ht,'#2f343b');Fp.rect(dx-9,ht*.5,dx+9,ht*.5+1,'#2f343b')}};
+ const portaoGaragem=(gx0,gx1,h)=>{const y=Y1-4;K.box(gx0-2,y-.5,gx0+1,y+3.5,0,h+4,'#9aa1a8');K.box(gx1-1,y-.5,gx1+2,y+3.5,0,h+4,'#9aa1a8');const Fg=K.face({y:y+2});Fg.rect(gx0+1,0,gx1-1,h,'#7d848c');for(let z=3;z<h;z+=3)Fg.rect(gx0+1,z,gx1-1,z+.7,'#5b636c')};
+ const quintal=(yy)=>{K.chao(X0+2,yy,X1-2,Y1-1,G2c);K.chao(dx-8,yy,dx+8,Y1-1,'#d9cbb0')};
+ if(t==='m'){const bx0=X0+8,bx1=X1-8,by0=Y0+6,by1=Y1-28;quintal(by1);const horta=()=>n3Canteiros(K,X0+6,Y1-22,3);
+  if(m===0){ // sobrado com sacada
+   const H=74;K.box(bx0,by0,bx1,by1,0,H,wl);const F=K.face({y:by1}),S=K.face({x:bx1});
+   for(const [Fc,a0,a1] of [[F,bx0,bx1],[S,by0,by1]]){Fc.rect(a0,0,a1,5,shade(wl,-30));Fc.rect(a0,36,a1,39,BR)}
+   porta(F,dx,0,15,28);jan(F,bx0+22,13,18,16,{peit:1});jan(F,bx0+22,46,18,18,{});F.rect(dx-10,42,dx+10,66,BR);F.rect(dx-8,42,dx+8,64,N3VID(K.noite));F.rect(dx-.5,42,dx+.5,64,BR);
+   S.jan((by0+by1)/2,13,16,15,{moldura:BR});S.jan((by0+by1)/2,46,16,16,{moldura:BR});
+   K.box(dx-18,by1,dx+18,by1+9,37,40,'#d8d0c0');{const Fr=K.face({y:by1+9});for(let a=dx-17;a<=dx+17;a+=3)Fr.rect(a,40,a+.8,50,'#2f343b');Fr.rect(dx-18,49,dx+18,50.5,'#2f343b')}
+   K.telhadoX(bx0-5,bx1+5,by0-4,by1+5,H,22,rf,shade(wl,-34));horta();vaso(X1-12,Y1-12);muro('baixo','#e9e1d0')}
+  else if(m===1){ // moderna de laje
+   const H=50;K.box(bx0,by0,bx1,by1,0,H,'#f2f2f0');const F=K.face({y:by1}),S=K.face({x:bx1});F.rect(bx0,0,bx1,4,'#3a3a40');S.rect(by0,0,by1,4,'#3a3a40');
+   F.rect(bx0+4,6,dx-14,42,'#3a3a40');F.rect(bx0+6,8,dx-16,40,N3VID(K.noite));F.rect((bx0+dx-10)/2,8,(bx0+dx-10)/2+1,40,'#3a3a40');
+   porta(F,dx,4,14,30,'#3a2a20');F.rect(dx+12,4,bx1-4,46,wl);for(let a=dx+14;a<bx1-4;a+=3.4)F.rect(a,4,a+.9,46,shade(wl,-22));S.rect(by0+8,10,by1-8,40,N3VID(K.noite));
+   K.box(bx0,by1-4,bx1,by1,H,H+5,'#3a3a40');K.box(bx1-4,by0,bx1,by1-4,H,H+5,'#3a3a40');K.box(dx-18,by1,dx+18,by1+12,40,43,'#3a3a40');
+   horta();vaso(X1-12,Y1-12);muro('alto','#d9d4cc')}
+  else{ // casa com garagem
+   const H=42,gx0=X0+92,gx1=X1-6;K.box(bx0,by0,bx1,by1,0,H,wl);const F=K.face({y:by1}),S=K.face({x:bx1});F.rect(bx0,0,bx1,5,shade(wl,-30));S.rect(by0,0,by1,5,shade(wl,-30));
+   porta(F,dx,0,14,27);jan(F,bx0+24,14,20,15,{peit:1});F.rect(gx0,0,bx1-3,32,'#ffffff');F.rect(gx0+2,0,bx1-5,30,'#9aa1a8');for(let z=3;z<30;z+=3)F.rect(gx0+2,z,bx1-5,z+.7,'#7d848c');
+   S.jan((by0+by1)/2,14,16,14,{moldura:BR});K.telhado4(bx0-5,bx1+5,by0-5,by1+5,H,20,rf);
+   K.chao(gx0,by1,gx1,Y1-1,'#bdb6a8');horta();muro('baixo','#e9e1d0',gx0,gx1);portaoGaragem(gx0,gx1,20)}
+ }else
+ if(t!=='g'){const bx0=X0+8,bx1=X1-8,by0=Y0+6,by1=Y1-28;quintal(by1);
+  const horta=()=>n3Canteiros(K,X0+6,Y1-22,3);
+  if(m===0){ // térrea com varandinha
+   const H=40;K.box(bx0,by0,bx1,by1,0,H,wl);const F=K.face({y:by1}),S=K.face({x:bx1});F.rect(bx0,0,bx1,5,shade(wl,-30));S.rect(by0,0,by1,5,shade(wl,-30));
+   porta(F,dx,0,15,27);jan(F,bx0+22,14,18,15,{peit:1});if(bx1-dx>30)jan(F,bx1-16,14,14,15,{peit:1});S.jan((by0+by1)/2,14,16,14,{moldura:BR});
+   K.telhadoX(bx0-5,bx1+5,by0-4,by1+6,H,24,rf,shade(wl,-34));
+   for(const ox of [-17,17])K.box(dx+ox-1.5,by1+8,dx+ox+1.5,by1+11,0,30,BR);K.box(dx-21,by1-2,dx+21,by1+13,30,33,shade(rf,-10));
+   horta();vaso(X1-12,Y1-12);muro('baixo','#e9e1d0')}
+  else if(m===1){ // colonial
+   const H=44;K.box(bx0,by0,bx1,by1,0,H,wl);const F=K.face({y:by1}),S=K.face({x:bx1});
+   for(const [Fc,a0,a1] of [[F,bx0,bx1],[S,by0,by1]]){Fc.rect(a0,0,a1,6,shade(wl,-35));Fc.rect(a0,0,a0+4,H,BR);Fc.rect(a1-4,0,a1,H,BR);Fc.rect(a0,H-4,a1,H,BR)}
+   porta(F,dx,0,14,28,'#2e5c8a');F.rect(dx-9,29,dx+9,34,BR);F.arco(dx,30,14,7,N3VID(K.noite));
+   const vene=(Fc,a)=>{jan(Fc,a,14,13,18);Fc.rect(a-14,14,a-7.5,32,'#2f7a4a');Fc.rect(a+7.5,14,a+14,32,'#2f7a4a');for(let z=16;z<31;z+=2.4){Fc.rect(a-13.5,z,a-8,z+.8,'#3f9a5e');Fc.rect(a+8,z,a+13.5,z+.8,'#3f9a5e')}};
+   vene(F,bx0+24);if(bx1-dx>34)vene(F,bx1-18);vene(S,(by0+by1)/2);
+   K.telhado4(bx0-5,bx1+5,by0-5,by1+5,H,22,rf);horta();vaso(X1-12,Y1-12);muro('baixo',shade(wl,-8))}
+  else{ // chalé
+   const H=34;K.box(bx0,by0,bx1,by1,0,H,wl);const S=K.face({x:bx1});S.rect(by0,0,by1,5,'#7a4a2a');S.jan((by0+by1)/2,12,16,14,{moldura:'#7a4a2a'});
+   K.telhadoY(bx0-6,bx1+6,by0-4,by1+3,H,44,rf);
+   const F=K.face({y:by1}),cx=(bx0+bx1)/2;F.rect(bx0,0,bx1,H,wl);F.path([[bx0-6,H],[bx1+6,H],[cx,H+44]],wl);for(let a=bx0+4;a<bx1;a+=6)F.rect(a,H+2,a+.8,H+40-Math.abs(a-cx)*.78,shade(wl,-22));
+   F.path([[bx0-8,H-1],[cx,H+46],[bx1+8,H-1]],null,'#6b3f22',2.4);F.circ(cx,H+18,6,'#7a4a2a');F.circ(cx,H+18,4.6,N3VID(K.noite));F.rect(bx0,0,bx1,5,'#7a4a2a');
+   porta(F,dx,0,14,26,'#7a4a2a');jan(F,bx0+22,12,16,14,{moldura:'#7a4a2a'});
+   horta();vaso(X1-12,Y1-12);muro('cerca')}
+ }else{ // mansões 6x4
+  const bx0=X0+8,bx1=X1-8,by0=Y0+8,by1=Y1-36;quintal(by1);
+  const horta=()=>n3Canteiros(K,X0+8,Y1-24,4);
+  if(m===0){ // clássica
+   const H=84;K.box(bx0,by0,bx1,by1,0,H,wl);const F=K.face({y:by1}),S=K.face({x:bx1});
+   for(const [Fc,a0,a1] of [[F,bx0,bx1],[S,by0,by1]]){Fc.rect(a0,0,a1,8,'#a59d8d');Fc.rect(a0,40,a1,44,BR);Fc.rect(a0,H-6,a1,H,BR);Fc.rect(a0,0,a0+5,H,BR);Fc.rect(a1-5,0,a1,H,BR)}
+   for(const a of [bx0+22,bx0+48,bx1-22,bx1-48])if(Math.abs(a-dx)>36){jan(F,a,12,14,22,{arco:1});jan(F,a,52,14,20,{})}
+   for(let a=by0+18;a<by1-8;a+=26){S.jan(a,12,14,22,{arco:1,moldura:BR});S.jan(a,52,14,20,{moldura:BR})}
+   porta(F,dx,8,18,32,'#5a3418');K.telhado4(bx0-5,bx1+5,by0-5,by1+5,H,30,rf);
+   K.box(dx-34,by1,dx+34,by1+16,0,8,'#d7cfbd');for(const ox of [-28,-10,10,28])K.box(dx+ox-3,by1+10,dx+ox+3,by1+15,8,62,BR);K.box(dx-36,by1,dx+36,by1+16,62,68,BR);
+   K.poly([[dx-38,by1+16,68],[dx,by1+16,86],[dx,by1,86],[dx-38,by1,68]],shade(rf,8));K.poly([[dx,by1+16,86],[dx+38,by1+16,68],[dx+38,by1,68],[dx,by1,86]],shade(rf,-22));
+   {const Fp=K.face({y:by1+16});Fp.path([[dx-38,68],[dx+38,68],[dx,86]],BR);Fp.path([[dx-30,70],[dx+30,70],[dx,82]],wl);Fp.circ(dx,75,3.2,N3VID(K.noite))}
+   n3Escada(K,dx-24,dx+24,by1+16,by1+22,8,2,'#cfc6b4');horta();K.box(X1-30,Y1-26,X1-12,Y1-12,0,4,'#c9c3b6');K.disco(X1-21,Y1-19,4.5,6,'#7fc4ef');K.box(X1-22,Y1-20,X1-20,Y1-18,4,16,'#d8d0c0');
+   muro('alto','#efe8da')}
+  else if(m===1){ // moderna com piscina
+   const H1=44,H2=86,ux1=bx0+108;
+   K.box(bx0,by0,bx1,by1,0,H1,'#f2f2f0');{const F=K.face({y:by1}),S=K.face({x:bx1});F.rect(bx0,0,bx1,4,'#3a3a40');S.rect(by0,0,by1,4,'#3a3a40');
+    F.rect(bx0+6,6,dx-14,38,'#3a3a40');F.rect(bx0+8,8,dx-16,36,N3VID(K.noite));for(let a=bx0+20;a<dx-16;a+=16)F.rect(a,8,a+1,36,'#3a3a40');
+    porta(F,dx,4,16,30,'#3a2a20');F.rect(dx+14,4,bx1-6,40,wl);for(let a=dx+16;a<bx1-6;a+=4)F.rect(a,4,a+1,40,shade(wl,-20));S.rect(by0+10,8,by1-10,36,N3VID(K.noite));for(let a=by0+24;a<by1-10;a+=14)S.rect(a,8,a+1,36,'#3a3a40')}
+   K.box(bx0,by1-4,bx1,by1,H1,H1+4,'#3a3a40');K.box(bx1-4,by0,bx1,by1-4,H1,H1+4,'#3a3a40');
+   K.box(bx0-4,by0+6,ux1,by1+8,H1,H2,'#3a3a40');{const F=K.face({y:by1+8}),S=K.face({x:ux1});F.rect(bx0,H1+4,ux1-4,H2-6,N3VID(K.noite));for(let a=bx0+14;a<ux1-4;a+=16)F.rect(a,H1+4,a+1.2,H2-6,'#3a3a40');F.rect(bx0-4,H2-4,ux1,H2,wl);S.rect(by0+12,H1+6,by1,H2-8,'#8a6a48');for(let a=by0+16;a<by1;a+=5)S.rect(a,H1+6,a+1,H2-8,'#6b4a2e')}
+   K.box(bx0-4,by0+6,ux1,by1+8,H2,H2+3,'#f2f2f0');
+   K.chao(dx+14,by1+2,X1-4,Y1-7,'#d9cbb0');K.box(dx+18,by1+5,X1-8,Y1-10,0,1,'#2a7fb8');K.poly([[dx+19,by1+6,1.2],[X1-9,by1+6,1.2],[X1-9,Y1-11,1.2],[dx+19,Y1-11,1.2]],'#5cc3ee');
+   n3Canteiros(K,X0+6,Y1-24,4);muro('alto','#3a3a40')}
+  else{ // casarão de fazenda
+   const H=50,vy=by1+14,gx0=bx1-48;K.box(bx0,by0,bx1,by1,0,H,wl);const F=K.face({y:by1}),S=K.face({x:bx1});
+   F.rect(bx0,0,bx1,6,shade(wl,-35));S.rect(by0,0,by1,6,shade(wl,-35));
+   F.rect(gx0,0,bx1-6,36,'#ffffff');F.rect(gx0+3,0,bx1-9,33,'#b98a5a');for(let z=4;z<33;z+=4)F.rect(gx0+3,z,bx1-9,z+.8,'#9a6a3e');
+   porta(F,dx,0,16,30,'#6b3f22');for(const a of [bx0+18,bx0+44,bx0+70])if(Math.abs(a-dx)>22&&a<gx0-10){jan(F,a,12,15,20,{});F.rect(a-12,12,a-8,32,'#2e5c8a');F.rect(a+8,12,a+12,32,'#2e5c8a')}
+   for(let a=by0+20;a<by1-6;a+=24)S.jan(a,12,15,20,{moldura:BR});
+   K.telhado4(bx0-8,bx1+8,by0-8,vy+4,H,30,rf);
+   for(let x=bx0;x<=gx0-6;x+=26)K.box(x-2,vy-2,x+2,vy+2,0,H,'#f4efe2');
+   K.chao(gx0,vy,bx1-4,Y1-1,'#8d877c');for(const [ax,ay] of [[bx0+40,by0+26],[bx1-60,by0+26]]){K.box(ax,ay,ax+18,ay+14,H+8,H+20,wl);K.pyr(ax-1,ay-1,ax+19,ay+15,H+20,12,rf)}
+   K.box(bx1-30,by0+12,bx1-20,by0+22,H+10,H+40,'#8a5a3b');horta();
+   muro('cerca',null,gx0,bx1-4);portaoGaragem(gx0,bx1-4,22)}
+ }}
+
+const N3K={},N3MAX=40;
+const hortaChave=b=>{let k='';for(let s=0;s<hortaSlots(b);s++)k+=hortaEst(hortaDe(b.n,s))+2;return k};
 const N3D={
+ casa:{H:130,S:1.6,sw:24,chave:b=>'#'+b.n+'.'+hortaChave(b),f:n3Casa},
+ mansao:{H:150,S:1.6,sw:24,chave:b=>'#'+b.n+'.'+hortaChave(b),f:n3Casa},
  igreja:{H:200,f(K){const {X0,X1,Y0,Y1}=K,cx=(X0+X1)/2,BR='#f6f2e8',TR='#2e6f95',OU='#e0b52e',TE='#b4583c',CAP='#3d6f9e',PE='#a9a296';
   K.chao(X0+2,Y1-44,X1-2,Y1-1,'#ddd5c4',12); // adro de pedra
   const nx0=X0+22,nx1=X1-22,ny0=Y0+16,ny1=Y1-42,Hn=74;
@@ -2741,16 +2864,16 @@ const N3D={
   n3Poste(K,X1-14,Y1-8,30);
  }},
 };
-function n3Desenha(list,b){const d=N3D[b.kind],noite=darkness()>.3,key=b.kind+(noite?'n':'d')+(d.chave?d.chave(b):'');
- let a=N3.get(key);
- if(!a){const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h),m=30,S=2,L=isoP(X0,Y1)[0]-m,R=isoP(X1,Y0)[0]+m,Tp=isoP(X0,Y0)[1]-d.H-m,Bt=isoP(X1,Y1)[1]+m;
+function n3Desenha(list,b){const d=N3D[b.kind],noite=darkness()>.3,key=b.kind+(noite?'n':'d')+(d.chave?d.chave(b):''),kk=b.n!=null?'h'+b.n:b.kind;
+ let a=N3.get(key);if(a){N3.delete(key);N3.set(key,a)}
+ if(!a){const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h),m=30,S=d.S||2,L=isoP(X0,Y1)[0]-m,R=isoP(X1,Y0)[0]+m,Tp=isoP(X0,Y0)[1]-d.H-m,Bt=isoP(X1,Y1)[1]+m;
   const cv=document.createElement('canvas');cv.width=Math.ceil((R-L)*S);cv.height=Math.ceil((Bt-Tp)*S);const g=cv.getContext('2d');
   const K=n3Kit(g,S,L,Tp);Object.assign(K,{X0,X1,Y0,Y1,noite,b});
   try{d.f(K)}catch(e){console.error('predio',b.kind,e)}
   let lz=K.luzes.filter(l=>l[3]<60);const lp=K.luzes.filter(l=>l[3]>=60);if(lz.length>14){const st=lz.length/14;lz=Array.from({length:14},(_,i)=>lz[Math.floor(i*st)])}
-  a={cv,L,R,Tp,Bt,S,X0,X1,Y0,Y1,luzes:noite?lz.map(l=>[l[0],l[1],l[2],44,.5]).concat(lp):null};if(N3K[b.kind]&&N3K[b.kind]!==key)N3.delete(N3K[b.kind]);N3K[b.kind]=key;N3.set(key,a)}
+  a={cv,L,R,Tp,Bt,S,X0,X1,Y0,Y1,luzes:noite?lz.map(l=>[l[0],l[1],l[2],44,.5]).concat(lp):null};if(N3K[kk]&&N3K[kk]!==key)N3.delete(N3K[kk]);N3K[kk]=key;N3.set(key,a);while(N3.size>N3MAX){const k0=N3.keys().next().value;if(k0===key)break;N3.delete(k0)}}
  let fade=1;if(eu&&!eu.hidden){const pe=isoP(eu.x,eu.y);if(a.X1+a.Y1>eu.x+eu.y+8&&eu.x+eu.y<a.X1+a.Y1&&pe[0]>a.L+20&&pe[0]<a.R-20&&pe[1]>a.Tp+20&&pe[1]-40<a.Bt&&eu.y<a.Y1-4&&eu.x<a.X1-4)fade=.3}
- const sw=16,cb=[a.X0,a.Y0,a.X1,a.Y1,d.H];
+ const sw=d.sw||16,cb=[a.X0,a.Y0,a.X1,a.Y1,d.H];
  for(let sx=a.L;sx<a.R;sx+=sw){const sc=sx+sw/2,fx=sc/IA+a.Y1;let px,py;
   if(fx<=a.X1){px=Math.max(a.X0,fx);py=a.Y1}else{px=a.X1;py=Math.max(a.Y0,a.X1-sc/IA)}
   const s0=sx,w=Math.min(sw+.6,a.R-s0);
@@ -4338,11 +4461,12 @@ const JOBS={
 const JOB_LUGAR={lixeiro:'prefeitura',pescador:'lagoa',policia:'delegacia',enfermeiro:'hospital',medico:'hospital',gerente:'banco',delegado:'delegacia',prefeito:'prefeitura'};
 const lugarDoJob=j=>JOB_LUGAR[j]||j;
 const LOJA={
+ h_alface:{nome:'um pé de alface',preco:6,local:'horta',fome:12,sede:2},h_tomate:{nome:'um tomate',preco:5,local:'horta',fome:8,sede:6},h_cenoura:{nome:'uma cenoura',preco:6,local:'horta',fome:14,sede:1},h_morango:{nome:'uns morangos',preco:8,local:'horta',fome:6,sede:8},h_milho:{nome:'uma espiga de milho',preco:10,local:'horta',fome:22,sede:0},
  cerveja:{nome:'uma cerveja',preco:8,local:'bar',fome:0,sede:25},pinga:{nome:'uma pinga',preco:4,local:'bar',fome:0,sede:10},guarana:{nome:'um guaraná',preco:6,local:'bar',fome:2,sede:30},agua_bar:{nome:'um copo de água',preco:2,local:'bar',fome:0,sede:30},
  pastel:{nome:'um pastel',preco:6,local:'bar',fome:15},pf:{nome:'um prato feito',preco:18,local:'bar',fome:50},porcao:{nome:'uma porção de batata',preco:25,local:'bar',fome:35},
  rodada:{nome:'uma rodada pra todo mundo',preco:80,local:'bar',fome:0,sede:25},cafe:{nome:'um cafezinho',preco:3,local:'padaria',fome:3,sede:12},suco:{nome:'um suco de laranja',preco:6,local:'padaria',fome:4,sede:35},pao:{nome:'um pão na chapa',preco:5,local:'padaria',fome:15},
  coxinha:{nome:'uma coxinha',preco:7,local:'padaria',fome:20},agua:{nome:'uma garrafa de água',preco:3,local:'mercadinho',fome:0,sede:40},banana:{nome:'um cacho de banana',preco:3,local:'mercadinho',fome:10,sede:2},laranja:{nome:'umas laranjas',preco:4,local:'mercadinho',fome:8,sede:15},melancia:{nome:'uma fatia de melancia',preco:5,local:'mercadinho',fome:10,sede:25},biscoito:{nome:'um pacote de biscoito',preco:6,local:'mercadinho',fome:15},queijo:{nome:'um pedaço de queijo',preco:9,local:'mercadinho',fome:22},sanduiche:{nome:'um sanduíche natural',preco:12,local:'mercadinho',fome:32,sede:5},cesta:{nome:'uma cesta básica',preco:60,local:'mercadinho',fome:100}};
-const ICON={cerveja:'🍺',pinga:'🥃',guarana:'🥤',pastel:'🥟',pf:'🍛',porcao:'🍟',rodada:'🍻',cafe:'☕',pao:'🍞',coxinha:'🍗',cesta:'🧺',agua:'💧',agua_bar:'💧',suco:'🧃',banana:'🍌',laranja:'🍊',melancia:'🍉',biscoito:'🍪',queijo:'🧀',sanduiche:'🥪'};
+const ICON={h_alface:'🥬',h_tomate:'🍅',h_cenoura:'🥕',h_morango:'🍓',h_milho:'🌽',cerveja:'🍺',pinga:'🥃',guarana:'🥤',pastel:'🥟',pf:'🍛',porcao:'🍟',rodada:'🍻',cafe:'☕',pao:'🍞',coxinha:'🍗',cesta:'🧺',agua:'💧',agua_bar:'💧',suco:'🧃',banana:'🍌',laranja:'🍊',melancia:'🍉',biscoito:'🍪',queijo:'🧀',sanduiche:'🥪'};
 const precoTanque=c=>c==='moto'?120:['fusca','kombi'].includes(c)?220:['opala','caminhonete','kombi_tonhao'].includes(c)?300:380;
 setInterval(()=>{const nb=!!(eu&&eu.driving&&!SERVICO(carOf(eu))&&BOMBAS.some(bb=>Math.hypot(eu.x-bb.x,eu.y-(bb.y+T(.9)))<T(2.2)));$('cbBomba').classList.toggle('hidden',!nb)},150);
 $('cbBomba').onclick=()=>{if(!eu)return;Som.play('clique');eu.path=[];abrirLugar(Object.assign(Object.create(SHOPS.posto),{bomba:1}))};
@@ -4453,6 +4577,7 @@ const api=ONLINE?(()=>{
   venderLoja:c=>rpc('vender_carro_loja',{p_carro:c}),
   roupas:async()=>(await q(sb.from('guarda_roupa').select('peca,item').eq('morador',eu.id))).map(r=>r.peca+':'+r.item),
   comprarRoupa:(p,i)=>rpc('comprar_roupa',{p_peca:p,p_item:i}),
+  hortas:()=>rpc('hortas'),plantar:(c,sl,pl)=>rpc('plantar',{p_casa:c,p_slot:sl,p_planta:pl}),colher:(c,sl)=>rpc('colher',{p_casa:c,p_slot:sl}),
   comercios:()=>rpc('comercios'),comprarComercio:id=>rpc('comprar_comercio',{p_id:id}),comRepor:(id,it,n)=>rpc('com_repor',{p_id:id,p_item:it,p_qtd:n}),
   comPreco:(id,it,v)=>rpc('com_preco',{p_id:id,p_item:it,p_preco:v}),comRecolher:id=>rpc('com_recolher',{p_id:id}),comNome:(id,n)=>rpc('com_nome',{p_id:id,p_nome:n}),comComprar:(id,it)=>rpc('com_comprar',{p_id:id,p_item:it}),
   propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
@@ -4551,6 +4676,9 @@ const api=ONLINE?(()=>{
   async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=50+premio;
    passeLocal(m,15);const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:50,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
   async cidade(){return null},
+  async hortas(){const H=L.hortas||{};return{agora:new Date().toISOString(),h:Object.entries(H).flatMap(([c,o])=>Object.entries(o).map(([sl,r])=>({casa:+c,slot:+sl,planta:r.planta,em:r.em})))}},
+  async plantar(c,sl,pl){const m=lme(),p=HORTA_PL[pl];if(!L.casas||!L.casas[c])fail('Só o dono da casa mexe na horta.');if(!p)fail('Semente inválida.');L.hortas=L.hortas||{};const o=L.hortas[c]=L.hortas[c]||{};if(o[sl])fail('Esse canteiro já está plantado.');if(m.dinheiro<p.semente)fail('Dinheiro insuficiente para a semente.');m.dinheiro-=p.semente;o[sl]={planta:pl,em:new Date().toISOString()};lsave();return{ok:true,eu:lest()}},
+  async colher(c,sl){const m=lme(),o=(L.hortas||{})[c]||{},r=o[sl];if(!r)fail('Esse canteiro está vazio.');const p=HORTA_PL[r.planta];if(Date.now()<Date.parse(r.em)+p.horas*36e5)fail('Ainda não está pronto. Volte mais tarde! 🌱');const k='h_'+r.planta;m.mochila=m.mochila||{};const q=m.mochila[k]||0,n=Math.min(20,q+p.colhe);m.mochila[k]=n;delete o[sl];lsave();return{item:k,qtd:n-q,mochila:m.mochila,eu:lest()}},
   async comercios(){return comLocal.lista()},async comprarComercio(id){return comLocal.comprarPonto(id)},async comRepor(id,it,n){return comLocal.repor(id,it,n)},async comPreco(id,it,v){return comLocal.preco(id,it,v)},
   async comRecolher(id){return comLocal.recolher(id)},async comNome(id,n){return comLocal.nome(id,n)},async comComprar(id,it){return comLocal.comprar(id,it)},
   async admin(){fail('Painel só funciona online.')},async roupas(){return(lme().roupas||[]).slice()},async comprarRoupa(p,i){const m=lme(),pr=precoRoupa(p.split('_')[0],i);if(m.dinheiro<pr)fail('Dinheiro insuficiente.');m.roupas=m.roupas||[];if(!m.roupas.includes(p+':'+i)){m.roupas.push(p+':'+i);m.dinheiro-=pr}lsave();return{eu:lest()}},async venderLoja(c){const m=lme();if(!CARS[c]||CARS[c].premium)fail('A concessionária não compra esse carro.');m.carros=m.carros.filter(x=>x!==c);if(m.carro===c)m.carro=null;const v=Math.floor(CARS[c].preco/2);m.dinheiro+=v;lsave();return{recebido:v,eu:lest()}},async propor(){fail('Venda entre jogadores só funciona online.')},async responder(){fail('Só online.')},
@@ -5093,6 +5221,20 @@ function abrirComercio(b){
   if(b.kind==='butique'){txt('Roupas exclusivas: não existem na loja oficial. Depois de comprar, vista no guarda-roupa (na cor que quiser).','font-size:11.5px;opacity:.7;margin:6px 2px');botao(box,'👕 Abrir o guarda-roupa',()=>{abrirGuarda('roupa')},{ghost:true})}}
  $('placeName').textContent=title;$('placeSub').textContent=sub;$('place').classList.remove('hidden');
 }
+/* ===== HORTINHA NO QUINTAL (etapa 46): o dono planta nos canteiros da frente; colhe e vai para a mochila ===== */
+const hortaTempo=r=>{const p=HORTA_PL[r.planta],ms=Math.max(0,Date.parse(r.em)+p.horas*36e5-(Date.now()+hortaDt)),tm=Math.ceil(ms/6e4),h=Math.floor(tm/60),m=tm%60;return h?h+'h'+(m?' '+m+'min':''):m+'min'};
+function abrirHorta(b,escolher){if(!eu)return;closeCard();lugarAtual=b;const box=$('placeActs');box.innerHTML='';
+ const atual=()=>{if(lugarAtual===b)abrirHorta(b)};
+ if(escolher!=null){const g=document.createElement('div');g.className='igrid';box.appendChild(g);
+  Object.entries(HORTA_PL).forEach(([k,p])=>{const c=document.createElement('button');c.className='icard';c.disabled=eu.dinheiro<p.semente;c.innerHTML=`<span class="e">${p.e}</span>${p.nome}<span class="pr">${money(p.semente)}</span><span class="tg">⏱️ ${p.horas}h · colhe ${p.colhe}</span>`;
+   c.onclick=()=>{Som.play('clique');acao(async()=>{tratar(await api.plantar(b.n,escolher,k));Som.play('moeda');toast(p.e+' Plantado! Fica pronto em '+p.horas+'h.',3000);await hortaCarregar(true);atual()})};g.appendChild(c)});
+  botao(box,'⬅️ Voltar',()=>abrirHorta(b),{ghost:true});$('placeName').textContent='🌱 Escolha a semente';$('placeSub').textContent='Canteiro '+(escolher+1)+' · a planta cresce mesmo com você fora do jogo.';$('place').classList.remove('hidden');return}
+ for(let s=0;s<hortaSlots(b);s++){const r=hortaDe(b.n,s),e=hortaEst(r),p=r&&HORTA_PL[r.planta];
+  if(!r)comLinha(box,`🟫 <b>Canteiro ${s+1}</b><br><span style="opacity:.75">vazio</span>`,[['🌱 Plantar',()=>abrirHorta(b,s)]]);
+  else if(e===3)comLinha(box,`${p.e} <b>${p.nome}</b><br><span style="color:#7dff9a">pronto para colher!</span>`,[['🧺 Colher',()=>acao(async()=>{const x=tratar(await api.colher(b.n,s));Som.play('moeda');toast(`🧺 Colheu ${x.qtd} ${p.nome.toLowerCase()}! Está na 🎒 mochila.`,3500);await hortaCarregar(true);atual()})]]);
+  else comLinha(box,`${p.e} <b>${p.nome}</b><br><span style="opacity:.8">crescendo · ${Math.round(hortaProg(r)*100)}% · falta ${hortaTempo(r)}</span>`,[])}
+ const d=document.createElement('div');d.style.cssText='font-size:11.5px;opacity:.7;margin:8px 2px';d.textContent='O que você colhe vai para a mochila: dá para comer em qualquer lugar. Todo mundo vê sua horta crescendo no quintal!';box.appendChild(d);
+ $('placeName').textContent='🌱 Minha horta';$('placeSub').textContent='Casa '+b.n+' · '+hortaSlots(b)+' canteiros no quintal da frente';$('place').classList.remove('hidden')}
 function abrirLugar(b){
  if(!eu)return;closeCard();lugarAtual=b;const k=b.kind;if(k==='lanchonete'||k==='butique'){abrirComercio(b);comCarregar(true).then(()=>{if(lugarAtual===b&&!$('place').classList.contains('hidden'))abrirComercio(b)});return}let box=$('placeActs');box.innerHTML='';let title=PLACE_TITLE[k]||'',sub='';
  if(k==='casa'||k==='mansao'){
@@ -6183,7 +6325,7 @@ function pertoOpcoes(){
  for(const f of FEATURES)if(perto(f.a.x,f.a.y,T(2.8)))o.push([PLACE_TITLE[f.kind],()=>abrirLugar(f)]);
  if(perto((lojaRoupa.front[0]+.5)*TILE,(lojaRoupa.front[1]+.5)*TILE,T(1.8)))o.push([PUB_ENTRA.roupas,()=>entrarSala(PUBB.roupas)]);
  
- {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
+ {const mc=casaEm(eu.x,eu.y)||houses.find(b=>!b.off&&perto((b.front[0]+.5)*TILE,(b.front[1]+.5)*TILE,T(1.3)));if(mc&&(casasInfo.get(mc.n)||{}).dono===eu.id){const ab=portas.get(mc.n)===true;o.push(['🌱 Minha horta',()=>{hortaCarregar(true);abrirHorta(mc)}]);o.push([ab?'🔒 Trancar porta':'🔓 Abrir porta p/ visitas',()=>trocarPorta(mc,!ab)])}}
  if(perto((imob.front[0]+.5)*TILE,(imob.front[1]+.5)*TILE,T(1.7)))o.push(['🏘️ Entrar na Imobiliária',()=>entrarSala(IMOB)]);
  if(perto((conc.front[0]+.5)*TILE,(conc.front[1]+.5)*TILE,T(1.8)))o.unshift(['🚗 Entrar no showroom',()=>entrarSala(SHOW)]);
  for(const bl of BLOCOS)if(perto((bl.front[0]+.5)*TILE,(bl.front[1]+.5)*TILE,T(1.7))){o.push(['🏢 Bloco '+bl.nome+': apartamentos',()=>abrirBloco(bl)]);break}
@@ -6562,7 +6704,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261127e';
+const VERSAO_JOGO='v20261127f';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */

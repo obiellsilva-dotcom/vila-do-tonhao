@@ -3751,3 +3751,82 @@ begin
   return json_build_object('ok', true, 'eu', _estado(m.id));
 end $$;
 grant execute on function public.comprar_roupa(text, integer) to authenticated;
+
+-- ===================== ETAPA 46: hortinha no quintal da casa =====================
+-- O dono da casa planta nos canteiros da frente (3 na casa, 4 na mansão). A planta cresce pelo tempo real;
+-- quando fica pronta, ele colhe e os legumes vão para a mochila (dá para comer depois).
+create table if not exists public.horta_plantas (
+  id text primary key, nome text not null, semente integer not null, horas numeric not null, colhe integer not null
+);
+alter table public.horta_plantas enable row level security;
+revoke all on public.horta_plantas from anon, authenticated;
+insert into public.horta_plantas(id, nome, semente, horas, colhe) values
+  ('alface','Alface',5,2,3),('tomate','Tomate',8,4,4),('cenoura','Cenoura',10,6,4),('morango','Morango',20,8,5),('milho','Milho',15,10,3)
+on conflict (id) do update set nome = excluded.nome, semente = excluded.semente, horas = excluded.horas, colhe = excluded.colhe;
+
+-- o que se colhe vira item de comer (não é vendido em loja nenhuma: local 'horta')
+insert into public.loja(id, tipo, nome, preco, local, fome, sede, nivel_min) values
+  ('h_alface','consumo','um pé de alface',6,'horta',12,2,1),('h_tomate','consumo','um tomate',5,'horta',8,6,1),
+  ('h_cenoura','consumo','uma cenoura',6,'horta',14,1,1),('h_morango','consumo','uns morangos',8,'horta',6,8,1),
+  ('h_milho','consumo','uma espiga de milho',10,'horta',22,0,1)
+on conflict (id) do update set nome = excluded.nome, local = excluded.local, fome = excluded.fome, sede = excluded.sede;
+
+create table if not exists public.hortas (
+  casa integer not null references public.casas(id) on delete cascade,
+  slot integer not null,
+  planta text not null references public.horta_plantas(id),
+  plantado_em timestamptz not null default now(),
+  primary key (casa, slot)
+);
+alter table public.hortas enable row level security;
+revoke all on public.hortas from anon, authenticated;
+
+-- todo mundo vê as hortas (para desenhar as plantas crescendo nos quintais)
+create or replace function public.hortas() returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object('agora', now(), 'h', coalesce((select json_agg(json_build_object('casa', casa, 'slot', slot, 'planta', planta, 'em', plantado_em)) from hortas), '[]'::json))
+$$;
+grant execute on function public.hortas() to authenticated;
+
+create or replace function public._minha_horta(p_casa integer, p_slot integer) returns casas
+language plpgsql security definer set search_path = public as $$
+declare c casas;
+begin
+  select * into c from casas where id = p_casa;
+  if not found or c.id > 1000 then raise exception 'Essa casa não tem quintal.'; end if;
+  if c.dono is distinct from auth.uid() then raise exception 'Só o dono da casa mexe na horta.'; end if;
+  if p_slot < 0 or p_slot >= (case when c.preco >= 200000 then 4 else 3 end) then raise exception 'Canteiro inválido.'; end if;
+  return c;
+end $$;
+revoke execute on function public._minha_horta(integer, integer) from public, anon, authenticated;
+
+create or replace function public.plantar(p_casa integer, p_slot integer, p_planta text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; p horta_plantas;
+begin
+  m := _eu(); perform _minha_horta(p_casa, p_slot);
+  select * into p from horta_plantas where id = p_planta;
+  if not found then raise exception 'Semente inválida.'; end if;
+  if exists (select 1 from hortas where casa = p_casa and slot = p_slot) then raise exception 'Esse canteiro já está plantado.'; end if;
+  if m.dinheiro < p.semente then raise exception 'Dinheiro insuficiente para a semente.'; end if;
+  update moradores set dinheiro = dinheiro - p.semente where id = m.id;
+  insert into hortas(casa, slot, planta) values (p_casa, p_slot, p_planta);
+  return json_build_object('ok', true, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.plantar(integer, integer, text) to authenticated;
+
+create or replace function public.colher(p_casa integer, p_slot integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; h hortas; p horta_plantas; k text; q integer; n integer;
+begin
+  m := _eu(); perform _minha_horta(p_casa, p_slot);
+  select * into h from hortas where casa = p_casa and slot = p_slot for update;
+  if not found then raise exception 'Esse canteiro está vazio.'; end if;
+  select * into p from horta_plantas where id = h.planta;
+  if now() < h.plantado_em + make_interval(secs => (p.horas * 3600)::integer) then raise exception 'Ainda não está pronto. Volte mais tarde! 🌱'; end if;
+  k := 'h_' || p.id; q := coalesce((m.mochila->>k)::integer, 0); n := least(20, q + p.colhe);
+  delete from hortas where casa = p_casa and slot = p_slot;
+  update moradores set mochila = mochila || jsonb_build_object(k, n) where id = m.id;
+  return json_build_object('item', k, 'qtd', n - q, 'mochila', (select mochila from moradores where id = m.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.colher(integer, integer) to authenticated;
