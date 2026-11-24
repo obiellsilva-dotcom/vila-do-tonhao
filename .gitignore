@@ -5,3 +5,4 @@ app-android/.gradle/
 app-android/local.properties
 *.keystore
 .wrangler/
+fotos-teste/
