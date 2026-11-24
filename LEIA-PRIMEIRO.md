@@ -32,8 +32,8 @@
 | **Pagamento site** | Mercado Pago (Pix), função `pix`. Preço vem da tabela `produtos`. |
 
 ## 3. Situação AGORA (22/11/2026)
-- **Site no ar:** `v20261127a`. **Jogo e site estão em dia**, nada pendente para subir.
-- **Banco:** etapas até a **44 confirmadas**. **Etapa 45** (comércios dos jogadores) escrita e testada: `entrega/sql-parte8-1/2/3.sql` — **o dono precisa rodar ANTES de subir o site v20261127b**.
+- **Site no ar:** `v20261127d` (24/11). **Jogo e site estão em dia**, nada pendente para subir.
+- **Banco:** etapas até a **44 confirmadas**. **Etapa 45** (comércios) rodada pelo dono e confirmada no ar (24/11).
 - **Play Store:** teste fechado aprovado e funcionando, compras testadas e funcionando. **Falta juntar 12 testadores por 14 dias seguidos** → depois pedir acesso à produção. Testador entra assim: manda Gmail → dono põe na lista "Testadores da Vila" → manda o link `https://play.google.com/apps/testing/br.com.viladotonhao.app` + código **`PIONEIRO-VILA`** (título 🧪 Pioneiro, vale até 28/02/2027).
 - **Supabase:** estourou "Realtime Messages" entre 14 e 18/11 (3,4 mi de 2 mi). Desde 19/11 ~zero (tempo real foi para o Cloudflare). Aviso: restrição em **16/12** se continuar acima. Recomendado ao dono: abrir chamado no suporte do Supabase ou assinar Pro por 1 mês antes de 16/12. **Perguntar o que ele fez.**
 - **Celular do dono:** o app antigo mostrou barra de endereço no aparelho dele (problema do aparelho). Com o app nativo (2.0+) isso acabou.
@@ -57,7 +57,8 @@
 
 - **OUTRA DIMENSÃO (v20261127d)**: TODAS as salas (casa, mansão, kit, ap2, imob, show e prédios públicos) ficam numa faixa extra da grade DEPOIS do fim do mundo (`XR=48` linhas, y 100 a 147; `inWorld` vai até lá, `G2` maior, `WY1E`). Nada é desenhado nem visto de fora. Antes as salas ficavam na floresta da borda e apareciam como manchas, e as salas novas chegaram a cobrir o pomar: corrigido. Nunca colocar sala dentro do mapa/margem de novo.
 - **Interiores dos prédios públicos**: delegacia (térreo recepção + 2º andar carceragem com 3 celas), hospital (térreo recepção/pronto-socorro + 2º andar internação com 6 leitos), prefeitura (térreo atendimento + 2º andar gabinete), banco e igreja (12x12). Escada igual à da mansão (`esc`, `cima`). Código: `PUB_SALA`, `SALAS.p_*`, `PUBB`, `pubDef`, `pubItens`, `pubBloq`, `pubOpcoes`. Na porta: "🚪 Entrar"; emprego no balcão (abre `abrirLugar`); ao começar o trabalho sai sozinho da sala.
-- **Plano combinado com o dono (uma etapa por vez, ele aprova cada uma):** 1 interiores com emprego (FEITO, aguardando aprovação) · 2 interiores das lojas (loja de roupas oficial refeita, lanchonete, loja dos jogadores) · 3 casas com 3 modelos por tipo (pequena, média, mansão) com cache leve · 4 prédios de apartamento de verdade.
+- **PENDENTE NO FINAL DE TODAS AS ETAPAS:** aviso de novidades que aparece UMA vez por jogador (interiores, visual novo dos prédios, lojas dos jogadores/comércios, roupas novas). Só subir esse aviso no fim.
+- **Plano combinado com o dono (uma etapa por vez, ele aprova cada uma):** 1 interiores com emprego (FEITO e NO AR v20261127d) · 2 interiores das lojas (loja de roupas oficial refeita, lanchonete, loja dos jogadores) · 3 casas com 3 modelos por tipo (pequena, média, mansão) com cache leve · 4 prédios de apartamento de verdade.
 
 ## 5. Banco — etapas recentes
 36 Luz de teto · 37 estilo da casa · 38 avisos de casa/vaga pelo Cloudflare (`pg_net` → `/glob`) · 39 economia + pacotes de dinheiro + limite semanal · 40 apartamentos sem limite · 41 títulos/conquistas · 42 fotos no R2 (aceita URLs do Worker) · 43 índice único para compras do Google Play (`pedidos_gp_unico`) · 44 admin define nível · 45 comércios dos jogadores + roupas 24-29.
