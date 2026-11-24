@@ -1614,6 +1614,23 @@ for(let x=62;x<=123;x++)for(const y of [-10,-9])setTile(x,y,G.ROAD);
 for(let y=-8;y<=-1;y++)for(let x=58;x<=127;x++){if(tileAt(x,y)===G.FOREST)setTile(x,y,G.GRASS);if(y<=-5||x>80&&x<86)noTree.add(x+','+y)} // gramado aberto entre o Bairro Nobre e a cidade
 for(let y=-8;y<=-1;y++)for(const x of [82,83])setTile(x,y,G.ROAD);
 for(let y=-11;y<=-1;y++)for(const x of [81,84])if(y>=-8)setTile(x,y,G.WALK);
+// ===== AVENIDA EM VOLTA DA CIDADE: liga as pontas das avenidas (acabou rua sem saída), com ponte no rio e curvas nos cantos =====
+{const R=(x,y)=>{setTile(x,y,G.ROAD);for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++)noTree.add((x+a)+','+(y+b))},
+  Wk=(x,y)=>{const t=tileAt(x,y);if(t===G.ROAD||t===G.BRIDGE||t===G.TRAIL||t===G.PATH||t===G.WATER||t===G.SAND)return;setTile(x,y,G.WALK);noTree.add(x+','+y)};
+ for(const [a,b,y0] of [[-3,-2,12],[121,122,-10]])for(let y=y0;y<=77;y++)for(const x of [a,b]){if(y>RIO0&&y<RIO1)setTile(x,y,G.BRIDGE);else R(x,y)}
+ for(const r of [12,13,30,31,49,50,62,63,76,77])for(const x of [-1,120])R(x,r);
+ for(let y=-10;y<=-1;y++)for(const x of [56,57,102,103])R(x,y); // ruas do alto agora sobem até o Bairro Nobre
+ for(let x=56;x<=61;x++)for(const y of [-10,-9])R(x,y);
+ for(const y of [-10,-9])setTile(123,y,G.GRASS);
+ for(let y=11;y<=78;y++)for(const x of [-4,-1])Wk(x,y);
+ for(let y=-11;y<=78;y++)for(const x of [120,123])Wk(x,y);
+ for(const x of [-4,-3,-2,-1])for(const y of [11,78])Wk(x,y);for(const x of [120,121,122,123])for(const y of [-11,78])Wk(x,y);}
+// cantos grandes da avenida (curva): ponto de dentro + direção para fora
+const CURVAS=[[-1,14,-1,-1],[121,-8,1,-1],[58,-8,-1,-1],[-1,76,-1,1],[121,76,1,1]];
+// quebra-molas: [x,y,'h'] = atravessa uma rua deitada (linhas); [x,y,'v'] = atravessa uma rua em pé (colunas)
+const LOMBADAS=[[23,12,'h'],[69,12,'h'],[45,30,'h'],[92,30,'h'],[23,49,'h'],[111,49,'h'],[45,62,'h'],[69,62,'h'],[23,76,'h'],[92,76,'h'],
+ [12,40,'v'],[34,21,'v'],[56,70,'v'],[82,40,'v'],[102,21,'v'],[-3,40,'v'],[121,70,'v'],[121,2,'v'],[90,-10,'h']];
+const LOMBA=new Set();for(const [x,y,o] of LOMBADAS){LOMBA.add(x+','+y);LOMBA.add(o==='h'?x+','+(y+1):(x+1)+','+y)}
 // preços das casas já estão na lista acima (30 mil, 45 mil, 75 mil e mansão 350 mil)
 const HOUSE_OFF=new Set();{const rows={};HOUSE_DEFS.forEach((p,i)=>{(rows[p[1]]=rows[p[1]]||[]).push(i)});for(const r of Object.values(rows)){r.sort((a,b)=>HOUSE_DEFS[a][0]-HOUSE_DEFS[b][0]);r.forEach((i,k)=>{if(k%2===1&&r.length>2)HOUSE_OFF.add(i)})}}
 HOUSE_OFF.add(58); // casa 59 saiu: o terreno virou parte da concessionária
@@ -1840,16 +1857,23 @@ function paintTile(c,x,y){
  if(b==='field'){c.fillStyle='rgba(120,90,50,.18)';for(let i=0;i<3;i++){c.beginPath();c.ellipse(px+h(100+i)*30,py+h(110+i)*30,3,1.5,0,0,7);c.fill()}if(h(8)<.15){c.fillStyle='#7fb05a';circ(c,px+h(9)*28+2,py+h(12)*28+2,3)}}
  if(b==='wood'||b==='wood2'){c.strokeStyle='rgba(60,30,10,.22)';c.lineWidth=1;for(let k=0;k<4;k++){const yy=py+k*8+.5;c.beginPath();c.moveTo(px,yy);c.lineTo(px+TILE,yy);c.stroke();const sx=px+((k*13+x*7)%32);c.beginPath();c.moveTo(sx+.5,yy);c.lineTo(sx+.5,yy+8);c.stroke()}}
  if(b==='walk'||b==='plaza'||b==='terr'||b==='grass'||b==='path'){}
- if(inCity(x,y)&&grid[y][x]===G.WALK){c.fillStyle='#d6d2c8';
-  const R=(xx,yy)=>xx>=0&&yy>=0&&xx<W&&yy<H&&grid[yy][xx]===G.ROAD,S=10,A='#45444a',TOP='#ebe7dd',FACE='#8f8a80',SH='rgba(0,0,0,.35)';
+ if(tileAt(x,y)===G.WALK){c.fillStyle='#d6d2c8';
+  const R=(xx,yy)=>{const t=tileAt(xx,yy);return t===G.ROAD||t===G.BRIDGE},S=10,A='#45444a',TOP='#ebe7dd',FACE='#8f8a80',SH='rgba(0,0,0,.35)';
   const dn=R(x,y+1),up=R(x,y-1),rt=R(x+1,y),lf=R(x-1,y);
   c.fillStyle=A;if(dn)c.fillRect(px,py+TILE-S,TILE,S);if(up)c.fillRect(px,py,TILE,S);if(rt)c.fillRect(px+TILE-S,py,S,TILE);if(lf)c.fillRect(px,py,S,TILE);
   if(!dn&&!rt&&R(x+1,y+1))c.fillRect(px+TILE-S,py+TILE-S,S,S);if(!dn&&!lf&&R(x-1,y+1))c.fillRect(px,py+TILE-S,S,S);if(!up&&!rt&&R(x+1,y-1))c.fillRect(px+TILE-S,py,S,S);if(!up&&!lf&&R(x-1,y-1))c.fillRect(px,py,S,S);
   // meio-fio: a face de pé aparece do lado de quem olha (baixo e direita); do outro lado, só a sombra
-  if(dn){c.fillStyle=TOP;c.fillRect(px,py+TILE-S-3,TILE,3);c.fillStyle=FACE;c.fillRect(px,py+TILE-S,TILE,4);c.fillStyle=SH;c.fillRect(px,py+TILE-S+4,TILE,2)}
-  if(rt){c.fillStyle=TOP;c.fillRect(px+TILE-S-3,py,3,TILE);c.fillStyle=FACE;c.fillRect(px+TILE-S,py,4,TILE);c.fillStyle=SH;c.fillRect(px+TILE-S+4,py,2,TILE)}
-  if(up){c.fillStyle=SH;c.fillRect(px,py+S-3,TILE,3);c.fillStyle=TOP;c.fillRect(px,py+S,TILE,3)}
-  if(lf){c.fillStyle=SH;c.fillRect(px+S-3,py,3,TILE);c.fillStyle=TOP;c.fillRect(px+S,py,3,TILE)}}
+  // esquina arredondada: quando a calçada tem rua em dois lados (cruzamento), o meio-fio faz curva
+  const ve=(dn||up)&&(rt||lf)&&!(dn&&up)&&!(rt&&lf),RC=15,cx=rt?px+TILE-S:px+S,cy=dn?py+TILE-S:py+S,ox=cx+(rt?-RC:RC),oy=cy+(dn?-RC:RC);
+  let hx0=px,hx1=px+TILE,vy0=py,vy1=py+TILE;
+  if(ve){if(rt)hx1=ox;else hx0=ox;if(dn)vy1=oy;else vy0=oy;c.fillStyle=A;c.fillRect(Math.min(ox,cx),Math.min(oy,cy),RC,RC);c.fillStyle='#d6d2c8';c.beginPath();c.moveTo(ox,oy);c.arc(ox,oy,RC,0,7);c.fill()}
+  if(dn){c.fillStyle=TOP;c.fillRect(hx0,py+TILE-S-3,hx1-hx0,3);c.fillStyle=FACE;c.fillRect(hx0,py+TILE-S,hx1-hx0,4);c.fillStyle=SH;c.fillRect(hx0,py+TILE-S+4,hx1-hx0,2)}
+  if(rt){c.fillStyle=TOP;c.fillRect(px+TILE-S-3,vy0,3,vy1-vy0);c.fillStyle=FACE;c.fillRect(px+TILE-S,vy0,4,vy1-vy0);c.fillStyle=SH;c.fillRect(px+TILE-S+4,vy0,2,vy1-vy0)}
+  if(up){c.fillStyle=SH;c.fillRect(hx0,py+S-3,hx1-hx0,3);c.fillStyle=TOP;c.fillRect(hx0,py+S,hx1-hx0,3)}
+  if(lf){c.fillStyle=SH;c.fillRect(px+S-3,vy0,3,vy1-vy0);c.fillStyle=TOP;c.fillRect(px+S,vy0,3,vy1-vy0)}
+  if(ve){const a0=Math.atan2(cy-oy,0)*0+(rt?(dn?0:-Math.PI/2):(dn?Math.PI/2:Math.PI)),a1=a0+Math.PI/2;
+   if(dn||rt){c.strokeStyle=FACE;c.lineWidth=4;c.beginPath();c.arc(ox,oy,RC+2,a0,a1);c.stroke()}
+   c.strokeStyle=TOP;c.lineWidth=3;c.beginPath();c.arc(ox,oy,RC-1.5,a0,a1);c.stroke()}}
 }
 const walkEdge=(x,y)=>{const t=tileAt(x,y);return t!==G.FOREST&&t!==G.GRASS&&t!==G.ROCK&&t!==G.HILL};
 function placa(c,x,y,txt,cor='#f3e3bd',tinta='#5a3a22'){c.font='600 9px Fredoka, sans-serif';const w=c.measureText(txt).width+12;c.fillStyle='#6d4426';c.fillRect(x-1.5,y+4,3,14);c.fillStyle=cor;rr(c,x-w/2,y-7,w,13,3);c.fill();c.fillStyle=tinta;c.textAlign='center';c.fillText(txt,x,y+3);c.textAlign='left'}
@@ -1904,6 +1928,21 @@ function paintStatic(c,x0,y0,w,h){
   for(let i=0;i<6;i++){if(isR(col-1,r))c.fillRect((col-1)*TILE+22,r*TILE+4+i*10.5,8,6);if(isR(col+2,r))c.fillRect((col+2)*TILE+2,r*TILE+4+i*10.5,8,6)}
   for(let i=0;i<6;i++){if(isR(col,r-1))c.fillRect(col*TILE+4+i*10.5,(r-1)*TILE+22,6,8);if(isR(col,r+2))c.fillRect(col*TILE+4+i*10.5,(r+2)*TILE+2,6,8)}
  }));
+ // faixa amarela da avenida de fora e das ruas novas do alto
+ c.fillStyle='#e2b42b';
+ for(const xx of [-2,122])for(let y=-10;y<=77;y++){if(xx<0&&y<12)continue;if([12,13,30,31,49,50,62,63,76,77,-10,-9].includes(y))continue;c.fillRect(T(xx)-1,T(y)+7,2,18)}
+ for(const xx of [57,103])for(let y=-8;y<=-1;y++)c.fillRect(T(xx)-1,T(y)+7,2,18);
+ for(const r of [13,31,50,63,77])for(const xx of [-3,-1,120,121])c.fillRect(T(xx)+7,T(r)-1,18,2);
+ // curvas grandes nos cantos da avenida
+ for(const [ix,iy,sx,sy] of CURVAS){const X0=T(ix),Y0=T(iy),Rr=T(2),bx=sx<0?X0-Rr:X0,by=sy<0?Y0-Rr:Y0;
+  c.save();c.beginPath();c.rect(bx,by,Rr,Rr);c.moveTo(X0+Rr,Y0);c.arc(X0,Y0,Rr,0,Math.PI*2);c.clip('evenodd');c.fillStyle='#d6d2c8';c.fillRect(bx,by,Rr,Rr);c.restore();
+  const a0=sx>0?(sy>0?0:-Math.PI/2):(sy>0?Math.PI/2:Math.PI);
+  c.strokeStyle='#8f8a80';c.lineWidth=4;c.beginPath();c.arc(X0,Y0,Rr-2,a0,a0+Math.PI/2);c.stroke();c.strokeStyle='#ebe7dd';c.lineWidth=3;c.beginPath();c.arc(X0,Y0,Rr+1.5,a0,a0+Math.PI/2);c.stroke();
+  c.strokeStyle='#e2b42b';c.lineWidth=2;c.setLineDash([18,14]);c.beginPath();c.arc(X0,Y0,T(1),a0,a0+Math.PI/2);c.stroke();c.setLineDash([])}
+ // quebra-molas (amarelo e preto)
+ for(const [x,y,o] of LOMBADAS){const h=o==='h',X0=h?T(x)+9:T(x)+3,Y0=h?T(y)+3:T(y)+9,w=h?14:T(2)-6,hh=h?T(2)-6:14;
+  c.fillStyle='rgba(0,0,0,.28)';c.fillRect(X0+2,Y0+2,w,hh);c.fillStyle='#ffd23f';c.fillRect(X0,Y0,w,hh);c.save();c.beginPath();c.rect(X0,Y0,w,hh);c.clip();c.fillStyle='#24211f';
+  for(let k=-4;k<12;k++){c.beginPath();if(h){c.moveTo(X0,Y0+k*9);c.lineTo(X0+w,Y0+k*9-8);c.lineTo(X0+w,Y0+k*9-3);c.lineTo(X0,Y0+k*9+5)}else{c.moveTo(X0+k*9,Y0);c.lineTo(X0+k*9-8,Y0+hh);c.lineTo(X0+k*9-3,Y0+hh);c.lineTo(X0+k*9+5,Y0)}c.fill()}c.restore()}
  // river
  c.fillStyle='rgba(255,255,255,.45)';c.fillRect(WX0,53*TILE,WX1-WX0,2);c.fillRect(WX0,57*TILE-2,WX1-WX0,2);
  c.fillStyle='#8a5a33';for(let x=40;x<=46;x++)c.fillRect(x*TILE,53*TILE+6,TILE-2,8);
@@ -5125,7 +5164,7 @@ function nearestCarTile(px,py,max=6){const tx=Math.floor(px/TILE),ty=Math.floor(
 function euUpdate(dt){
  if(!eu)return;
  eu.blinkT-=dt;if(eu.blinkT<-.12)eu.blinkT=rand(2,5);
- const car=carOf(eu),semGas=car&&!SERVICO(car)&&(eu.gas??100)<=0,spd=car?(semGas?40:car==='moto'?150:car==='viatura'?185:170):72,wf=car?carOk:walkP;
+ const car=carOf(eu),semGas=car&&!SERVICO(car)&&(eu.gas??100)<=0,spd=(car?(semGas?40:car==='moto'?150:car==='viatura'?185:170):72)*(car&&LOMBA.has(Math.floor(eu.x/TILE)+','+Math.floor(eu.y/TILE))?.4:1),wf=car?carOk:walkP;
  if(car&&!SERVICO(car)&&eu.moving&&!semGas){eu.gas=Math.max(0,(eu.gas??100)-dt*100/(car==='moto'?900:['esportivo','neon','sedan','jipe'].includes(car)?540:720));if(eu.gas<=0){say(eu,'⛽ Acabou a gasolina! Empurrando até o posto…',4,true);toast('⛽ Sem gasolina! O carro vai devagar. Leve até o ⛽ Posto para abastecer.',5000)}else if(eu.gas<15&&now>(eu.gasAviso||0)){eu.gasAviso=now+40;say(eu,'⛽ A gasolina tá acabando…',3,true)}}
  eu.alcool=Math.max(0,(eu.alcool||0)-dt/90);eu.bebK=eu.alcool>2?Math.min(1,(eu.alcool-2)/4+.3):0;const bk=eu.bebK;
  let kx=(keys.r?1:0)-(keys.l?1:0),ky=(keys.d?1:0)-(keys.u?1:0);if(joyV.x||joyV.y){kx=joyV.x;ky=joyV.y}
@@ -5185,7 +5224,7 @@ const VAGAS=[];
 (function gerarVagas(){
  const used=new Set();
  const cross=(x,y)=>(roadRows.includes(y)&&(roadCols.includes(x)||roadCols.includes(x-1)||roadCols.includes(x+1)))||(roadCols.includes(x)&&(roadRows.includes(y-1)||roadRows.includes(y+1)));
- const bad=(x,y)=>!carOk(x,y)||tileAt(x,y)===G.BRIDGE||cross(x,y)||used.has(x+','+y);
+ const bad=(x,y)=>LOMBA.has(x+','+y)||!carOk(x,y)||tileAt(x,y)===G.BRIDGE||cross(x,y)||used.has(x+','+y);
  function add(lugar,ax,ay,n,casa){
   const c=[];for(let dy=-10;dy<=10;dy++)for(let dx=-10;dx<=10;dx++){const x=ax+dx,y=ay+dy;if(!bad(x,y))c.push([x,y,dx*dx+dy*dy])}
   c.sort((a,b)=>a[2]-b[2]);let k=0;
