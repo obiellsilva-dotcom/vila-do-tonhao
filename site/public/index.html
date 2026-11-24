@@ -5686,7 +5686,7 @@ function sairSala(){if(MOB.ativo)fecharMob();try{Som.casaPara()}catch(e){}joyV.x
 let salaFade=0,salaCD=0,SALA_ON=false;const SALA_ESC=1.8;
 setInterval(()=>{if(!eu||eu.driving||eu.hidden||now<salaCD)return;if(eu.rm){const R=eu.rm.R;if(eu.x<T(R.x0-1)||eu.x>T(R.x1+2)||eu.y<T(R.y0-1)||eu.y>T(R.y1+2)){if(R.porta){eu.x=T(R.porta[0]+.5);eu.y=T(R.porta[1]-.7)}else{eu.x=T(R.esc.x0-.5);eu.y=T(R.esc.y0+.5)}eu.path=[]}}if(!eu.rm){const b=casaEm(eu.x,eu.y);if(b&&!b.loja&&!b.off&&houses.includes(b))entrarSala(b)}else{const R=eu.rm.R,tx=Math.floor(eu.x/TILE),ty=Math.floor(eu.y/TILE);if(R.porta&&tx===R.porta[0]&&ty===R.porta[1])sairSala();else if(R.esc&&ty===R.esc.y0&&tx>=R.esc.x0&&tx<=R.esc.x1)trocaAndar()}},120);
 function trocaAndar(){if(MOB.ativo)fecharMob();const a=eu.rm.andar?0:1,R=salaDe(eu.rm.b,a);levantarCasa();eu.rm.andar=a;eu.rm.R=R;eu.rm.subiu=true;eu.path=[];eu.onArrive=null;if(a){eu.x=T(R.esc.x0-.5);eu.y=T(R.esc.y0+.5)}else{eu.x=T(R.esc.x0+.5);eu.y=T(R.esc.y1+1.5)}cam.x=eu.x;cam.y=eu.y;salaTiles();Som.play('porta');sendPos(true);toast(a?'⬆️ Andar de cima':'⬇️ Andar de baixo',1500)}
-const salaKey=p=>p===eu?(eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0):(p.rm||0);
+const salaKey=p=>!p?0:p===eu?(eu.rm?'c'+eu.rm.n+(eu.rm.andar?'s':''):0):(p.rm||0);
 // ===== Estilo da casa: cor das paredes, piso e janelas (o dono escolhe em 🛋️ Decorar → 🎨 Paredes e piso) =====
 const EST_PRECO={p:300,c:600,j:400};
 const EST_PAREDE=[['Creme','#efe2c8'],['Branco','#f6f5f0'],['Cinza','#c9ccd1'],['Azul bebê','#cfe3f2'],['Verde menta','#cfeadb'],['Rosa','#f4d4dc'],['Lilás','#ddd0ee'],['Amarelo','#f6e7a8'],['Terracota','#d9967a'],['Azul marinho','#3c5372'],['Verde musgo','#6f7f58'],['Grafite','#4a4a52']];
@@ -6845,7 +6845,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261128b';
+const VERSAO_JOGO='v20261128c';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
