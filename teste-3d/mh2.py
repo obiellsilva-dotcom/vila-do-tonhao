@@ -54,20 +54,12 @@ def bracos(r,fw=0,cot=0):
     if cot:
         for sd,sg in (('l',1),('r',-1)):p=r.pose.bones['lowerarm_'+sd];p.rotation_quaternion=p.rotation_quaternion@Quaternion(Vector(CAX),math.radians(cot*CS*sg))
     for sd,sg in (('l',1),('r',-1)):p=r.pose.bones['lowerarm_'+sd];p.rotation_quaternion=p.rotation_quaternion@Quaternion((0,1,0),math.radians(PR*sg))
-def andar(r,t):
-    zera(r);s=math.sin(t*2*math.pi);bracos(r,0,6+6*max(0,s))
-    for sd,sg in (('l',1),('r',-1)):
-        rot(r,'thigh_'+sd,(1,0,0),-24*s*sg);rot(r,'calf_'+sd,(1,0,0),32*max(0,math.sin(t*2*math.pi+(0 if sg>0 else math.pi)+1.7)))
-        rot(r,'upperarm_'+sd,(1,0,0),30*s*sg)
-    r.pose.bones['pelvis'].location=(0,0,0)
 from mathutils import Matrix
 def _upd():bpy.context.view_layer.update()
 def aim(r,n,d):
-    """aponta o osso n na direção d (espaço do esqueleto) com a menor rotação possível a partir da pose de descanso"""
     _upd();pb=r.pose.bones[n];rest=pb.bone.matrix_local.to_3x3();rd=(rest@Vector((0,1,0))).normalized()
     q=rd.rotation_difference(Vector(d).normalized());M=(q.to_matrix()@rest).to_4x4();M.translation=pb.head.copy();pb.matrix=M;_upd()
 def ik2(r,a,b,alvo,polo):
-    """braço/perna de 2 ossos até o alvo (espaço do esqueleto); polo = para onde aponta o cotovelo/joelho"""
     _upd();S=r.pose.bones[a].head.copy();L1=r.pose.bones[a].bone.length;L2=r.pose.bones[b].bone.length
     T=Vector(alvo);v=T-S;d=min(max(v.length,1e-4),L1+L2-1e-4);u=v.normalized()
     x=(L1*L1+d*d-L2*L2)/(2*d);h=math.sqrt(max(L1*L1-x*x,0));p=Vector(polo);p=(p-u*p.dot(u)).normalized()
@@ -75,17 +67,23 @@ def ik2(r,a,b,alvo,polo):
 def W2A(r,w):return r.matrix_world.inverted()@Vector(w)
 def bracos_baixo(r,swing=0,cot=12,abre=.06):
     for sd,sx in (('l',1),('r',-1)):
-        a=math.radians(swing*sx if False else swing);c=math.radians(cot)
-        sw=swing*(1 if sd=='l' else -1);a=math.radians(sw)
+        sw=swing*(1 if sd=='l' else -1);a=math.radians(sw);c=math.radians(cot)
         aim(r,'upperarm_'+sd,(sx*abre,-math.sin(a),-math.cos(a)))
         aim(r,'lowerarm_'+sd,(sx*abre*.6,-math.sin(a+c),-math.cos(a+c)))
 def andar(r,t):
-    zera(r);s=math.sin(t*2*math.pi)
+    """caminhada suave: passada curta, joelho dobra só quando a perna vai à frente, quadril sobe/desce e gira de leve"""
+    zera(r);ph=t*2*math.pi;s_=math.sin(ph);c_=math.cos(ph)
     for sd,sg in (('l',1),('r',-1)):
-        rot(r,'thigh_'+sd,(1,0,0),-24*s*sg);rot(r,'calf_'+sd,(1,0,0),32*max(0,math.sin(t*2*math.pi+(0 if sg>0 else math.pi)+1.7)))
+        sw=s_*sg;fw=max(0,c_*sg)
+        rot(r,'thigh_'+sd,(1,0,0),-19*sw)
+        rot(r,'calf_'+sd,(1,0,0),5+30*fw**1.4)
+        rot(r,'foot_'+sd,(1,0,0),-6*fw+4*max(0,-sw))
+    rot(r,'pelvis',(0,0,1),3.5*s_);rot(r,'spine_02',(0,0,1),-4.5*s_);rot(r,'spine_01',(1,0,0),2.5)
+    try:r.location.z=BASEZ-.012+.012*math.cos(2*ph)
+    except NameError:pass
     for sd,sg in (('l',-1),('r',1)):
-        sw=24*s*sg;a=math.radians(sw);c=math.radians(10+8*max(0,sw)/24);sx=1 if sd=='l' else -1
-        aim(r,'upperarm_'+sd,(sx*.06,-math.sin(a),-math.cos(a)));aim(r,'lowerarm_'+sd,(sx*.04,-math.sin(a+c),-math.cos(a+c)))
+        sw=11*s_*sg;a=math.radians(sw);c=math.radians(12+7*max(0,s_*sg));sx=1 if sd=='l' else -1
+        aim(r,'upperarm_'+sd,(sx*.07,-math.sin(a),-math.cos(a)));aim(r,'lowerarm_'+sd,(sx*.05,-math.sin(a+c),-math.cos(a+c)))
 def parado(r):zera(r);bracos_baixo(r,0,10)
 def sentar(r):
     zera(r)
@@ -109,11 +107,31 @@ def cam(tz=.9,az=45):
     a=math.radians(az);e=math.radians(60);d=10;C.rotation_euler=(e,0,a);C.location=Vector((math.sin(a)*math.sin(e)*d,-math.cos(a)*math.sin(e)*d,math.cos(e)*d+tz))
 GEN=os.environ.get('GEN','m');TESTE=os.environ.get('TESTE')
 r=pessoa(1.0,'young_caucasian_male','short02','male_casualsuit02','shoes01','eyebrow001') if GEN=='m' else pessoa(0.0,'young_caucasian_female','ponytail01','female_casualsuit01','shoes02','eyebrow010')
-arm=r;base=arm.location.copy()
+arm=r;base=arm.location.copy();BASEZ=base.z
 def shot(n):bpy.context.view_layer.update();sc.render.filepath=f'{OUT}/{GEN}_{n}.png';bpy.ops.render.render(write_still=True)
 cam()
 SHEET=os.environ.get('SHEET')
-MG=(.3,-.5,.9);MP=(.18,.06,.4);MSEAT=.9;MY=.1   # moto do jogo: guidão, pedaleira, altura do quadril, recuo do banco
+MG=(.28,-.44,.94);MP=(.17,.4,.41);MSEAT=.89;MY=.28   # moto do jogo: guidão, pedaleira, altura do quadril, recuo do banco
+WT=os.environ.get('WT')
+if WT:
+    sc.render.resolution_x=sc.render.resolution_y=300;C.data.ortho_scale=2.2
+    def camv(az,el=80):
+        a=math.radians(az);e=math.radians(el);C.rotation_euler=(e,0,a);C.location=Vector((math.sin(a)*math.sin(e)*10,-math.cos(a)*math.sin(e)*10,math.cos(e)*10+.85))
+    if WT=='walk':
+        for az in (90,0):
+            camv(az)
+            for f in range(0,12,2):arm.location=base.copy();andar(r,f/12);shot(f'wt_az{az}_{f:02d}')
+    if WT=='moto':
+        wht=mat((.85,.86,.88));blk=mat((.04,.04,.05))
+        def cb(l,s_,m_,rx=0):
+            bpy.ops.mesh.primitive_cube_add(location=l,rotation=(math.radians(rx),0,0));o=bpy.context.object;o.scale=s_;o.data.materials.append(m_);bb=o.modifiers.new('b','BEVEL');bb.width=.04;bb.segments=3
+        for y in (-.7,.68):
+            bpy.ops.mesh.primitive_torus_add(location=(0,y,.3),rotation=(0,math.radians(90),0),major_radius=.25,minor_radius=.07);bpy.context.object.data.materials.append(blk)
+        cb((0,-.18,.88),(.17,.22,.09),wht);cb((0,-.62,.86),(.13,.16,.17),wht,22);cb((0,-.4,.58),(.13,.3,.18),wht);cb((0,.22,.79),(.13,.18,.03),blk);cb((0,.58,.86),(.1,.17,.05),wht,-10);cb((0,-.44,.94),(.28,.015,.015),blk)
+        for x in (-.17,.17):cb((x,.4,.41),(.05,.02,.012),blk)
+        for az in (90,0,45,135):
+            camv(az,75);zera(r);arm.location=base.copy();_upd();hip=(arm.matrix_world@arm.pose.bones['thigh_l'].head).z;arm.location.z=base.z+(MSEAT-hip);arm.location.y=base.y+MY;pilotar(r,MG,MP);shot(f'mt_az{az}')
+    raise SystemExit
 if SHEET:
     sc.render.resolution_x=sc.render.resolution_y=128;sc.cycles.samples=16;C.data.ortho_scale=2.32
     def camk(az):
@@ -121,13 +139,13 @@ if SHEET:
     def sh(n):_upd();sc.render.filepath=f'{OUT}/{n}.png';bpy.ops.render.render(write_still=True)
     for k in range(8 if not os.environ.get('SOMOTO') else 0):
         camk(45-k*45)
-        for f in range(8):arm.location=base;andar(r,f/8);sh(f'w{k}_{f}')
-        arm.location=base;parado(r);sh(f'i{k}')
+        for f in range(12):arm.location=base.copy();andar(r,f/12);sh(f'w{k}_{f}')
+        arm.location=base.copy();parado(r);sh(f'i{k}')
         zera(r);arm.location=base;_upd();hip=(arm.matrix_world@arm.pose.bones['thigh_l'].head).z;arm.location.z=base.z+(.5-hip);sentar(r);sh(f's{k}')
     hold=bpy.data.materials.new('hold');hold.use_nodes=True;nt=hold.node_tree;[nt.nodes.remove(n) for n in list(nt.nodes)]
     ho=nt.nodes.new('ShaderNodeHoldout');out=nt.nodes.new('ShaderNodeOutputMaterial');nt.links.new(ho.outputs[0],out.inputs[0])
     hob=[]
-    for (l,s_,rx) in (((0,-.28,.86),(.15,.24,.11),0),((0,-.62,.86),(.14,.16,.16),25),((0,-.45,.55),(.13,.32,.17),0),((0,.0,.62),(.13,.3,.14),0),((0,.55,.86),(.1,.22,.06),-10)):
+    for (l,s_,rx) in (((0,-.18,.88),(.17,.22,.09),0),((0,-.6,.86),(.14,.16,.17),22),((0,-.4,.58),(.13,.3,.18),0),((0,.12,.6),(.13,.3,.16),0),((0,.62,.86),(.1,.2,.05),-10)):
         bpy.ops.mesh.primitive_cube_add(location=l,rotation=(math.radians(rx),0,0));o=bpy.context.object;o.scale=s_;o.data.materials.append(hold);bb=o.modifiers.new('b','BEVEL');bb.width=.05;bb.segments=3;hob.append(o)
     for k in range(32):
         camk(45-k*11.25)
