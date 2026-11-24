@@ -70,9 +70,11 @@ def bracos_baixo(r,swing=0,cot=12,abre=.06):
         sw=swing*(1 if sd=='l' else -1);a=math.radians(sw);c=math.radians(cot)
         aim(r,'upperarm_'+sd,(sx*abre,-math.sin(a),-math.cos(a)))
         aim(r,'lowerarm_'+sd,(sx*abre*.6,-math.sin(a+c),-math.cos(a+c)))
+def fecha(r,g=4.5):
+    rot(r,'thigh_l',(0,1,0),g);rot(r,'thigh_r',(0,1,0),-g);rot(r,'foot_l',(0,1,0),-g*.6);rot(r,'foot_r',(0,1,0),g*.6)
 def andar(r,t):
-    """caminhada suave: passada curta, joelho dobra só quando a perna vai à frente, quadril sobe/desce e gira de leve"""
-    zera(r);ph=t*2*math.pi;s_=math.sin(ph);c_=math.cos(ph)
+    """caminhada suave"""
+    zera(r);fecha(r);ph=t*2*math.pi;s_=math.sin(ph);c_=math.cos(ph)
     for sd,sg in (('l',1),('r',-1)):
         sw=s_*sg;fw=max(0,c_*sg)
         rot(r,'thigh_'+sd,(1,0,0),-19*sw)
@@ -84,7 +86,7 @@ def andar(r,t):
     for sd,sg in (('l',-1),('r',1)):
         sw=11*s_*sg;a=math.radians(sw);c=math.radians(12+7*max(0,s_*sg));sx=1 if sd=='l' else -1
         aim(r,'upperarm_'+sd,(sx*.07,-math.sin(a),-math.cos(a)));aim(r,'lowerarm_'+sd,(sx*.05,-math.sin(a+c),-math.cos(a+c)))
-def parado(r):zera(r);bracos_baixo(r,0,10)
+def parado(r):zera(r);fecha(r);bracos_baixo(r,0,10)
 def sentar(r):
     zera(r)
     for sd in 'lr':rot(r,'thigh_'+sd,(1,0,0),-88);rot(r,'calf_'+sd,(1,0,0),84)
@@ -148,7 +150,7 @@ if SHEET:
     for (l,s_,rx) in (((0,-.18,.88),(.17,.22,.09),0),((0,-.6,.86),(.14,.16,.17),22),((0,-.4,.58),(.13,.3,.18),0),((0,.12,.6),(.13,.3,.16),0),((0,.62,.86),(.1,.2,.05),-10)):
         bpy.ops.mesh.primitive_cube_add(location=l,rotation=(math.radians(rx),0,0));o=bpy.context.object;o.scale=s_;o.data.materials.append(hold);bb=o.modifiers.new('b','BEVEL');bb.width=.05;bb.segments=3;hob.append(o)
     for k in range(32):
-        camk(45-k*11.25)
+        camk(90+11.25*k)   # casado com a foto k da moto do jogo
         zera(r);arm.location=base;_upd();hip=(arm.matrix_world@arm.pose.bones['thigh_l'].head).z;arm.location.z=base.z+(MSEAT-hip);arm.location.y=base.y+MY;pilotar(r,MG,MP);sh(f'm{k}')
     raise SystemExit
 VID=os.environ.get('VID')
