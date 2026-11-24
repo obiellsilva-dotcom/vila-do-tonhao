@@ -112,6 +112,27 @@ r=pessoa(1.0,'young_caucasian_male','short02','male_casualsuit02','shoes01','eye
 arm=r;base=arm.location.copy()
 def shot(n):bpy.context.view_layer.update();sc.render.filepath=f'{OUT}/{GEN}_{n}.png';bpy.ops.render.render(write_still=True)
 cam()
+SHEET=os.environ.get('SHEET')
+MG=(.3,-.5,.9);MP=(.18,.06,.4);MSEAT=.9;MY=.1   # moto do jogo: guidão, pedaleira, altura do quadril, recuo do banco
+if SHEET:
+    sc.render.resolution_x=sc.render.resolution_y=128;sc.cycles.samples=16;C.data.ortho_scale=2.32
+    def camk(az):
+        a=math.radians(az);e=math.radians(60);d=10;C.rotation_euler=(e,0,a);C.location=Vector((math.sin(a)*math.sin(e)*d,-math.cos(a)*math.sin(e)*d,math.cos(e)*d+.8))
+    def sh(n):_upd();sc.render.filepath=f'{OUT}/{n}.png';bpy.ops.render.render(write_still=True)
+    for k in range(8 if not os.environ.get('SOMOTO') else 0):
+        camk(45-k*45)
+        for f in range(8):arm.location=base;andar(r,f/8);sh(f'w{k}_{f}')
+        arm.location=base;parado(r);sh(f'i{k}')
+        zera(r);arm.location=base;_upd();hip=(arm.matrix_world@arm.pose.bones['thigh_l'].head).z;arm.location.z=base.z+(.5-hip);sentar(r);sh(f's{k}')
+    hold=bpy.data.materials.new('hold');hold.use_nodes=True;nt=hold.node_tree;[nt.nodes.remove(n) for n in list(nt.nodes)]
+    ho=nt.nodes.new('ShaderNodeHoldout');out=nt.nodes.new('ShaderNodeOutputMaterial');nt.links.new(ho.outputs[0],out.inputs[0])
+    hob=[]
+    for (l,s_,rx) in (((0,-.28,.86),(.15,.24,.11),0),((0,-.62,.86),(.14,.16,.16),25),((0,-.45,.55),(.13,.32,.17),0),((0,.0,.62),(.13,.3,.14),0),((0,.55,.86),(.1,.22,.06),-10)):
+        bpy.ops.mesh.primitive_cube_add(location=l,rotation=(math.radians(rx),0,0));o=bpy.context.object;o.scale=s_;o.data.materials.append(hold);bb=o.modifiers.new('b','BEVEL');bb.width=.05;bb.segments=3;hob.append(o)
+    for k in range(32):
+        camk(45-k*11.25)
+        zera(r);arm.location=base;_upd();hip=(arm.matrix_world@arm.pose.bones['thigh_l'].head).z;arm.location.z=base.z+(MSEAT-hip);arm.location.y=base.y+MY;pilotar(r,MG,MP);sh(f'm{k}')
+    raise SystemExit
 VID=os.environ.get('VID')
 if VID:
     N=int(os.environ.get('N','48'));sc.render.resolution_x=sc.render.resolution_y=int(os.environ.get('RES','320'));sc.cycles.samples=12;C.data.ortho_scale=2.3
