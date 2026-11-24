@@ -2729,6 +2729,35 @@ function n3Casa(K){const LT=!!K.b.lote,b=K.b,{X0,X1,Y0,Y1}=K,[t,m]=casaModelo(b)
 const N3K={},N3MAX=40;
 const hortaChave=b=>{let k='';for(let s=0;s<hortaSlots(b);s++)k+=hortaEst(hortaDe(b.n,s))+2;return k};
 const N3D={
+ bloco:{H:175,chave:b=>'#'+b.i,f(K){const b=K.b,{X0,X1,Y0,Y1}=K,cx=(X0+X1)/2,wl=b.cor,AC=shade(wl,-45),BR='#fbf7ee',FH=24,T0=26;
+  K.chao(X0+2,Y1-14,X1-2,Y1-1,'#cfc8ba',12);
+  const bx0=X0+4,bx1=X1-4,by0=Y0+6,by1=Y1-16,Hb=T0+4*FH+6;
+  K.box(bx0,by0,bx1,by1,0,Hb,wl);
+  const F=K.face({y:by1}),S=K.face({x:bx1});
+  // térreo: base de pedra, portaria de vidro com marquise
+  F.rect(bx0,0,bx1,T0,shade(wl,-18));for(let a=bx0;a<bx1;a+=8)F.rect(a,0,a+.6,T0,shade(wl,-32));F.rect(bx0,T0-2,bx1,T0,BR);
+  F.rect(cx-20,0,cx+20,22,'#3a3f47');F.rect(cx-18,0,cx-1,20,N3VID(K.noite));F.rect(cx+1,0,cx+18,20,N3VID(K.noite));F.rect(cx-3,8,cx-1.6,14,'#e9edf1');F.rect(cx+1.6,8,cx+3,14,'#e9edf1');
+  for(const a of [bx0+18,bx0+46,bx1-18,bx1-46])F.jan(a,6,16,12,{moldura:BR,grade:1});
+  S.rect(by0,0,by1,T0,shade(wl,-18));S.rect(by0,T0-2,by1,T0,BR);
+  // faixa da escada no meio (cor de destaque) com janelinhas
+  F.rect(cx-16,T0,cx+16,Hb,AC);for(let f=0;f<4;f++)F.jan(cx,T0+f*FH+8,10,9,{moldura:shade(AC,30),trav:false});
+  // andares: 2 apartamentos de cada lado da escada, cada um com janela e porta da sacada
+  const apts=[bx0+26,bx0+70,bx1-70,bx1-26];
+  for(let f=0;f<4;f++){const z=T0+f*FH;F.rect(bx0,z,cx-16,z+1.4,shade(wl,-30));F.rect(cx+16,z,bx1,z+1.4,shade(wl,-30));
+   for(const a of apts){F.jan(a-11,z+7,13,13,{moldura:BR});F.rect(a+1,z+3,a+15,z+20,BR);F.rect(a+2.5,z+3,a+13.5,z+19,N3VID(K.noite&&hsh(b.i*9+a,f,3)<.6));F.rect(a+7.8,z+3,a+8.2,z+19,BR);
+    if((f+apts.indexOf(a))%2===0){F.rect(a-22,z+12,a-14,z+18,'#e9edf1');F.rect(a-21,z+13,a-15,z+17,'#c9ced4')}}}
+  for(let f=0;f<4;f++)for(let a=by0+14;a<by1-8;a+=22)S.jan(a,T0+f*FH+6,13,13,{moldura:BR});
+  // sacadas de vidro (saem da fachada)
+  for(let f=0;f<4;f++){const z=T0+f*FH;for(const a of apts){K.box(a-2,by1,a+18,by1+9,z,z+2,'#e9e4da');K.cam();const p0=K.P(a-2,by1+9,z+2),p1=K.P(a+18,by1+9,z+2);K.g.fillStyle='rgba(170,215,235,.55)';K.g.beginPath();K.g.moveTo(p0[0],p0[1]);K.g.lineTo(p1[0],p1[1]);K.g.lineTo(p1[0],p1[1]-9);K.g.lineTo(p0[0],p0[1]-9);K.g.fill();K.g.strokeStyle='#9aa3ad';K.g.lineWidth=1;K.g.beginPath();K.g.moveTo(p0[0],p0[1]-9);K.g.lineTo(p1[0],p1[1]-9);K.g.stroke()}}
+  // marquise da portaria e letreiro
+  K.box(cx-26,by1,cx+26,by1+12,24,27,'#3a3f47');{const Fm=K.face({y:by1+12});Fm.rect(cx-26,24,cx+26,27,'#3a3f47');Fm.text('BLOCO '+b.nome,cx,24.6,5,'#ffd23f',700)}
+  for(const ox of [-22,22])K.box(cx+ox-1.5,by1+9,cx+ox+1.5,by1+12,0,24,'#9aa1a8');
+  // teto: platibanda, casa de máquinas, caixa d'água e antena
+  K.box(bx0,by1-4,bx1,by1,Hb,Hb+5,shade(wl,-12));K.box(bx1-4,by0,bx1,by1-4,Hb,Hb+5,shade(wl,-12));
+  K.box(cx-18,by0+14,cx+18,by0+46,Hb,Hb+20,shade(wl,-8));K.box(cx-14,by0+18,cx+14,by0+42,Hb+20,Hb+40,'#8fb3c9');K.box(cx-15,by0+17,cx+15,by0+43,Hb+40,Hb+42,'#6f93a9');
+  K.box(bx1-34,by0+16,bx1-20,by0+28,Hb,Hb+10,'#cfd3d8');K.box(bx0+20,by0+14,bx0+21.5,by0+15.5,Hb,Hb+30,'#9aa1a8');
+  for(const px of [bx0+8,bx1-8]){K.box(px-5,by1+3,px+5,by1+11,0,8,'#a0522d');const q=K.P(px,by1+7,16);K.cam();K.g.fillStyle='#3f8f3f';K.g.beginPath();K.g.arc(q[0],q[1],6,0,7);K.g.fill()}
+ }},
  casa:{H:130,S:1.6,sw:24,chave:b=>'#'+b.n+(b.lote?'':'.'+hortaChave(b)),f:n3Casa},
  mansao:{H:150,S:1.6,sw:24,chave:b=>'#'+b.n+(b.lote?'':'.'+hortaChave(b)),f:n3Casa},
  igreja:{H:200,f(K){const {X0,X1,Y0,Y1}=K,cx=(X0+X1)/2,BR='#f6f2e8',TR='#2e6f95',OU='#e0b52e',TE='#b4583c',CAP='#3d6f9e',PE='#a9a296';
@@ -2926,7 +2955,7 @@ const N3D={
   n3Poste(K,X1-14,Y1-8,30);
  }},
 };
-function n3Desenha(list,b){const d=N3D[b.kind],noite=darkness()>.3,key=b.kind+(noite?'n':'d')+(d.chave?d.chave(b):''),kk=b.n!=null?'h'+b.n:b.kind;
+function n3Desenha(list,b){const d=N3D[b.kind],noite=darkness()>.3,key=b.kind+(noite?'n':'d')+(d.chave?d.chave(b):''),kk=b.nk||(b.n!=null?'h'+b.n:b.kind);
  let a=N3.get(key);if(a){N3.delete(key);N3.set(key,a)}
  if(!a){const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h),m=30,S=d.S||2,L=isoP(X0,Y1)[0]-m,R=isoP(X1,Y0)[0]+m,Tp=isoP(X0,Y0)[1]-d.H-m,Bt=isoP(X1,Y1)[1]+m;
   const cv=document.createElement('canvas');cv.width=Math.ceil((R-L)*S);cv.height=Math.ceil((Bt-Tp)*S);const g=cv.getContext('2d');
@@ -5022,23 +5051,18 @@ async function celAvisos(){if(!eu)return;try{const r=await api.naoLidas();if(!r)
 setInterval(()=>{if(eu&&!document.hidden)celAvisos()},25000);
 
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261201';
+const NOVID='v20261128';
+const novEmo=(g,t,a,b)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText(a,110,128+Math.sin(t*2.2)*6);if(b){g.font='44px sans-serif';const L=b.split(' ');g.fillText(L[Math.floor(t/1.1)%L.length],220,122+Math.cos(t*2)*5)}};
 const NOV_SLIDES=[
- {t:'🏎️ Carros novos na cidade',x:'Chegou o <b>Porshe GT</b> (💎 loja, no lugar do Fusca Dourado) e o <b>Fiestta</b>, um hatch esperto na concessionária (no lugar da Kombi). Os dois com <b>rodas girando</b>, faróis de verdade e <b>pintura na oficina</b>. ',d:(g,t)=>{const k=Math.floor(t/4)%2?'kombi':'fusca_ouro';g.save();g.translate(128,122);g.scale(1.5,1.5);drawCarStack(g,0,0,k,t*.7,null,{});g.restore()}},
- {t:'🛋️ 50 móveis novos e 🎵 jukebox nas casas',x:'Em <b>🛋️ Decorar</b> tem <b>banheiro</b>, cozinha gourmet, rede, piscina, cama king, sofá curvo, <b>móveis de luxo</b> (piano, lustre de cristal, vitrola) e móveis <b>com efeito</b>: lareira com fogo, globo de festa, neon e fonte. VIP ganha <b>trono, hidromassagem, fliperama</b> e mais! E a <b>jukebox</b> da sua casa agora toca música <b>sertaneja</b> para todo mundo que estiver lá.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';const L=['🛋️','🔥','🪩','🛁','👑'];g.fillText(L[Math.floor(t/.9)%L.length],110,128+Math.sin(t*3)*5);g.font='44px sans-serif';g.fillText('🎵',225,118)}},
- {t:'🛡️ Cidade mais segura e 💬 sua opinião',x:'Mensagens com <b>assédio ou conteúdo sexual</b> agora são bloqueadas na hora e quem manda fica <b>silenciado</b>. Viu alguém passando dos limites? Toque nele → <b>🚩 Denunciar</b>. E agora você pode mandar <b>ideias e problemas</b> direto para o administrador em <b>⚙️ → 💬 Ideias e problemas</b>!',d:(g,t)=>{g.textAlign='center';g.font='72px sans-serif';g.fillText('🛡️',110,128+Math.sin(t*3)*5);g.font='46px sans-serif';g.fillText(Math.floor(t/1.2)%2?'💬':'🚩',225,118)}},
- {t:'📱 Celular novo!',x:'Toque no <b>📱</b> do menu ☰: <b>💬 mensagens privadas</b> com seus amigos, <b>👥 amigos</b> (peça amizade tocando num jogador ou procurando pelo nome), <b>🏦 banco</b> e <b>📈 investimento</b>: guarde dinheiro e ele <b>rende 1% por dia</b> (até R$ 100 mil investidos).',d:(g,t)=>{g.textAlign='center';g.font='78px sans-serif';g.fillText('📱',110,130+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['💬','👥','🏦','📈'];g.fillText(L[Math.floor(t/.9)%L.length],225,115)}},
- {t:'🚗 Furacão GT no Passe',x:'O carro exclusivo do <b>Passe Premium</b> chegou: o <b>Furacão GT</b>, com rodas girando, faróis de LED e lanternas que acendem à noite. Libere no <b>nível 20</b> do Passe e pinte da cor que quiser na <b>🔧 Oficina</b>. Ele <b>nunca mais volta</b> depois de 31/12!',d:(g,t)=>{g.save();g.translate(160,130);g.scale(2.2,2.2);try{drawCarStack(g,0,0,'natal',-.6+Math.sin(t*.8)*.5,null,{luz:Math.floor(t)%2===0})}catch(e){}g.restore()}},
- {t:'🚗 Concessionária nova',x:'A <b>Carros do Zé</b> mudou: prédio novo com <b>pátio cheio de carros</b> (veja o preço na plaquinha) e um <b>showroom</b> por dentro, com a Caminhonete do Tonhão, a Ferrarini e a Lambordini em exposição. Entre pela <b>porta de vidro</b>!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏎️':'🚗',110+Math.sin(t*2)*10,125);g.font='44px sans-serif';g.fillText('🔑',225,115+Math.sin(t*3)*6)}},
- {t:'🗺️ Passeio pela cidade',x:'Quem chega agora ganha um <b>passeio guiado</b>: a câmera visita o bar, os empregos, as lojas, as casas, o condomínio, a delegacia, o hospital e a prefeitura, explicando cada lugar.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText('🗺️',110,125);g.font='40px sans-serif';const L=['🍺','💼','🚗','🏠','🏛️'];g.fillText(L[Math.floor(t/.9)%L.length],225,120+Math.sin(t*3)*5)}},
- {t:'🎟️ Passe Natal na Vila',x:'Novo <b>Passe</b> com 20 níveis: trabalhe, ganhe pontos (tarefas mais demoradas dão mais) e libere prêmios. No Premium tem o <b>🎅 gorro de Papai Noel brilhante</b> e um <b>🚗 carro exclusivo</b> que <b>nunca mais voltam</b> depois de 31/12! Abra pelo <b>🎟️</b> no menu ☰.',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎟️',110,125+Math.sin(t*3)*6);g.font='44px sans-serif';const L=['👕','🧢','👟','💰','🎨'];g.fillText(L[Math.floor(t/.8)%L.length],220,120);g.fillStyle='#ffc94a';g.fillRect(70,160,180*((t*.25)%1),10)}},
- {t:'🎱 Sinuca de verdade e 🎁 bônus',x:'A sinuca agora tem <b>15 bolas e 10 tacadas</b>. Em dupla vale a regra de verdade: <b>lisas × listradas</b> e a <b>8 preta</b> no final, e o amistoso dá XP (30 para quem vence). Nos empregos: a cada <b>10 tarefas, +R$ 50</b>, mas <b>errar o minijogo custa R$ 25</b>!',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🎱',110,125+Math.sin(t*3)*5);g.font='40px sans-serif';g.fillText(Math.floor(t/1.3)%2?'🎁':'💰',225,120)}},
- {t:'👕 Guarda-roupa e 🎒 Mochila novos',x:'Toque em você e em <b>👕 Guarda-roupa</b>: veja todas as suas roupas com o boneco vestindo, troque na hora, salve até <b>3 looks</b> e escolha o <b>✨ brilho no chão</b>. A <b>🎒 Mochila</b> agora tem abas: itens, roupas, carros e pets.',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText(Math.floor(t/1.4)%2?'🎒':'👕',110,125+Math.sin(t*3)*5);g.font='38px sans-serif';const L=['👗','🧢','👟','✨'];L.forEach((e,i)=>g.fillText(e,190+(i%2)*55,85+Math.floor(i/2)*60))}},
- {t:'👑 VIP ficou melhor',x:'Roupas VIP novas: <b>jaqueta bomber dourada, moletom neon, jaqueta de veludo, smoking, vestido de lantejoulas, tênis e boné neon</b>. E o VIP ganha <b>🎁 presente todo mês</b>, <b>🏠 vai para casa num toque</b>, <b>+50% no passe</b> e a <b>🏎️ Lambordini</b>.',d:(g,t)=>{g.save();g.translate(110,95);g.scale(3,3);coroaVip(g,0,0);g.restore();g.textAlign='center';g.font='54px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🏠':'🎁',225,125+Math.sin(t*3)*5)}},
- {t:'⭐ XP em dobro nos empregos',x:'Cada tarefa dos empregos agora dá <b>o dobro de XP</b>. Você sobe de nível bem mais rápido e libera empregos, casas e carros mais cedo!',d:(g,t)=>{g.textAlign='center';g.font='64px sans-serif';g.fillText('⭐',110,125+Math.sin(t*3)*6);g.font='bold 54px Fredoka,sans-serif';g.fillStyle='#ffd23f';g.fillText('2x',215,128);g.font='26px sans-serif';g.fillText('⬆️',160,70-((t*30)%30))}},
- {t:'🏢 Imobiliária nova',x:'A <b>Imobiliária</b> abriu ao lado da Igreja. Fale com o corretor para <b>comprar ou alugar</b>: ele mostra no mapa as casas livres e os apartamentos do condomínio. As casas da cidade ficaram mais valorizadas.',d:(g,t)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText('🏢',120,125);g.font='50px sans-serif';g.fillText(Math.floor(t/1.2)%2?'🔑':'🧑‍💼',220,120+Math.sin(t*3)*5)}},
- {t:'🏘️ Condomínio Vila Tonhão',x:'São <b>64 apartamentos</b> em 4 blocos, com portaria, playground, churrasqueira e quadra. Kitnet ou 2 quartos: <b>compre ou alugue por semana</b>. O aluguel é cobrado sozinho; com 3 dias de atraso você perde o apartamento. Visitas tocam a <b>campainha</b> 🔔.',d:(g,t)=>{g.textAlign='center';g.font='46px sans-serif';const L=['🏢','🏢','🏢','🏢'];L.forEach((e,i)=>g.fillText(e,70+i*60,120+(Math.floor(t*2)%4===i?-6:0)));g.font='30px sans-serif';g.fillText('🔔',160,175+Math.sin(t*8)*2)}},
- {t:'⚡ Jogo mais leve e tela nova',x:'O mapa ficou <b>mais leve e rápido</b>, principalmente no celular. A tela mudou: em cima ficam nível, dinheiro, hora e <b>quantas pessoas estão online</b> (toque nele para ir a qualquer lugar ou morador); o menu <b>☰</b> fica no canto direito e abre para cima. E em ⚙️ Configurações dá para trocar o <b>joystick de lado</b>!',d:(g,t)=>{g.textAlign='center';g.font='60px sans-serif';g.fillText('⚡',90,125+Math.sin(t*4)*5);g.font='40px sans-serif';g.fillText('☰',190,150-Math.min(30,(t*40)%60));g.fillText('🟢',250,110);g.fillText('🕹️',200,80)}}];
+ {t:'🏛️ A cidade ficou mais bonita',x:'A <b>igreja</b> ganhou torres com sinos, a <b>prefeitura</b> tem colunas e relógio, a <b>delegacia</b>, o <b>hospital</b> (com heliponto!) e o <b>banco</b> foram refeitos. De noite as janelas acendem.',d:(g,t)=>novEmo(g,t,'🏛️','⛪ 🚓 🏥 🏦')},
+ {t:'🚪 Agora dá para entrar nos prédios',x:'Delegacia, prefeitura, hospital, banco e igreja têm <b>interior</b>. Os <b>empregos</b> agora são pegos no <b>balcão lá dentro</b>. Suba a escada: na delegacia ficam as <b>celas</b>, no hospital os <b>quartos</b> e na prefeitura o <b>gabinete</b>.',d:(g,t)=>novEmo(g,t,'🚪','💼 👮 🩺 🙏')},
+ {t:'🏠 Casas com lote, garagem e portão',x:'Cada casa agora tem <b>lote murado</b>, <b>portão que abre</b> quando você chega e <b>garagem</b> para guardar o carro dentro. São 9 modelos de casa. <b>Atenção:</b> algumas casas <b>mudaram de lugar</b> — quem tem casa continua dono dela, é só procurar no mapa (ou na 🏘️ Imobiliária).',d:(g,t)=>novEmo(g,t,'🏡','🚗 🔑 🚪')},
+ {t:'🏰 Bairro Nobre',x:'As <b>mansões</b> ganharam terrenos grandes, com <b>piscina</b>, estradinha e garagem. Quatro delas ficam no novo <b>Bairro Nobre</b>, no alto da cidade, subindo a avenida.',d:(g,t)=>novEmo(g,t,'🏰','🏊 🌳 🚙')},
+ {t:'🌱 Hortinha no quintal',x:'Plante <b>alface, tomate, cenoura, morango e milho</b> nos canteiros do seu quintal. A planta cresce <b>mesmo com você fora do jogo</b>. Na hora da colheita vai tudo para a <b>🎒 mochila</b>. Fique no quintal, perto dos canteiros, e toque em <b>🌱 Minha horta</b>.',d:(g,t)=>novEmo(g,t,'🌱','🥬 🍅 🥕 🍓 🌽')},
+ {t:'🏪 Invista num comércio',x:'Compre a <b>🍔 Lanchonete</b> ou a <b>🛍️ Loja de Roupas da Vila</b> (perto da praça) e coloque o <b>nome que quiser</b> na fachada. Compre mercadoria, escolha o preço e ganhe dinheiro: os moradores compram <b>mesmo com você offline</b>. Passe lá para recolher o caixa!',d:(g,t)=>novEmo(g,t,'🏪','🍔 🛍️ 💰')},
+ {t:'👕 Roupas que só existem lá',x:'A Loja de Roupas da Vila vende <b>6 roupas exclusivas</b>: jaqueta universitária, camisa anos 70, kimono florido, poncho gaúcho, camisa com suspensório e jaqueta bomber. Toda semana o fornecedor traz <b>2 modelos</b>; os que saem de linha <b>ficam raros</b>!',d:(g,t)=>novEmo(g,t,'👕','🧥 👘 🎽')},
+ {t:'✨ Mais novidades',x:'A <b>👕 Loja de Roupas</b> oficial tem prédio novo e uma loja grande por dentro. Os <b>prédios do condomínio</b> agora têm sacada, portaria e caixa d’água. E o emprego de <b>🚗 Vendedor de carros</b> foi consertado: pegue na concessionária!',d:(g,t)=>novEmo(g,t,'✨','👗 🏢 🚗')}
+];
 let novAnim=null,NOV_OFF=null;
 async function mostrarNovidades(){if(!eu||document.getElementById('novid'))return;const kk='cidadeTonhao.novid.'+NOVID+'.'+eu.id;try{if(localStorage.getItem(kk))return}catch(_){}
  const marca=()=>{try{localStorage.setItem(kk,'1')}catch(_){}api.vistoNovidades(NOVID).catch(()=>{})};
@@ -5686,7 +5710,7 @@ function condoItens(list){const C=CONDO,cx=T((C.x0+C.x1)/2),cy=T((C.y0+C.y1)/2);
  cancela(list,'ab2',T(12),T(-3.5),T(14),T(-3.5));
  // blocos
  for(const b of BLOCOS){const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h);let fade=1;if(eu&&!eu.hidden&&!eu.rm&&eu.x>X0-T(1)&&eu.x<X1+T(1)&&eu.y<Y0&&eu.y>Y0-T(6))fade=.3;
-  for(let i=0;i<b.w;i++){const xa=X0+i*TILE;list.push({x:xa+16,y:Y1,k:xa+16+Y1-2,cam:1,f:()=>blocoFatia(b,i,fade)})}}
+  b.kind='bloco';b.nk='bloco'+b.i;n3Desenha(list,b)}
  // playground (escorregador e balanço) e churrasqueira coberta
  list.push({x:T(5),y:T(-5.5),k:T(5)+T(-5.5),cam:1,f:()=>{const X=T(3),Y=T(-6.5);isoBox(ctx,X,Y,X+8,Y+8,0,22,'#e74c3c');isoBox(ctx,X+8,Y,X+30,Y+8,0,8,'#f1c40f');isoBox(ctx,X+60,Y-4,X+63,Y-1,0,26,'#3498db');isoBox(ctx,X+90,Y-4,X+93,Y-1,0,26,'#3498db');isoBox(ctx,X+60,Y-4,X+93,Y-1,26,28,'#2c3e50');isoBox(ctx,X+72,Y-3,X+80,Y,8,10,'#8e5a3c')}});
  list.push({x:T(17.3),y:T(-5),k:T(17.3)+T(-5),cam:1,f:()=>{const X=T(15.2),Y=T(-6.6);for(const [a,b2] of [[0,0],[150,0],[0,60],[150,60]])isoBox(ctx,X+a,Y+b2,X+a+4,Y+b2+4,0,30,'#7a5a3a');isoBox(ctx,X-4,Y-4,X+158,Y+68,30,34,'#a0522d');isoBox(ctx,X+10,Y+6,X+34,Y+20,0,16,'#b5533c');isoBox(ctx,X+50,Y+20,X+120,Y+40,0,10,'#8e6a44');
@@ -6768,7 +6792,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261127g';
+const VERSAO_JOGO='v20261128a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
