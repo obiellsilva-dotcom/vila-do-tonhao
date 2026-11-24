@@ -3846,3 +3846,94 @@ begin
   return json_build_object('ganho', tot, 'vendidos', n, 'mochila', mo, 'eu', _estado(m.id));
 end $$;
 grant execute on function public.vender_horta() to authenticated;
+
+-- ===================== ETAPA 48: casas mais caras (devolução), salários +15%, loja de roupas zerada =====================
+-- Pode rodar mais de uma vez: cada ajuste só acontece uma vez (fica anotado na tabela "ajustes").
+create table if not exists public.ajustes (id text primary key, feito timestamptz not null default now());
+alter table public.ajustes enable row level security;
+revoke all on public.ajustes from anon, authenticated;
+
+-- 1) "Tipo" da casa (1 de cada tipo por pessoa): simples < R$ 60.000 <= média < R$ 200.000 <= mansão
+drop index if exists public.casas_um_por_tipo;
+alter table public.casas drop column if exists tipo;
+alter table public.casas add column tipo text generated always as (case when id > 1000 then 'apto' when preco >= 200000 then 'mansao' when preco >= 60000 then 'media' else 'barata' end) stored;
+
+do $$
+declare r record; volta integer;
+begin
+  -- 2) Devolve as casas: o dono recebe o PREÇO NOVO + os móveis pelo preço cheio; a comida da geladeira vai para a mochila
+  if not exists (select 1 from ajustes where id = 'casas_2026_11') then
+    update casas set preco = case preco when 30000 then 50000 when 45000 then 70000 when 75000 then 90000 when 350000 then 500000 else preco end
+      where id < 1000;
+    for r in select * from casas where id < 1000 and dono is not null loop
+      select coalesce(sum(coalesce(preco_movel(e->>'t'), 0)), 0) into volta from jsonb_array_elements(r.moveis) e;
+      update moradores m set dinheiro = m.dinheiro + r.preco + volta,
+        mochila = (select coalesce(jsonb_object_agg(k, coalesce((m.mochila->>k)::int, 0) + coalesce((r.geladeira->>k)::int, 0)), '{}'::jsonb)
+                   from (select jsonb_object_keys(m.mochila) k union select jsonb_object_keys(r.geladeira)) ks),
+        casa_id = case when m.casa_id = r.id then (select a.id from casas a where a.dono = m.id and a.id > 1000 limit 1) else m.casa_id end
+        where m.id = r.dono;
+      update vagas set morador = null, carro = null, desde = null where casa = r.id;
+      if to_regclass('public.hortas') is not null then execute 'delete from public.hortas where casa = $1' using r.id; end if;
+      update casas set dono = null, comprada_em = null, aberta = false, moveis = '[]'::jsonb, geladeira = '{}'::jsonb where id = r.id;
+    end loop;
+    insert into ajustes(id) values ('casas_2026_11');
+  end if;
+
+  -- 3) Salários +15% para todos os empregos
+  if not exists (select 1 from ajustes where id = 'salarios_15') then
+    update trabalhos set salario = round(salario * 1.15);
+    insert into ajustes(id) values ('salarios_15');
+  end if;
+
+  -- 4) Loja de Roupas da Vila (ponto 2) volta a ficar à venda; o dono recebe de volta o ponto, o caixa e a mercadoria
+  if not exists (select 1 from ajustes where id = 'reset_loja_2') then
+    for r in select * from comercios where id = 2 and dono is not null loop
+      update moradores set dinheiro = dinheiro + r.preco_ponto + r.caixa
+        + coalesce((select sum(i.qtd * k.custo) from comercio_itens i join comercio_catalogo k on k.tipo = r.tipo and k.item = i.item where i.comercio = r.id), 0)
+        where id = r.dono;
+      delete from comercio_itens where comercio = r.id;
+      update comercios set dono = null, nome = null, caixa = 0, vendas = 0, atrasos = 0, pago_ate = null, comprado_em = null, atualizado = now() where id = r.id;
+    end loop;
+    insert into ajustes(id) values ('reset_loja_2');
+  end if;
+end $$;
+create unique index if not exists casas_um_por_tipo on public.casas(dono, tipo) where dono is not null;
+
+-- peixe do pescador +15% (R$ 28 -> R$ 32)
+create or replace function public.vender_peixes() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; ganho integer;
+begin
+  m := _eu();
+  if m.peixes < 1 then raise exception 'Você não tem peixe para vender.'; end if;
+  ganho := m.peixes * 32;
+  update moradores set dinheiro = dinheiro + ganho, peixes = 0 where id = m.id;
+  return json_build_object('ganho', ganho, 'vendidos', m.peixes, 'eu', _estado(m.id));
+end $$;
+
+-- ronda da polícia +15% (R$ 50 -> R$ 58)
+create or replace function public.ronda_policia() returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; novo_xp integer; novo_nivel integer; premio integer := 0; morreu boolean; cansado boolean := false;
+begin
+  m := _eu();
+  if m.trabalho is distinct from 'policia' then raise exception 'Você não está de patrulha.'; end if;
+  if m.tarefa_em is not null and now() - m.tarefa_em < interval '85 seconds' then
+    raise exception 'O próximo pagamento da patrulha ainda não chegou.';
+  end if;
+  novo_xp := m.xp + 20;
+  novo_nivel := nivel_de(novo_xp);
+  if novo_nivel > m.nivel then
+    select coalesce(sum(50 * g), 0) into premio from generate_series(m.nivel + 1, novo_nivel) g;
+  end if;
+  update moradores set dinheiro = dinheiro + 58 + premio, xp = novo_xp, nivel = novo_nivel, tarefa_em = now() where id = m.id;
+  perform _passe_pontos(m.id, 15);
+  morreu := _gastar_fome(m.id, 1);
+  if morreu or (select fome from moradores where id = m.id) < 10 then
+    cansado := true;
+    update moradores set trabalho = null, trabalho_inicio = null, turnos = turnos + 1 where id = m.id;
+  end if;
+  return json_build_object('pago', 58, 'xp_ganho', 20, 'subiu', novo_nivel - m.nivel, 'premio', premio,
+    'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
+end $$;
+
