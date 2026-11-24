@@ -4575,24 +4575,24 @@ const ONLINE=!!(CONF.supabaseUrl&&CONF.supabaseAnonKey&&!/COLE_/.test(CONF.supab
 const MAX_SALA=CONF.maxPorSala||50;
 // valores de exibição; no modo online eles são lidos do servidor (que é quem manda)
 const JOBS={
- bar:{nome:'Garçom do Tonhão',salario:52,duracao:40,nivel_min:1,xp:15,fome:8},
- mercadinho:{nome:'Repositor',salario:58,duracao:45,nivel_min:1,xp:18,fome:9},
- posto:{nome:'Frentista',salario:58,duracao:40,nivel_min:3,xp:18,fome:8},
- padaria:{nome:'Padeiro',salario:63,duracao:50,nivel_min:5,xp:21,fome:9},
+ bar:{nome:'Garçom do Tonhão',salario:68,duracao:40,nivel_min:1,xp:15,fome:8},
+ mercadinho:{nome:'Repositor',salario:75,duracao:45,nivel_min:1,xp:18,fome:9},
+ posto:{nome:'Frentista',salario:75,duracao:40,nivel_min:3,xp:18,fome:8},
+ padaria:{nome:'Padeiro',salario:82,duracao:50,nivel_min:5,xp:21,fome:9},
  pescador:{nome:'Pescador',salario:0,duracao:45,nivel_min:4,xp:18,fome:8},
- barbearia:{nome:'Barbeiro',salario:69,duracao:50,nivel_min:7,xp:22,fome:10},
- lixeiro:{nome:'Lixeiro(a)',salario:75,duracao:60,nivel_min:6,xp:25,fome:12},
- prefeitura:{nome:'Servidor público',salario:81,duracao:60,nivel_min:10,xp:27,fome:10},
- oficina:{nome:'Mecânico',salario:92,duracao:60,nivel_min:12,xp:30,fome:12},
- policia:{nome:'Policial',salario:109,duracao:60,nivel_min:23,xp:33,fome:12},
- banco:{nome:'Caixa do banco',salario:104,duracao:75,nivel_min:15,xp:38,fome:12},
- concessionaria:{nome:'Vendedor de carros',salario:115,duracao:90,nivel_min:18,xp:45,fome:14},
- fabrica:{nome:'Operário da fábrica',salario:127,duracao:90,nivel_min:20,xp:48,fome:15},
- enfermeiro:{nome:'Enfermeiro(a)',salario:144,duracao:90,nivel_min:21,xp:50,fome:14},
- gerente:{nome:'Gerente do banco',salario:161,duracao:100,nivel_min:25,xp:56,fome:15},
- delegado:{nome:'Delegado(a)',salario:178,duracao:100,nivel_min:27,xp:62,fome:16},
- medico:{nome:'Médico(a)',salario:201,duracao:110,nivel_min:29,xp:70,fome:16},
- prefeito:{nome:'Prefeito(a)',salario:230,duracao:120,nivel_min:30,xp:78,fome:16}};
+ barbearia:{nome:'Barbeiro',salario:90,duracao:50,nivel_min:7,xp:22,fome:10},
+ lixeiro:{nome:'Lixeiro(a)',salario:98,duracao:60,nivel_min:6,xp:25,fome:12},
+ prefeitura:{nome:'Servidor público',salario:105,duracao:60,nivel_min:10,xp:27,fome:10},
+ oficina:{nome:'Mecânico',salario:120,duracao:60,nivel_min:12,xp:30,fome:12},
+ policia:{nome:'Policial',salario:142,duracao:60,nivel_min:23,xp:33,fome:12},
+ banco:{nome:'Caixa do banco',salario:135,duracao:75,nivel_min:15,xp:38,fome:12},
+ concessionaria:{nome:'Vendedor de carros',salario:150,duracao:90,nivel_min:18,xp:45,fome:14},
+ fabrica:{nome:'Operário da fábrica',salario:165,duracao:90,nivel_min:20,xp:48,fome:15},
+ enfermeiro:{nome:'Enfermeiro(a)',salario:187,duracao:90,nivel_min:21,xp:50,fome:14},
+ gerente:{nome:'Gerente do banco',salario:209,duracao:100,nivel_min:25,xp:56,fome:15},
+ delegado:{nome:'Delegado(a)',salario:231,duracao:100,nivel_min:27,xp:62,fome:16},
+ medico:{nome:'Médico(a)',salario:261,duracao:110,nivel_min:29,xp:70,fome:16},
+ prefeito:{nome:'Prefeito(a)',salario:299,duracao:120,nivel_min:30,xp:78,fome:16}};
 const JOB_LUGAR={lixeiro:'prefeitura',pescador:'lagoa',policia:'delegacia',enfermeiro:'hospital',medico:'hospital',gerente:'banco',delegado:'delegacia',prefeito:'prefeitura'};
 const lugarDoJob=j=>JOB_LUGAR[j]||j;
 const LOJA={
@@ -4612,7 +4612,7 @@ const CARS_PREMIUM={natal:{nome:'Furacão GT',preco:0,nivel_min:1,premium:true},
 const CAR_COLOR={sedan:'#8e1b3a',jipe:'#3d5a2a',esportivo:'#e01b24',moto:'#c0392b',fusca:'#3c78d8',kombi:'#f3c13a',opala:'#2d2d34',caminhonete:'#aeb3b8',viatura:'#f4f4f4',duster:'#f4f4f4',sw4:'#1d1e22',frontier:'#e67e22',caminhao:'#f4f4f4',lixo:'#2f8f46',natal:'#1f4fa8'};
 Object.assign(CAR_COLOR,{fusca_ouro:'#c9ccd1',kombi_tonhao:'#e67e22',neon:'#f1b20f'});
 const PLACE_TITLE={lanchonete:'🍔 Lanchonete',butique:'🛍️ Loja de Roupas da Vila',roupas:'👕 Loja de Roupas',bar:'🍺 Bar do Tonhão',mercadinho:'🛒 Mercadinho',padaria:'🥖 Padaria',barbearia:'💈 Barbearia',banco:'🏦 Banco',igreja:'⛪ Capela',concessionaria:'🚗 Carros do Zé',oficina:'🔧 Oficina',posto:'⛽ Posto',fabrica:'🏭 Fábrica de Gelo',prefeitura:'🏛️ Prefeitura',delegacia:'🚓 Delegacia',hospital:'🏥 Hospital',lagoa:'🎣 Lagoa da Cachoeira',mirante:'⛰️ Mirante',acampamento:'⛺ Acampamento'};
-const PRECO_PEIXE=32,MANSAO_NIVEL=10;
+const PRECO_PEIXE=42,MANSAO_NIVEL=10;
 const NIVEL_MAX=50;
 const LV={de(xp){let n=Math.max(1,Math.floor((1+Math.sqrt(1+4*Math.max(xp,0)/25))/2));while(25*(n+1)*n<=xp)n++;while(n>1&&25*n*(n-1)>xp)n--;return Math.min(n,NIVEL_MAX)},base:n=>25*n*(n-1)};
 const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
@@ -4809,8 +4809,8 @@ const api=ONLINE?(()=>{
   async excluirConta(){L.me=null;lsave();try{localStorage.removeItem(LKEY)}catch(e){}},
   async erroTarefa(){const m=lme();if(!m.trabalho||m.trabalho==='pescador')return{multa:0,eu:lest()};const multa=Math.min(25,m.dinheiro);m.dinheiro-=multa;lsave();return{multa,eu:lest()}},
   async sinucaDupla(v){const m=lme();if(m.sinuca_em&&Date.now()-m.sinuca_em<90e3)fail('XP da sinuca só a cada 90 s.');const g=v?30:10,antes=m.nivel;m.xp+=g;const novo=LV.de(m.xp);let premio=0;for(let q=antes+1;q<=novo;q++)premio+=50*q;m.nivel=novo;m.dinheiro+=premio;m.sinuca_em=Date.now();lsave();return{xp_ganho:g,subiu:novo-antes,premio,eu:lest()}},
-  async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=58+premio;
-   passeLocal(m,15);const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:58,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
+  async rondaPolicia(){const m=lme();if(m.trabalho!=='policia')fail('Você não está de patrulha.');const antes=m.nivel;m.xp+=20;const novo=LV.de(m.xp);let premio=0;for(let g=antes+1;g<=novo;g++)premio+=50*g;m.nivel=novo;m.dinheiro+=75+premio;
+   passeLocal(m,15);const morreu=lfome(m,1),cansado=morreu||m.fome<10;if(cansado)m.trabalho=null;lsave();return{pago:75,xp_ganho:20,subiu:novo-antes,premio,morreu,cansado,eu:lest()}},
   async cidade(){return null},
   async hortas(){const H=L.hortas||{};return{agora:new Date().toISOString(),h:Object.entries(H).flatMap(([c,o])=>Object.entries(o).map(([sl,r])=>({casa:+c,slot:+sl,planta:r.planta,em:r.em})))}},
   async plantar(c,sl,pl){const m=lme(),p=HORTA_PL[pl];if(!L.casas||!L.casas[c])fail('Só o dono da casa mexe na horta.');if(!p)fail('Semente inválida.');L.hortas=L.hortas||{};const o=L.hortas[c]=L.hortas[c]||{};if(o[sl])fail('Esse canteiro já está plantado.');if(m.dinheiro<p.semente)fail('Dinheiro insuficiente para a semente.');m.dinheiro-=p.semente;o[sl]={planta:pl,em:new Date().toISOString()};lsave();return{ok:true,eu:lest()}},
@@ -5101,18 +5101,13 @@ async function celAvisos(){if(!eu)return;try{const r=await api.naoLidas();if(!r)
 setInterval(()=>{if(eu&&!document.hidden)celAvisos()},25000);
 
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261128b'; // mudou: todo mundo vê de novo (agora com vídeos)
+const NOVID='v20261129'; // mudou: todo mundo vê de novo (eleição, ruas, salários)
 const novEmo=(g,t,a,b)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText(a,110,128+Math.sin(t*2.2)*6);if(b){g.font='44px sans-serif';const L=b.split(' ');g.fillText(L[Math.floor(t/1.1)%L.length],220,122+Math.cos(t*2)*5)}};
 const NOV_VID='novidades/v20261128/';
 const NOV_SLIDES=[
- {v:'predios',t:'🏛️ Novas estruturas',x:'A <b>igreja</b>, a <b>prefeitura</b>, a <b>delegacia</b>, o <b>hospital</b> e o <b>banco</b> foram reformados. Passe na frente e veja como ficaram! De noite as janelas acendem.',d:(g,t)=>novEmo(g,t,'🏛️','⛪ 🚓 🏥 🏦')},
- {v:'interiores',t:'🚪 Agora dá para entrar nos prédios',x:'Delegacia, prefeitura, hospital, banco e igreja têm <b>interior</b>. Os <b>empregos</b> são pegos no <b>balcão lá dentro</b>. Suba a escada: na delegacia ficam as <b>celas</b>, no hospital os <b>quartos</b> e na prefeitura o <b>gabinete</b>.',d:(g,t)=>novEmo(g,t,'🚪','💼 👮 🩺 🙏')},
- {v:'casa',t:'🏡 Casas com lote próprio',x:'Cada casa agora tem <b>lote murado</b>, <b>portão que abre</b> quando você chega e <b>garagem</b> para guardar o carro dentro. <b>Atenção:</b> algumas casas <b>mudaram de lugar</b> — quem tem casa continua dono dela, é só procurar no mapa ou na 🏘️ Imobiliária.',d:(g,t)=>novEmo(g,t,'🏡','🚗 🔑 🚪')},
- {v:'nobre',t:'🏰 Bairro Nobre',x:'As <b>mansões</b> ganharam terrenos grandes, com <b>piscina</b> e garagem para 2 carros. Quatro delas ficam no novo <b>Bairro Nobre</b>, no alto da cidade: é só subir a avenida.',d:(g,t)=>novEmo(g,t,'🏰','🏊 🌳 🚙')},
- {v:'horta',t:'🌱 Plante, colha e venda',x:'Plante <b>alface, tomate, cenoura, morango e milho</b> nos canteiros do quintal. A planta cresce <b>mesmo com você fora do jogo</b>. Colha (vai para a 🎒 mochila) e <b>venda no mercadinho</b> — ou coma quando der fome!',d:(g,t)=>novEmo(g,t,'🌱','🥬 🍅 🥕 🍓 🌽')},
- {v:'comercio',t:'🏪 Invista num comércio',x:'Compre a <b>🍔 Lanchonete</b> ou a <b>🛍️ Loja de Roupas da Vila</b> (perto da praça) e coloque o <b>nome que quiser</b> na fachada. Compre mercadoria, escolha o preço e ganhe dinheiro: os moradores compram <b>mesmo com você offline</b>.',d:(g,t)=>novEmo(g,t,'🏪','🍔 🛍️ 💰')},
- {v:'roupas',t:'👕 Roupas exclusivas',x:'A Loja de Roupas da Vila vende <b>6 roupas que não existem em outro lugar</b>: jaqueta universitária, camisa anos 70, kimono florido, poncho gaúcho, camisa com suspensório e jaqueta bomber. Os modelos que saem de linha <b>ficam raros</b>!',d:(g,t)=>novEmo(g,t,'👕','🧥 👘 🎽')},
- {v:'mais',t:'✨ E tem mais',x:'A <b>👗 Loja de Roupas</b> oficial tem prédio novo e loja grande por dentro, os <b>🏢 prédios do condomínio</b> foram refeitos e o emprego de <b>🚗 Vendedor de carros</b> foi consertado e <b>💼 todos os salários subiram 15%</b>!',d:(g,t)=>novEmo(g,t,'✨','👗 🏢 🚗')}
+ {t:'🗳️ Eleição para prefeito',x:'Agora o prefeito é <b>eleito pela cidade</b>! Na <b>sexta</b>, quem é <b>nível 20+</b> se candidata na 🏛️ prefeitura com uma mensagem. No <b>sábado</b>, todo mundo do <b>nível 5+</b> vota (o voto é <b>secreto</b> e candidato não vota). Deu empate? <b>2º turno no domingo</b>. O eleito fica <b>uma semana</b> no cargo.',d:(g,t)=>novEmo(g,t,'🗳️','🏛️ 👑 ✅')},
+ {t:'🛣️ Ruas novas',x:'Acabaram as <b>ruas sem saída</b>: agora tem uma <b>avenida em volta da cidade</b>, com <b>curvas</b> e ponte no rio. As ruas do alto sobem até o <b>Bairro Nobre</b>, as esquinas ficaram <b>arredondadas</b> e tem <b>quebra-molas</b> 🟡 — passe devagar!',d:(g,t)=>novEmo(g,t,'🛣️','🚗 🟡 ↩️')},
+ {t:'💰 Salários +30%',x:'<b>Todos os empregos</b> passaram a pagar <b>30% a mais</b>! O peixe do pescador agora vale <b>R$ 42</b> e a ronda da polícia paga <b>R$ 75</b>. Bora trabalhar! 💪',d:(g,t)=>novEmo(g,t,'💰','💵 💼 🐟')}
 ];
 let novAnim=null,NOV_OFF=null;
 async function mostrarNovidades(){if(!eu||document.getElementById('novid'))return;const kk='cidadeTonhao.novid.'+NOVID+'.'+eu.id;try{if(localStorage.getItem(kk))return}catch(_){}
@@ -5122,10 +5117,10 @@ async function mostrarNovidades(){if(!eu||document.getElementById('novid'))retur
  let i=0,t0=performance.now(),auto=performance.now();const el=document.createElement('div');el.id='novid';
  el.innerHTML=`<style>#novid{position:fixed;inset:0;z-index:80;background:rgba(10,5,8,.78);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Fredoka,sans-serif}#novid .bx{width:min(560px,100%);max-height:96vh;overflow:auto;background:linear-gradient(#3a2129,#24141a);border:2px solid #ffc94a;border-radius:20px;padding:14px;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.6)}#novid .tag{color:#ffd23f;font-weight:700;font-size:13px;letter-spacing:.5px}#novid h3{margin:4px 0 8px;font-size:20px}#novid canvas{width:100%;height:auto;border-radius:14px;background:radial-gradient(circle at 50% 40%,#4a3040,#1c1016)}#novid .vd{position:relative;width:100%;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#120a0e;box-shadow:0 4px 18px rgba(0,0,0,.5)}#novid video{width:100%;height:100%;object-fit:cover;display:block}#novid .vd canvas{position:absolute;inset:0;width:100%;height:100%}#novid h3{font-size:22px}#novid p{font-size:15px;min-height:70px}#novid p{font-size:14px;line-height:1.4;min-height:84px;margin:8px 0}#novid .ds{display:flex;gap:5px;justify-content:center;margin:6px 0}#novid .ds i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25)}#novid .ds i.on{background:#ffd23f}#novid .bt{display:flex;gap:8px}#novid button{flex:1;border:0;border-radius:12px;padding:10px;font:700 14px Fredoka,sans-serif;background:#ffc94a;color:#2a1a14}#novid button.g{flex:.5;background:rgba(255,255,255,.12);color:#fff}</style><div class="bx"><div class="tag">🆕 NOVIDADES DA ATUALIZAÇÃO</div><h3></h3><div class="vd"><video muted playsinline preload="auto"></video><canvas width="320" height="200" style="display:none"></canvas></div><p></p><div class="ds"></div><div class="bt"><button class="g" data-a="v">◀</button><button data-a="p"></button></div></div>`;
  document.body.appendChild(el);const cv2=el.querySelector('canvas'),g=cv2.getContext('2d'),vd=el.querySelector('video');let semVideo=false,proxT=0;vd.onerror=()=>{semVideo=true;vd.style.display='none';cv2.style.display='block'};vd.onended=()=>{clearTimeout(proxT);if(i<NOV_SLIDES.length-1)proxT=setTimeout(()=>{if(el.isConnected){i++;pinta()}},1200);else{vd.currentTime=0;vd.play().catch(()=>{})}};
- const pinta=()=>{const S=NOV_SLIDES[i];el.querySelector('h3').textContent=S.t;el.querySelector('p').innerHTML=S.x;el.querySelector('.ds').innerHTML=NOV_SLIDES.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');el.querySelector('[data-a=p]').textContent=i<NOV_SLIDES.length-1?'▶ Próximo':'✔ Bora jogar!';t0=performance.now();auto=performance.now();clearTimeout(proxT);if(!semVideo&&S.v){vd.poster=NOV_VID+S.v+'.jpg';vd.innerHTML=`<source src="${NOV_VID+S.v}.mp4" type="video/mp4"><source src="${NOV_VID+S.v}.webm" type="video/webm">`;const ul=vd.querySelector('source:last-child');ul.onerror=()=>vd.onerror();vd.load();vd.play().catch(()=>{})}};
+ const pinta=()=>{const S=NOV_SLIDES[i];el.querySelector('h3').textContent=S.t;el.querySelector('p').innerHTML=S.x;el.querySelector('.ds').innerHTML=NOV_SLIDES.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');el.querySelector('[data-a=p]').textContent=i<NOV_SLIDES.length-1?'▶ Próximo':'✔ Bora jogar!';t0=performance.now();auto=performance.now();clearTimeout(proxT);if(!S.v){vd.pause();vd.style.display='none';cv2.style.display='block'}else if(semVideo){vd.style.display='none';cv2.style.display='block'}if(!semVideo&&S.v){vd.style.display='';cv2.style.display='none';vd.poster=NOV_VID+S.v+'.jpg';vd.innerHTML=`<source src="${NOV_VID+S.v}.mp4" type="video/mp4"><source src="${NOV_VID+S.v}.webm" type="video/webm">`;const ul=vd.querySelector('source:last-child');ul.onerror=()=>vd.onerror();vd.load();vd.play().catch(()=>{})}};
  const fecha=()=>{cancelAnimationFrame(novAnim);clearTimeout(proxT);try{vd.pause()}catch(_){}el.remove();marca()};
  el.querySelector('[data-a=p]').onclick=()=>{if(i<NOV_SLIDES.length-1){i++;pinta()}else fecha()};el.querySelector('[data-a=v]').onclick=()=>{if(i>0){i--;pinta()}};
- const loop=()=>{if(!el.isConnected)return;const t=(performance.now()-t0)/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,320,200);if(semVideo){try{NOV_SLIDES[i].d(g,t)}catch(e){}if(performance.now()-auto>9000&&i<NOV_SLIDES.length-1){i++;pinta()}}novAnim=requestAnimationFrame(loop)};pinta();loop()}
+ const loop=()=>{if(!el.isConnected)return;const t=(performance.now()-t0)/1000;g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,320,200);if(semVideo||!NOV_SLIDES[i].v){try{NOV_SLIDES[i].d(g,t)}catch(e){}if(performance.now()-auto>9000&&i<NOV_SLIDES.length-1){i++;pinta()}}novAnim=requestAnimationFrame(loop)};pinta();loop()}
 async function aplicarPerfil(m,anunciar){
  const novo=!eu;if(novo)setTimeout(()=>mostrarNovidades(),3500);
  if(novo)eu=makePlayer(m.id,m.nome,decode(m.visual)||randomVis());
@@ -6845,7 +6840,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261128c';
+const VERSAO_JOGO='v20261129a';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
