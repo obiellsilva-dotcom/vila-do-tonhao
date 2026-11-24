@@ -33,7 +33,7 @@
 
 ## 3. Situação AGORA (22/11/2026)
 - **Site no ar:** `v20261127a`. **Jogo e site estão em dia**, nada pendente para subir.
-- **Banco:** etapas até a **44 confirmadas** (o dono rodou a 44 em 23/11).
+- **Banco:** etapas até a **44 confirmadas**. **Etapa 45** (comércios dos jogadores) escrita e testada: `entrega/sql-parte8-1/2/3.sql` — **o dono precisa rodar ANTES de subir o site v20261127b**.
 - **Play Store:** teste fechado aprovado e funcionando, compras testadas e funcionando. **Falta juntar 12 testadores por 14 dias seguidos** → depois pedir acesso à produção. Testador entra assim: manda Gmail → dono põe na lista "Testadores da Vila" → manda o link `https://play.google.com/apps/testing/br.com.viladotonhao.app` + código **`PIONEIRO-VILA`** (título 🧪 Pioneiro, vale até 28/02/2027).
 - **Supabase:** estourou "Realtime Messages" entre 14 e 18/11 (3,4 mi de 2 mi). Desde 19/11 ~zero (tempo real foi para o Cloudflare). Aviso: restrição em **16/12** se continuar acima. Recomendado ao dono: abrir chamado no suporte do Supabase ou assinar Pro por 1 mês antes de 16/12. **Perguntar o que ele fez.**
 - **Celular do dono:** o app antigo mostrou barra de endereço no aparelho dele (problema do aparelho). Com o app nativo (2.0+) isso acabou.
@@ -50,8 +50,13 @@
 **Convite de testadores:** aparece 1 vez para quem joga pelo site + ⚙️ → 🧪 Testar o app (só no site).
 **Diagnóstico da loja no app:** ⚙️ → 🔧 Diagnóstico (mostra `PLAY_DIAG`).
 
+## 4b. Novidades da v20261127b (ainda NÃO no ar em 24/11)
+- **Prédios desenhados à mão** (`N3D`, `n3Desenha`, `n3Kit`): igreja (2 torres, frontão barroco), prefeitura (colunas, relógio, bandeiras), delegacia (torre azul com brasão, marquise, grade), hospital (heliponto, pronto-socorro), banco ("BANCO DA VILA", caixa 24h). Arte pintada 1x por dia/noite e desenhada em fatias com profundidade certa. Luzes de janela à noite (`a.luzes`).
+- **Comércios dos jogadores** (etapa 45): Lanchonete (x16-23,y41-46) e Loja de Roupas da Vila (`butique`, x25-31,y41-46), no quarteirão entre a praça e a avenida. Tabelas `comercios`, `comercio_catalogo`, `comercio_itens`; funções `comercios`, `comprar_comercio`, `com_repor`, `com_preco`, `com_recolher`, `com_nome`, `com_comprar`; `_com_atualiza` conta as vendas dos bonecos pelo tempo (máx. 72h) e a conta de luz/água semanal (2 atrasos = perde o ponto). Um comércio por pessoa. Cliente: `abrirComercio`, `COM_CAT`, `comLocal` (modo offline).
+- **Roupas novas (24-29, `ROUPAS_COL`)**: Jaqueta universitária, Camisa anos 70, Kimono florido, Poncho gaúcho, Camisa com suspensório, Jaqueta bomber. Só vendidas na loja dos jogadores (2 modelos por semana no fornecedor, `_colecao`). A loja oficial recusa 24-29. Comprar dá `roupa_m` e `roupa_f`. **Roupas normais novas têm que ficar abaixo do índice 24.**
+
 ## 5. Banco — etapas recentes
-36 Luz de teto · 37 estilo da casa · 38 avisos de casa/vaga pelo Cloudflare (`pg_net` → `/glob`) · 39 economia + pacotes de dinheiro + limite semanal · 40 apartamentos sem limite · 41 títulos/conquistas · 42 fotos no R2 (aceita URLs do Worker) · 43 índice único para compras do Google Play (`pedidos_gp_unico`) · 44 admin define nível.
+36 Luz de teto · 37 estilo da casa · 38 avisos de casa/vaga pelo Cloudflare (`pg_net` → `/glob`) · 39 economia + pacotes de dinheiro + limite semanal · 40 apartamentos sem limite · 41 títulos/conquistas · 42 fotos no R2 (aceita URLs do Worker) · 43 índice único para compras do Google Play (`pedidos_gp_unico`) · 44 admin define nível · 45 comércios dos jogadores + roupas 24-29.
 Segurança: nenhuma tabela aceita escrita direta (RLS); tudo por funções `security definer` que conferem `_eu()`. Compras conferidas no Mercado Pago / Google antes de entregar.
 
 ## 6. Correções importantes já feitas (não desfazer)

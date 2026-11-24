@@ -3489,3 +3489,265 @@ begin
   return json_build_object('ok', true, 'id', a.id, 'nome', a.nome);
 end $$;
 
+
+-- ===================== ETAPA 45: comércios dos jogadores (Lanchonete e Loja de Roupas) =====================
+-- O jogador compra o ponto, compra mercadoria no fornecedor, escolhe o preço e recolhe o caixa.
+-- Os bonecos da cidade compram sozinhos (conta feita pelo tempo que passou, quando alguém abre a loja).
+-- Conta de luz e água semanal: sai do caixa (se faltar, do bolso do dono). Esse dinheiro some do jogo.
+create table if not exists public.comercios (
+  id integer primary key,
+  tipo text not null,                    -- lanchonete | butique
+  preco_ponto integer not null,
+  nivel_min integer not null,
+  despesa integer not null,              -- conta de luz e água por semana
+  dono uuid references public.moradores(id) on delete set null,
+  nome text,
+  caixa integer not null default 0,
+  vendas bigint not null default 0,
+  atrasos integer not null default 0,
+  atualizado timestamptz not null default now(),
+  pago_ate timestamptz,
+  comprado_em timestamptz
+);
+create table if not exists public.comercio_catalogo (
+  tipo text not null, item text not null, nome text not null,
+  custo integer not null, ref integer not null, pmin integer not null, pmax integer not null,
+  taxa numeric not null,                 -- vendas por hora para os bonecos, no preço de referência
+  fome integer not null default 0, sede integer not null default 0, roupa integer, maxq integer not null,
+  primary key (tipo, item)
+);
+create table if not exists public.comercio_itens (
+  comercio integer not null references public.comercios(id) on delete cascade,
+  item text not null, qtd integer not null default 0, preco integer not null, sobra numeric not null default 0,
+  primary key (comercio, item)
+);
+alter table public.comercios enable row level security;
+alter table public.comercio_catalogo enable row level security;
+alter table public.comercio_itens enable row level security;
+revoke all on public.comercios, public.comercio_catalogo, public.comercio_itens from anon, authenticated;
+
+insert into public.comercios(id, tipo, preco_ponto, nivel_min, despesa) values
+  (1, 'lanchonete', 120000, 15, 4000), (2, 'butique', 150000, 20, 5000)
+on conflict (id) do update set tipo = excluded.tipo, preco_ponto = excluded.preco_ponto, nivel_min = excluded.nivel_min, despesa = excluded.despesa;
+
+insert into public.comercio_catalogo(tipo, item, nome, custo, ref, pmin, pmax, taxa, fome, sede, roupa, maxq) values
+  ('lanchonete','burger','Hambúrguer da casa', 8, 20, 12, 40, 6, 45, 0, null, 300),
+  ('lanchonete','suco','Suco natural', 3, 8, 5, 16, 6, 0, 45, null, 300),
+  ('lanchonete','combo','Combo X-Tudo', 14, 32, 20, 60, 3, 70, 30, null, 300),
+  ('butique','r24','Jaqueta universitária', 400, 1200, 600, 4000, .1, 0, 0, 24, 40),
+  ('butique','r25','Camisa anos 70', 400, 1200, 600, 4000, .1, 0, 0, 25, 40),
+  ('butique','r26','Kimono florido', 400, 1200, 600, 4000, .1, 0, 0, 26, 40),
+  ('butique','r27','Poncho gaúcho', 400, 1200, 600, 4000, .1, 0, 0, 27, 40),
+  ('butique','r28','Camisa com suspensório', 400, 1200, 600, 4000, .1, 0, 0, 28, 40),
+  ('butique','r29','Jaqueta bomber', 400, 1200, 600, 4000, .1, 0, 0, 29, 40)
+on conflict (tipo, item) do update set nome = excluded.nome, custo = excluded.custo, ref = excluded.ref, pmin = excluded.pmin, pmax = excluded.pmax,
+  taxa = excluded.taxa, fome = excluded.fome, sede = excluded.sede, roupa = excluded.roupa, maxq = excluded.maxq;
+delete from public.comercio_catalogo where tipo = 'butique' and item not in ('r24','r25','r26','r27','r28','r29');
+
+-- coleção da semana na loja de roupas: 2 modelos por semana (o fornecedor só vende esses)
+create or replace function public._colecao(p_t timestamptz default now()) returns text[]
+language sql stable as $$
+  select array(select 'r' || (24 + ((floor(extract(epoch from p_t) / 604800)::integer * 2 + k) % 6)) from generate_series(0, 1) k)
+$$;
+
+-- conta as vendas dos bonecos e as contas semanais desde a última vez
+create or replace function public._com_atualiza(p_id integer) returns void
+language plpgsql security definer set search_path = public as $$
+declare c comercios; h numeric; r record; mult numeric; v numeric; n integer; tot integer := 0; d moradores;
+begin
+  select * into c from comercios where id = p_id for update;
+  if not found or c.dono is null then return; end if;
+  h := least(72, greatest(0, extract(epoch from now() - c.atualizado) / 3600));
+  if h > 0.01 then
+    for r in select i.*, k.taxa, k.ref from comercio_itens i join comercio_catalogo k on k.tipo = c.tipo and k.item = i.item where i.comercio = c.id and i.qtd > 0 loop
+      mult := greatest(0.1, least(1.5, 2 - r.preco::numeric / r.ref));
+      v := r.sobra + r.taxa * mult * h;
+      n := least(r.qtd, floor(v)::integer);
+      update comercio_itens set qtd = qtd - n, sobra = case when n = r.qtd then 0 else v - n end where comercio = c.id and item = r.item;
+      tot := tot + n * r.preco;
+      update comercios set vendas = vendas + n where id = c.id;
+    end loop;
+    update comercios set caixa = caixa + tot, atualizado = now() where id = c.id;
+  end if;
+  -- contas da semana
+  select * into c from comercios where id = p_id;
+  while c.pago_ate is not null and c.pago_ate + interval '7 days' <= now() loop
+    if c.caixa >= c.despesa then
+      update comercios set caixa = caixa - despesa, pago_ate = pago_ate + interval '7 days', atrasos = 0 where id = c.id;
+    else
+      select * into d from moradores where id = c.dono for update;
+      if d.dinheiro >= c.despesa - greatest(0, c.caixa) then
+        update moradores set dinheiro = dinheiro - (c.despesa - greatest(0, c.caixa)) where id = d.id;
+        update comercios set caixa = 0, pago_ate = pago_ate + interval '7 days', atrasos = 0 where id = c.id;
+      else
+        update comercios set pago_ate = pago_ate + interval '7 days', atrasos = atrasos + 1 where id = c.id;
+      end if;
+    end if;
+    select * into c from comercios where id = p_id;
+    if c.atrasos >= 2 then -- duas contas sem pagar: o ponto volta à venda
+      delete from comercio_itens where comercio = c.id;
+      update comercios set dono = null, nome = null, caixa = 0, atrasos = 0, pago_ate = null, comprado_em = null where id = c.id;
+      return;
+    end if;
+  end loop;
+end $$;
+revoke execute on function public._com_atualiza(integer) from public, anon, authenticated;
+
+create or replace function public._com_json(p_id integer) returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object('id', c.id, 'tipo', c.tipo, 'preco_ponto', c.preco_ponto, 'nivel_min', c.nivel_min, 'despesa', c.despesa,
+    'dono', c.dono, 'dono_nome', m.nome, 'nome', c.nome,
+    'caixa', case when c.dono = auth.uid() then c.caixa end, 'vendas', case when c.dono = auth.uid() then c.vendas end,
+    'pago_ate', case when c.dono = auth.uid() then c.pago_ate end, 'atrasos', case when c.dono = auth.uid() then c.atrasos end,
+    'colecao', case when c.tipo = 'butique' then _colecao() end,
+    'itens', coalesce((select json_agg(json_build_object('item', i.item, 'qtd', i.qtd, 'preco', i.preco) order by i.item) from comercio_itens i where i.comercio = c.id), '[]'::json))
+  from comercios c left join moradores m on m.id = c.dono where c.id = p_id
+$$;
+revoke execute on function public._com_json(integer) from public, anon;
+
+-- lista de todos os comércios (para a fachada e para o painel)
+create or replace function public.comercios() returns json
+language plpgsql security definer set search_path = public as $$
+declare r record;
+begin
+  for r in select id from comercios where dono is not null and atualizado < now() - interval '2 minutes' loop perform _com_atualiza(r.id); end loop;
+  return (select json_agg(_com_json(id) order by id) from comercios);
+end $$;
+grant execute on function public.comercios() to authenticated;
+
+create or replace function public.comprar_comercio(p_id integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios;
+begin
+  m := _eu();
+  perform _com_atualiza(p_id);
+  select * into c from comercios where id = p_id for update;
+  if not found then raise exception 'Esse ponto não existe.'; end if;
+  if c.dono is not null then raise exception 'Esse ponto já tem dono.'; end if;
+  if exists (select 1 from comercios where dono = m.id) then raise exception 'Você já tem um comércio. Um por pessoa!'; end if;
+  if m.nivel < c.nivel_min then raise exception 'Libera no nível %.', c.nivel_min; end if;
+  if m.dinheiro < c.preco_ponto then raise exception 'Dinheiro insuficiente. O ponto custa R$ %.', c.preco_ponto; end if;
+  update moradores set dinheiro = dinheiro - c.preco_ponto where id = m.id;
+  delete from comercio_itens where comercio = c.id;
+  update comercios set dono = m.id, nome = left(case when c.tipo = 'lanchonete' then 'Lanchonete' else 'Loja' end || ' do ' || split_part(m.nome, ' ', 1), 22),
+    caixa = 0, vendas = 0, atrasos = 0, atualizado = now(), pago_ate = now(), comprado_em = now() where id = c.id;
+  return json_build_object('comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.comprar_comercio(integer) to authenticated;
+
+create or replace function public._meu_comercio(p_id integer) returns comercios
+language plpgsql security definer set search_path = public as $$
+declare c comercios;
+begin
+  perform _com_atualiza(p_id);
+  select * into c from comercios where id = p_id for update;
+  if not found or c.dono is distinct from auth.uid() then raise exception 'Esse comércio não é seu.'; end if;
+  return c;
+end $$;
+revoke execute on function public._meu_comercio(integer) from public, anon, authenticated;
+
+-- comprar mercadoria no fornecedor
+create or replace function public.com_repor(p_id integer, p_item text, p_qtd integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios; k comercio_catalogo; atual integer; custo integer;
+begin
+  m := _eu(); c := _meu_comercio(p_id);
+  select * into k from comercio_catalogo where tipo = c.tipo and item = p_item;
+  if not found then raise exception 'Produto inválido.'; end if;
+  if c.tipo = 'butique' and not (p_item = any(_colecao())) then raise exception 'Essa roupa saiu de linha. O fornecedor não tem mais.'; end if;
+  if p_qtd < 1 or p_qtd > 500 then raise exception 'Quantidade inválida.'; end if;
+  select qtd into atual from comercio_itens where comercio = c.id and item = p_item;
+  if coalesce(atual, 0) + p_qtd > k.maxq then raise exception 'O estoque cabe no máximo % unidades.', k.maxq; end if;
+  custo := k.custo * p_qtd;
+  if m.dinheiro < custo then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', custo; end if;
+  update moradores set dinheiro = dinheiro - custo where id = m.id;
+  insert into comercio_itens(comercio, item, qtd, preco) values (c.id, p_item, p_qtd, k.ref)
+  on conflict (comercio, item) do update set qtd = comercio_itens.qtd + p_qtd;
+  return json_build_object('custo', custo, 'comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.com_repor(integer, text, integer) to authenticated;
+
+create or replace function public.com_preco(p_id integer, p_item text, p_preco integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare c comercios; k comercio_catalogo;
+begin
+  c := _meu_comercio(p_id);
+  select * into k from comercio_catalogo where tipo = c.tipo and item = p_item;
+  if not found then raise exception 'Produto inválido.'; end if;
+  if p_preco < k.pmin or p_preco > k.pmax then raise exception 'O preço tem que ficar entre R$ % e R$ %.', k.pmin, k.pmax; end if;
+  update comercio_itens set preco = p_preco where comercio = c.id and item = p_item;
+  if not found then raise exception 'Compre esse produto no fornecedor primeiro.'; end if;
+  return json_build_object('comercio', _com_json(c.id));
+end $$;
+grant execute on function public.com_preco(integer, text, integer) to authenticated;
+
+create or replace function public.com_recolher(p_id integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios; v integer;
+begin
+  m := _eu(); c := _meu_comercio(p_id);
+  v := greatest(0, c.caixa);
+  if v = 0 then raise exception 'O caixa está vazio.'; end if;
+  update comercios set caixa = caixa - v where id = c.id;
+  update moradores set dinheiro = dinheiro + v where id = m.id;
+  return json_build_object('valor', v, 'comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.com_recolher(integer) to authenticated;
+
+create or replace function public.com_nome(p_id integer, p_nome text) returns json
+language plpgsql security definer set search_path = public as $$
+declare c comercios; n text;
+begin
+  c := _meu_comercio(p_id);
+  n := btrim(regexp_replace(limpar_texto(coalesce(p_nome, '')), '\s+', ' ', 'g'));
+  if char_length(n) < 3 or char_length(n) > 22 then raise exception 'O nome tem que ter de 3 a 22 letras.'; end if;
+  update comercios set nome = n where id = c.id;
+  return json_build_object('comercio', _com_json(c.id));
+end $$;
+grant execute on function public.com_nome(integer, text) to authenticated;
+
+-- um jogador compra na loja de outro (ou na sua)
+create or replace function public.com_comprar(p_id integer, p_item text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios; i comercio_itens; k comercio_catalogo; morreu boolean := false;
+begin
+  m := _eu();
+  perform _com_atualiza(p_id);
+  select * into c from comercios where id = p_id;
+  if not found or c.dono is null then raise exception 'Essa loja está fechada.'; end if;
+  select * into i from comercio_itens where comercio = c.id and item = p_item for update;
+  if not found or i.qtd < 1 then raise exception 'Acabou o estoque desse produto.'; end if;
+  select * into k from comercio_catalogo where tipo = c.tipo and item = p_item;
+  if m.dinheiro < i.preco then raise exception 'Dinheiro insuficiente.'; end if;
+  if k.roupa is not null then
+    if exists (select 1 from guarda_roupa where morador = m.id and peca = 'roupa_' || case when coalesce((_vis_nums(m.visual))[10], 0) = 1 then 'f' else 'm' end and item = k.roupa) then raise exception 'Você já tem essa roupa. Vista no guarda-roupa!'; end if;
+    insert into guarda_roupa(morador, peca, item) values (m.id, 'roupa_m', k.roupa), (m.id, 'roupa_f', k.roupa) on conflict do nothing;
+    update moradores set dinheiro = dinheiro - i.preco where id = m.id;
+  else
+    morreu := _gastar_fome(m.id, 0);
+    update moradores set dinheiro = dinheiro - i.preco, fome = least(100, fome + k.fome), sede = least(100, sede + k.sede) where id = m.id;
+  end if;
+  update comercio_itens set qtd = qtd - 1 where comercio = c.id and item = p_item;
+  update comercios set caixa = caixa + i.preco, vendas = vendas + 1 where id = c.id;
+  return json_build_object('item', p_item, 'preco', i.preco, 'morreu', morreu, 'comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
+grant execute on function public.com_comprar(integer, text) to authenticated;
+
+-- a Loja de Roupas oficial não vende as roupas da coleção (24-29): só a loja dos jogadores
+create or replace function public.comprar_roupa(p_peca text, p_item integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m public.moradores; pr integer;
+begin
+  m := _eu();
+  if p_peca not in ('roupa_m','roupa_f','calca_m','calca_f','calcado_m','calcado_f','chapeu_m','chapeu_f','extra_m','extra_f','estampa') then raise exception 'Peça inválida.'; end if;
+  if p_item < 0 or p_item >= 50 then raise exception 'Peça inválida.'; end if;
+  if p_item >= 30 and p_item < 40 then raise exception 'Esse item é exclusivo do Passe da Temporada.'; end if;
+  if p_peca in ('roupa_m','roupa_f') and p_item between 24 and 29 then raise exception 'Essa roupa só é vendida na loja de roupas dos jogadores.'; end if;
+  if exists (select 1 from guarda_roupa where morador = m.id and peca = p_peca and item = p_item) then return json_build_object('ok', true, 'eu', _estado(m.id)); end if;
+  pr := preco_roupa(p_peca, p_item);
+  if m.dinheiro < pr then raise exception 'Dinheiro insuficiente.'; end if;
+  insert into guarda_roupa(morador, peca, item) values (m.id, p_peca, p_item);
+  update moradores set dinheiro = dinheiro - pr where id = m.id;
+  return json_build_object('ok', true, 'eu', _estado(m.id));
+end $$;
+grant execute on function public.comprar_roupa(text, integer) to authenticated;
