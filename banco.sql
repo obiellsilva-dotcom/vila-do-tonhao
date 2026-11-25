@@ -4106,12 +4106,12 @@ begin
 end $$;
 
 -- ===== ETAPA 52: quiosques da praça (pipoca, açaí, pastel/caldo de cana, banca) + painel de lucros =====
--- Pontos baratos (R$ 10 mil, nível 8, conta R$ 200/semana). O lucro é por produto: paga o custo no fornecedor e vende pelo preço que escolher.
+-- Pontos de R$ 30 a 50 mil ( nível 8, conta R$ 200/semana). O lucro é por produto: paga o custo no fornecedor e vende pelo preço que escolher.
 alter table public.comercios add column if not exists investido bigint not null default 0;   -- gasto com mercadoria
 alter table public.comercios add column if not exists faturado bigint not null default 0;    -- tudo o que foi vendido
 alter table public.comercios add column if not exists contas bigint not null default 0;      -- contas de luz e água pagas
 insert into public.comercios(id, tipo, preco_ponto, nivel_min, despesa) values
-  (3, 'pipoca', 10000, 8, 200), (4, 'acai', 10000, 8, 200), (5, 'caldo', 10000, 8, 200), (6, 'banca', 10000, 8, 200)
+  (3, 'pipoca', 30000, 8, 200), (4, 'acai', 50000, 8, 200), (5, 'caldo', 40000, 8, 200), (6, 'banca', 30000, 8, 200)
 on conflict (id) do update set tipo = excluded.tipo, preco_ponto = excluded.preco_ponto, nivel_min = excluded.nivel_min, despesa = excluded.despesa;
 insert into public.comercio_catalogo(tipo, item, nome, custo, ref, pmin, pmax, taxa, fome, sede, roupa, maxq) values
   ('pipoca','salgada','Pipoca salgada', 10, 25, 15, 50, .07, 15, 0, null, 60),
