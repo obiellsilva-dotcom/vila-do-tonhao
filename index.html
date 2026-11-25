@@ -1766,7 +1766,21 @@ const PRACA_DECO=[addB({kind:'coreto',deco:1,x:23,y:39,w:3,h:3}),
  addB({kind:'canteiro',deco:1,x:17,y:36,w:2,h:1,flor:1}),addB({kind:'canteiro',deco:1,x:29,y:36,w:2,h:1,flor:1}),
  ...[['pipoca',19,3],['acai',21,4],['caldo',26,5],['banca',28,6]].map(([tipo,x,cid])=>addB({kind:'quiosque',tipo,x,y:46,w:2,h:1,cid})),
  ...[['escorrega',73,65,2,2],['balanco',76,65,3,1],['gangorra',73,68,2,1],['barra',77,68,2,2],['bicicleta',79,65,1,2]].map(([tipo,x,y,w,h])=>addB({kind:'brinquedo',deco:1,tipo,x,y,w,h})),
- ...[[20,37],[28,37],[20,43],[28,43],[107,64],[117,65],[105,69],[118,70]].map(([x,y],i)=>addB({kind:'posteP',deco:1,x,y,w:1,h:1,i}))];
+ // nada de árvore da mata dentro do pomar, do acampamento e do mirante
+ ...(()=>{for(const [x0,y0,x1,y1] of [[47,84,67,95],[-16,36,-4,45],[125,30,138,38]])for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)noTree.add(x+','+y);return[]})(),
+ // mirante: luneta de moeda, pedras, canteiros, mesa de piquenique e postes
+ addB({kind:'passeio',deco:1,tipo:'luneta',x:133,y:33,w:1,h:1}),addB({kind:'passeio',deco:1,tipo:'luneta',x:130,y:33,w:1,h:1}),
+ addB({kind:'passeio',deco:1,tipo:'pedra',x:127,y:36,w:2,h:2}),addB({kind:'passeio',deco:1,tipo:'pedra2',x:129,y:38,w:2,h:1}),
+ addB({kind:'passeio',deco:1,tipo:'mesa',x:134,y:35,w:2,h:2}),addB({kind:'passeio',deco:1,tipo:'flores',x:126,y:33,w:2,h:1}),addB({kind:'passeio',deco:1,tipo:'flores',x:136,y:34,w:1,h:2}),
+ // acampamento: barracas, troncos em volta da fogueira, varal, mesa, caixa térmica e lenha
+ addB({kind:'passeio',deco:1,tipo:'barraca',cor:'#e67e22',x:-14,y:37,w:2,h:2}),addB({kind:'passeio',deco:1,tipo:'barraca',cor:'#27ae60',x:-7,y:37,w:2,h:2}),addB({kind:'passeio',deco:1,tipo:'barraca',cor:'#c0392b',x:-13,y:40,w:2,h:2}),
+ addB({kind:'passeio',deco:1,tipo:'varal',x:-9,y:36,w:3,h:1}),addB({kind:'passeio',deco:1,tipo:'mesa',x:-6,y:40,w:2,h:2}),addB({kind:'passeio',deco:1,tipo:'lenha',x:-7,y:42,w:1,h:1}),addB({kind:'passeio',deco:1,tipo:'cooler',x:-11,y:38,w:1,h:1}),
+ // pomar: cerca de madeira, fileiras de árvores com fruta, espantalho, banca, cestos e carrinho de mão
+ ...[[49,86,8,'h'],[59,86,8,'h'],[49,94,8,'h'],[59,94,8,'h'],[48,86,1,'v8'],[66,86,1,'v8']].map(([x,y,w,o])=>addB({kind:'passeio',deco:1,tipo:'cerca'+o,x,y,w:o[0]==='v'?1:w,h:o[0]==='v'?9:1})),
+ ...[[52,90],[56,90],[60,90],[64,90],[52,87],[64,87],[52,93],[64,93]].map(([x,y],i)=>addB({kind:'passeio',deco:1,tipo:'fruteira',fruta:i%3,x,y,w:1,h:1})),
+ addB({kind:'passeio',deco:1,tipo:'espantalho',x:57,y:91,w:1,h:1}),addB({kind:'passeio',deco:1,tipo:'bancafruta',x:55,y:84,w:2,h:1}),
+ addB({kind:'passeio',deco:1,tipo:'cesto',x:51,y:89,w:1,h:1}),addB({kind:'passeio',deco:1,tipo:'cesto',x:61,y:93,w:1,h:1}),addB({kind:'passeio',deco:1,tipo:'carrinho',x:63,y:89,w:1,h:1}),
+ ...[[20,37],[28,37],[20,43],[28,43],[129,35],[134,35],[-9,36],[57,85],[107,64],[117,65],[105,69],[118,70]].map(([x,y],i)=>addB({kind:'posteP',deco:1,x,y,w:1,h:1,i}))];
 const plazaTiles=[],fieldTiles=[];
 for(let y=33;y<=47;y++)for(let x=15;x<=32;x++)if(grid[y][x]===G.PLAZA)plazaTiles.push([x,y]);
 for(let y=16;y<=27;y++)for(let x=60;x<=78;x++)fieldTiles.push([x,y]);
@@ -1952,7 +1966,7 @@ function paintFeatures(c,x0,y0,w,h){const ve=(ax,ay,bx,by)=>x0==null||!(T(bx)<x0
  // mirante
   placa(c,T(131.5),T(37.7),'⛰️ MIRANTE');placa(c,T(121.5),T(29.3),'MIRANTE →');
  // acampamento
- banco(c,FOGUEIRA.x-20,FOGUEIRA.y+14);placa(c,T(-0.5),T(28.6),'⛺ ACAMPAMENTO');
+ placa(c,T(-0.5),T(28.6),'⛺ ACAMPAMENTO');
  // pomar
  placa(c,T(58.5),T(84.6),'🥭 POMAR');placa(c,T(58.3),T(79.4),'POMAR ↓');
  // horta, campinho, parque
@@ -3258,6 +3272,29 @@ Object.assign(N3D,{
   K.box(cx-9.5,cy-6.5,cx+9.5,cy+6.5,34,36,'#d63a2f');K.box(cx-.8,cy-.8,cx+.8,cy+.8,36,52,'#888');
   {const ap=[cx,cy,62],P=n3Oct(cx,cy,20,0);for(let i=0;i<8;i++){const a=P[i],b=P[(i+1)%8];K.poly([[a[0],a[1],52],[b[0],b[1],52],ap],i%2?'#ffffff':'#e8463a')}}
   {const F=K.face({y:cy+7});F.rect(cx-10,13,cx+10,18,'#ffd23f');F.text('PIPOCA',cx,14,4.2,'#9b1d16',800)}
+ }},
+ passeio:{H:110,chave:b=>b.tipo+(b.cor||'')+(b.fruta!=null?b.fruta:''),f(K){const b=K.b,{X0,X1,Y0,Y1}=K,cx=(X0+X1)/2,cy=(Y0+Y1)/2,g=K.g,MD='#8a5a33',MD2='#6b4423';
+  const t=b.tipo;
+  if(t==='luneta'){K.box(cx-4,cy-4,cx+4,cy+4,0,3,'#7a7f86');K.box(cx-1.4,cy-1.4,cx+1.4,cy+1.4,3,26,'#5b6068');K.box(cx-4,cy-3,cx+4,cy+3,24,32,'#2e6f95');K.box(cx+3,cy-2.2,cx+10,cy+2.2,26,31,'#2e6f95');K.box(cx+9,cy-2.8,cx+11,cy+2.8,25,32,'#cfd6dc');K.box(cx-6,cy-1.5,cx-3,cy+1.5,26,30,'#1d2a33')}
+  if(t==='pedra'||t==='pedra2'){K.cam();for(let i=0;i<(t==='pedra'?4:3);i++){const x=X0+8+hsh(b.x,i,1)*(X1-X0-16),y=Y0+8+hsh(b.y,i,2)*(Y1-Y0-16),r=8+hsh(b.x,i,3)*7,q=K.P(x,y,r*.4);g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(q[0]+3,q[1]+r*.5,r,r*.4,0,0,7);g.fill();g.fillStyle=['#8f8c84','#a3a097','#7c7972'][i%3];g.beginPath();g.ellipse(q[0],q[1],r,r*.75,0,0,7);g.fill();g.fillStyle='rgba(255,255,255,.22)';g.beginPath();g.ellipse(q[0]-r*.3,q[1]-r*.3,r*.45,r*.25,0,0,7);g.fill();g.fillStyle='#6f9a4a';g.beginPath();g.ellipse(q[0]+r*.2,q[1]-r*.55,r*.35,r*.15,0,0,7);g.fill()}}
+  if(t==='flores'){K.box(X0+3,Y0+3,X1-3,Y1-3,0,6,'#9c6b45');K.box(X0+5,Y0+5,X1-5,Y1-5,6,6.5,'#4a3020');K.cam();for(let i=0;i<22;i++){const q=K.P(X0+6+hsh(b.x,i,7)*(X1-X0-12),Y0+6+hsh(b.y,i,8)*(Y1-Y0-12),8);g.fillStyle='#4f8a3a';g.beginPath();g.arc(q[0],q[1]+1,2.4,0,7);g.fill();g.fillStyle=['#ff5d8f','#ffd23f','#fff','#c77dff','#ff8a3d'][i%5];g.beginPath();g.arc(q[0],q[1]-1,1.5,0,7);g.fill()}}
+  if(t==='mesa'){K.box(X0+8,cy-14,X1-8,cy-10,0,10,MD2);K.box(X0+8,cy+10,X1-8,cy+14,0,10,MD2);for(const x of [X0+12,X1-14])K.box(x,cy-8,x+2,cy+8,0,18,MD2);K.box(X0+6,cy-8,X1-6,cy+8,18,21,MD);K.box(X0+6,cy-16,X1-6,cy-10,9,11,MD);K.box(X0+6,cy+10,X1-6,cy+16,9,11,MD);
+   K.box(cx-6,cy-3,cx+2,cy+3,21,22,'#e74c3c');K.box(cx+4,cy-2,cx+7,cy+1,21,28,'#2f7d3a')}
+  if(t==='barraca'){const c1=b.cor,ap=[cx,cy,40];K.poly([[X0+4,Y1-4,0],[X1-4,Y1-4,0],ap],shade(c1,6));K.poly([[X1-4,Y1-4,0],[X1-4,Y0+4,0],ap],shade(c1,-28));
+   const F=K.face({y:Y1-4});F.path([[cx-7,0],[cx+7,0],[cx,22]],'#2a1f18');F.path([[cx-7,0],[cx-2,0],[cx-1,18]],shade(c1,-15));K.linha([cx,cy,40],[cx,cy,47],'#555',1.4);K.linha([X0+4,Y1-4,0],[X0-2,Y1+2,0],'#888',.6);K.linha([X1-4,Y0+4,0],[X1+2,Y0-2,0],'#888',.6)}
+  if(t==='varal'){for(const x of [X0+4,X1-4])K.box(x-1,cy-1,x+1,cy+1,0,30,MD2);K.linha([X0+4,cy,28],[X1-4,cy,28],'#ddd',.7);const cores=['#3498db','#f1c40f','#e74c3c','#fff','#9b59b6'];
+   for(let i=0;i<5;i++){const x=X0+14+i*((X1-X0-28)/4);K.box(x-4,cy-.5,x+4,cy+.5,16,27.5,cores[i])}}
+  if(t==='lenha'){for(let k=0;k<3;k++)for(let i=0;i<3-k;i++){const q=K.P(cx-6+i*6+k*3,cy,3+k*5);K.cam();g.fillStyle='#7a4a2a';g.beginPath();g.ellipse(q[0],q[1],3.4,2.8,0,0,7);g.fill();g.fillStyle='#d6a86b';g.beginPath();g.ellipse(q[0],q[1],2.2,1.8,0,0,7);g.fill()}}
+  if(t==='cooler'){K.box(cx-7,cy-5,cx+7,cy+5,0,12,'#2e86c1');K.box(cx-7.5,cy-5.5,cx+7.5,cy+5.5,12,15,'#f4f4f4');K.box(cx-3,cy-1,cx+3,cy+1,15,17,'#ccc')}
+  if(t.startsWith('cerca')){const v=t.includes('v'),A=v?Y0:X0,Bv=v?Y1:X1;for(let a=A+2;a<=Bv-2;a+=16){const x=v?cx:a,y=v?a:cy;K.box(x-1.3,y-1.3,x+1.3,y+1.3,0,18,MD2)}
+   for(const z of [7,14]){if(v)K.box(cx-.8,Y0+2,cx+.8,Y1-2,z,z+2.4,MD);else K.box(X0+2,cy-.8,X1-2,cy+.8,z,z+2.4,MD)}}
+  if(t==='fruteira'){const fc=['#ff9f1a','#e74c3c','#ffd23f'][b.fruta];K.box(cx-2,cy-2,cx+2,cy+2,0,20,'#6b4a33');n3Copa(K,cx,cy,24,17,'#3f8f45',b.x*7+b.y);K.cam();for(let i=0;i<12;i++){const q=K.P(cx+(hsh(b.x,i,1)-.5)*28,cy+(hsh(b.y,i,2)-.5)*16,26+hsh(i,b.x,3)*14);g.fillStyle=fc;g.beginPath();g.arc(q[0],q[1],2.4,0,7);g.fill();g.fillStyle='rgba(255,255,255,.4)';g.beginPath();g.arc(q[0]-.7,q[1]-.7,.8,0,7);g.fill()}}
+  if(t==='espantalho'){K.box(cx-1,cy-1,cx+1,cy+1,0,40,MD2);K.box(cx-12,cy-1,cx+12,cy+1,30,32,MD2);K.box(cx-6,cy-3,cx+6,cy+3,18,34,'#3b6fb6');K.box(cx-11,cy-2,cx-6,cy+2,28,33,'#3b6fb6');K.box(cx+6,cy-2,cx+11,cy+2,28,33,'#3b6fb6');
+   K.cam();const q=K.P(cx,cy,40);g.fillStyle='#e8c48a';g.beginPath();g.arc(q[0],q[1],5,0,7);g.fill();g.fillStyle='#222';g.fillRect(q[0]-2.5,q[1]-1.5,1.2,1.2);g.fillRect(q[0]+1.3,q[1]-1.5,1.2,1.2);g.fillStyle='#c9a227';g.beginPath();g.ellipse(q[0],q[1]-4,9,2.6,0,0,7);g.fill();g.beginPath();g.ellipse(q[0],q[1]-6,4.5,3,0,0,7);g.fill();g.fillStyle='#e8c860';for(const dx of [-12,12]){const r=K.P(cx+dx,cy,31);g.fillRect(r[0]-1,r[1],2,4)}}
+  if(t==='bancafruta'){K.box(X0+6,Y0+6,X1-6,Y1-6,0,16,MD);K.box(X0+4,Y0+4,X1-4,Y1-4,16,18,MD2);K.cam();for(let i=0;i<16;i++){const q=K.P(X0+10+(i%8)*((X1-X0-20)/7),Y0+9+Math.floor(i/8)*8,19);g.fillStyle=['#ff9f1a','#e74c3c','#ffd23f','#7fbf3f'][i%4];g.beginPath();g.arc(q[0],q[1],2.6,0,7);g.fill()}
+   for(const x of [X0+6,X1-6])K.box(x-1,cy-1,x+1,cy+1,16,40,MD2);K.box(X0+2,Y0+2,X1-2,Y1-2,40,42,'#e74c3c');{const F=K.face({y:Y1-2});for(let i=0;i<6;i++){const a=X0+2+i*(X1-X0-4)/6;F.rect(a,36,a+(X1-X0-4)/12,40,'#fff')}F.text('FRUTA FRESQUINHA',cx,43,4.4,'#7a1d12',800)}}
+  if(t==='cesto'){K.box(cx-6,cy-5,cx+6,cy+5,0,9,'#b5884f');K.cam();for(let i=0;i<7;i++){const q=K.P(cx-4+(i%4)*2.6,cy-2+Math.floor(i/4)*3,10);g.fillStyle=['#ff9f1a','#e74c3c'][i%2];g.beginPath();g.arc(q[0],q[1],2.2,0,7);g.fill()}}
+  if(t==='carrinho'){K.box(cx-7,cy-5,cx+6,cy+5,6,12,'#2f7d4f');K.cam();{const q=K.P(cx+8,cy,4);g.fillStyle='#222';g.beginPath();g.arc(q[0],q[1],3.6,0,7);g.fill()}K.linha([cx-7,cy-3,8],[cx-14,cy-4,12],'#6b4423',1.4);K.linha([cx-7,cy+3,8],[cx-14,cy+4,12],'#6b4423',1.4);for(let i=0;i<5;i++){const q=K.P(cx-3+i*2.2,cy,13);g.fillStyle='#ffd23f';g.beginPath();g.arc(q[0],q[1],2,0,7);g.fill()}}
  }},
  brinquedo:{H:90,chave:b=>b.tipo,f(K){const b=K.b,{X0,X1,Y0,Y1}=K,cx=(X0+X1)/2,cy=(Y0+Y1)/2,g=K.g,M='#e85d4a',A='#f1c40f',Z='#2e86c1',C='#8a8f96';
   if(b.tipo==='escorrega'){K.box(X0+8,Y0+8,X0+12,Y0+12,0,40,C);K.box(X0+20,Y0+8,X0+24,Y0+12,0,40,C);K.box(X0+8,Y0+18,X0+12,Y0+22,0,40,C);K.box(X0+20,Y0+18,X0+24,Y0+22,0,40,C);K.box(X0+6,Y0+6,X0+26,Y0+24,38,42,Z);
@@ -4746,7 +4783,7 @@ function drawCena(){
  for(const f of FRUTAS)if(vis(f.x,f.y))list.push({x:f.x,y:f.y,f:()=>drawFruteira(ctx,f)});
  if(vis(T(131.5),T(32))){list.push({x:T(131.5),y:T(32.4),k:T(128)+T(30.6),cam:1,f:()=>deckMirante(ctx)});for(const bx of [129.2,131.4])list.push({x:T(bx),y:T(31.6),k:T(bx)+T(31.6)+6,cam:1,f:()=>bancoIso(ctx,T(bx),T(31.1))});list.push({x:T(134),y:T(31.8),k:T(134)+T(31.8)+6,cam:1,f:()=>lunetaIso(ctx,T(134),T(31.8))})}
  if(vis(T(98),T(25))){for(const bb of BOMBAS)list.push({x:bb.x,y:bb.y,cam:1,f:()=>drawBomba(ctx,bb)});list.push({x:T(100.8),y:T(26.9),k:T(100.8)+T(26.9)+40,cam:1,f:()=>drawCobertura(ctx)})}
- if(vis(FOGUEIRA.x,FOGUEIRA.y)){list.push({x:FOGUEIRA.x,y:FOGUEIRA.y,f:()=>drawFogueira(ctx)});for(const [tx,col,ty] of [[-13.2,'#e67e22',38.8],[-6.6,'#2e86c1',38.6]])list.push({x:T(tx),y:T(ty),f:()=>drawBarraca(ctx,T(tx),T(ty),col)})}
+ if(vis(FOGUEIRA.x,FOGUEIRA.y)){list.push({x:FOGUEIRA.x,y:FOGUEIRA.y,f:()=>drawFogueira(ctx)});for(const [dx,dy,r] of [[-34,2,.35],[30,4,-.35],[-2,28,0]]){const X=FOGUEIRA.x+dx,Y=FOGUEIRA.y+dy;list.push({x:X,y:Y,f:()=>{ctx.save();ctx.translate(X,Y);ctx.rotate(r);ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(1,3,15,4,0,0,7);ctx.fill();const g=ctx.createLinearGradient(0,-8,0,2);g.addColorStop(0,'#9a6a3c');g.addColorStop(1,'#5e3d22');ctx.fillStyle=g;rr(ctx,-14,-7,28,9,4.5);ctx.fill();ctx.fillStyle='#d9b07a';ctx.beginPath();ctx.ellipse(14,-2.5,2.6,4.5,0,0,7);ctx.fill();ctx.strokeStyle='#b5884f';ctx.lineWidth=.6;ctx.beginPath();ctx.ellipse(14,-2.5,1.3,2.4,0,0,7);ctx.stroke();ctx.restore()}})}}
  if(vis(T(46),T(-12))){ctx.save();ctx.beginPath();ctx.rect(T(36),T(-14.6),T(22),T(12));ctx.clip();drawCachoeira(ctx);ctx.restore();
   list.push({x:T(46.5),y:T(-15.2),cam:1,nc:1,f:()=>drawPenhasco(ctx)})}
  if(cam.z>.42)for(let ry=Math.floor(vy0/TILE)-1;ry<=Math.ceil(vy1/TILE)+1;ry++){const row=MATA.get(ry);if(!row)continue;for(let ii=0;ii<row.length;ii++){const o=row[ii];if(cam.z<1&&(ii+ry)%2)continue;if(o.x<vx0||o.x>vx1||!vis(o.x,o.y))continue;list.push({x:o.x,y:o.y,f:()=>drawTreeLite(ctx,o)})}}
