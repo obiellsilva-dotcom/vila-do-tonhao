@@ -1514,7 +1514,7 @@ for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(grid[y][x]!==G.GRASS)continue;
  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const yy=y+dy,xx=x+dx;if(yy>=0&&yy<H&&xx>=0&&xx<W&&grid[yy][xx]===G.ROAD)grid[y][x]=G.WALK}}
 for(let x=0;x<W;x++){if(grid[6][x]===G.GRASS)grid[6][x]=G.PATH;if(grid[39][x]===G.GRASS)grid[39][x]=G.PATH;if((x<=10||x>=84)&&grid[20][x]===G.GRASS)grid[20][x]=G.PATH;if(x>=58&&x<=101&&grid[71][x]===G.GRASS)grid[71][x]=G.PATH}
 // horta comunitária, campinho de terra e parque com lago (Vila do Outro Lado)
-for(let y=65;y<=70;y++){for(let x=1;x<=10;x++)grid[y][x]=G.HORTA;for(let x=72;x<=80;x++)grid[y][x]=G.FIELD}
+for(let y=65;y<=70;y++){for(let x=1;x<=10;x++)grid[y][x]=G.HORTA;for(let x=72;x<=80;x++){grid[y][x]=G.PLAZA}}
 for(let y=64;y<=71;y++)for(let x=105;x<=118;x++){const a=Math.atan2(y+.5-67.5,x+.5-111.5),w=1+.08*Math.sin(a*3+1)+.05*Math.sin(a*5+2);if(((x+.5-111.5)/(3.9*w))**2+((y+.5-67.5)/(2.4*w))**2<=1)grid[y][x]=G.WATER}
 // ===== mata em volta da cidade =====
 const noTree=new Set();
@@ -1765,10 +1765,11 @@ const PRACA_DECO=[addB({kind:'coreto',deco:1,x:23,y:39,w:3,h:3}),
  addB({kind:'canteiro',deco:1,x:17,y:43,w:2,h:2,ipe:'#f2c41b'}),addB({kind:'canteiro',deco:1,x:29,y:43,w:2,h:2,ipe:'#ef7fb3'}),
  addB({kind:'canteiro',deco:1,x:17,y:36,w:2,h:1,flor:1}),addB({kind:'canteiro',deco:1,x:29,y:36,w:2,h:1,flor:1}),
  ...[['pipoca',19,3],['acai',21,4],['caldo',26,5],['banca',28,6]].map(([tipo,x,cid])=>addB({kind:'quiosque',tipo,x,y:46,w:2,h:1,cid})),
+ ...[['escorrega',73,65,2,2],['balanco',76,65,3,1],['gangorra',73,68,2,1],['barra',77,68,2,2],['bicicleta',79,65,1,2]].map(([tipo,x,y,w,h])=>addB({kind:'brinquedo',deco:1,tipo,x,y,w,h})),
  ...[[20,37],[28,37],[20,43],[28,43],[107,64],[117,65],[105,69],[118,70]].map(([x,y],i)=>addB({kind:'posteP',deco:1,x,y,w:1,h:1,i}))];
 const plazaTiles=[],fieldTiles=[];
 for(let y=33;y<=47;y++)for(let x=15;x<=32;x++)if(grid[y][x]===G.PLAZA)plazaTiles.push([x,y]);
-for(let y=16;y<=27;y++)for(let x=60;x<=78;x++)fieldTiles.push([x,y]);
+for(const y of [15,28])for(let x=60;x<=78;x++)fieldTiles.push([x,y]); // a torcida fica na beira do campo (dentro tem a pelada)
 
 // decor
 const trees=[];
@@ -1956,8 +1957,7 @@ function paintFeatures(c){
  placa(c,T(58.5),T(84.6),'🥭 POMAR');placa(c,T(58.3),T(79.4),'POMAR ↓');
  // horta, campinho, parque
  c.strokeStyle='#8b5a2b';c.lineWidth=2;c.strokeRect(T(1)-2,T(65)-2,T(10)+4,T(6)+4);placa(c,T(6),T(64.5),'🥬 HORTA COMUNITÁRIA');
- c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=2;c.strokeRect(T(72)+4,T(65)+4,T(9)-8,T(6)-8);c.beginPath();c.moveTo(T(76.5),T(65)+4);c.lineTo(T(76.5),T(71)-4);c.stroke();
- for(const gx of [T(72)+6,T(81)-6]){c.strokeStyle='#fff';c.lineWidth=2.5;c.beginPath();c.moveTo(gx,T(67.3));c.lineTo(gx,T(68.7));c.stroke()}placa(c,T(76.5),T(64.4),'⚽ CAMPINHO');
+ {const x0=T(72),y0=T(65),x1=T(81),y1=T(71);c.fillStyle='#e7d9b8';c.fillRect(x0,y0,x1-x0,y1-y0);c.fillStyle='#d9c08a';for(let i=0;i<400;i++)c.fillRect(x0+hsh(i,1,71)*(x1-x0),y0+hsh(i,2,72)*(y1-y0),1.5,1.5);c.fillStyle='#e85d4a';c.fillRect(x0,y0,x1-x0,4);c.fillRect(x0,y1-4,x1-x0,4);c.fillRect(x0,y0,4,y1-y0);c.fillRect(x1-4,y0,4,y1-y0)}placa(c,T(76.5),T(64.2),'🛝 PARQUINHO E ACADEMIA');
  {const cx=T(111.5),cy=T(67.5);c.strokeStyle='#d9c8a3';c.lineWidth=18;c.beginPath();lagoForma(c,cx,cy,T(3.9),T(2.4),T(1.15),3);c.stroke();c.strokeStyle='rgba(120,90,50,.18)';c.lineWidth=1;for(const m of [T(1.15)-8,T(1.15)+8]){c.beginPath();lagoForma(c,cx,cy,T(3.9),T(2.4),m,3);c.stroke()}
   lagoBonito(c,cx,cy,T(3.9),T(2.4),3,[104,63,119,72]);
   // deck de madeira entrando no lago
@@ -2263,6 +2263,59 @@ const WALKT=['Bom dia, vizinho!','Calor, hein?','Mais tarde eu passo no Tonhão.
 const PRACA=['Que dia bonito!','Cadê o pipoqueiro?','Essa fonte tá funcionando!'];
 const RIO=['Hoje sai peixe!','Nada ainda...','Shhh, espanta o peixe!','Peguei um! ...era uma bota.'];
 const CAMPO=['Passa a bola!','GOOOL!','Foi falta, juiz!','Toca pra mim!','Chuta, chuta!'];
+/* ===== PELADA NO CAMPO DO TERRÃO: um jogo a cada 10 minutos (8 de bola rolando + 2 de intervalo). Dá para apostar no próximo jogo ===== */
+const PEL_TIMES=[['Unidos do Bar','#d62828','#fff',0],['Terrão FC','#1d6fd6','#fff',1],['Galáticos da Vila','#111','#ffd23f',9],['Pé de Cana EC','#2f8f46','#fff',3],['Real Pastel','#f1c40f','#1d3354',2],['Atlético Fiado','#8e44ad','#fff',5]];
+const peladaSlot=()=>Math.floor(Date.now()/600000);
+const peladaTimes=s=>{const i=((s%6)+6)%6,j=(i+1+((Math.floor(s/6)%5)+5)%5)%6;return[PEL_TIMES[i],PEL_TIMES[j===i?(i+1)%6:j]]};
+function peladaResLocal(s){let h=2166136261;for(const ch of 'terrao'+s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return[(h>>>0)%5,((h>>>8)>>>0)%5]}
+const PEL={slot:null,a:0,b:0,res:null,jogando:false,jog:[],gols:[],ga:0,gb:0,apostas:[],carregado:0,comemora:0};
+const PELF={x0:T(60.6),x1:T(78.4),y0:T(16.4),y1:T(27.6)};
+function peladaMontar(s){PEL.slot=s;const [A,B]=peladaTimes(s);PEL.jog=[];
+ for(let t=0;t<2;t++)for(let i=0;i<5;i++){const nome=(t?B:A)[0]+' '+i+' '+s,v=Object.assign({},visFromName(nome));v.sexo=hsh(s,i+t*7,3)<.25?1:0;const goleiro=i===0;Object.assign(v,{camisa:goleiro?13:(t?B:A)[3],roupa:0,chapeu:0,extra:0,estampa:0,corCalca:10,calca:0});
+  PEL.jog.push({t,i,v,x:t?PELF.x1-30:PELF.x0+30,y:(PELF.y0+PELF.y1)/2+(i-2)*30,goleiro,ph:Math.random()*6,mv:null,cor:(t?B:A)[1]})}
+ const r=PEL.res&&PEL.res.slot===s?[PEL.res.a,PEL.res.b]:null;PEL.gols=[];
+ if(r){let n=0;for(let k=0;k<r[0];k++)PEL.gols.push({t:0});for(let k=0;k<r[1];k++)PEL.gols.push({t:1});PEL.gols.sort((a,b)=>hsh(s,a.t*9+(n++),5)-.5);PEL.gols.forEach((g,k)=>g.at=40+(k+1)*440/(PEL.gols.length+1)+hsh(s,k,6)*30)}
+ PEL.ga=0;PEL.gb=0;PEL.gi=0}
+async function peladaCarregar(){if(!eu)return;PEL.carregado=Date.now();try{const r=tratar(await api.pelada());PEL.res=r;PEL.apostas=r.apostas||[];if(r.ganho>0){Som.play('moeda');toast('⚽ Você ganhou '+money(r.ganho)+' na aposta da pelada!',4500)}if(PEL.slot===r.slot&&!PEL.gols.length&&(r.a+r.b))peladaMontar(r.slot)}catch(e){}}
+function peladaPasso(dt){const s=peladaSlot(),seg=(Date.now()/1000)%600;
+ if(eu&&(PEL.slot!==s||Date.now()-PEL.carregado>90000)&&Date.now()-PEL.carregado>4000){const q=Math.hypot(eu.x-T(69),eu.y-T(22));if(q<T(26)||PEL.slot!==s)peladaCarregar()}
+ if(PEL.slot!==s)peladaMontar(s);
+ PEL.jogando=seg<480;if(!PEL.jogando){ball.tx=ball.x=T(69.5);ball.ty=ball.y=T(22);return}
+ // placar até agora (gols acontecem na hora marcada)
+ while(PEL.gi<PEL.gols.length&&seg>=PEL.gols[PEL.gi].at){const g=PEL.gols[PEL.gi++];if(g.t)PEL.gb++;else PEL.ga++;PEL.comemora=now+3;if(Math.hypot(eu.x-T(69),eu.y-T(22))<T(18)){Som.play('nivel');const tm=peladaTimes(s)[g.t][0];floatText(T(69.5),T(19),'⚽ GOOOL do '+tm+'!','#ffd23f')}}
+ // a bola vai para o gol quando está perto da hora de um gol
+ const prox=PEL.gols[PEL.gi],perto=prox&&prox.at-seg<5,cx=(PELF.x0+PELF.x1)/2,cy=(PELF.y0+PELF.y1)/2;
+ const bd=Math.hypot(ball.tx-ball.x,ball.ty-ball.y);
+ if(perto){ball.tx=prox.t?PELF.x0-6:PELF.x1+6;ball.ty=cy+Math.sin(seg)*10}
+ else if(bd<4||now>PEL.toque){const lado=Math.random()<.5,tx=lado?cx+(Math.random()-.3)*(PELF.x1-PELF.x0)*.45:cx-(Math.random()-.3)*(PELF.x1-PELF.x0)*.45;ball.tx=Math.max(PELF.x0+10,Math.min(PELF.x1-10,tx));ball.ty=PELF.y0+16+Math.random()*(PELF.y1-PELF.y0-32);PEL.toque=now+1.2+Math.random()*1.6}
+ {const d=Math.hypot(ball.tx-ball.x,ball.ty-ball.y);if(d>.5){const sp=Math.min(d,(perto?170:110)*dt);ball.x+=(ball.tx-ball.x)/d*sp;ball.y+=(ball.ty-ball.y)/d*sp}ball.z=Math.abs(Math.sin(now*7))*Math.min(5,d/10)}
+ // jogadores: goleiro no gol, os outros perto da bola mantendo a posição
+ for(const j of PEL.jog){let tx,ty;const meuGol=j.t?PELF.x1-14:PELF.x0+14;
+  if(j.goleiro){tx=meuGol;ty=Math.max(cy-34,Math.min(cy+34,ball.y))}
+  else{const base=[[0,0],[-.18,-.25],[-.18,.25],[.2,-.18],[.2,.18]][j.i],dirAtk=j.t?-1:1,bx=cx+base[0]*dirAtk*(PELF.x1-PELF.x0)+(ball.x-cx)*.55,by=cy+base[1]*(PELF.y1-PELF.y0)+(ball.y-cy)*.4;
+   const maisPerto=PEL.jog.filter(o=>o.t===j.t&&!o.goleiro).sort((a,b)=>Math.hypot(a.x-ball.x,a.y-ball.y)-Math.hypot(b.x-ball.x,b.y-ball.y))[0]===j;
+   tx=maisPerto?ball.x-dirAtk*8:bx;ty=maisPerto?ball.y:by}
+  if(PEL.comemora>now&&!j.goleiro){tx=j.x;ty=j.y}
+  const dx=tx-j.x,dy=ty-j.y,d=Math.hypot(dx,dy),sp=Math.min(d,(j.goleiro?50:70)*dt);
+  if(d>2){j.x+=dx/d*sp;j.y+=dy/d*sp;const sx=(dx-dy)*IA,sy=(dx+dy)*IB;j.mv=Math.round(Math.atan2(sy,sx)/(Math.PI/8))*(Math.PI/8);j.ph+=dt*9;j.dir=sx>=0?1:-1}else{j.mv=null}}}
+function peladaItens(list,vis){if(!PEL.jog.length||!vis(T(69),T(22))&&!vis(T(62),T(17))&&!vis(T(77),T(27)))return;
+ for(const j of PEL.jog){if(!PEL.jogando)continue;list.push({x:j.x,y:j.y,f:()=>{drawPerson(ctx,j.x,j.y,j.v,{s:PS,mv:j.mv,walk:j.mv!=null?j.ph:null,dir:j.dir||1});const q=[j.x,j.y-46*PS];ctx.fillStyle=j.cor;ctx.beginPath();ctx.arc(q[0],q[1]-4,2.6,0,7);ctx.fill()}})}
+ // traves 3D e placar
+ for(const [gx,lado] of [[PELF.x0-2,1],[PELF.x1+2,-1]]){const cy=(PELF.y0+PELF.y1)/2;list.push({x:gx,y:cy+40,k:gx+cy+34,cam:1,f:()=>{const W='#f4f4f4';isoBox(ctx,gx-2,cy-36,gx+2,cy-32,0,24,W);isoBox(ctx,gx-2,cy+32,gx+2,cy+36,0,24,W);isoBox(ctx,gx-2,cy-36,gx+2,cy+36,22,25,W);
+   const P=(x,y,z)=>{const q=isoP(x,y);return[q[0],q[1]-z]};ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=.6;for(let k=-34;k<=34;k+=6){const a=P(gx,cy+k,23),b=P(gx-lado*12,cy+k,4);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}for(let z=4;z<24;z+=5){const a=P(gx-lado*12*(1-z/24),cy-34,z),b=P(gx-lado*12*(1-z/24),cy+34,z);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}}})}
+ {const X=T(69.5),Y=T(15.6);list.push({x:X,y:Y,k:X+Y,cam:1,f:()=>{const q=isoP(X,Y),s=peladaSlot(),[A,B]=peladaTimes(s),seg=(Date.now()/1000)%600;ctx.save();ctx.translate(q[0],q[1]);
+   ctx.fillStyle='#3a3f47';ctx.fillRect(-46,-40,3,40);ctx.fillRect(43,-40,3,40);ctx.fillStyle='#1d2329';rr(ctx,-60,-74,120,38,5);ctx.fill();ctx.strokeStyle='#f1c40f';ctx.lineWidth=1.5;ctx.stroke();
+   ctx.font='700 7px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillStyle=A[1]==='#111'?'#ddd':A[1];ctx.fillText(A[0],-30,-64);ctx.fillStyle=B[1]==='#111'?'#ddd':B[1];ctx.fillText(B[0],30,-64);
+   ctx.font='800 15px Fredoka, sans-serif';ctx.fillStyle='#ffd23f';ctx.fillText(PEL.jogando?PEL.ga+'  x  '+PEL.gb:'—',0,-48);
+   ctx.font='600 6.5px Fredoka, sans-serif';ctx.fillStyle='#9fe3ff';const mm=Math.floor(seg/60),ss=Math.floor(seg%60);ctx.fillText(PEL.jogando?('⏱ '+String(Math.floor(seg/480*90)).padStart(2,'0')+"' · aposte no próximo jogo"):'INTERVALO · próximo jogo em '+(9-mm)+':'+String(59-ss).padStart(2,'0'),0,-40);ctx.restore()}})}}
+function abrirPelada(){if(!eu)return;closeCard();const box=$('placeActs');box.innerHTML='';const s=peladaSlot(),[A,B]=peladaTimes(s),[A2,B2]=peladaTimes(s+1),seg=(Date.now()/1000)%600;
+ const t=document.createElement('div');t.style.cssText='font-size:13px;margin:4px 2px 8px;line-height:1.5';t.innerHTML=(PEL.jogando?`🔴 <b>Ao vivo:</b> ${A[0]} <b>${PEL.ga} x ${PEL.gb}</b> ${B[0]}`:`⏸️ Intervalo. O próximo jogo começa em ${Math.ceil((600-seg)/60)} min.`)+`<br>⚽ <b>Próximo jogo:</b> ${A2[0]} x ${B2[0]}<br><span style="opacity:.75;font-size:12px">Acertou o time: ganha 2,2x. Acertou empate: ganha 4x. De R$ 100 a R$ 5.000, uma aposta por jogo. O prêmio cai sozinho quando o jogo acaba.</span>`;box.appendChild(t);
+ const ja=(PEL.apostas||[]).find(a=>a.slot===s+1);
+ if(ja){const d=document.createElement('div');d.style.cssText='background:rgba(255,201,74,.15);border-radius:12px;padding:8px;margin:6px 0;font-size:13px';d.innerHTML=`✅ Você apostou <b>${money(ja.valor)}</b> em <b>${ja.palpite==='a'?A2[0]:ja.palpite==='b'?B2[0]:'empate'}</b>. Boa sorte!`;box.appendChild(d)}
+ else{let val=500;const lin=comLinha(box,'',[['−',()=>{val=Math.max(100,val-(val>1000?500:100));pv()}],['+',()=>{val=Math.min(5000,val+(val>=1000?500:100));pv()}]]),pv=()=>{lin.firstChild.innerHTML=`💰 Valor da aposta: <b>${money(val)}</b>`};pv();
+  for(const [p,nm] of [['a','🏳️ '+A2[0]],['e','🤝 Empate'],['b','🏳️ '+B2[0]]])botao(box,nm,()=>confirmar('⚽ Apostar?',`Apostar <b>${money(val)}</b> em <b>${nm.replace(/^\S+ /,'')}</b> no próximo jogo?`,()=>acao(async()=>{const r=tratar(await api.peladaApostar(p,val));PEL.apostas=r.apostas||[];Som.play('moeda');toast('⚽ Aposta feita! Assista ao próximo jogo no Campo do Terrão.',3500);abrirPelada()})),{off:eu.dinheiro<val})}
+ if((PEL.apostas||[]).length){const h=document.createElement('div');h.style.cssText='font-size:12px;opacity:.85;margin-top:8px';h.innerHTML='<b>Suas últimas apostas</b><br>'+PEL.apostas.slice(0,5).map(a=>{const [x,y]=peladaTimes(a.slot),nm=a.palpite==='a'?x[0]:a.palpite==='b'?y[0]:'empate';return`${nm} · ${money(a.valor)} · ${!a.pago?'⏳ aguardando':a.premio?'🎉 +'+money(a.premio):'❌ perdeu'}`}).join('<br>');box.appendChild(h)}
+ $('placeName').textContent='⚽ Pelada do Terrão';$('placeSub').textContent='Um jogo a cada 10 minutos';$('place').classList.remove('hidden')}
 const WCF=['Alguém tem papel?','Esse banheiro... 😬','Já volto!'];
 function say(o,t,d=3.6,force){if(o!==tonhao&&!force){let n=0;for(const r of residents)if(r.bub&&r.bub.until>now)n++;if(n>=4)return}o.bub={t,until:now+d}}
 function floatText(x,y,t,col){floats.push({x,y,t,col,t0:now})}
@@ -2455,9 +2508,10 @@ function update(dt){
   else{const s=30*dt;chopp.x+=dx/d*Math.min(s,d);chopp.y+=dy/d*Math.min(s,d)}
   if(chopp.ret&&now>chopp.wait){chopp.tx=chopp.home[0];chopp.ty=chopp.home[1];chopp.ret=false}}
  // ball
- const players=residents.filter(r=>r.place==='campo'&&!r.hidden&&r.state==='stay');
- const bd=Math.hypot(ball.tx-ball.x,ball.ty-ball.y);
- if(bd<3){if(players.length){const p=pick(players);ball.tx=p.x+p.dir*5;ball.ty=p.y;if(Math.random()<.08)say(p,pick(CAMPO))}else{ball.tx=T(69);ball.ty=T(22)}}
+ peladaPasso(dt);
+ const players=PEL.jogando?[]:residents.filter(r=>r.place==='campo'&&!r.hidden&&r.state==='stay');
+ const bd=PEL.jogando?0:Math.hypot(ball.tx-ball.x,ball.ty-ball.y);
+ if(PEL.jogando){}else if(bd<3){if(players.length){const p=pick(players);ball.tx=p.x+p.dir*5;ball.ty=p.y;if(Math.random()<.08)say(p,pick(CAMPO))}else{ball.tx=T(69);ball.ty=T(22)}}
  else{const s=Math.min(bd,130*dt);ball.x+=(ball.tx-ball.x)/bd*s;ball.y+=(ball.ty-ball.y)/bd*s}
  ball.z=Math.abs(Math.sin(now*6))*Math.min(6,bd/8);
  if(follow){cam.x+=(follow.x-cam.x)*Math.min(1,dt*4);cam.y+=(follow.y-10-cam.y)*Math.min(1,dt*4)}
@@ -3207,6 +3261,15 @@ Object.assign(N3D,{
   K.box(cx-9.5,cy-6.5,cx+9.5,cy+6.5,34,36,'#d63a2f');K.box(cx-.8,cy-.8,cx+.8,cy+.8,36,52,'#888');
   {const ap=[cx,cy,62],P=n3Oct(cx,cy,20,0);for(let i=0;i<8;i++){const a=P[i],b=P[(i+1)%8];K.poly([[a[0],a[1],52],[b[0],b[1],52],ap],i%2?'#ffffff':'#e8463a')}}
   {const F=K.face({y:cy+7});F.rect(cx-10,13,cx+10,18,'#ffd23f');F.text('PIPOCA',cx,14,4.2,'#9b1d16',800)}
+ }},
+ brinquedo:{H:90,chave:b=>b.tipo,f(K){const b=K.b,{X0,X1,Y0,Y1}=K,cx=(X0+X1)/2,cy=(Y0+Y1)/2,g=K.g,M='#e85d4a',A='#f1c40f',Z='#2e86c1',C='#8a8f96';
+  if(b.tipo==='escorrega'){K.box(X0+8,Y0+8,X0+12,Y0+12,0,40,C);K.box(X0+20,Y0+8,X0+24,Y0+12,0,40,C);K.box(X0+8,Y0+18,X0+12,Y0+22,0,40,C);K.box(X0+20,Y0+18,X0+24,Y0+22,0,40,C);K.box(X0+6,Y0+6,X0+26,Y0+24,38,42,Z);
+   for(let k=0;k<6;k++)K.box(X0+6,Y0+8+k*3,X0+10,Y0+9.5+k*3,k*6.5,k*6.5+1.5,A);K.poly([[X0+26,Y0+10,40],[X0+26,Y0+22,40],[X1-6,Y0+22,4],[X1-6,Y0+10,4]],M);K.poly([[X1-6,Y0+10,4],[X1-6,Y0+22,4],[X1-6,Y0+22,0],[X1-6,Y0+10,0]],shade(M,-30));K.box(X0+5,Y0+5,X0+27,Y0+25,42,56,'rgba(0,0,0,0)');K.pyr(X0+4,Y0+4,X0+28,Y0+26,56,14,M);for(const [x,y] of [[X0+6,Y0+6],[X0+26,Y0+6],[X0+6,Y0+24],[X0+26,Y0+24]])K.box(x-1,y-1,x+1,y+1,42,56,C)}
+  if(b.tipo==='balanco'){for(const x of [X0+6,X1-6])for(const y of [Y0+6,Y1-6])K.box(x-1.5,y-1.5,x+1.5,y+1.5,0,42,C);K.box(X0+6,cy-1.5,X1-6,cy+1.5,40,44,C);
+   for(let k=0;k<2;k++){const sx=X0+24+k*36,sw=Math.sin(now*2+k)*0,yy=cy;K.linha([sx-5,yy,40],[sx-5,yy,14],'#444',.8);K.linha([sx+5,yy,40],[sx+5,yy,14],'#444',.8);K.box(sx-7,yy-3,sx+7,yy+3,12,14,k?A:M)}}
+  if(b.tipo==='gangorra'){K.box(cx-3,cy-3,cx+3,cy+3,0,8,C);K.poly([[X0+4,cy-2,4],[X1-4,cy-2,14],[X1-4,cy+2,14],[X0+4,cy+2,4]],A);for(const [x,z] of [[X0+8,6],[X1-8,15]])K.box(x-1,cy-5,x+1,cy+5,z,z+6,M)}
+  if(b.tipo==='barra'){for(const [x0,h] of [[X0+8,28],[X0+30,38],[X0+52,22]]){K.box(x0-1,cy-10,x0+1,cy-8,0,h,C);K.box(x0-1,cy+8,x0+1,cy+10,0,h,C);K.box(x0-1,cy-10,x0+1,cy+10,h-2,h,Z)}{const S2=K.face({y:Y1-2});}K.box(X0+40,Y1-14,X1-6,Y1-6,0,6,'#5a6b7a');K.box(X0+40,Y1-14,X1-6,Y1-6,6,7,'#3d4b57')}
+  if(b.tipo==='bicicleta'){K.box(cx-2,cy-12,cx+2,cy+12,0,4,'#5a6b7a');K.box(cx-1,cy+4,cx+1,cy+6,4,22,C);K.box(cx-5,cy+3,cx+5,cy+7,22,24,'#222');K.box(cx-1,cy-10,cx+1,cy-8,4,26,C);K.box(cx-6,cy-10,cx+6,cy-8,26,28,'#222');{K.cam();const q=K.P(cx,cy-2,10);g.strokeStyle=Z;g.lineWidth=2;g.beginPath();g.ellipse(q[0],q[1],6,7,0,0,7);g.stroke()}}
  }},
  quiosque:{H:90,chave:b=>{const c=typeof COM!=='undefined'&&COM.get(b.cid);return b.cid+'|'+(c&&c.dono?(c.nome||'?'):'')},f(K){const b=K.b,{X0,X1,Y0,Y1}=K,g=K.g,c=typeof COM!=='undefined'&&COM.get(b.cid),dono=!!(c&&c.dono);
   const ST={pipoca:['#d63a2f','#ffffff','#ffd23f'],acai:['#6a2c91','#8fd14f','#f3e8ff'],caldo:['#2f8f46','#ffd23f','#fff6d0'],banca:['#245f3c','#f2d34b','#eef5ee']}[b.tipo],[C1,C2,C3]=ST;
@@ -4690,7 +4753,7 @@ function drawCena(){
  if(MAPA_MARCA&&eu&&!eu.rm){const a=MAPA_MARCA;list.push({x:a.x,y:a.y,k:1e9,f:()=>drawEntrega(ctx,a)});list.push({x:eu.x,y:eu.y,k:1e9+1,f:()=>drawSetaPe(ctx,a)})}
  {const a=msAlvo();if(a&&a.seta){list.push({x:a.x,y:a.y,k:1e9,f:()=>drawEntrega(ctx,a)});list.push({x:eu.x,y:eu.y,k:1e9+1,f:()=>drawSetaPe(ctx,a)})}}
  condoItens(list);
- lagoItens(list,vis);
+ lagoItens(list,vis);peladaItens(list,vis);
  for(const p of PLACAS.values())if(vis(p.x,p.y))list.push({x:p.x,y:p.y,k:p.x+p.y,cam:1,f:()=>placaPe(ctx,p)});
  for(const [bx,by,o] of PARQUE_BANCOS)if(vis(T(bx),T(by))){const X=T(bx),Y=T(by);if(o==='n'||o==='w'){list.push({x:X,y:Y,k:X+Y+4,cam:1,f:()=>bancoIso(ctx,X,Y,o,'assento')});list.push({x:X,y:Y,k:X+Y+54,cam:1,f:()=>bancoIso(ctx,X,Y,o,'encosto')})}else list.push({x:X,y:Y,k:X+Y+8,cam:1,f:()=>bancoIso(ctx,X,Y,o)})}
  if(marker&&now-marker.t<1.1&&vis(marker.x,marker.y)){const k=(now-marker.t)/1.1;ctx.strokeStyle=`rgba(255,201,74,${1-k})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(marker.x,marker.y,6+k*10,2.5+k*4,0,0,7);ctx.stroke()}
@@ -5059,6 +5122,7 @@ const api=ONLINE?(()=>{
   propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
   responder:(id,ok)=>rpc('responder_proposta',{p_id:id,p_aceitar:ok}),
   assumirPref:()=>rpc('assumir_prefeitura'),
+   pelada:()=>rpc('pelada'),peladaApostar:(p,v)=>rpc('pelada_apostar',{p_palpite:p,p_valor:v}),
    eleicao:()=>rpc('eleicao'),candidatar:m=>rpc('candidatar',{p_msg:m}),votar:id=>rpc('votar',{p_cand:id}),
    deixarPref:()=>rpc('deixar_prefeitura'),
    vistoNovidades:v=>ONLINE?rpc('visto_novidades',{p_v:v}):Promise.resolve(null),
@@ -5175,6 +5239,8 @@ const api=ONLINE?(()=>{
   async usarCarro(c){lme().carro=c;if(L.vaga&&c)L.vaga.carro=c;lsave();return{carro:c}},
   async estacionar(v,c){const vg=VAGAS.find(x=>x.id===v);if(!vg)fail('Essa vaga não existe.');if(vg.casa&&lme().casa_id!==vg.casa)fail('Essa garagem é de outra pessoa.');L.vaga={id:v,carro:c};lsave();return{vaga:v}},
   async assumirPref(){if(lme().nivel<30)fail('A prefeitura libera no nível 30.');return{}},
+  async pelada(){const m=lme(),s=peladaSlot();L.pel=L.pel||[];let ganho=0;for(const a of L.pel)if(!a.pago&&a.slot<s){const r=peladaResLocal(a.slot),v=r[0]>r[1]?'a':r[1]>r[0]?'b':'e';a.pago=true;if(a.palpite===v){a.premio=v==='e'?a.valor*4:Math.floor(a.valor*2.2);ganho+=a.premio}}m.dinheiro+=ganho;lsave();const r=peladaResLocal(s);return{slot:s,a:r[0],b:r[1],ganho,eu:lest(),apostas:L.pel.slice(-6).reverse()}},
+  async peladaApostar(p,v){const m=lme(),s=peladaSlot()+1;L.pel=L.pel||[];if(v<100||v>5000)fail('A aposta vai de R$ 100 a R$ 5.000.');if(L.pel.some(a=>a.slot===s))fail('Você já apostou no próximo jogo.');if(m.dinheiro<v)fail('Dinheiro insuficiente.');m.dinheiro-=v;L.pel.push({slot:s,palpite:p,valor:v,premio:0,pago:false});lsave();return this.pelada()},
   async eleicao(){const m=lme(),d=new Date().getDay(),E=L.ele=L.ele||{c:[{id:'b1',nome:'Dona Cida',nivel:24,foto:null,msg:'Vou colocar mais bancos na praça e festa todo sábado!'},{id:'b2',nome:'Zé do Fusca',nivel:31,foto:null,msg:'Asfalto novo e gasolina mais barata pra todo mundo.'}]};
    const fase=E.fase||(d===5?'candidatura':d===6?'votacao':'fechada'),tn=fase==='votacao'?1:fase==='segundo'?2:0,souc=E.c.some(c=>c.id==='local'),mot=!tn?'A votação é no sábado.':souc?'Candidato não vota.':m.nivel<5?'Para votar precisa ser nível 5.':null;
    return{fase,turno:tn,candidatos:E.c,sou_candidato:souc,pode_votar:!mot,motivo:mot,meu_voto:E.voto||null,pode_candidatar:fase==='candidatura'&&m.nivel>=20&&!souc,resultado:E.res||null}},
@@ -6812,6 +6878,7 @@ function pertoOpcoes(){
   if(!eu||trabalho||emCasa||sinucaAberta||carOf(eu))return[];
  const o=[],perto=(x,y,r)=>Math.hypot(eu.x-x,eu.y-y)<r;
   if(eu.parkLoc&&!eu.seat&&perto(eu.parkLoc.x,eu.parkLoc.y,T(2.2)))o.push(['🚗 Entrar no carro',()=>entrarNoParado()]);
+ if(eu.x>T(58)&&eu.x<T(81)&&eu.y>T(14)&&eu.y<T(29.5))o.push(['⚽ Pelada: apostar',()=>{peladaCarregar().then(()=>{if(lugarAtual==='pelada')abrirPelada()});lugarAtual='pelada';abrirPelada()}]);
  if(eu.seat){o.push(['🧍 Levantar',levantar]);if(eu.seat.kind!=='praca')o.push(['🍺 Pedir ao Tonhão',()=>abrirLugar({kind:'bar'})]);return o}
  {const ps=PRACA_SEATS.filter(s=>!s.occ&&perto(T(s.x),T(s.y),T(1.2))).sort((a,b)=>Math.hypot(eu.x-T(a.x),eu.y-T(a.y))-Math.hypot(eu.x-T(b.x),eu.y-T(b.y)))[0];if(ps)o.push(['🪑 Sentar no banco',()=>{sentar(ps);say(eu,pick(['Que sombra boa!','Daqui eu vejo a cidade toda.','Descansando um pouquinho…']),3,true)}])}
  const dentro=eu.x>T(18)&&eu.x<T(30)&&eu.y>T(17.5)&&eu.y<T(26.4);
