@@ -3076,7 +3076,7 @@ function n3Loja(K,o){const {X0,X1,Y0,Y1}=K,b=K.b,g=K.g,dx=T(b.front[0]+.5),fr=o.
  if(o.extra)o.extra(K,{bx0,bx1,by0,by1,Hb,cx,dx,F,S});
 }
 Object.assign(N3D,{
- imobiliaria:{H:150,f(K){n3Loja(K,{cor:'#eef4f8',acento:'#2e6f95',nome:'IMOBILIÁRIA',ic:'🏠',H:84,jan:4,telhado:'duas',telha:'#2e5f85',lote:{arv:[[K.X0+8,K.Y0+14],[K.X1-8,K.Y0+14]]},
+ imobiliaria:{H:150,f(K){n3Loja(K,{cor:'#eef4f8',acento:'#2e6f95',nome:'IMOBILIÁRIA',ic:'🏠',H:58,jan:4,telhado:'duas',telha:'#2e5f85',lote:{arv:[[K.X0+8,K.Y0+14],[K.X1-8,K.Y0+14]]},
    vitrine:(F,a)=>{for(let k=0;k<3;k++){F.rect(a-8+k*6,16,a-3+k*6,23,'#fff');F.rect(a-7+k*6,17,a-4+k*6,20,['#7fb3d5','#a9d18e','#f5b7b1'][k])}},
    extra:(K,e)=>{K.box(e.dx+20,e.by1+10,e.dx+21.4,e.by1+11.4,0,22,'#8a8f96');K.box(e.dx+14,e.by1+10,e.dx+28,e.by1+11,18,30,'#ffffff');const Fp=K.face({y:e.by1+11});Fp.text('VENDE-SE',e.dx+21,22.5,3.6,'#c0392b',800)}})}},
  padaria:{H:140,f(K){n3Loja(K,{cor:'#f6e2c0',acento:'#b5651d',nome:'PADARIA',ic:'🥖',H:66,jan:2,tijolo:1,telhado:'duas',telha:'#9c4a2c',mx:10,frente:30,lote:{jardim:false,chao:'#d8c9ad'},
@@ -3209,10 +3209,12 @@ function n3Desenha(list,b){const d=N3D[b.kind],noite=darkness()>.3,key=b.kind+(n
   a={cv,L,R,Tp,Bt,S,X0,X1,Y0,Y1,luzes:noite?lz.map(l=>[l[0],l[1],l[2],44,.5]).concat(lp):null};if(N3K[kk]&&N3K[kk]!==key)N3.delete(N3K[kk]);N3K[kk]=key;N3.set(key,a);while(N3.size>N3MAX){const k0=N3.keys().next().value;if(k0===key)break;N3.delete(k0)}}
  let fade=1;if(eu&&!eu.hidden){const pe=isoP(eu.x,eu.y);if(a.X1+a.Y1>eu.x+eu.y+8&&eu.x+eu.y<a.X1+a.Y1&&pe[0]>a.L+20&&pe[0]<a.R-20&&pe[1]>a.Tp+20&&pe[1]-40<a.Bt&&eu.y<a.Y1-4&&eu.x<a.X1-4)fade=.3}
  const sw=d.sw||16,cb=[a.X0,a.Y0,a.X1,a.Y1,d.H];
+ // chave de profundidade: a MENOR das duas bordas da fatia (assim quem passa na calçada da frente nunca fica atrás de um pedaço do prédio)
+ const kAt=sc=>{const fx=sc/IA+a.Y1;return fx<=a.X1?Math.max(a.X0,fx)+a.Y1:a.X1+Math.max(a.Y0,a.X1-sc/IA)};
  for(let sx=a.L;sx<a.R;sx+=sw){const sc=sx+sw/2,fx=sc/IA+a.Y1;let px,py;
   if(fx<=a.X1){px=Math.max(a.X0,fx);py=a.Y1}else{px=a.X1;py=Math.max(a.Y0,a.X1-sc/IA)}
-  const s0=sx,w=Math.min(sw+.6,a.R-s0);
-  list.push({x:px,y:py,k:px+py-2,cam:1,cb,f:()=>{ctx.globalAlpha=fade;ctx.drawImage(a.cv,(s0-a.L)*a.S,0,w*a.S,a.cv.height,s0,a.Tp,w,a.Bt-a.Tp)}})}
+  const s0=sx,w=Math.min(sw+.6,a.R-s0),kk2=Math.min(kAt(s0),kAt(s0+w))-6;
+  list.push({x:px,y:py,k:kk2,cam:1,cb,f:()=>{ctx.globalAlpha=fade;ctx.drawImage(a.cv,(s0-a.L)*a.S,0,w*a.S,a.cv.height,s0,a.Tp,w,a.Bt-a.Tp)}})}
 }
 function predioFatias(list,b,dentro){
  const X0=T(b.x),X1=T(b.x+b.w),Y0=T(b.y),Y1=T(b.y+b.h),Hf=b.h*TILE*WK,casa=b.kind==='casa'||b.kind==='mansao',Hw=Hf*(casa?.52:.62),rf=b.roof||ROOF_KIND[b.kind]||'#8e5a3c',wl=b.wall||'#e8e3d3';
