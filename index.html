@@ -1765,7 +1765,7 @@ const PRACA_DECO=[addB({kind:'coreto',deco:1,x:23,y:39,w:3,h:3}),
  addB({kind:'canteiro',deco:1,x:17,y:43,w:2,h:2,ipe:'#f2c41b'}),addB({kind:'canteiro',deco:1,x:29,y:43,w:2,h:2,ipe:'#ef7fb3'}),
  addB({kind:'canteiro',deco:1,x:17,y:36,w:2,h:1,flor:1}),addB({kind:'canteiro',deco:1,x:29,y:36,w:2,h:1,flor:1}),
  ...[['pipoca',19,3],['acai',21,4],['caldo',26,5],['banca',28,6]].map(([tipo,x,cid])=>addB({kind:'quiosque',tipo,x,y:46,w:2,h:1,cid})),
- ...[[20,37],[28,37],[20,43],[28,43]].map(([x,y],i)=>addB({kind:'posteP',deco:1,x,y,w:1,h:1,i}))];
+ ...[[20,37],[28,37],[20,43],[28,43],[107,64],[117,65],[105,69],[118,70]].map(([x,y],i)=>addB({kind:'posteP',deco:1,x,y,w:1,h:1,i}))];
 const plazaTiles=[],fieldTiles=[];
 for(let y=33;y<=47;y++)for(let x=15;x<=32;x++)if(grid[y][x]===G.PLAZA)plazaTiles.push([x,y]);
 for(let y=16;y<=27;y++)for(let x=60;x<=78;x++)fieldTiles.push([x,y]);
@@ -1891,7 +1891,15 @@ function paintTile(c,x,y){
    c.strokeStyle=TOP;c.lineWidth=3;c.beginPath();c.arc(ox,oy,RC-1.5,a0,a1);c.stroke()}}
 }
 const walkEdge=(x,y)=>{const t=tileAt(x,y);return t!==G.FOREST&&t!==G.GRASS&&t!==G.ROCK&&t!==G.HILL};
-function placa(c,x,y,txt,cor='#f3e3bd',tinta='#5a3a22'){c.font='600 9px Fredoka, sans-serif';const w=c.measureText(txt).width+12;c.fillStyle='#6d4426';c.fillRect(x-1.5,y+4,3,14);c.fillStyle=cor;rr(c,x-w/2,y-7,w,13,3);c.fill();c.fillStyle=tinta;c.textAlign='center';c.fillText(txt,x,y+3);c.textAlign='left'}
+// placas de madeira EM PÉ (antes eram pintadas deitadas no chão): o chão só guarda a posição, o desenho vai na lista de profundidade
+const PLACAS=new Map();
+function placa(c,x,y,txt,cor='#f3e3bd',tinta='#5a3a22'){const k=txt+'|'+Math.round(x)+'|'+Math.round(y);if(!PLACAS.has(k))PLACAS.set(k,{x,y:y+16,txt,cor,tinta})}
+function placaPe(c,p){const q=isoP(p.x,p.y);c.save();c.font='700 9px Fredoka, sans-serif';const w=c.measureText(p.txt).width+14,H=30;
+ c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(q[0]+4,q[1]+1,w*.45,3,0,0,7);c.fill();
+ for(const dx of [-w/2+7,w/2-9]){c.fillStyle='#5a3418';c.fillRect(q[0]+dx,q[1]-H,3,H);c.fillStyle='#3e2410';c.fillRect(q[0]+dx+2,q[1]-H,1,H)}
+ c.fillStyle='#4a2c14';rr(c,q[0]-w/2-1,q[1]-H-14,w+2,18,4);c.fill();c.fillStyle=p.cor;rr(c,q[0]-w/2,q[1]-H-15,w,16,4);c.fill();
+ c.strokeStyle='rgba(90,58,34,.35)';c.lineWidth=.6;for(const yy of [-H-10,-H-5]){c.beginPath();c.moveTo(q[0]-w/2+3,q[1]+yy);c.lineTo(q[0]+w/2-3,q[1]+yy);c.stroke()}
+ c.fillStyle=p.tinta;c.textAlign='center';c.fillText(p.txt,q[0],q[1]-H-4);c.textAlign='left';c.restore()}
 function banco(c,x,y){c.fillStyle='#8b5a2b';c.fillRect(x,y+8,40,6);c.fillStyle='#6d4426';c.fillRect(x,y+2,40,4);c.fillRect(x+3,y+14,3,6);c.fillRect(x+34,y+14,3,6)}
 
 // lago com borda natural e profundidade (desenhado por cima dos quadrados de água)
@@ -1954,7 +1962,7 @@ function paintFeatures(c){
   lagoBonito(c,cx,cy,T(3.9),T(2.4),3,[104,63,119,72]);
   // deck de madeira entrando no lago
   const dx0=T(110.6),dy0=T(68.9),dx1=T(112.4),dy1=T(71);c.fillStyle='rgba(0,0,0,.25)';c.fillRect(dx0+3,dy0+3,dx1-dx0,dy1-dy0);c.fillStyle='#a8743f';c.fillRect(dx0,dy0,dx1-dx0,dy1-dy0);c.strokeStyle='#7a5028';c.lineWidth=1.2;for(let y=dy0+5;y<dy1;y+=6){c.beginPath();c.moveTo(dx0,y);c.lineTo(dx1,y);c.stroke()}c.fillStyle='#6b4423';for(const [x,y] of [[dx0,dy0],[dx1-4,dy0],[dx0,dy1-4],[dx1-4,dy1-4]])c.fillRect(x,y,4,4)}
- placa(c,T(111.5),T(63.6),'🌳 PARQUE DO LAGO');
+ placa(c,T(107.2),T(64.5),'🌳 PARQUE DO LAGO');
 }
 function paintStatic(c,x0,y0,w,h){
  const tx0=Math.max(-MX,Math.floor(x0/TILE)-1),ty0=Math.max(-MY,Math.floor(y0/TILE)-1),tx1=Math.min(W+MX-1,Math.ceil((x0+w)/TILE)+1),ty1=Math.min(H+MY-1,Math.ceil((y0+h)/TILE)+1);
@@ -3401,6 +3409,8 @@ function drawPista(c){const x0=T(PISTA.x0),y0=T(PISTA.y0),cw=(T(PISTA.x1)-x0)/8,
  c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<5;i++){const a=now*3+i*1.3;c.fillRect(cx+Math.cos(a)*4.5,cy+Math.sin(a*1.3)*4,1.4,1.4)}
  c.font='bold 8px Fredoka,sans-serif';c.textAlign='center';c.fillStyle=cores[b%cores.length];c.fillText('💃 PISTA 🕺',cx,y0-3);c.textAlign='left';c.restore()}
 /* ----- lagos: patos nadando (mãe com filhotes), ondinhas e juncos na beira ----- */
+// bancos de madeira em volta do lago do parque, virados para a água
+const PARQUE_BANCOS=[[110.4,63.75,'s'],[114.6,64.05,'s'],[106.1,66.3,'e'],[116.95,67.6,'w'],[106.9,70.2,'n'],[115.4,70.6,'n']];
 const LAGOS=[{cx:111.5,cy:67.5,rx:3.9,ry:2.4,sem:3},{cx:46.5,cy:-10.5,rx:7.3,ry:4.3,sem:1}];
 const PATOS=[{l:0,r:.55,v:.16,f:0,fil:3},{l:0,r:.35,v:-.11,f:2,fil:0},{l:1,r:.6,v:.09,f:1,fil:4},{l:1,r:.4,v:-.07,f:4,fil:0}];
 function lagoItens(list,vis){
@@ -4681,6 +4691,8 @@ function drawCena(){
  {const a=msAlvo();if(a&&a.seta){list.push({x:a.x,y:a.y,k:1e9,f:()=>drawEntrega(ctx,a)});list.push({x:eu.x,y:eu.y,k:1e9+1,f:()=>drawSetaPe(ctx,a)})}}
  condoItens(list);
  lagoItens(list,vis);
+ for(const p of PLACAS.values())if(vis(p.x,p.y))list.push({x:p.x,y:p.y,k:p.x+p.y,cam:1,f:()=>placaPe(ctx,p)});
+ for(const [bx,by,o] of PARQUE_BANCOS)if(vis(T(bx),T(by))){const X=T(bx),Y=T(by);if(o==='n'||o==='w'){list.push({x:X,y:Y,k:X+Y+4,cam:1,f:()=>bancoIso(ctx,X,Y,o,'assento')});list.push({x:X,y:Y,k:X+Y+54,cam:1,f:()=>bancoIso(ctx,X,Y,o,'encosto')})}else list.push({x:X,y:Y,k:X+Y+8,cam:1,f:()=>bancoIso(ctx,X,Y,o)})}
  if(marker&&now-marker.t<1.1&&vis(marker.x,marker.y)){const k=(now-marker.t)/1.1;ctx.strokeStyle=`rgba(255,201,74,${1-k})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(marker.x,marker.y,6+k*10,2.5+k*4,0,0,7);ctx.stroke()}
  if(SALA){const ax=T(SALA.x0)-4,bx=T(SALA.x1+1)+4,ay=T(SALA.y0)-4,by=T(SALA.y1+2);for(let i=list.length-1;i>=0;i--){const o=list[i];if(!(o.x>=ax&&o.x<=bx&&o.y>=ay&&o.y<=by))list.splice(i,1)}salaItens(list,SALA)}
  for(const o of list)if(o.k==null)o.k=o.x+o.y;
@@ -6551,7 +6563,17 @@ function drawAnimal(c,a){
 
  const x=a.x,y=a.y,d=a.dir,l=Math.sin(a.ph)*1.6;c.save();c.translate(x,y);c.scale(d,1);
  c.fillStyle='rgba(0,0,0,.18)';c.beginPath();c.ellipse(0,0,a.kind==='cavalo'?14:a.kind==='capivara'?10:5,2.5,0,0,7);c.fill();
- if(a.kind==='capivara'){c.fillStyle='#6e4a2c';c.fillRect(-6,-4,2.4,4-Math.max(0,l));c.fillRect(4,-4,2.4,4-Math.max(0,-l));c.fillStyle='#8a5e3a';c.beginPath();c.ellipse(0,-7,10,5.5,0,0,7);c.fill();rr(c,6,-12,8,7,3);c.fill();c.fillStyle='#6e4a2c';circ(c,8,-12.5,1.5);c.fillStyle='#2b1a14';circ(c,11,-10,.9);circ(c,13.6,-8.2,.8)}
+ if(a.kind==='capivara'){const deita=a.tx==null&&Math.sin(a.x*.13+now*.05)>.3,dz=deita?3:0;
+  c.fillStyle='rgba(0,0,0,.2)';c.beginPath();c.ellipse(1,0,14,4,0,0,7);c.fill();
+  if(!deita){c.fillStyle='#5a3a22';for(const [lx,s2] of [[-8,1],[-4,-1],[5,-1],[9,1]]){rr(c,lx-1.6,-6,3.4,6-Math.max(0,l*s2),1.2);c.fill()}}
+  const g=c.createLinearGradient(0,-17+dz,0,-2+dz);g.addColorStop(0,'#b5895a');g.addColorStop(.55,'#8f6440');g.addColorStop(1,'#5e3d24');c.fillStyle=g;
+  c.beginPath();c.moveTo(-12,-6+dz);c.quadraticCurveTo(-14,-16+dz,-4,-16.5+dz);c.quadraticCurveTo(7,-17+dz,10,-12+dz);c.lineTo(10,-5+dz);c.quadraticCurveTo(0,-2+dz,-12,-6+dz);c.fill();
+  c.fillStyle='rgba(255,255,255,.12)';c.beginPath();c.ellipse(-3,-14+dz,7,2,0,0,7);c.fill();
+  // cabeça grande e quadrada
+  c.fillStyle='#8f6440';rr(c,7,-17+dz,10,9,3.5);c.fill();c.fillStyle='#7a5434';rr(c,13,-14+dz,6,6,2.5);c.fill();
+  c.fillStyle='#5e3d24';c.beginPath();c.ellipse(9,-17.5+dz,2,1.6,0,0,7);c.ellipse(12.5,-17.8+dz,1.8,1.5,0,0,7);c.fill();
+  c.fillStyle='#1d120c';c.beginPath();c.arc(13,-14.2+dz,1,0,7);c.fill();c.fillRect(17.2,-12.2+dz,1.2,.9);c.fillRect(17.2,-10+dz,1.2,.9);
+  c.strokeStyle='#4a2e1a';c.lineWidth=.7;c.beginPath();c.moveTo(16,-9.6+dz);c.lineTo(18.6,-9.6+dz);c.stroke()}
  else if(a.kind==='galinha'){c.strokeStyle='#e0a030';c.lineWidth=1;c.beginPath();c.moveTo(-1,-3);c.lineTo(-1-l*.5,0);c.moveTo(1,-3);c.lineTo(1+l*.5,0);c.stroke();c.fillStyle='#fafafa';circ(c,0,-6,4.2);circ(c,3,-10,2.6);c.fillStyle='#e74c3c';c.fillRect(2,-13.5,2.6,2);c.fillStyle='#f39c12';c.beginPath();c.moveTo(5.4,-10.5);c.lineTo(7.4,-9.6);c.lineTo(5.4,-9);c.fill();c.fillStyle='#2b1a14';circ(c,3.8,-10.6,.6);c.fillStyle='#e8e8e8';c.beginPath();c.moveTo(-4,-7);c.lineTo(-7,-10);c.lineTo(-4,-4);c.fill()}
  else{c.fillStyle='#5e3a1e';for(const [lx,s] of [[-9,1],[-5,-1],[6,-1],[10,1]])c.fillRect(lx,-12,2.6,12-Math.max(0,l*s));c.fillStyle='#7a4a2a';c.beginPath();c.ellipse(0,-15,13,6,0,0,7);c.fill();
   c.beginPath();c.moveTo(8,-18);c.lineTo(14,-28);c.lineTo(19,-26);c.lineTo(13,-15);c.fill();rr(c,14,-31,9,6,3);c.fill();c.fillStyle='#2b1a14';c.beginPath();c.moveTo(9,-19);c.lineTo(14,-29);c.lineTo(12,-29);c.lineTo(7,-20);c.fill();
