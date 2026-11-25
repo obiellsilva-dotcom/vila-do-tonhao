@@ -4114,18 +4114,18 @@ insert into public.comercios(id, tipo, preco_ponto, nivel_min, despesa) values
   (3, 'pipoca', 30000, 8, 200), (4, 'acai', 50000, 8, 200), (5, 'caldo', 40000, 8, 200), (6, 'banca', 30000, 8, 200)
 on conflict (id) do update set tipo = excluded.tipo, preco_ponto = excluded.preco_ponto, nivel_min = excluded.nivel_min, despesa = excluded.despesa;
 insert into public.comercio_catalogo(tipo, item, nome, custo, ref, pmin, pmax, taxa, fome, sede, roupa, maxq) values
-  ('pipoca','salgada','Pipoca salgada', 10, 25, 15, 50, .07, 15, 0, null, 60),
-  ('pipoca','doce','Pipoca doce', 12, 28, 16, 55, .07, 15, 0, null, 60),
-  ('pipoca','algodao','Algodão-doce', 15, 35, 20, 70, .06, 10, 0, null, 60),
-  ('acai','acai','Açaí 300 ml', 20, 45, 28, 90, .07, 25, 10, null, 60),
-  ('acai','casquinha','Sorvete de casquinha', 8, 20, 12, 40, .07, 5, 15, null, 60),
-  ('acai','picole','Picolé', 5, 12, 7, 25, .07, 0, 15, null, 60),
-  ('caldo','caldo','Caldo de cana', 8, 20, 12, 40, .07, 0, 40, null, 60),
-  ('caldo','pastelc','Pastel de carne', 12, 28, 16, 55, .07, 35, 0, null, 60),
-  ('caldo','pastelq','Pastel de queijo', 12, 28, 16, 55, .07, 35, 0, null, 60),
-  ('banca','revista','Revista da semana', 10, 25, 15, 50, .06, 0, 0, null, 60),
-  ('banca','figurinha','Pacote de figurinhas', 6, 15, 9, 30, .08, 0, 0, null, 60),
-  ('banca','bala','Bala e chiclete', 2, 6, 3, 12, .08, 3, 0, null, 60)
+  ('pipoca','salgada','Pipoca salgada', 10, 25, 15, 50, 0.9, 15, 0, null, 300),
+  ('pipoca','doce','Pipoca doce', 12, 28, 16, 55, 0.9, 15, 0, null, 300),
+  ('pipoca','algodao','Algodão-doce', 15, 35, 20, 70, 0.9, 10, 0, null, 300),
+  ('acai','acai','Açaí 300 ml', 20, 45, 28, 90, 1.7, 25, 10, null, 300),
+  ('acai','casquinha','Sorvete de casquinha', 8, 20, 12, 40, 1.7, 5, 15, null, 300),
+  ('acai','picole','Picolé', 5, 12, 7, 25, 1.7, 0, 15, null, 300),
+  ('caldo','caldo','Caldo de cana', 8, 20, 12, 40, 1.35, 0, 40, null, 300),
+  ('caldo','pastelc','Pastel de carne', 12, 28, 16, 55, 1.35, 35, 0, null, 300),
+  ('caldo','pastelq','Pastel de queijo', 12, 28, 16, 55, 1.35, 35, 0, null, 300),
+  ('banca','revista','Revista da semana', 10, 25, 15, 50, 1.6, 0, 0, null, 300),
+  ('banca','figurinha','Pacote de figurinhas', 6, 15, 9, 30, 1.6, 0, 0, null, 300),
+  ('banca','bala','Bala e chiclete', 2, 6, 3, 12, 1.6, 3, 0, null, 300)
 on conflict (tipo, item) do update set nome = excluded.nome, custo = excluded.custo, ref = excluded.ref, pmin = excluded.pmin, pmax = excluded.pmax,
   taxa = excluded.taxa, fome = excluded.fome, sede = excluded.sede, roupa = excluded.roupa, maxq = excluded.maxq;
 
