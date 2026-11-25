@@ -1769,7 +1769,7 @@ const PRACA_DECO=[addB({kind:'coreto',deco:1,x:23,y:39,w:3,h:3}),
  ...[[20,37],[28,37],[20,43],[28,43],[107,64],[117,65],[105,69],[118,70]].map(([x,y],i)=>addB({kind:'posteP',deco:1,x,y,w:1,h:1,i}))];
 const plazaTiles=[],fieldTiles=[];
 for(let y=33;y<=47;y++)for(let x=15;x<=32;x++)if(grid[y][x]===G.PLAZA)plazaTiles.push([x,y]);
-for(const y of [15,28])for(let x=60;x<=78;x++)fieldTiles.push([x,y]); // a torcida fica na beira do campo (dentro tem a pelada)
+for(let y=16;y<=27;y++)for(let x=60;x<=78;x++)fieldTiles.push([x,y]);
 
 // decor
 const trees=[];
@@ -1944,9 +1944,9 @@ function lagoNatural(c){
  c.fillStyle='rgba(60,90,40,.6)';for(let i=0;i<26;i++){const a=i/26*Math.PI*2+.1,x=T(46.5)+Math.cos(a)*(T(7.3)+3),y=T(-10.5)+Math.sin(a)*(T(4.3)+3);if(Math.sin(a)<-.6&&Math.abs(Math.cos(a))<.3)continue;
   for(let k=0;k<3;k++){c.fillRect(x+k*3-3,y-6-k%2*2,1.4,7+k%2*2)}}
 }
-function paintFeatures(c){
+function paintFeatures(c,x0,y0,w,h){const ve=(ax,ay,bx,by)=>x0==null||!(T(bx)<x0||T(ax)>x0+w||T(by)<y0||T(ay)>y0+h);if(!ve(-20,-20,140,100))return;
  // lagoa e cachoeira
- lagoNatural(c);
+ if(ve(35,-19,58,-1))lagoNatural(c);
   placa(c,T(36.5),T(-1.6),'🎣 LAGOA');placa(c,T(40),T(-3.4),'LAGOA DA CACHOEIRA');
  c.fillStyle='#8a5a33';for(let k=0;k<4;k++)c.fillRect(T(44)+k*20,T(-7)+6,18,7);c.fillStyle='#6d4426';c.fillRect(T(44),T(-7)+12,3,10);c.fillRect(T(44)+76,T(-7)+12,3,10);
  // mirante
@@ -1958,7 +1958,7 @@ function paintFeatures(c){
  // horta, campinho, parque
  c.strokeStyle='#8b5a2b';c.lineWidth=2;c.strokeRect(T(1)-2,T(65)-2,T(10)+4,T(6)+4);placa(c,T(6),T(64.5),'🥬 HORTA COMUNITÁRIA');
  {const x0=T(72),y0=T(65),x1=T(81),y1=T(71);c.fillStyle='#e7d9b8';c.fillRect(x0,y0,x1-x0,y1-y0);c.fillStyle='#d9c08a';for(let i=0;i<400;i++)c.fillRect(x0+hsh(i,1,71)*(x1-x0),y0+hsh(i,2,72)*(y1-y0),1.5,1.5);c.fillStyle='#e85d4a';c.fillRect(x0,y0,x1-x0,4);c.fillRect(x0,y1-4,x1-x0,4);c.fillRect(x0,y0,4,y1-y0);c.fillRect(x1-4,y0,4,y1-y0)}placa(c,T(76.5),T(64.2),'🛝 PARQUINHO E ACADEMIA');
- {const cx=T(111.5),cy=T(67.5);c.strokeStyle='#d9c8a3';c.lineWidth=18;c.beginPath();lagoForma(c,cx,cy,T(3.9),T(2.4),T(1.15),3);c.stroke();c.strokeStyle='rgba(120,90,50,.18)';c.lineWidth=1;for(const m of [T(1.15)-8,T(1.15)+8]){c.beginPath();lagoForma(c,cx,cy,T(3.9),T(2.4),m,3);c.stroke()}
+ if(ve(102,62,121,73)){const cx=T(111.5),cy=T(67.5);c.strokeStyle='#d9c8a3';c.lineWidth=18;c.beginPath();lagoForma(c,cx,cy,T(3.9),T(2.4),T(1.15),3);c.stroke();c.strokeStyle='rgba(120,90,50,.18)';c.lineWidth=1;for(const m of [T(1.15)-8,T(1.15)+8]){c.beginPath();lagoForma(c,cx,cy,T(3.9),T(2.4),m,3);c.stroke()}
   lagoBonito(c,cx,cy,T(3.9),T(2.4),3,[104,63,119,72]);
   // deck de madeira entrando no lago
   const dx0=T(110.6),dy0=T(68.9),dx1=T(112.4),dy1=T(71);c.fillStyle='rgba(0,0,0,.25)';c.fillRect(dx0+3,dy0+3,dx1-dx0,dy1-dy0);c.fillStyle='#a8743f';c.fillRect(dx0,dy0,dx1-dx0,dy1-dy0);c.strokeStyle='#7a5028';c.lineWidth=1.2;for(let y=dy0+5;y<dy1;y+=6){c.beginPath();c.moveTo(dx0,y);c.lineTo(dx1,y);c.stroke()}c.fillStyle='#6b4423';for(const [x,y] of [[dx0,dy0],[dx1-4,dy0],[dx0,dy1-4],[dx1-4,dy1-4]])c.fillRect(x,y,4,4)}
@@ -1999,9 +1999,9 @@ function paintStatic(c,x0,y0,w,h){
  c.fillStyle='#6d4426';c.fillRect(40*TILE,53*TILE+14,4,12);c.fillRect(46*TILE+26,53*TILE+14,4,12);
  // boat
  c.fillStyle='#c0392b';c.beginPath();c.moveTo(T(60),T(54.3));c.lineTo(T(62.5),T(54.3));c.lineTo(T(62),T(54.8));c.lineTo(T(60.4),T(54.8));c.closePath();c.fill();
- paintPlaza(c);paintCampo(c);paintCondo(c);
+ {const ve=(ax,ay,bx,by)=>!(T(bx)<x0||T(ax)>x0+w||T(by)<y0||T(ay)>y0+h);if(ve(14,32,34,49)||ve(37,14,52,16))paintPlaza(c);if(ve(58,14,81,29))paintCampo(c);if(ve(8,-14,32,-3))paintCondo(c)}
  const M=120;
- paintFeatures(c);
+ paintFeatures(c,x0,y0,w,h);
 }
 // profundidade: sombra projetada (sol vindo do alto à esquerda) + volume nas paredes
 function sombraB(c,b){
@@ -2278,6 +2278,7 @@ function peladaMontar(s){PEL.slot=s;const [A,B]=peladaTimes(s);PEL.jog=[];
  PEL.ga=0;PEL.gb=0;PEL.gi=0}
 async function peladaCarregar(){if(!eu)return;PEL.carregado=Date.now();try{const r=tratar(await api.pelada());PEL.res=r;PEL.apostas=r.apostas||[];if(r.ganho>0){Som.play('moeda');toast('⚽ Você ganhou '+money(r.ganho)+' na aposta da pelada!',4500)}if(PEL.slot===r.slot&&!PEL.gols.length&&(r.a+r.b))peladaMontar(r.slot)}catch(e){}}
 function peladaPasso(dt){const s=peladaSlot(),seg=(Date.now()/1000)%600;
+ const pertoCampo=eu&&Math.hypot(cam.x-T(69),cam.y-T(22))<T(30);
  if(eu&&(PEL.slot!==s||Date.now()-PEL.carregado>90000)&&Date.now()-PEL.carregado>4000){const q=Math.hypot(eu.x-T(69),eu.y-T(22));if(q<T(26)||PEL.slot!==s)peladaCarregar()}
  if(PEL.slot!==s)peladaMontar(s);
  PEL.jogando=seg<480;if(!PEL.jogando){ball.tx=ball.x=T(69.5);ball.ty=ball.y=T(22);return}
@@ -2289,6 +2290,7 @@ function peladaPasso(dt){const s=peladaSlot(),seg=(Date.now()/1000)%600;
  if(perto){ball.tx=prox.t?PELF.x0-6:PELF.x1+6;ball.ty=cy+Math.sin(seg)*10}
  else if(bd<4||now>PEL.toque){const lado=Math.random()<.5,tx=lado?cx+(Math.random()-.3)*(PELF.x1-PELF.x0)*.45:cx-(Math.random()-.3)*(PELF.x1-PELF.x0)*.45;ball.tx=Math.max(PELF.x0+10,Math.min(PELF.x1-10,tx));ball.ty=PELF.y0+16+Math.random()*(PELF.y1-PELF.y0-32);PEL.toque=now+1.2+Math.random()*1.6}
  {const d=Math.hypot(ball.tx-ball.x,ball.ty-ball.y);if(d>.5){const sp=Math.min(d,(perto?170:110)*dt);ball.x+=(ball.tx-ball.x)/d*sp;ball.y+=(ball.ty-ball.y)/d*sp}ball.z=Math.abs(Math.sin(now*7))*Math.min(5,d/10)}
+ if(!pertoCampo)return;
  // jogadores: goleiro no gol, os outros perto da bola mantendo a posição
  for(const j of PEL.jog){let tx,ty;const meuGol=j.t?PELF.x1-14:PELF.x0+14;
   if(j.goleiro){tx=meuGol;ty=Math.max(cy-34,Math.min(cy+34,ball.y))}
@@ -2298,16 +2300,12 @@ function peladaPasso(dt){const s=peladaSlot(),seg=(Date.now()/1000)%600;
   if(PEL.comemora>now&&!j.goleiro){tx=j.x;ty=j.y}
   const dx=tx-j.x,dy=ty-j.y,d=Math.hypot(dx,dy),sp=Math.min(d,(j.goleiro?50:70)*dt);
   if(d>2){j.x+=dx/d*sp;j.y+=dy/d*sp;const sx=(dx-dy)*IA,sy=(dx+dy)*IB;j.mv=Math.round(Math.atan2(sy,sx)/(Math.PI/8))*(Math.PI/8);j.ph+=dt*9;j.dir=sx>=0?1:-1}else{j.mv=null}}}
-function peladaItens(list,vis){if(!PEL.jog.length||!vis(T(69),T(22))&&!vis(T(62),T(17))&&!vis(T(77),T(27)))return;
- for(const j of PEL.jog){if(!PEL.jogando)continue;list.push({x:j.x,y:j.y,f:()=>{drawPerson(ctx,j.x,j.y,j.v,{s:PS,mv:j.mv,walk:j.mv!=null?j.ph:null,dir:j.dir||1});const q=[j.x,j.y-46*PS];ctx.fillStyle=j.cor;ctx.beginPath();ctx.arc(q[0],q[1]-4,2.6,0,7);ctx.fill()}})}
+function peladaItens(list,vis){if(!vis(T(61),T(22))&&!vis(T(78),T(22)))return;
+ for(const j of PEL.jog){if(!PEL.jogando||cam.z<1.05||!vis(j.x,j.y))continue;list.push({x:j.x,y:j.y,f:()=>{drawPerson(ctx,j.x,j.y,j.v,{s:PS,mv:j.mv,walk:j.mv!=null?j.ph:null,dir:j.dir||1});const q=[j.x,j.y-46*PS];ctx.fillStyle=j.cor;ctx.beginPath();ctx.arc(q[0],q[1]-4,2.6,0,7);ctx.fill()}})}
  // traves 3D e placar
  for(const [gx,lado] of [[PELF.x0-2,1],[PELF.x1+2,-1]]){const cy=(PELF.y0+PELF.y1)/2;list.push({x:gx,y:cy+40,k:gx+cy+34,cam:1,f:()=>{const W='#f4f4f4';isoBox(ctx,gx-2,cy-36,gx+2,cy-32,0,24,W);isoBox(ctx,gx-2,cy+32,gx+2,cy+36,0,24,W);isoBox(ctx,gx-2,cy-36,gx+2,cy+36,22,25,W);
    const P=(x,y,z)=>{const q=isoP(x,y);return[q[0],q[1]-z]};ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=.6;for(let k=-34;k<=34;k+=6){const a=P(gx,cy+k,23),b=P(gx-lado*12,cy+k,4);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}for(let z=4;z<24;z+=5){const a=P(gx-lado*12*(1-z/24),cy-34,z),b=P(gx-lado*12*(1-z/24),cy+34,z);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}}})}
- {const X=T(69.5),Y=T(15.6);list.push({x:X,y:Y,k:X+Y,cam:1,f:()=>{const q=isoP(X,Y),s=peladaSlot(),[A,B]=peladaTimes(s),seg=(Date.now()/1000)%600;ctx.save();ctx.translate(q[0],q[1]);
-   ctx.fillStyle='#3a3f47';ctx.fillRect(-46,-40,3,40);ctx.fillRect(43,-40,3,40);ctx.fillStyle='#1d2329';rr(ctx,-60,-74,120,38,5);ctx.fill();ctx.strokeStyle='#f1c40f';ctx.lineWidth=1.5;ctx.stroke();
-   ctx.font='700 7px Fredoka, sans-serif';ctx.textAlign='center';ctx.fillStyle=A[1]==='#111'?'#ddd':A[1];ctx.fillText(A[0],-30,-64);ctx.fillStyle=B[1]==='#111'?'#ddd':B[1];ctx.fillText(B[0],30,-64);
-   ctx.font='800 15px Fredoka, sans-serif';ctx.fillStyle='#ffd23f';ctx.fillText(PEL.jogando?PEL.ga+'  x  '+PEL.gb:'—',0,-48);
-   ctx.font='600 6.5px Fredoka, sans-serif';ctx.fillStyle='#9fe3ff';const mm=Math.floor(seg/60),ss=Math.floor(seg%60);ctx.fillText(PEL.jogando?('⏱ '+String(Math.floor(seg/480*90)).padStart(2,'0')+"' · aposte no próximo jogo"):'INTERVALO · próximo jogo em '+(9-mm)+':'+String(59-ss).padStart(2,'0'),0,-40);ctx.restore()}})}}
+}
 function abrirPelada(){if(!eu)return;closeCard();const box=$('placeActs');box.innerHTML='';const s=peladaSlot(),[A,B]=peladaTimes(s),[A2,B2]=peladaTimes(s+1),seg=(Date.now()/1000)%600;
  const t=document.createElement('div');t.style.cssText='font-size:13px;margin:4px 2px 8px;line-height:1.5';t.innerHTML=(PEL.jogando?`🔴 <b>Ao vivo:</b> ${A[0]} <b>${PEL.ga} x ${PEL.gb}</b> ${B[0]}`:`⏸️ Intervalo. O próximo jogo começa em ${Math.ceil((600-seg)/60)} min.`)+`<br>⚽ <b>Próximo jogo:</b> ${A2[0]} x ${B2[0]}<br><span style="opacity:.75;font-size:12px">Acertou o time: ganha 2,2x. Acertou empate: ganha 4x. De R$ 100 a R$ 5.000, uma aposta por jogo. O prêmio cai sozinho quando o jogo acaba.</span>`;box.appendChild(t);
  const ja=(PEL.apostas||[]).find(a=>a.slot===s+1);
@@ -2508,10 +2506,9 @@ function update(dt){
   else{const s=30*dt;chopp.x+=dx/d*Math.min(s,d);chopp.y+=dy/d*Math.min(s,d)}
   if(chopp.ret&&now>chopp.wait){chopp.tx=chopp.home[0];chopp.ty=chopp.home[1];chopp.ret=false}}
  // ball
- peladaPasso(dt);
- const players=PEL.jogando?[]:residents.filter(r=>r.place==='campo'&&!r.hidden&&r.state==='stay');
- const bd=PEL.jogando?0:Math.hypot(ball.tx-ball.x,ball.ty-ball.y);
- if(PEL.jogando){}else if(bd<3){if(players.length){const p=pick(players);ball.tx=p.x+p.dir*5;ball.ty=p.y;if(Math.random()<.08)say(p,pick(CAMPO))}else{ball.tx=T(69);ball.ty=T(22)}}
+ const players=residents.filter(r=>r.place==='campo'&&!r.hidden&&r.state==='stay');
+ const bd=Math.hypot(ball.tx-ball.x,ball.ty-ball.y);
+ if(bd<3){if(players.length){const p=pick(players);ball.tx=p.x+p.dir*5;ball.ty=p.y;if(Math.random()<.08)say(p,pick(CAMPO))}else{ball.tx=T(69);ball.ty=T(22)}}
  else{const s=Math.min(bd,130*dt);ball.x+=(ball.tx-ball.x)/bd*s;ball.y+=(ball.ty-ball.y)/bd*s}
  ball.z=Math.abs(Math.sin(now*6))*Math.min(6,bd/8);
  if(follow){cam.x+=(follow.x-cam.x)*Math.min(1,dt*4);cam.y+=(follow.y-10-cam.y)*Math.min(1,dt*4)}
@@ -3309,6 +3306,8 @@ function n3Desenha(list,b){const d=N3D[b.kind],noite=darkness()>.3,key=b.kind+(n
  const sw=d.sw||16,cb=[a.X0,a.Y0,a.X1,a.Y1,d.H];
  // chave de profundidade: a MENOR das duas bordas da fatia (assim quem passa na calçada da frente nunca fica atrás de um pedaço do prédio)
  const kAt=sc=>{const fx=sc/IA+a.Y1;return fx<=a.X1?Math.max(a.X0,fx)+a.Y1:a.X1+Math.max(a.Y0,a.X1-sc/IA)};
+ // de longe (zoom pequeno) desenha o prédio inteiro de uma vez: muito mais leve no celular
+ if(cam.z<1.02){list.push({x:a.X1,y:a.Y1,k:a.X0+a.Y1-6,cam:1,cb,f:()=>{ctx.globalAlpha=fade;ctx.drawImage(a.cv,0,0,a.cv.width,a.cv.height,a.L,a.Tp,a.R-a.L,a.Bt-a.Tp)}});return}
  for(let sx=a.L;sx<a.R;sx+=sw){const sc=sx+sw/2,fx=sc/IA+a.Y1;let px,py;
   if(fx<=a.X1){px=Math.max(a.X0,fx);py=a.Y1}else{px=a.X1;py=Math.max(a.Y0,a.X1-sc/IA)}
   const s0=sx,w=Math.min(sw+.6,a.R-s0),kk2=Math.min(kAt(s0),kAt(s0+w))-6;
@@ -3511,7 +3510,14 @@ function pomboDraw(c,p){const x=p.x,y=p.y,z=p.z,d=p.dir,voo=z>1,bic=voo?0:Math.m
 /* ----- Natal na praça: árvore enfeitada e pisca-pisca ----- */
 const NATAL={x:19.2,y:34.9};
 function pisca(i){return Math.sin(now*3+i*1.7)>-.2}
-function drawNatal(c){const x=T(NATAL.x),y=T(NATAL.y),cores=['#ff3b3b','#ffd23f','#3bc4ff','#ff7ad9','#7dff6b','#ffffff'],S=2.3;
+// a árvore é desenhada 1 vez numa imagem guardada; a cada quadro só pisca o pisca-pisca (leve no celular)
+let NATAL_CV=null;
+function drawNatal(c){const x=T(NATAL.x),y=T(NATAL.y),S=2.3,N=7,H=12+N*11.5*S*.82+15*S,cores=['#ff3b3b','#ffd23f','#3bc4ff','#ff7ad9','#7dff6b','#ffffff'];
+ if(!NATAL_CV){const W=180,HH=Math.ceil(H+60),cv=document.createElement('canvas'),k=2;cv.width=W*k;cv.height=HH*k;const g=cv.getContext('2d');g.scale(k,k);g.translate(W/2-x,HH-24-y);drawNatalArte(g,x,y);NATAL_CV={cv,W,HH}}
+ c.drawImage(NATAL_CV.cv,x-NATAL_CV.W/2,y-(NATAL_CV.HH-24),NATAL_CV.W,NATAL_CV.HH);
+ for(let i=0;i<54;i++){if(!pisca(i))continue;const t=i/54,yy=y-16-t*(H-30),w=(1-t)*27*S*.85,xx=x+Math.sin(i*2.4)*w,cl=cores[(i+Math.floor(now*2))%6];c.fillStyle=cl;c.globalAlpha=.35;c.beginPath();c.arc(xx,yy,4,0,7);c.fill();c.globalAlpha=1;c.beginPath();c.arc(xx,yy,2,0,7);c.fill()}
+ {const sy=y-H-4,sc=1.6+.12*Math.sin(now*4);c.save();c.translate(x,sy);c.scale(sc,sc);c.fillStyle='rgba(255,224,102,.35)';c.beginPath();c.arc(0,0,12,0,7);c.fill();c.fillStyle='#ffe066';c.beginPath();for(let j=0;j<10;j++){const r=j%2?3.4:8.5,a=-Math.PI/2+j*Math.PI/5;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();c.restore()}}
+function drawNatalArte(c,x,y){const cores=['#ff3b3b','#ffd23f','#3bc4ff','#ff7ad9','#7dff6b','#ffffff'],S=2.3;
  c.save();
  // base: tapete de neve e cerca de madeira baixinha
  c.fillStyle='rgba(0,0,0,.22)';c.beginPath();c.ellipse(x+10,y+4,30*S,11*S,0,0,7);c.fill();
@@ -3528,10 +3534,6 @@ function drawNatal(c){const x=T(NATAL.x),y=T(NATAL.y),cores=['#ff3b3b','#ffd23f'
  c.strokeStyle='#ffd23f';c.lineWidth=2;for(let i=0;i<5;i++){const yb=y-24-i*H/6.2,w=(26-i*4.6)*S*.9;c.beginPath();c.moveTo(x-w,yb);c.quadraticCurveTo(x,yb+10,x+w,yb-8);c.stroke()}
  // bolas grandes com brilho
  for(let i=0;i<26;i++){const t=hsh(i,1,301),yy=y-20-t*(H-40),w=(1-t)*26*S*.85,xx=x+(hsh(i,2,302)*2-1)*w,cl=cores[i%5],r=3.4+hsh(i,3,303)*1.6,g=c.createRadialGradient(xx-1,yy-1,.5,xx,yy,r);g.addColorStop(0,'#fff');g.addColorStop(.35,cl);g.addColorStop(1,shade(cl,-55));c.fillStyle=g;c.beginPath();c.arc(xx,yy,r,0,7);c.fill()}
- // pisca-pisca
- for(let i=0;i<54;i++){const t=i/54,yy=y-16-t*(H-30),w=(1-t)*27*S*.85,xx=x+Math.sin(i*2.4)*w;if(pisca(i)){c.fillStyle=cores[(i+Math.floor(now*2))%6];c.shadowColor=c.fillStyle;c.shadowBlur=8;c.beginPath();c.arc(xx,yy,2,0,7);c.fill();c.shadowBlur=0}}
- // estrela grande
- {const sy=y-H-4,sc=1.6+.12*Math.sin(now*4);c.save();c.translate(x,sy);c.scale(sc,sc);c.fillStyle='#ffe066';c.shadowColor='#ffd23f';c.shadowBlur=16;c.beginPath();for(let j=0;j<10;j++){const r=j%2?3.4:8.5,a=-Math.PI/2+j*Math.PI/5;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();c.restore()}
  // presentes em volta
  [[-40,4,'#e74c3c','#ffd23f',14],[-24,10,'#3498db','#fff',11],[26,8,'#9b59b6','#7dff6b',13],[42,2,'#27ae60','#e74c3c',10],[8,12,'#f39c12','#fff',12]].forEach(([px,py,cl,fi,sz])=>{isoBox(c,x+px-sz/2,y+py-sz/2,x+px+sz/2,y+py+sz/2,0,sz*.9,cl);const q=isoP(x+px,y+py);c.fillStyle=fi;c.fillRect(q[0]-1.2,q[1]-sz*.9-1-sz*.4,2.4,sz*.4+2);c.beginPath();c.ellipse(q[0]-3,q[1]-sz*.9-2,3,1.8,-.5,0,7);c.ellipse(q[0]+3,q[1]-sz*.9-2,3,1.8,.5,0,7);c.fill()});
  c.restore();
@@ -5122,7 +5124,6 @@ const api=ONLINE?(()=>{
   propor:(n,c,v)=>rpc('propor_venda',{p_nome:n,p_carro:c,p_valor:v}),
   responder:(id,ok)=>rpc('responder_proposta',{p_id:id,p_aceitar:ok}),
   assumirPref:()=>rpc('assumir_prefeitura'),
-   pelada:()=>rpc('pelada'),peladaApostar:(p,v)=>rpc('pelada_apostar',{p_palpite:p,p_valor:v}),
    eleicao:()=>rpc('eleicao'),candidatar:m=>rpc('candidatar',{p_msg:m}),votar:id=>rpc('votar',{p_cand:id}),
    deixarPref:()=>rpc('deixar_prefeitura'),
    vistoNovidades:v=>ONLINE?rpc('visto_novidades',{p_v:v}):Promise.resolve(null),
@@ -6878,7 +6879,6 @@ function pertoOpcoes(){
   if(!eu||trabalho||emCasa||sinucaAberta||carOf(eu))return[];
  const o=[],perto=(x,y,r)=>Math.hypot(eu.x-x,eu.y-y)<r;
   if(eu.parkLoc&&!eu.seat&&perto(eu.parkLoc.x,eu.parkLoc.y,T(2.2)))o.push(['🚗 Entrar no carro',()=>entrarNoParado()]);
- if(eu.x>T(58)&&eu.x<T(81)&&eu.y>T(14)&&eu.y<T(29.5))o.push(['⚽ Pelada: apostar',()=>{peladaCarregar().then(()=>{if(lugarAtual==='pelada')abrirPelada()});lugarAtual='pelada';abrirPelada()}]);
  if(eu.seat){o.push(['🧍 Levantar',levantar]);if(eu.seat.kind!=='praca')o.push(['🍺 Pedir ao Tonhão',()=>abrirLugar({kind:'bar'})]);return o}
  {const ps=PRACA_SEATS.filter(s=>!s.occ&&perto(T(s.x),T(s.y),T(1.2))).sort((a,b)=>Math.hypot(eu.x-T(a.x),eu.y-T(a.y))-Math.hypot(eu.x-T(b.x),eu.y-T(b.y)))[0];if(ps)o.push(['🪑 Sentar no banco',()=>{sentar(ps);say(eu,pick(['Que sombra boa!','Daqui eu vejo a cidade toda.','Descansando um pouquinho…']),3,true)}])}
  const dentro=eu.x>T(18)&&eu.x<T(30)&&eu.y>T(17.5)&&eu.y<T(26.4);
