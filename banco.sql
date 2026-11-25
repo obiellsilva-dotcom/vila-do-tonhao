@@ -4104,3 +4104,147 @@ begin
   return json_build_object('pago', 75, 'xp_ganho', 20, 'subiu', novo_nivel - m.nivel, 'premio', premio,
     'morreu', morreu, 'cansado', cansado, 'eu', _estado(m.id));
 end $$;
+
+-- ===== ETAPA 52: quiosques da praça (pipoca, açaí, pastel/caldo de cana, banca) + painel de lucros =====
+-- Pontos baratos (R$ 10 mil, nível 8, conta R$ 200/semana). O lucro é por produto: paga o custo no fornecedor e vende pelo preço que escolher.
+alter table public.comercios add column if not exists investido bigint not null default 0;   -- gasto com mercadoria
+alter table public.comercios add column if not exists faturado bigint not null default 0;    -- tudo o que foi vendido
+alter table public.comercios add column if not exists contas bigint not null default 0;      -- contas de luz e água pagas
+insert into public.comercios(id, tipo, preco_ponto, nivel_min, despesa) values
+  (3, 'pipoca', 10000, 8, 200), (4, 'acai', 10000, 8, 200), (5, 'caldo', 10000, 8, 200), (6, 'banca', 10000, 8, 200)
+on conflict (id) do update set tipo = excluded.tipo, preco_ponto = excluded.preco_ponto, nivel_min = excluded.nivel_min, despesa = excluded.despesa;
+insert into public.comercio_catalogo(tipo, item, nome, custo, ref, pmin, pmax, taxa, fome, sede, roupa, maxq) values
+  ('pipoca','salgada','Pipoca salgada', 10, 25, 15, 50, .07, 15, 0, null, 60),
+  ('pipoca','doce','Pipoca doce', 12, 28, 16, 55, .07, 15, 0, null, 60),
+  ('pipoca','algodao','Algodão-doce', 15, 35, 20, 70, .06, 10, 0, null, 60),
+  ('acai','acai','Açaí 300 ml', 20, 45, 28, 90, .07, 25, 10, null, 60),
+  ('acai','casquinha','Sorvete de casquinha', 8, 20, 12, 40, .07, 5, 15, null, 60),
+  ('acai','picole','Picolé', 5, 12, 7, 25, .07, 0, 15, null, 60),
+  ('caldo','caldo','Caldo de cana', 8, 20, 12, 40, .07, 0, 40, null, 60),
+  ('caldo','pastelc','Pastel de carne', 12, 28, 16, 55, .07, 35, 0, null, 60),
+  ('caldo','pastelq','Pastel de queijo', 12, 28, 16, 55, .07, 35, 0, null, 60),
+  ('banca','revista','Revista da semana', 10, 25, 15, 50, .06, 0, 0, null, 60),
+  ('banca','figurinha','Pacote de figurinhas', 6, 15, 9, 30, .08, 0, 0, null, 60),
+  ('banca','bala','Bala e chiclete', 2, 6, 3, 12, .08, 3, 0, null, 60)
+on conflict (tipo, item) do update set nome = excluded.nome, custo = excluded.custo, ref = excluded.ref, pmin = excluded.pmin, pmax = excluded.pmax,
+  taxa = excluded.taxa, fome = excluded.fome, sede = excluded.sede, roupa = excluded.roupa, maxq = excluded.maxq;
+
+-- ETAPA 52 (continuação): contas do painel de lucros
+create or replace function public._com_atualiza(p_id integer) returns void
+language plpgsql security definer set search_path = public as $$
+declare c comercios; h numeric; r record; mult numeric; v numeric; n integer; tot integer := 0; d moradores;
+begin
+  select * into c from comercios where id = p_id for update;
+  if not found or c.dono is null then return; end if;
+  h := least(72, greatest(0, extract(epoch from now() - c.atualizado) / 3600));
+  if h > 0.01 then
+    for r in select i.*, k.taxa, k.ref from comercio_itens i join comercio_catalogo k on k.tipo = c.tipo and k.item = i.item where i.comercio = c.id and i.qtd > 0 loop
+      mult := greatest(0.1, least(1.5, 2 - r.preco::numeric / r.ref));
+      v := r.sobra + r.taxa * mult * h;
+      n := least(r.qtd, floor(v)::integer);
+      update comercio_itens set qtd = qtd - n, sobra = case when n = r.qtd then 0 else v - n end where comercio = c.id and item = r.item;
+      tot := tot + n * r.preco;
+      update comercios set vendas = vendas + n where id = c.id;
+    end loop;
+    update comercios set caixa = caixa + tot, faturado = faturado + tot, atualizado = now() where id = c.id;
+  end if;
+  -- contas da semana
+  select * into c from comercios where id = p_id;
+  while c.pago_ate is not null and c.pago_ate + interval '7 days' <= now() loop
+    if c.caixa >= c.despesa then
+      update comercios set caixa = caixa - despesa, contas = contas + despesa, pago_ate = pago_ate + interval '7 days', atrasos = 0 where id = c.id;
+    else
+      select * into d from moradores where id = c.dono for update;
+      if d.dinheiro >= c.despesa - greatest(0, c.caixa) then
+        update moradores set dinheiro = dinheiro - (c.despesa - greatest(0, c.caixa)) where id = d.id;
+        update comercios set caixa = 0, contas = contas + despesa, pago_ate = pago_ate + interval '7 days', atrasos = 0 where id = c.id;
+      else
+        update comercios set pago_ate = pago_ate + interval '7 days', atrasos = atrasos + 1 where id = c.id;
+      end if;
+    end if;
+    select * into c from comercios where id = p_id;
+    if c.atrasos >= 2 then -- duas contas sem pagar: o ponto volta à venda
+      delete from comercio_itens where comercio = c.id;
+      update comercios set dono = null, nome = null, caixa = 0, atrasos = 0, pago_ate = null, comprado_em = null where id = c.id;
+      return;
+    end if;
+  end loop;
+end $$;
+
+create or replace function public._com_json(p_id integer) returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object('id', c.id, 'tipo', c.tipo, 'preco_ponto', c.preco_ponto, 'nivel_min', c.nivel_min, 'despesa', c.despesa,
+    'dono', c.dono, 'dono_nome', m.nome, 'nome', c.nome,
+    'caixa', case when c.dono = auth.uid() then c.caixa end, 'vendas', case when c.dono = auth.uid() then c.vendas end,
+    'pago_ate', case when c.dono = auth.uid() then c.pago_ate end,
+    'investido', case when c.dono = auth.uid() then c.investido end, 'faturado', case when c.dono = auth.uid() then c.faturado end, 'contas', case when c.dono = auth.uid() then c.contas end,
+    'estoque_valor', case when c.dono = auth.uid() then (select coalesce(sum(i.qtd * k.custo), 0) from comercio_itens i join comercio_catalogo k on k.tipo = c.tipo and k.item = i.item where i.comercio = c.id) end, 'atrasos', case when c.dono = auth.uid() then c.atrasos end,
+    'colecao', case when c.tipo = 'butique' then _colecao() end,
+    'itens', coalesce((select json_agg(json_build_object('item', i.item, 'qtd', i.qtd, 'preco', i.preco) order by i.item) from comercio_itens i where i.comercio = c.id), '[]'::json))
+  from comercios c left join moradores m on m.id = c.dono where c.id = p_id
+$$;
+
+-- ETAPA 52 (continuação): compra do ponto, fornecedor e venda contam no painel
+create or replace function public.comprar_comercio(p_id integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios;
+begin
+  m := _eu();
+  perform _com_atualiza(p_id);
+  select * into c from comercios where id = p_id for update;
+  if not found then raise exception 'Esse ponto não existe.'; end if;
+  if c.dono is not null then raise exception 'Esse ponto já tem dono.'; end if;
+  if exists (select 1 from comercios where dono = m.id) then raise exception 'Você já tem um comércio. Um por pessoa!'; end if;
+  if m.nivel < c.nivel_min then raise exception 'Libera no nível %.', c.nivel_min; end if;
+  if m.dinheiro < c.preco_ponto then raise exception 'Dinheiro insuficiente. O ponto custa R$ %.', c.preco_ponto; end if;
+  update moradores set dinheiro = dinheiro - c.preco_ponto where id = m.id;
+  delete from comercio_itens where comercio = c.id;
+  update comercios set dono = m.id, nome = left(case c.tipo when 'lanchonete' then 'Lanchonete' when 'butique' then 'Loja' when 'pipoca' then 'Pipoca' when 'acai' then 'Açaí' when 'caldo' then 'Pastel' else 'Banca' end || ' do ' || split_part(m.nome, ' ', 1), 22),
+    caixa = 0, vendas = 0, atrasos = 0, investido = 0, faturado = 0, contas = 0, atualizado = now(), pago_ate = now(), comprado_em = now() where id = c.id;
+  return json_build_object('comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
+
+create or replace function public.com_repor(p_id integer, p_item text, p_qtd integer) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios; k comercio_catalogo; atual integer; custo integer;
+begin
+  m := _eu(); c := _meu_comercio(p_id);
+  select * into k from comercio_catalogo where tipo = c.tipo and item = p_item;
+  if not found then raise exception 'Produto inválido.'; end if;
+  if c.tipo = 'butique' and not (p_item = any(_colecao())) then raise exception 'Essa roupa saiu de linha. O fornecedor não tem mais.'; end if;
+  if p_qtd < 1 or p_qtd > 500 then raise exception 'Quantidade inválida.'; end if;
+  select qtd into atual from comercio_itens where comercio = c.id and item = p_item;
+  if coalesce(atual, 0) + p_qtd > k.maxq then raise exception 'O estoque cabe no máximo % unidades.', k.maxq; end if;
+  custo := k.custo * p_qtd;
+  if m.dinheiro < custo then raise exception 'Dinheiro insuficiente. Precisa de R$ %.', custo; end if;
+  update moradores set dinheiro = dinheiro - custo where id = m.id;
+  update comercios set investido = investido + custo where id = c.id;
+  insert into comercio_itens(comercio, item, qtd, preco) values (c.id, p_item, p_qtd, k.ref)
+  on conflict (comercio, item) do update set qtd = comercio_itens.qtd + p_qtd;
+  return json_build_object('custo', custo, 'comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
+
+create or replace function public.com_comprar(p_id integer, p_item text) returns json
+language plpgsql security definer set search_path = public as $$
+declare m moradores; c comercios; i comercio_itens; k comercio_catalogo; morreu boolean := false;
+begin
+  m := _eu();
+  perform _com_atualiza(p_id);
+  select * into c from comercios where id = p_id;
+  if not found or c.dono is null then raise exception 'Essa loja está fechada.'; end if;
+  select * into i from comercio_itens where comercio = c.id and item = p_item for update;
+  if not found or i.qtd < 1 then raise exception 'Acabou o estoque desse produto.'; end if;
+  select * into k from comercio_catalogo where tipo = c.tipo and item = p_item;
+  if m.dinheiro < i.preco then raise exception 'Dinheiro insuficiente.'; end if;
+  if k.roupa is not null then
+    if exists (select 1 from guarda_roupa where morador = m.id and peca = 'roupa_' || case when coalesce((_vis_nums(m.visual))[10], 0) = 1 then 'f' else 'm' end and item = k.roupa) then raise exception 'Você já tem essa roupa. Vista no guarda-roupa!'; end if;
+    insert into guarda_roupa(morador, peca, item) values (m.id, 'roupa_m', k.roupa), (m.id, 'roupa_f', k.roupa) on conflict do nothing;
+    update moradores set dinheiro = dinheiro - i.preco where id = m.id;
+  else
+    morreu := _gastar_fome(m.id, 0);
+    update moradores set dinheiro = dinheiro - i.preco, fome = least(100, fome + k.fome), sede = least(100, sede + k.sede) where id = m.id;
+  end if;
+  update comercio_itens set qtd = qtd - 1 where comercio = c.id and item = p_item;
+  update comercios set caixa = caixa + i.preco, faturado = faturado + i.preco, vendas = vendas + 1 where id = c.id;
+  return json_build_object('item', p_item, 'preco', i.preco, 'morreu', morreu, 'comercio', _com_json(c.id), 'eu', _estado(m.id));
+end $$;
