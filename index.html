@@ -5546,13 +5546,13 @@ async function celAvisos(){if(!eu)return;try{const r=await api.naoLidas();if(!r)
 setInterval(()=>{if(eu&&!document.hidden)celAvisos()},25000);
 
 /* ----- novidades da atualização: aparece 1 vez para cada pessoa ----- */
-const NOVID='v20261129'; // mudou: todo mundo vê de novo (eleição, ruas, salários)
+const NOVID='v20261130'; // praça, bar e quiosques
 const novEmo=(g,t,a,b)=>{g.textAlign='center';g.font='70px sans-serif';g.fillText(a,110,128+Math.sin(t*2.2)*6);if(b){g.font='44px sans-serif';const L=b.split(' ');g.fillText(L[Math.floor(t/1.1)%L.length],220,122+Math.cos(t*2)*5)}};
 const NOV_VID='novidades/v20261128/';
 const NOV_SLIDES=[
- {t:'🗳️ Eleição para prefeito',x:'Agora o prefeito é <b>eleito pela cidade</b>! Na <b>sexta</b>, quem é <b>nível 20+</b> se candidata na 🏛️ prefeitura com uma mensagem. No <b>sábado</b>, todo mundo do <b>nível 5+</b> vota (o voto é <b>secreto</b> e candidato não vota). Deu empate? <b>2º turno no domingo</b>. O eleito fica <b>uma semana</b> no cargo.',d:(g,t)=>novEmo(g,t,'🗳️','🏛️ 👑 ✅')},
- {t:'🛣️ Ruas novas',x:'Acabaram as <b>ruas sem saída</b>: agora tem uma <b>avenida em volta da cidade</b>, com <b>curvas</b> e ponte no rio. As ruas do alto sobem até o <b>Bairro Nobre</b>, as esquinas ficaram <b>arredondadas</b> e tem <b>quebra-molas</b> 🟡 — passe devagar!',d:(g,t)=>novEmo(g,t,'🛣️','🚗 🟡 ↩️')},
- {t:'💰 Salários +30%',x:'<b>Todos os empregos</b> passaram a pagar <b>30% a mais</b>! O peixe do pescador agora vale <b>R$ 42</b> e a ronda da polícia paga <b>R$ 75</b>. Bora trabalhar! 💪',d:(g,t)=>novEmo(g,t,'💰','💵 💼 🐟')}
+ {t:'🌳 Praça do Tonhão nova',x:'A praça agora ocupa o <b>quarteirão inteiro</b>: chão de <b>pedra portuguesa</b>, <b>coreto</b> que acende à noite, <b>ipês</b>, postes antigos, bancos em volta do coreto e <b>pombos</b> que voam quando você chega perto. E tem <b>árvore de Natal gigante</b>, <b>Papai Noel</b> e <b>trenó com renas</b>! 🎄',d:(g,t)=>novEmo(g,t,'🌳','🎪 🎄 🐦')},
+ {t:'🍺 Bar com cara de boteco',x:'O <b>Bar do Tonhão</b> ganhou <b>toldo listrado</b>, <b>portas de enrolar</b>, azulejo, <b>letreiro de neon</b> que acende à noite, engradados de cerveja, piso de ladrilho, geladeira de vidro e <b>ventilador de teto</b>. A <b>Lanchonete</b> e a <b>Loja de Roupas da Vila</b> mudaram para o lado do bar.',d:(g,t)=>novEmo(g,t,'🍺','🍻 💡 🎶')},
+ {t:'🛒 Compre um quiosque na praça',x:'4 quiosques à venda: <b>🍿 Pipoca</b> e <b>📰 Banca</b> (R$ 30 mil), <b>🥟 Pastel e caldo de cana</b> (R$ 40 mil) e <b>🍇 Açaí</b> (R$ 50 mil). Compre mercadoria, escolha o preço e ganhe <b>lucro por produto vendido</b> — os moradores compram mesmo com você offline. Tem <b>painel de lucros</b>! (a partir do nível 8, um comércio por pessoa)',d:(g,t)=>novEmo(g,t,'🛒','🍿 🍇 🥟 📰')}
 ];
 let novAnim=null,NOV_OFF=null;
 async function mostrarNovidades(){if(!eu||document.getElementById('novid'))return;const kk='cidadeTonhao.novid.'+NOVID+'.'+eu.id;try{if(localStorage.getItem(kk))return}catch(_){}
@@ -7309,7 +7309,7 @@ function verPerfil(r){if(!r)return;const me=r===eu||(eu&&r.id===eu.id);if(me)r=e
 $('cardSocial').onclick=()=>{if(selected&&selected.isPlayer)verPerfil(selected)};
 
 /* ----- aviso de versão nova do site ----- */
-const VERSAO_JOGO='v20261130a';
+const VERSAO_JOGO='v20261130b';
 setInterval(()=>{if(location.protocol!=='https:')return;fetch('/?nv='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{if(t.includes("VERSAO_JOGO='v")&&!t.includes(VERSAO_JOGO))confirmar('🆕 Atualização!','Saiu uma versão nova da cidade. Recarregue para jogar com as novidades.',()=>location.reload())}).catch(()=>{})},180000);
 
 /* ----- menu lateral, empregos e boas-vindas ----- */
